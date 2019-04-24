@@ -472,6 +472,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Users/manager_dashboard');
 		$this->Acl->allow($group, 'controllers/Users/profile');
 		$this->Acl->allow($group, 'controllers/Users/edit');
+		$this->Acl->allow($group, 'controllers/SiteInspections');
 
 		//Allow Reviewers
 		$group->id = 3;

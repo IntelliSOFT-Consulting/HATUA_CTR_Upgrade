@@ -285,7 +285,7 @@ public function index() {
 			'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
 				'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
 				'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-				'AnnualApproval', 'Document', 'Review'
+				'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
 				// => array('conditions' => array('Review.type' => 'response'))
 				))));
 		$this->set('counties', $this->Application->SiteDetail->County->find('list'));

@@ -107,7 +107,13 @@
             echo $this->Html->link('<i class="icon-flag"></i> Trial Statuses',
               array('controller' => 'trial_statuses', 'action' => 'index', 'admin' => true), array('escape' => false));
             ?>
-            </li>
+            </li>            
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-question-sign"></i> Site Questions',
+          array('controller' => 'site_questions', 'action' => 'index', 'admin' => true), array('escape' => false));
+        ?>
+        </li>
              <li class="divider"></li>
         </ul>
        </li>

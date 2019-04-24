@@ -119,6 +119,12 @@
           array('controller' => 'trial_statuses', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-question-sign"></i> Site Questions <small class="muted">(Site inspection questions)</small>',
+          array('controller' => 'site_questions', 'action' => 'index', 'admin' => true), array('escape' => false));
+        ?>
+        </li>
       </ul>
     </div>
       </div> <!-- /row -->

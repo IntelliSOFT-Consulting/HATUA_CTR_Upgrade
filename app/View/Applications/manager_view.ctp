@@ -35,6 +35,11 @@
                    if($application['Application']['approved'] == 2) echo 'Approved';
                    elseif($application['Application']['approved'] == 1) echo 'Rejected';
                    ?>)</small></a></li>
+          <?php
+            if($application['Application']['approved'] == 2) {
+              echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections</a></li>';
+            }
+          ?>
       </ul>
       <div class="tab-content my-tab-content">
         <div class="tab-pane active" id="tab1">
@@ -130,6 +135,14 @@
            echo "<hr>";
 
            echo $this->Form->postLink(__('<i class="icon-trash"></i> Delete'), array('action' => 'delete', $application['Application']['id']), array('escape' => false, 'class' => 'btn btn-danger'), __('Are you sure you want to delete Application # %s? You will not be able to recover it later.', $application['Application']['id']));
+
+            if ($application['Application']['approved'] == 2) {
+               echo "<hr>";                
+               echo $this->Html->link(__('<i class="icon-search"></i> Site Inspection'),
+                      array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
+                      array('escape' => false, 'class' => 'btn btn-info'));
+            }
+
            ?>
       </div>
       <?php
@@ -366,6 +379,28 @@
        </div>
        </div>
     </div>
+
+
+    <?php
+      if($application['Application']['approved'] == 2) { 
+    ?>
+      <div class="tab-pane" id="tab6">
+          <ul class="dl-horizontal">
+              <?php
+                foreach ($application['SiteInspection'] as $site_inspection) {
+                  echo "<li>".$site_inspection['study_title']."</li>";
+                  echo "<li>".$site_inspection['protocol_no']."</li>";
+                  foreach ($site_inspection['SiteAnswer'] as $site_answer) {                    
+                    echo "<li>".$site_answer['question']."</li>";
+                  }
+                }
+              ?>
+          </ul>
+      </div>
+    <?php     
+      }
+    ?>
+
 
 </div>
 </div>
