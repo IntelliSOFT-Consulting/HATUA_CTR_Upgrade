@@ -1,0 +1,12 @@
+/*HIDE LABELS AND REMOVE MARGINS FOR CONTROLS IN AMENDMENTS*/
+/*.form-horizontal .control-label {
+    display: none;
+    width: 0px;
+}
+.form-horizontal .control-group {
+    margin-bottom: 10px;
+}
+.form-horizontal .controls {
+    margin-left: 0px;
+}
+*/
