@@ -36,9 +36,7 @@
                    elseif($application['Application']['approved'] == 1) echo 'Rejected';
                    ?>)</small></a></li>
           <?php
-            if($application['Application']['approved'] == 2) {
               echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections</a></li>';
-            }
           ?>
       </ul>
       <div class="tab-content my-tab-content">
@@ -380,26 +378,169 @@
        </div>
     </div>
 
+    <div class="tab-pane" id="tab6">   
+      <div class="row-fluid">
+        <div class="span12">
 
-    <?php
-      if($application['Application']['approved'] == 2) { 
-    ?>
-      <div class="tab-pane" id="tab6">
-          <ul class="dl-horizontal">
-              <?php
-                foreach ($application['SiteInspection'] as $site_inspection) {
-                  echo "<li>".$site_inspection['study_title']."</li>";
-                  echo "<li>".$site_inspection['protocol_no']."</li>";
-                  foreach ($site_inspection['SiteAnswer'] as $site_answer) {                    
-                    echo "<li>".$site_answer['question']."</li>";
+
+          <h2 style="text-align: center;"> AVAREF</h2>   
+          <hr class="soften" style="margin: 10px 0px;">
+          <?php
+            foreach ($application['SiteInspection'] as $site_inspection) {
+          ?>
+
+          <?php
+            echo $this->Form->create('SiteInspection', array(
+                  'url' => array('controller' => 'site_inspections','action' => 'edit', $site_inspection['id']),
+                  'type' => 'file',
+                  'class' => 'form-inline',
+                  'inputDefaults' => array(
+                    // 'div' => array('class' => 'control-group'),
+                    'label' => array('class' => 'control-label'),
+                    // 'between' => '<div class="controls">',
+                    // 'after' => '</div>',
+                    'class' => '',
+                    'format' => array('before', 'label', 'between', 'input', 'after','error'),
+                    'error' => array('attributes' => array( 'class' => 'controls help-block')),
+                   ),
+            ));
+            // echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
+            echo $this->Form->input('id', array('value' => $site_inspection['id'], 'type' => 'hidden'));
+          ?>
+
+          <h3>Part 1: General Information</h3>
+
+            <table class="table table-bordered">
+              <tbody>
+                  <tr>
+                    <th class="my-well">Study Title</th>
+                    <td><?php echo $site_inspection['study_title'];?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Protocol number and version</th>
+                    <td><?php echo $site_inspection['protocol_no'];?><br/><?php echo $site_inspection['version_no'];?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">PACTR Registration number</th>
+                    <td><?php echo $this->Form->input('pactr_number', array('label' => false)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Phase of trial</th>
+                    <td><?php echo $this->Form->input('trial_phase', array('label' => false)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Investigator(s)</th>
+                    <td><?php echo $this->Form->input('investigators', array('label' => false, 'rows' => 2)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Co-investigator(s)</th>
+                    <td><?php echo $this->Form->input('co_investigators', array('label' => false, 'rows' => 2)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Stage of study inspected:</th>
+                    <td>
+                      <?php
+                          echo $this->Form->input('study_stage',
+                                array('type' => 'select', 'empty' => false,
+                                  'options' =>  array('Before trial commencement' => 'Before trial commencement', 'During clinical conduct' => 'During clinical conduct', 
+                                                      'After completion of trial' => 'After completion of trial'), 
+                                  'label' => false));
+                      ?>                      
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Country where the study is inspected</th>
+                    <td><?php echo $this->Form->input('inspection_country', array('label' => false, 'rows' => 2)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Names of Inspectors, and countries represented</th>
+                    <td><?php echo $this->Form->input('inspector_names', array('label' => false, 'rows' => 2)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Date of Inspection</th>
+                    <td><?php echo $this->Form->input('inspection_date', array('label' => false)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Name and address of the clinical site</th>
+                    <td><?php echo $this->Form->input('site_address', array('label' => false, 'rows' => 2)); ?></td>
+                  </tr>
+                  <tr>
+                    <th class="my-well">Name and address of laboratories (clinical, bio-analytical)</th>
+                    <td><?php echo $this->Form->input('lab_address', array('label' => false, 'rows' => 2)); ?></td>
+                  </tr>
+              </tbody>
+            </table>
+              <table class="table table-bordered table-condensed">
+              <thead><th></th><th></th><th width="20%"></th><th></th></thead>
+              <tbody>
+                  <?php
+                  // foreach ($site_inspection['SiteAnswer'] as $site_answer) { 
+                  for ($i = 0; $i <= count($site_inspection['SiteAnswer'])-1; $i++) {
+                      echo $this->Form->input('SiteAnswer.'.$i.'.id', array('type' => 'hidden', 'value' => $site_inspection['SiteAnswer'][$i]['id']));
+                      echo $this->Form->input('SiteAnswer.'.$i.'.site_inspection_id', array('type' => 'hidden', 'value' => $site_inspection['id']));
+                      if ($site_inspection['SiteAnswer'][$i]['question_type'] == 'section') {
+                           echo "<tr class='success'><td colspan='4'><strong>".$site_inspection['SiteAnswer'][$i]['question']."</strong></td></tr>";                     
+                      } elseif ($site_inspection['SiteAnswer'][$i]['question_type'] == 'comment') {
+                          echo "<tr><td colspan='2'>"; 
+                              echo $this->Form->input('SiteAnswer.'.$i.'.comment', array('label' => false, 'rows' => 1));
+                              echo '</td>';
+                          echo "<td colspan='2'>"; 
+                             echo $this->Form->input('SiteAnswer.'.$i.'.finding',
+                              array('type' => 'select', 'empty' => true,
+                                'options' =>  array('major' => 'major', 'minor' => 'minor', 'critical' => 'critical'), 
+                                'label' => false));
+                          echo "</td></tr>"; 
+                      } else {                    
+                           echo "<tr><td>".$site_inspection['SiteAnswer'][$i]['question_number']."</td>";   
+                              echo "<td>".$site_inspection['SiteAnswer'][$i]['question']."</td>"; 
+                              echo "<td>";
+                              echo $this->Form->input('SiteAnswer.'.$i.'.answer', array(
+                                'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                                'class' => 'answer',
+                                'before' => '
+                                  <input type="hidden" value="" id="ApplicationApproved_" name="data[SiteInspection][0][SiteAnswer][answer]"> <label class="radio inline">',
+                                'after' => '</label>',
+                                'options' => array(2 => 'Yes'),
+                              ));                          
+                              echo $this->Form->input('SiteAnswer.'.$i.'.answer', array(
+                                'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'answer',
+                                'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                                'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+                                'before' => '<label class="radio inline">',
+                                'after' => '</label>
+                                      <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                                      onclick="$(\'.answer\').removeAttr(\'checked disabled\')">
+                                      <em class="accordion-toggle">clear!</em></a> </span>
+                                     ',
+                                'options' => array(1 => 'No'),
+                              ));
+                              echo "</td>";
+                              echo "<td>";
+                              echo $this->Form->input('SiteAnswer.'.$i.'.comment', array('label' => false, 'rows' => 1));
+                              echo '</td></tr>';
+                      }
                   }
-                }
-              ?>
-          </ul>
-      </div>
-    <?php     
-      }
-    ?>
+
+                  ?>     
+               </tbody>        
+              </table>
+                  <div class="controls">
+                  <?php
+                    echo $this->Form->button('<i class="icon-save"></i> Submit', array(
+                        'name' => 'submit',
+                        'class' => 'btn btn-primary'
+                      ));
+                    ?>
+                  </div>
+                  <?php
+                      echo $this->Form->end();
+                   ?>   
+          </div>
+        </div>
+      <?php
+        }
+      ?>
+    </div>
 
 
 </div>
