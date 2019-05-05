@@ -24,6 +24,13 @@ class SiteInspection extends AppModel {
  * @var array
  */
 	public $belongsTo = array(
+		'User' => array(
+			'className' => 'User',
+			'foreignKey' => 'user_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
 		'Application' => array(
 			'className' => 'Application',
 			'foreignKey' => 'application_id',

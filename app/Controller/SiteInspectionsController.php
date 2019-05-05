@@ -14,10 +14,10 @@ class SiteInspectionsController extends AppController {
  *
  * @return void
  */
-	public function index() {
-		$this->SiteInspection->recursive = 0;
-		$this->set('siteInspections', $this->paginate());
-	}
+    public function index() {
+        $this->SiteInspection->recursive = 0;
+        $this->set('siteInspections', $this->paginate());
+    }
 
 /**
  * view method
@@ -26,42 +26,89 @@ class SiteInspectionsController extends AppController {
  * @param string $id
  * @return void
  */
-	public function view($id = null) {
-		$this->SiteInspection->id = $id;
-		if (!$this->SiteInspection->exists()) {
-			throw new NotFoundException(__('Invalid site inspection'));
-		}
-		$this->set('siteInspection', $this->SiteInspection->read(null, $id));
-	}
+    public function view($id = null) {
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        $this->set('siteInspection', $this->SiteInspection->read(null, $id));
+    }
 
+    public function manager_view($id = null) {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
+        }
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
+                // => array('conditions' => array('Review.type' => 'response'))
+                )));
+        $this->set('application', $application);
+        $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+
+        $this->request->data = $application;
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'SiteInspection_' . $this->params['named']['inspection_id'],  'orientation' => 'portrait');
+        }
+    }
 /**
  * add method
  *
  * @return void
  */
-	public function manager_add($application_id = null) {
-		// if ($this->request->is('post')) {
-			$this->SiteInspection->create();
-			// $application = $this->SiteInspection->Application->read(null, $application_id);
-			$application = $this->Application->find('first', array(
-		        'conditions' => array('Application.id' => $application_id)
-		    ));
-			$all_questions = $this->SiteQuestion->find('all');
-			$answers = [];
-			foreach ($all_questions as $question) {
-				$dpoint = ['question_type' => $question['SiteQuestion']['question_type'], 'question_number' => $question['SiteQuestion']['question_number'], 
-						   'question' => $question['SiteQuestion']['question']];
-				$answers[] = $dpoint;
-			}
-			$data = array('application_id' => $application_id, 'study_title' => $application['Application']['study_title'], 'protocol_no' => $application['Application']['protocol_no']);
-			if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
-				$this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
-				$this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id));
-			} else {
-				$this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
-			}
-		// }
-	}
+    public function manager_add($application_id = null) {
+        // if ($this->request->is('post')) {
+            $this->SiteInspection->create();
+            // $application = $this->SiteInspection->Application->read(null, $application_id);
+            $application = $this->Application->find('first', array(
+                'conditions' => array('Application.id' => $application_id)
+            ));
+            $all_questions = $this->SiteQuestion->find('all');
+            $answers = [];
+            foreach ($all_questions as $question) {
+                $dpoint = ['question_type' => $question['SiteQuestion']['question_type'], 'question_number' => $question['SiteQuestion']['question_number'], 
+                           'question' => $question['SiteQuestion']['question']];
+                $answers[] = $dpoint;
+            }
+            $trial = ""; $inspection_country = ""; $investigators = ""; $co_investigators = "";
+            $trial .= ($application['Application']['trial_human_pharmacology'] == 1) ? "Human pharmacology (Phase I) : \n" : null;
+            $trial .= ($application['Application']['trial_administration_humans'] == 1) ? "First administration to humans\n" : null;
+            $trial .= ($application['Application']['trial_bioequivalence_study'] == 1) ? "Bioequivalence study\n" : null;
+            $trial .= ($application['Application']['trial_other'] == 1) ? "Other : ".$application['Application']['trial_other_specify'] : null;
+            $trial .= ($application['Application']['trial_therapeutic_exploratory'] == 1) ? "Therapeutic exploratory (Phase II)\n" : null;
+            $trial .= ($application['Application']['trial_therapeutic_confirmatory'] == 1) ? "Therapeutic confirmatory (Phase III)\n" : null;
+            $trial .= ($application['Application']['trial_therapeutic_use'] == 1) ? "Therapeutic use (Phase IV)\n" : null;
+            $inspection_country .= ($application['Application']['single_site_member_state'] == 'Yes') ? "Kenya\n" : null;
+            $inspection_country .= ($application['Application']['multiple_sites_member_state'] == 'Yes') ? "Kenya\n" : null;
+            $inspection_country .= $application['Application']['multi_country_list'];
+            $investigators = $application['Application']['investigator1_given_name']." ".$application['Application']['investigator1_family_name'].
+                             "\nTel: ".$application['Application']['investigator1_telephone'].
+                             "\nEmail: ".$application['Application']['investigator1_email'];
+            foreach ($application['InvestigatorContact'] as $key => $value) {
+                $co_investigators .= ($key+1)." ".$value['given_name']." ".$value['family_name']." Email: ".$value['email']."\n";
+            }
+            $data = array('application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'study_title' => $application['Application']['study_title'], 
+                          'protocol_no' => $application['Application']['protocol_no'],
+                          'trial_phase' => $trial, 'investigators' => $investigators, 'co_investigators' => $co_investigators, 'inspection_country' => $inspection_country);
+            if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
+                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $this->SiteInspection->id));
+            } else {
+                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        // }
+    }
 
 /**
  * edit method
@@ -70,22 +117,34 @@ class SiteInspectionsController extends AppController {
  * @param string $id
  * @return void
  */
-	public function edit($id = null) {
-		$this->SiteInspection->id = $id;
-		if (!$this->SiteInspection->exists()) {
-			throw new NotFoundException(__('Invalid site inspection'));
-		}
-		if ($this->request->is('post') || $this->request->is('put')) {
-			if ($this->SiteInspection->save($this->request->data)) {
-				$this->Session->setFlash(__('The site inspection has been saved'));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'));
-			}
-		} else {
-			$this->request->data = $this->SiteInspection->read(null, $id);
-		}
-	}
+    public function manager_edit($id = null, $application_id = null) {
+        // debug($this->request);
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->SiteInspection->saveMany($this->request->data['SiteInspection'], array('deep' => true))) {
+                if (isset($this->request->data['submitReport'])) {
+                    $this->SiteInspection->saveField('approved', 1);
+                }
+                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $id));
+            } else {
+                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        } else {
+            $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
+                // => array('conditions' => array('Review.type' => 'response'))
+                )));
+            $this->request->data = $application;
+        }
+    }
 
 /**
  * delete method
@@ -95,19 +154,19 @@ class SiteInspectionsController extends AppController {
  * @param string $id
  * @return void
  */
-	public function delete($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
-		$this->SiteInspection->id = $id;
-		if (!$this->SiteInspection->exists()) {
-			throw new NotFoundException(__('Invalid site inspection'));
-		}
-		if ($this->SiteInspection->delete()) {
-			$this->Session->setFlash(__('Site inspection deleted'));
-			$this->redirect(array('action' => 'index'));
-		}
-		$this->Session->setFlash(__('Site inspection was not deleted'));
-		$this->redirect(array('action' => 'index'));
-	}
+    public function delete($id = null) {
+        if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        if ($this->SiteInspection->delete()) {
+            $this->Session->setFlash(__('Site inspection deleted'));
+            $this->redirect(array('action' => 'index'));
+        }
+        $this->Session->setFlash(__('Site inspection was not deleted'));
+        $this->redirect(array('action' => 'index'));
+    }
 }
