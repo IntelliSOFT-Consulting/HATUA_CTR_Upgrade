@@ -380,7 +380,7 @@
 
     <div class="tab-pane" id="tab6">   
       <div class="row-fluid">
-        <div class="span12">         
+        <div class="span12">
 
           <?php
             echo $this->element('/application/inspection_edit');

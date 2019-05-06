@@ -41,17 +41,17 @@ class GroupsController extends AppController {
  *
  * @return void
  */
-	// public function add() {
-	// 	if ($this->request->is('post')) {
-	// 		$this->Group->create();
-	// 		if ($this->Group->save($this->request->data)) {
-	// 			$this->Session->setFlash(__('The group has been saved'));
-	// 			$this->redirect(array('action' => 'index'));
-	// 		} else {
-	// 			$this->Session->setFlash(__('The group could not be saved. Please, try again.'));
-	// 		}
-	// 	}
-	// }
+	public function add() {
+		if ($this->request->is('post')) {
+			$this->Group->create();
+			if ($this->Group->save($this->request->data)) {
+				$this->Session->setFlash(__('The group has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The group could not be saved. Please, try again.'));
+			}
+		}
+	}
 
 /**
  * edit method

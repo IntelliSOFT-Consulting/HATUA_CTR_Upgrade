@@ -161,6 +161,7 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
 					if($this->Session->read('Auth.User.group_id') == '3') echo $this->element('menus/reviewer_menu');
 					if($this->Session->read('Auth.User.group_id') == '4') echo $this->element('menus/partner_menu');
 					if($this->Session->read('Auth.User.group_id') == '5') echo $this->element('menus/applicant_menu');
+					if($this->Session->read('Auth.User.group_id') == '6') echo $this->element('menus/inspector_menu');
 				}
 				echo $this->Session->flash();
 				echo $this->Session->flash('auth');

@@ -147,8 +147,8 @@
               </td>
               <td>
                 <?php
-                  //pr($this->request->params); //REMEMBER to limit this for administrators and managers only
-                  if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true') {
+                  //pr($this->request->params); //REMEMBER to limit this for administrators, managers and inspector only
+                  if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Form->input('users', array(
                         'type' => 'select', 'div' => false, 'class' => 'span12',
                         'empty' => true,

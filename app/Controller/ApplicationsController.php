@@ -95,7 +95,30 @@ public function index() {
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
+    }
 
+    public function inspector_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+            $criteria = $this->Application->parseCriteria($this->passedArgs);
+            if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Application.created' => 'desc');
+
+        $this->paginate['contain'] = array(
+            'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
+            'InvestigatorContact', 'SiteDetail' => array('County'));
+
+            $this->set('page_options', $page_options);
+            $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+            $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
     }
 
     public function reviewer_index() {
@@ -299,6 +322,35 @@ public function index() {
         }
     }
 
+    public function inspector_view($id = null) {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
+        }
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
+                // => array('conditions' => array('Review.type' => 'response'))
+                )));
+        $this->set('application', $application);
+        $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+
+        $this->request->data = $application;
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
+        }
+    }
+
     public function admin_view($id = null) {
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
@@ -388,6 +440,24 @@ public function index() {
     }
 
     public function manager_view_notification($id = null, $notification = null) {
+        $this->Application->id = $id;
+        if (!$this->Application->exists() || empty($notification)) {
+            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_info');
+            $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
+        } else {
+            $this->loadModel('Notification');
+            $this->Notification->id = $notification;
+            if($this->Notification->delete()) {
+                // $this->Session->setFlash(__('Click the assigned reviewers tab to view response.'), 'alerts/flash_success');
+                $this->redirect(array('action' => 'view', $id));
+            } else {
+                // $this->Session->setFlash(__('Click the assigned reviewers tab to view response.'), 'alerts/flash_info');
+                $this->redirect(array('action' => 'view', $id));
+            }
+        }
+    }
+
+    public function inspector_view_notification($id = null, $notification = null) {
         $this->Application->id = $id;
         if (!$this->Application->exists() || empty($notification)) {
             $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_info');

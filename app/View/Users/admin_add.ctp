@@ -1,11 +1,11 @@
 <?php
-	$this->assign('Users', 'active');
+	$this->assign('Register', 'active');
 ?>
 
 <div class="row-fluid">
 	<div class="span12">
 		<div class="page-header">
-			<div class="styled_title"><h3>Edit <?php echo $this->request->data['User']['name'];?></h3></div>
+			<div class="styled_title"><h1>Create User</h1></div>
 		</div>
 	<?php
 		echo $this->Session->flash();
@@ -29,8 +29,6 @@
 	<div class="row-fluid">
 		<div class="span6">
 			<?php
-				echo $this->Form->input('id');
-				echo $this->Form->input('group_id');
 				echo $this->Form->input('username',
 					array('label' => array('class' => 'control-label required', 'text' => 'Username <span class="sterix">*</span>'),));
 				echo $this->Form->input('password',
@@ -46,8 +44,8 @@
 				));
 				echo $this->Form->input('phone_no',
 					array('label' => array('class' => 'control-label required', 'text' => 'Phone Number <span class="sterix">*</span>'),));
+				echo $this->Form->input('group_id');
 				echo $this->Form->input('is_active');
-
 				?>
 		</div><!--/span-->
 		<div class="span6">
@@ -67,7 +65,7 @@
 								));
 				echo $this->Form->input('country_id', array(
 					'empty' => true,
-					'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>'), ));
+					'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>') ));
 				?>
 		</div><!--/span-->
 	</div><!--/row-->
