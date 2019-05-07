@@ -403,6 +403,8 @@ $(function() {
         expires: 1
       }
   });
+    
+
   $(".morecontent").expander();
   $('#ReviewText').ckeditor();
   $('#ReviewRecommendation').ckeditor();

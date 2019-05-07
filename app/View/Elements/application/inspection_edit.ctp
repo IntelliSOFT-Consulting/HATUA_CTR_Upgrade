@@ -244,7 +244,7 @@ if(isset($this->params['named']['inspection_id'])) {
     <h2 style="text-align: center;"> AVAREF</h2>   
     <hr class="soften" style="margin: 10px 0px;">
     <ul class="nav nav-tabs">
-      <li><a href="#assessment_form" class="active" data-toggle="tab">Assessment Form</a></li>
+      <li class="active"><a href="#assessment_form" data-toggle="tab">Assessment Form</a></li>
       <li><a href="#summary_report" data-toggle="tab">Summary Report</a></li>
       <li><a href="#internal_comments" data-toggle="tab">Internal Comments</a></li>
       <li><a href="#external_comments" data-toggle="tab">PI Comments</a></li>
@@ -350,16 +350,19 @@ if(isset($this->params['named']['inspection_id'])) {
           </table>
       </div>
       <div class="tab-pane" id="summary_report">
+        <div class="page-header">
+          <div class="styled_title"><h3>Summary Report</h3></div>
+        </div>
           <?php
             echo $this->Form->create('SiteInspection', array(
                   'url' => array('controller' => 'site_inspections','action' => 'summary', $site_inspection['id'], $application['Application']['id']),
                   'type' => 'file',
-                  'class' => 'form-inline',
+                  'class' => 'form-horizontal',
                   'inputDefaults' => array(
-                    // 'div' => array('class' => 'control-group'),
+                    'div' => array('class' => 'control-group'),
                     'label' => array('class' => 'control-label'),
-                    // 'between' => '<div class="controls">',
-                    // 'after' => '</div>',
+                    'between' => '<div class="controls">',
+                    'after' => '</div>',
                     'class' => '',
                     'format' => array('before', 'label', 'between', 'input', 'after','error'),
                     'error' => array('attributes' => array( 'class' => 'controls help-block')),
@@ -367,16 +370,19 @@ if(isset($this->params['named']['inspection_id'])) {
             ));
             // echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
             echo $this->Form->input('SiteInspection.'.'0'.'.id', array('value' => $site_inspection['id'], 'type' => 'hidden'));
-            echo $this->Form->input('SiteInspection.'.'0'.'.conclusion');
-            echo $this->Form->input('SiteInspection.'.'0'.'.summary_report');
-            echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit summary', array(
-            'name' => 'submitSummary',
-            'onclick'=>"return confirm('Are you sure you wish to submit the summary report?');",
-            'class' => 'btn btn-primary mapop',
-            'id' => 'SummarySubmitReport', 'title'=>'Save and Submit Report',
-            'data-content' => 'Submit summary report.',
-            'div' => false,
-          ));
+            echo $this->Form->input('SiteInspection.'.'0'.'.conclusion',
+              array('label' => array('class' => 'control-label required', 'text' => 'Conclusion <span class="sterix">*</span>')));
+            echo $this->Form->input('SiteInspection.'.'0'.'.summary_report',
+              array('label' => array('class' => 'control-label required', 'text' => 'Summary Report <span class="sterix">*</span>')));
+            echo $this->Form->end(array(
+              'label' => 'Submit',
+              'value' => 'Save',
+              'class' => 'btn btn-primary',
+              'id' => 'LeloSaveChanges',
+              'div' => array(
+                'class' => 'form-actions',
+              )
+            ));
             echo $this->Form->end();
           ?>
       </div>
