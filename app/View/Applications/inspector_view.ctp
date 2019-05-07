@@ -28,13 +28,6 @@
                     }
                }
           ?>
-          <li><a href="#tab2" data-toggle="tab">Assigned Reviewers <small>(<?php echo $count_reviews;?>)</small></a></li>
-          <li><a href="#tab3" data-toggle="tab">Reviewer Comments  <small>(<?php echo $count_comments; ?>)</small></a></li>
-          <li><a href="#tab4" data-toggle="tab">My Reviews <small>(<?php echo $my_reviews; ?>)</small></a></li>
-          <li><a href="#tab5" data-toggle="tab">Approve / Reject <small>(<?php
-                   if($application['Application']['approved'] == 2) echo 'Approved';
-                   elseif($application['Application']['approved'] == 1) echo 'Rejected';
-                   ?>)</small></a></li>
           <?php
               echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections ('.count($application['SiteInspection']).')</a></li>';
           ?>

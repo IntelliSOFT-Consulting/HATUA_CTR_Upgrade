@@ -200,7 +200,7 @@ class SiteInspectionsController extends AppController {
                 if (isset($this->request->data['submitReport'])) {
                     $this->SiteInspection->saveField('approved', 1);
                     $results = Hash::extract($this->request->data['SiteInspection'], '{n}.SiteAnswer.{n}.finding');
-                    if (isset(array_count_values($results)['Major']) && array_count_values($results))['Major'] > 4 || array_count_values($results))['Critical'] > 0) {
+                    if (isset(array_count_values($results)['Major']) && array_count_values($results)['Major'] > 4 || array_count_values($results)['Critical'] > 0) {
                         $this->SiteInspection->saveField('conclusion', 'Site did not meet criterial!');
                     }
                 }

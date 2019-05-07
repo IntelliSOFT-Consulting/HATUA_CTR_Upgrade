@@ -1,4 +1,6 @@
 /app/Config/database.php
+/app/Config/appwide.php
+/app/Config/bootstrap.php
 /app/tmp
 /lib/Cake/Console/Templates/skel/tmp/
 /vendors
