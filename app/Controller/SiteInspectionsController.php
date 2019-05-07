@@ -221,6 +221,31 @@ class SiteInspectionsController extends AppController {
             $this->request->data = $application;
         }
     }
+    public function manager_summary($id = null, $application_id = null) {
+        // debug($this->request);
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->SiteInspection->saveMany($this->request->data['SiteInspection'], array('deep' => true))) {
+                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $id));
+            } else {
+                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        } else {
+            $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
+                // => array('conditions' => array('Review.type' => 'response'))
+                )));
+            $this->request->data = $application;
+        }
+    }
     
     public function inspector_edit($id = null, $application_id = null) {
         // debug($this->request);
