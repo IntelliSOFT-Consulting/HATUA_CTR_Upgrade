@@ -280,6 +280,19 @@ td.table-amendlabel:before {
   content: 'amendment field';
 }
 
+
+.amend-form {
+  background-color: #F9F9F9;
+  position: relative;
+  /*margin: 3px 0;*/
+  padding: 15px 15px 15px 15px;
+  /*padding-top: 19px;*/
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
 tr.table-viewlabel {
   /*border: 1px solid #DDDDDD;*/
   background-color: #F9F9F9;

@@ -243,11 +243,11 @@ if(isset($this->params['named']['inspection_id'])) {
 
     <h2 style="text-align: center;"> AVAREF</h2>   
     <hr class="soften" style="margin: 10px 0px;">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#assessment_form" data-toggle="tab">Assessment Form</a></li>
-      <li><a href="#summary_report" data-toggle="tab">Summary Report</a></li>
-      <li><a href="#internal_comments" data-toggle="tab">Internal Comments</a></li>
-      <li><a href="#external_comments" data-toggle="tab">PI Comments</a></li>
+    <ul id="assessment_tab" class="nav nav-tabs">
+      <li class="active"><a href="#assessment_form">Assessment Form</a></li>
+      <li><a href="#summary_report">Summary Report</a></li>
+      <li><a href="#internal_comments">Internal Comments</a></li>
+      <li><a href="#external_comments">PI Comments</a></li>
     </ul>
 
     <div class="tab-content">
@@ -350,43 +350,35 @@ if(isset($this->params['named']['inspection_id'])) {
           </table>
       </div>
       <div class="tab-pane" id="summary_report">
-        <div class="page-header">
-          <div class="styled_title"><h3>Summary Report</h3></div>
-        </div>
           <?php
-            echo $this->Form->create('SiteInspection', array(
-                  'url' => array('controller' => 'site_inspections','action' => 'summary', $site_inspection['id'], $application['Application']['id']),
-                  'type' => 'file',
-                  'class' => 'form-horizontal',
-                  'inputDefaults' => array(
-                    'div' => array('class' => 'control-group'),
-                    'label' => array('class' => 'control-label'),
-                    'between' => '<div class="controls">',
-                    'after' => '</div>',
-                    'class' => '',
-                    'format' => array('before', 'label', 'between', 'input', 'after','error'),
-                    'error' => array('attributes' => array( 'class' => 'controls help-block')),
-                   ),
-            ));
-            // echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-            echo $this->Form->input('SiteInspection.'.'0'.'.id', array('value' => $site_inspection['id'], 'type' => 'hidden'));
-            echo $this->Form->input('SiteInspection.'.'0'.'.conclusion',
-              array('label' => array('class' => 'control-label required', 'text' => 'Conclusion <span class="sterix">*</span>')));
-            echo $this->Form->input('SiteInspection.'.'0'.'.summary_report',
-              array('label' => array('class' => 'control-label required', 'text' => 'Summary Report <span class="sterix">*</span>')));
-            echo $this->Form->end(array(
-              'label' => 'Submit',
-              'value' => 'Save',
-              'class' => 'btn btn-primary',
-              'id' => 'LeloSaveChanges',
-              'div' => array(
-                'class' => 'form-actions',
-              )
-            ));
-            echo $this->Form->end();
+            echo $this->element('/application/inspection_summary', array('site_inspection' => $site_inspection, 'application' => $application, 'akey' => $akey));
           ?>
       </div>
-      <div class="tab-pane" id="internal_comments">...</div>
+      <div class="tab-pane" id="internal_comments">
+        <hr>
+        <div class="row-fluid">
+            <div class="span12">
+            <br>
+            <?php //if(strpos($this->request->here, 'pdf') !== false) { ?>
+              <div class="amend-form">
+                <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php echo $this->element('comments/list', ['comments' => $site_inspection['InternalComment']]) ?> 
+                  </div>
+                  <div class="span4 lefty">
+                    <?php  
+                          echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
+                                               'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add-from-site-inspection']]) 
+                    ?>
+                  </div>
+                </div>
+              </div>
+            <?php //} ?>
+            </div><!--/span-->
+        </div><!--/row-->
+      </div>
       <div class="tab-pane" id="external_comments">...</div>
     </div>
  
@@ -397,3 +389,31 @@ if(isset($this->params['named']['inspection_id'])) {
         }
       }
     ?>
+
+<script text="type/javascript">
+$.expander.defaults.slicePoint = 170;
+$(function() {
+    //https://stackoverflow.com/questions/18999501/bootstrap-3-keep-selected-tab-on-page-refresh
+    //from mcaz
+    $('#assessment_tab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+
+    $('#assessment_tab a').on("shown", function (e) {
+        var id = $(e.target).attr("href");
+        localStorage.setItem('assessmentTab', id)
+    });
+
+    var assessmentTab = localStorage.getItem('assessmentTab');
+    if (assessmentTab != null) {
+        console.log("select tab");
+        console.log($('#assessment_tab a[href="' + assessmentTab + '"]'));
+        $('#assessment_tab a[href="' + assessmentTab + '"]').tab('show');
+    }
+
+    var hashTab = $('#assessment_tab a[href="' + location.hash + '"]');
+    hashTab && hashTab.tab('show');
+    //end mcaz
+});
+</script>

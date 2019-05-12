@@ -1,4 +1,3 @@
-
 <?php echo $this->fetch('amendment-lead'); ?>
   <hr style="margin:5px;">
 
@@ -2025,7 +2024,7 @@ $(function() {
         $(this).tab('show');
     });
 
-    $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+    $('a[data-toggle="tab"]').on("shown", function (e) {
         var id = $(e.target).attr("href");
         localStorage.setItem('selectedTab', id)
     });

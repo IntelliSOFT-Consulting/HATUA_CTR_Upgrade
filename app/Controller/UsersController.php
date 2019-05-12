@@ -197,7 +197,12 @@ class UsersController extends AppController {
                     $this->Session->setFlash('Your account has been deactivated! Please contact PPB.', 'alerts/flash_error');
                     $this->redirect($this->Auth->logout());
                 }
+
+                 
                 // $this->redirect($this->Auth->redirect());
+                // if(strlen($this->Auth->redirect()) > 12) {
+                //     return $this->redirect($this->Auth->redirect());           
+                // }
                 if($this->Auth->User('group_id') == '1') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'admin' => true));
                 if($this->Auth->User('group_id') == '2') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'manager' => true));
                 if($this->Auth->User('group_id') == '3') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'reviewer' => true));

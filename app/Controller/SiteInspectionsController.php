@@ -201,7 +201,7 @@ class SiteInspectionsController extends AppController {
                     $this->SiteInspection->saveField('approved', 1);
                     $results = Hash::extract($this->request->data['SiteInspection'], '{n}.SiteAnswer.{n}.finding');
                     if (isset(array_count_values($results)['Major']) && array_count_values($results)['Major'] > 4 || array_count_values($results)['Critical'] > 0) {
-                        $this->SiteInspection->saveField('conclusion', 'Site did not meet criterial!');
+                        $this->SiteInspection->saveField('conclusion', 'Site did not meet criteria!');
                     }
                 }
                 $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
@@ -229,6 +229,9 @@ class SiteInspectionsController extends AppController {
         }
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->SiteInspection->saveMany($this->request->data['SiteInspection'], array('deep' => true))) {
+                if (isset($this->request->data['submitReport'])) {
+                    $this->SiteInspection->saveField('summary_approved', 1);
+                }
                 $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
                 $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $id));
             } else {
