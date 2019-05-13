@@ -1,7 +1,7 @@
 /app/Config/database.php
 /app/Config/appwide.php
 /app/Config/bootstrap.php
-app/webroot/media/
+/app/webroot/media/
 /app/tmp
 /lib/Cake/Console/Templates/skel/tmp/
 /vendors

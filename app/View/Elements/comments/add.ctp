@@ -8,7 +8,7 @@
     <div class="bs-example">
       <?php 
         // echo $this->Form->create(null, ['type' => 'file','url' => ['controller' => 'Comments', 'action' => $model['url']]]); 
-        echo $this->Form->create(null, array(
+        echo $this->Form->create('Comment', array(
             'url' => array('controller' => 'comments','action' => $model['url']),
             'type' => 'file',
             'class' => false,
@@ -21,15 +21,12 @@
                         echo $this->Form->input('category', ['type' => 'hidden', 'value' => $model['category']]);
                         echo $this->Form->input('user_id', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')]);
                         if(strpos($model['url'], 'committee') !== false) {
-                          echo $this->Form->input('sender', ['escape' => false, 'templates' => 'comment_form']);
+                          echo $this->Form->input('sender', ['escape' => false]);
                         } else {                          
                           echo $this->Form->input('sender', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.name')]);
                         }
                         echo $this->Form->input('subject', ['label' => 'Subject']);
-                        echo $this->Form->input('content', ['label' => 'Content', 'type' => 'textarea', 'templates' => 
-                              [
-                              'inputContainer' => '<div class="{{type}}{{required}}">{{content}}</div>',
-                              'textarea' => '<textarea class="form-control" rows=3 name="{{name}}"{{attrs}}>{{value}}</textarea>',]]);                     
+                        echo $this->Form->input('content', ['label' => 'Content', 'type' => 'textarea']);                     
                   ?>
                   <div class="row">
                       <div class="col-xs-12">

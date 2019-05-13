@@ -370,7 +370,7 @@ if(isset($this->params['named']['inspection_id'])) {
                     <?php  
                           echo $this->element('comments/add', [
                                    'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
-                                               'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add-from-site-inspection']]) 
+                                               'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add_si_internal']]) 
                     ?>
                   </div>
                 </div>
