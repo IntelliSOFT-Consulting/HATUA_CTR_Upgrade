@@ -67,13 +67,13 @@ class SiteInspection extends AppModel {
             'conditions' => array('Attachment.model' => 'SiteInspection', 'Attachment.group' => 'site_inspections'),
         ),
         'InternalComment' => array(
-            'className' => 'Comments',
+            'className' => 'Comment',
             'foreignKey' => 'foreign_key',
             'dependent' => true,
             'conditions' => array('InternalComment.model' => 'SiteInspection', 'InternalComment.category' => 'internal' ),
         ),
         'ExternalComment' => array(
-            'className' => 'Comments',
+            'className' => 'Comment',
             'foreignKey' => 'foreign_key',
             'dependent' => true,
             'conditions' => array('ExternalComment.model' => 'SiteInspection', 'ExternalComment.category' => 'external' ),

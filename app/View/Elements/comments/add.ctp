@@ -21,15 +21,15 @@
                         echo $this->Form->input('category', ['type' => 'hidden', 'value' => $model['category']]);
                         echo $this->Form->input('user_id', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')]);
                         if(strpos($model['url'], 'committee') !== false) {
-                          echo $this->Form->input('sender', ['escape' => false]);
+                          echo $this->Form->input('sender', ['label' => array('class' => 'required') ,'escape' => false]);
                         } else {                          
                           echo $this->Form->input('sender', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.name')]);
                         }
-                        echo $this->Form->input('subject', ['label' => 'Subject']);
-                        echo $this->Form->input('content', ['label' => 'Content', 'type' => 'textarea']);                     
+                        echo $this->Form->input('subject', ['label' => array('class' => 'required')]);
+                        echo $this->Form->input('content', ['label' => array('class' => 'required'), 'type' => 'textarea']);                     
                   ?>
-                  <div class="row">
-                      <div class="col-xs-12">
+                  <div class="row-fluid">
+                      <div class="span11">
                         <div class="uploadsTable">
                           <h6 class="muted"><b>Attach File(s) </b>
                               <button type="button" class="btn btn-primary btn-small addUpload">&nbsp;<i class="icon-plus"></i>&nbsp;</button>

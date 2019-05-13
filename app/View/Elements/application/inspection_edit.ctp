@@ -379,7 +379,34 @@ if(isset($this->params['named']['inspection_id'])) {
             </div><!--/span-->
         </div><!--/row-->
       </div>
-      <div class="tab-pane" id="external_comments">...</div>
+
+      <div class="tab-pane" id="external_comments">
+
+        <hr>
+        <div class="row-fluid">
+            <div class="span12">
+            <br>
+            <?php //if(strpos($this->request->here, 'pdf') !== false) { ?>
+              <div class="amend-form">
+                <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php echo $this->element('comments/list', ['comments' => $site_inspection['ExternalComment']]) ?> 
+                  </div>
+                  <div class="span4 lefty">
+                    <?php  
+                          echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
+                                               'model' => 'SiteInspection', 'category' => 'external', 'url' => 'add_si_external']]) 
+                    ?>
+                  </div>
+                </div>
+              </div>
+            <?php //} ?>
+            </div><!--/span-->
+        </div><!--/row-->
+
+      </div>
     </div>
  
     <!-- end view -->
