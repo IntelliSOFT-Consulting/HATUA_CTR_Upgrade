@@ -127,12 +127,10 @@
 
            echo $this->Form->postLink(__('<i class="icon-trash"></i> Delete'), array('action' => 'delete', $application['Application']['id']), array('escape' => false, 'class' => 'btn btn-danger'), __('Are you sure you want to delete Application # %s? You will not be able to recover it later.', $application['Application']['id']));
 
-            if ($application['Application']['approved'] == 2) {
-               echo "<hr>";                
-               echo $this->Html->link(__('<i class="icon-search"></i> Site Inspection'),
-                      array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
-                      array('escape' => false, 'class' => 'btn btn-info'));
-            }
+           echo "<hr>";                
+           echo $this->Html->link(__('<i class="icon-search"></i> Site Inspection'),
+                  array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
+                  array('escape' => false, 'class' => 'btn btn-info'));
 
            ?>
       </div>

@@ -30,7 +30,10 @@
     <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
-          <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments  <small>(<?php echo $reviewers_comments;?>)</small></a></li>
+          <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments  <small>(<?php echo $reviewers_comments;?>)</small></a></li>          
+          <?php
+              echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections ('.count($application['SiteInspection']).')</a></li>';
+          ?>
       </ul>
       <div class="tab-content my-tab-content">
         <div class="tab-pane active" id="tab1">
@@ -181,6 +184,19 @@ $this->end();
           </div>
        </div>
     </div>
+
+    <div class="tab-pane" id="tab6">   
+      <div class="row-fluid">
+        <div class="span12">
+
+          <?php
+            echo $this->element('/application/inspection_edit');
+          ?>
+
+          </div>
+      </div>
+    </div>
+
 </div>
 </div>
 

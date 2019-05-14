@@ -38,33 +38,45 @@ class CommentsController extends AppController {
  *
  * @return void
  */
-    public function manager_add_si_internal() {
+    private function add_si_internal() {
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
                 $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'));
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             }
         }
         $users = $this->Comment->User->find('list');
         $this->set(compact('users'));
     }
-    public function manager_add_si_external() {
+    private function add_si_external() {
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
                 $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'));
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             }
         }
         $users = $this->Comment->User->find('list');
         $this->set(compact('users'));
+    }
+    public function manager_add_si_internal() {
+        $this->add_si_internal();
+    }
+    public function manager_add_si_external() {
+        $this->add_si_external();
+    }
+    public function inspector_add_si_internal() {
+        $this->add_si_internal();
+    }
+    public function inspector_add_si_external() {
+        $this->add_si_external();
     }
 
 /**

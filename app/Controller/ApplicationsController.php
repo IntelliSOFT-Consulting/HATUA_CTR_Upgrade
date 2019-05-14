@@ -293,7 +293,7 @@ public function index() {
         
     }
 
-    public function manager_view($id = null) {
+    private function aview($id = null) {
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
             $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
@@ -310,7 +310,6 @@ public function index() {
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
                 'AnnualApproval', 'Document', 'Review', 'SiteInspection', 
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'))
-                // => array('conditions' => array('Review.type' => 'response'))
                 )));
         $this->set('application', $application);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -322,34 +321,11 @@ public function index() {
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
         }
     }
-
+    public function manager_view($id = null) {
+        $this->aview($id);
+    }
     public function inspector_view($id = null) {
-        $this->Application->id = $id;
-        if (!$this->Application->exists()) {
-            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
-            $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
-        }
-
-        $trial_statuses = $this->Application->TrialStatus->find('list');
-        $this->set(compact('trial_statuses'));
-
-        $application = $this->Application->find('first', array(
-            'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
-                // => array('conditions' => array('Review.type' => 'response'))
-                )));
-        $this->set('application', $application);
-        $this->set('counties', $this->Application->SiteDetail->County->find('list'));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
-
-        $this->request->data = $application;
-
-        if (strpos($this->request->url, 'pdf') !== false) {
-            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
-        }
+        $this->aview($id);
     }
 
     public function admin_view($id = null) {
@@ -866,11 +842,22 @@ public function index() {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail',
-                'Organization', 'Placebo', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                    'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee',
-                    'Attachment', 'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')),
-                )));
+            'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'SiteInspection', 
+                'SiteInspection' => array(
+                        'conditions' => array('SiteInspection.summary_approved' => 2),
+                        'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')
+                    )
+                )
+            // 'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail',
+            //     'Organization', 'Placebo', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+            //         'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee',
+            //         'Attachment', 'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')),
+            //     )
+            )
+        );
         if($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('id'),'debug');
             $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');

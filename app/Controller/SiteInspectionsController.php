@@ -96,90 +96,52 @@ class SiteInspectionsController extends AppController {
  *
  * @return void
  */
+    private function add($application_id = null) {
+        $this->SiteInspection->create();
+        // $application = $this->SiteInspection->Application->read(null, $application_id);
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id)
+        ));
+        $all_questions = $this->SiteQuestion->find('all');
+        $answers = [];
+        foreach ($all_questions as $question) {
+            $dpoint = ['question_type' => $question['SiteQuestion']['question_type'], 'question_number' => $question['SiteQuestion']['question_number'], 
+                       'question' => $question['SiteQuestion']['question']];
+            $answers[] = $dpoint;
+        }
+        $trial = ""; $inspection_country = ""; $investigators = ""; $co_investigators = "";
+        $trial .= ($application['Application']['trial_human_pharmacology'] == 1) ? "Human pharmacology (Phase I) : \n" : null;
+        $trial .= ($application['Application']['trial_administration_humans'] == 1) ? "First administration to humans\n" : null;
+        $trial .= ($application['Application']['trial_bioequivalence_study'] == 1) ? "Bioequivalence study\n" : null;
+        $trial .= ($application['Application']['trial_other'] == 1) ? "Other : ".$application['Application']['trial_other_specify'] : null;
+        $trial .= ($application['Application']['trial_therapeutic_exploratory'] == 1) ? "Therapeutic exploratory (Phase II)\n" : null;
+        $trial .= ($application['Application']['trial_therapeutic_confirmatory'] == 1) ? "Therapeutic confirmatory (Phase III)\n" : null;
+        $trial .= ($application['Application']['trial_therapeutic_use'] == 1) ? "Therapeutic use (Phase IV)\n" : null;
+        $inspection_country .= ($application['Application']['single_site_member_state'] == 'Yes') ? "Kenya\n" : null;
+        $inspection_country .= ($application['Application']['multiple_sites_member_state'] == 'Yes') ? "Kenya\n" : null;
+        $inspection_country .= $application['Application']['multi_country_list'];
+        $investigators = $application['Application']['investigator1_given_name']." ".$application['Application']['investigator1_family_name'].
+                         "\nTel: ".$application['Application']['investigator1_telephone'].
+                         "\nEmail: ".$application['Application']['investigator1_email'];
+        foreach ($application['InvestigatorContact'] as $key => $value) {
+            $co_investigators .= ($key+1)." ".$value['given_name']." ".$value['family_name']." Email: ".$value['email']."\n";
+        }
+        $data = array('application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'study_title' => $application['Application']['study_title'], 
+                      'protocol_no' => $application['Application']['protocol_no'],
+                      'trial_phase' => $trial, 'investigators' => $investigators, 'co_investigators' => $co_investigators, 'inspection_country' => $inspection_country);
+        if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
+            $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $this->SiteInspection->id));
+        } else {
+            $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
+        }
+    }
     public function manager_add($application_id = null) {
-        // if ($this->request->is('post')) {
-            $this->SiteInspection->create();
-            // $application = $this->SiteInspection->Application->read(null, $application_id);
-            $application = $this->Application->find('first', array(
-                'conditions' => array('Application.id' => $application_id)
-            ));
-            $all_questions = $this->SiteQuestion->find('all');
-            $answers = [];
-            foreach ($all_questions as $question) {
-                $dpoint = ['question_type' => $question['SiteQuestion']['question_type'], 'question_number' => $question['SiteQuestion']['question_number'], 
-                           'question' => $question['SiteQuestion']['question']];
-                $answers[] = $dpoint;
-            }
-            $trial = ""; $inspection_country = ""; $investigators = ""; $co_investigators = "";
-            $trial .= ($application['Application']['trial_human_pharmacology'] == 1) ? "Human pharmacology (Phase I) : \n" : null;
-            $trial .= ($application['Application']['trial_administration_humans'] == 1) ? "First administration to humans\n" : null;
-            $trial .= ($application['Application']['trial_bioequivalence_study'] == 1) ? "Bioequivalence study\n" : null;
-            $trial .= ($application['Application']['trial_other'] == 1) ? "Other : ".$application['Application']['trial_other_specify'] : null;
-            $trial .= ($application['Application']['trial_therapeutic_exploratory'] == 1) ? "Therapeutic exploratory (Phase II)\n" : null;
-            $trial .= ($application['Application']['trial_therapeutic_confirmatory'] == 1) ? "Therapeutic confirmatory (Phase III)\n" : null;
-            $trial .= ($application['Application']['trial_therapeutic_use'] == 1) ? "Therapeutic use (Phase IV)\n" : null;
-            $inspection_country .= ($application['Application']['single_site_member_state'] == 'Yes') ? "Kenya\n" : null;
-            $inspection_country .= ($application['Application']['multiple_sites_member_state'] == 'Yes') ? "Kenya\n" : null;
-            $inspection_country .= $application['Application']['multi_country_list'];
-            $investigators = $application['Application']['investigator1_given_name']." ".$application['Application']['investigator1_family_name'].
-                             "\nTel: ".$application['Application']['investigator1_telephone'].
-                             "\nEmail: ".$application['Application']['investigator1_email'];
-            foreach ($application['InvestigatorContact'] as $key => $value) {
-                $co_investigators .= ($key+1)." ".$value['given_name']." ".$value['family_name']." Email: ".$value['email']."\n";
-            }
-            $data = array('application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'study_title' => $application['Application']['study_title'], 
-                          'protocol_no' => $application['Application']['protocol_no'],
-                          'trial_phase' => $trial, 'investigators' => $investigators, 'co_investigators' => $co_investigators, 'inspection_country' => $inspection_country);
-            if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
-                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
-                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $this->SiteInspection->id));
-            } else {
-                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
-            }
-        // }
+        $this->add($application_id);
     }
 
     public function inspector_add($application_id = null) {
-        // if ($this->request->is('post')) {
-            $this->SiteInspection->create();
-            // $application = $this->SiteInspection->Application->read(null, $application_id);
-            $application = $this->Application->find('first', array(
-                'conditions' => array('Application.id' => $application_id)
-            ));
-            $all_questions = $this->SiteQuestion->find('all');
-            $answers = [];
-            foreach ($all_questions as $question) {
-                $dpoint = ['question_type' => $question['SiteQuestion']['question_type'], 'question_number' => $question['SiteQuestion']['question_number'], 
-                           'question' => $question['SiteQuestion']['question']];
-                $answers[] = $dpoint;
-            }
-            $trial = ""; $inspection_country = ""; $investigators = ""; $co_investigators = "";
-            $trial .= ($application['Application']['trial_human_pharmacology'] == 1) ? "Human pharmacology (Phase I) : \n" : null;
-            $trial .= ($application['Application']['trial_administration_humans'] == 1) ? "First administration to humans\n" : null;
-            $trial .= ($application['Application']['trial_bioequivalence_study'] == 1) ? "Bioequivalence study\n" : null;
-            $trial .= ($application['Application']['trial_other'] == 1) ? "Other : ".$application['Application']['trial_other_specify'] : null;
-            $trial .= ($application['Application']['trial_therapeutic_exploratory'] == 1) ? "Therapeutic exploratory (Phase II)\n" : null;
-            $trial .= ($application['Application']['trial_therapeutic_confirmatory'] == 1) ? "Therapeutic confirmatory (Phase III)\n" : null;
-            $trial .= ($application['Application']['trial_therapeutic_use'] == 1) ? "Therapeutic use (Phase IV)\n" : null;
-            $inspection_country .= ($application['Application']['single_site_member_state'] == 'Yes') ? "Kenya\n" : null;
-            $inspection_country .= ($application['Application']['multiple_sites_member_state'] == 'Yes') ? "Kenya\n" : null;
-            $inspection_country .= $application['Application']['multi_country_list'];
-            $investigators = $application['Application']['investigator1_given_name']." ".$application['Application']['investigator1_family_name'].
-                             "\nTel: ".$application['Application']['investigator1_telephone'].
-                             "\nEmail: ".$application['Application']['investigator1_email'];
-            foreach ($application['InvestigatorContact'] as $key => $value) {
-                $co_investigators .= ($key+1)." ".$value['given_name']." ".$value['family_name']." Email: ".$value['email']."\n";
-            }
-            $data = array('application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'study_title' => $application['Application']['study_title'], 
-                          'protocol_no' => $application['Application']['protocol_no'],
-                          'trial_phase' => $trial, 'investigators' => $investigators, 'co_investigators' => $co_investigators, 'inspection_country' => $inspection_country);
-            if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
-                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
-                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $this->SiteInspection->id));
-            } else {
-                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
-            }
-        // }
+        $this->add($application_id);
     }
 
 /**
@@ -221,35 +183,7 @@ class SiteInspectionsController extends AppController {
             $this->request->data = $application;
         }
     }
-    public function manager_summary($id = null, $application_id = null) {
-        // debug($this->request);
-        $this->SiteInspection->id = $id;
-        if (!$this->SiteInspection->exists()) {
-            throw new NotFoundException(__('Invalid site inspection'));
-        }
-        if ($this->request->is('post') || $this->request->is('put')) {
-            if ($this->SiteInspection->saveMany($this->request->data['SiteInspection'], array('deep' => true))) {
-                if (isset($this->request->data['submitReport'])) {
-                    $this->SiteInspection->saveField('summary_approved', 1);
-                }
-                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
-                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $id));
-            } else {
-                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
-            }
-        } else {
-            $application = $this->Application->find('first', array(
-            'conditions' => array('Application.id' => $application_id),
-            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
-                // => array('conditions' => array('Review.type' => 'response'))
-                )));
-            $this->request->data = $application;
-        }
-    }
-    
+        
     public function inspector_edit($id = null, $application_id = null) {
         // debug($this->request);
         $this->SiteInspection->id = $id;
@@ -279,6 +213,40 @@ class SiteInspectionsController extends AppController {
         }
     }
 
+    public function summary($id = null, $application_id = null) {
+        // debug($this->request);
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->SiteInspection->saveMany($this->request->data['SiteInspection'], array('deep' => true))) {
+                if (isset($this->request->data['submitReport'])) {
+                    $this->SiteInspection->saveField('summary_approved', 1);
+                }
+                $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $id));
+            } else {
+                $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        } else {
+            $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
+                // => array('conditions' => array('Review.type' => 'response'))
+                )));
+            $this->request->data = $application;
+        }
+    }
+    public function manager_summary($id = null, $application_id = null) {
+        $this->summary($id, $application_id);
+    }
+    public function inspector_summary($id = null, $application_id = null) {
+        $this->summary($id, $application_id);
+    }
 /**
  * delete method
  *
