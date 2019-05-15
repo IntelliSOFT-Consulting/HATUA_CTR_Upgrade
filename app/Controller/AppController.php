@@ -68,6 +68,7 @@ class AppController extends Controller {
 										<button data-dismiss="alert" class="close">&times;</button>
 										<h4>Invalid e-mail / password combination.  Please try again.</h4>
 									 </div>', true);
+		$this->set('redir', $redir);
          // $this->Auth->authenticate = array(
          //     'all' => array (
          //         'scope' => array('User.is_active' => 1)

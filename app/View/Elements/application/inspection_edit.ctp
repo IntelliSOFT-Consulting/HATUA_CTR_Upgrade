@@ -5,7 +5,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Events summary</th>
+          <th>Inspector</th>
           <th>Status</th>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
@@ -17,7 +17,7 @@
         ?>
           <tr>
             <td><?php echo $site_inspection['id'] ?></td>
-            <td><?php echo $site_inspection['events_summary'] ?></td>
+            <td><?php echo $site_inspection['User']['name'] ?></td>
             <td><p><?php 
                     if($site_inspection['approved'] == 0) echo 'Unsubmitted';
                     elseif($site_inspection['approved'] == 1) echo 'Awaiting Peer Review';
@@ -31,9 +31,18 @@
                   echo $this->Html->link('<label class="label label-info">View</label>',
                                    array('action' => 'view', $application['Application']['id'], 'inspection_id' => $site_inspection['id']), array('escape'=>false));
                   echo "&nbsp;";
-                  echo $this->Html->link(__('<label class="label label-success">PDF</label>'),
+                  echo $this->Html->link(__('<label class="label">PDF</label>'),
                     array('controller' => 'site_inspections', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id'], 'inspection_id' => $site_inspection['id']),
                     array('escape' => false));
+                  echo "&nbsp;";
+
+                  if (($this->Session->read('Auth.User.group_id') === '2' or $this->Session->read('Auth.User.group_id') === '6') and 
+                          ($site_inspection['user_id'] !== $this->Session->read('Auth.User.id')) and
+                          $site_inspection['approved'] !== '2'
+                      ) {
+                      echo $this->Form->postLink(__('<label class="label label-success">Approve</label>'), array('controller' => 'site_inspections', 'action' => 'approve', $site_inspection['id'], 1), array('escape' => false), __('Are you sure you want to approve site inspection # %s?', $site_inspection['id']));
+                  }
+                  
                 } else {
                   echo $this->Html->link('<span class="label label-success"> Edit </span>',
                      array('action' => 'view', $application['Application']['id'], 'inspection_id' => $site_inspection['id']), array('escape'=>false));
@@ -127,12 +136,16 @@ if(isset($this->params['named']['inspection_id'])) {
           <td><?php echo $this->Form->input('SiteInspection.'.$akey.'.inspector_names', array('label' => false, 'rows' => 2)); ?></td>
         </tr>
         <tr>
-          <th class="my-well">Date of Inspection</th>
-          <td><?php echo $this->Form->input('SiteInspection.'.$akey.'.inspection_date', array('label' => false, 'dateFormat' => 'DMY')); ?></td>
+          <th class="my-well">Date(s) of Inspection</th>
+          <td><?php echo $this->Form->input('SiteInspection.'.$akey.'.inspection_dates', array('label' => false, 'rows' => 2)); ?></td>
         </tr>
         <tr>
           <th class="my-well">Name and address of the clinical site</th>
           <td><?php echo $this->Form->input('SiteInspection.'.$akey.'.site_address', array('label' => false, 'rows' => 2)); ?></td>
+        </tr>
+        <tr>
+          <th class="my-well">Name and address of the sponsor site</th>
+          <td><?php echo $this->Form->input('SiteInspection.'.$akey.'.sponsor_address', array('label' => false, 'rows' => 2)); ?></td>
         </tr>
         <tr>
           <th class="my-well">Name and address of laboratories (clinical, bio-analytical)</th>
@@ -297,7 +310,7 @@ if(isset($this->params['named']['inspection_id'])) {
               </tr>
               <tr>
                 <th class="my-well">Date of Inspection</th>
-                <td><?php echo $site_inspection['inspection_date']; ?></td>
+                <td><?php echo $site_inspection['inspection_dates']; ?></td>
               </tr>
               <tr>
                 <th class="my-well">Name and address of the clinical site</th>
