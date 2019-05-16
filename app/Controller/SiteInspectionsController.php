@@ -275,6 +275,7 @@ class SiteInspectionsController extends AppController {
         );
         $disp  = $site_inspection['SiteInspection'];
         $disp['SiteAnswer'] = $site_inspection['SiteAnswer'];
+        $disp['Attachment'] = $site_inspection['Attachment'];
         // $site_inspection  = $this->SiteInspection->read(null, $id);
         $this->set('site_inspection', $disp);
         $this->set('akey', $site_inspection['SiteInspection']['application_id']);
@@ -286,6 +287,31 @@ class SiteInspectionsController extends AppController {
     }
     public function inspector_download_assessment($id = null) {
         $this->download_assessment($id);
+    }
+    private function download_summary($id = null) {
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        $site_inspection = $this->SiteInspection->find('first', array(
+            'conditions' => array('SiteInspection.id' => $id),
+            'contain' => array('SiteAnswer', 'Attachment')
+            )
+        );
+        $disp  = $site_inspection['SiteInspection'];
+        $disp['SiteAnswer'] = $site_inspection['SiteAnswer'];
+        $disp['Attachment'] = $site_inspection['Attachment'];
+        // $site_inspection  = $this->SiteInspection->read(null, $id);
+        $this->set('site_inspection', $disp);
+        $this->set('akey', $site_inspection['SiteInspection']['application_id']);
+        $this->pdfConfig = array('filename' => 'Site_Inspection_Summary_' . $id,  'orientation' => 'portrait');
+        $this->render('download_summary');
+    }
+    public function manager_download_summary($id = null) {
+        $this->download_summary($id);
+    }
+    public function inspector_download_summary($id = null) {
+        $this->download_summary($id);
     }
 /**
  * delete method

@@ -86,9 +86,14 @@
       </div>
     </div>
     <div class="tab-pane" id="summary_report">
+      <div style="position: relative; border-top: 1px solid #ddd;">  
         <?php
+          echo $this->Html->link(__('<i class="icon-download-alt"></i> Download PDF'),
+                  array('controller' => 'site_inspections', 'ext' => 'pdf', 'action' => 'download_summary', $site_inspection['id']),
+                  array('escape' => false, 'class' => 'btn btn-small btn-info topright'));
           echo $this->element('/application/inspection_summary', array('site_inspection' => $site_inspection, 'akey' => $akey));
         ?>
+      </div>
     </div>
 
     <?php if($redir !== 'applicant') { ?>
