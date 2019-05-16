@@ -8,6 +8,7 @@ App::uses('AppModel', 'Model');
  */
 class SiteInspection extends AppModel {
 
+public $actsAs = array('Containable', 'Search.Searchable', 'SoftDelete');
 /**
  * Display field
  *

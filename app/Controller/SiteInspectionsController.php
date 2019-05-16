@@ -256,6 +256,38 @@ class SiteInspectionsController extends AppController {
     }
 
 /**
+ * download methods
+ *
+ * @throws MethodNotAllowedException
+ * @throws NotFoundException
+ * @param string $id
+ * @return void
+ */
+    private function download_assessment($id = null) {
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        $site_inspection = $this->SiteInspection->find('first', array(
+            'conditions' => array('SiteInspection.id' => $id),
+            'contain' => array('SiteAnswer', 'Attachment')
+            )
+        );
+        $disp  = $site_inspection['SiteInspection'];
+        $disp['SiteAnswer'] = $site_inspection['SiteAnswer'];
+        // $site_inspection  = $this->SiteInspection->read(null, $id);
+        $this->set('site_inspection', $disp);
+        $this->set('akey', $site_inspection['SiteInspection']['application_id']);
+        $this->pdfConfig = array('filename' => 'Site_Inspection_' . $id,  'orientation' => 'portrait');
+        $this->render('download_assessment');
+    }
+    public function manager_download_assessment($id = null) {
+        $this->download_assessment($id);
+    }
+    public function inspector_download_assessment($id = null) {
+        $this->download_assessment($id);
+    }
+/**
  * delete method
  *
  * @throws MethodNotAllowedException

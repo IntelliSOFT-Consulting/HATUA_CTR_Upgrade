@@ -10,7 +10,7 @@
   </div>
     <?php
       echo $this->Form->create('SiteInspection', array(
-            'url' => array('controller' => 'site_inspections','action' => 'summary', $site_inspection['id'], $application['Application']['id']),
+            'url' => array('controller' => 'site_inspections','action' => 'summary', $site_inspection['id'], $site_inspection['application_id']),
             'type' => 'file',
             'class' => 'form-horizontal',
             'inputDefaults' => array(
@@ -23,7 +23,6 @@
               'error' => array('attributes' => array( 'class' => 'controls help-block')),
              ),
       ));
-      // echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
       echo $this->Form->input('SiteInspection.'.$akey.'.id', array('value' => $site_inspection['id'], 'type' => 'hidden'));
       echo $this->Form->input('SiteInspection.'.$akey.'.conclusion',
         array('label' => array('class' => 'control-label required', 'text' => 'Conclusion <span class="sterix">*</span>')));

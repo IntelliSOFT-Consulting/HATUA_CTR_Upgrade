@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <!-- <link rel="STYLESHEET" href="http://localhost/css/pdf.css" type="text/css" /> -->
    <?php
-            echo $this->Html->css('pdf', null,array('fullBase' => true));
+        echo $this->Html->css('pdf', null,array('fullBase' => true));
    ?>
    <style type="text/css">
       * {

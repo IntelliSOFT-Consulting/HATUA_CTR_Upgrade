@@ -1,5 +1,5 @@
 <?php
-$config['Domain']['root'] = 'http://ppbctrdev/';
+$config['Domain']['root'] = 'http://localhost/';
 $config['Domain']['name'] = '';
 $config['Reports']['limit'] = 3;
 $config['Reports']['all_sadr']['subject'] = 'Suspected Adverse Drug Reaction Reports : ';
