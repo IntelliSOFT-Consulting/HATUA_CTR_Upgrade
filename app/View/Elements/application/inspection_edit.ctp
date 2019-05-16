@@ -41,12 +41,16 @@
                           ($site_inspection['user_id'] !== $this->Session->read('Auth.User.id')) and
                           $site_inspection['approved'] !== '2'
                       ) {
-                      echo $this->Form->postLink(__('<label class="label label-success">Approve</label>'), array('controller' => 'site_inspections', 'action' => 'approve', $site_inspection['id'], 1), array('escape' => false), __('Are you sure you want to approve site inspection # %s?', $site_inspection['id']));
+                      echo $this->Form->postLink(__('<label class="label label-success">Approve</label>'), array('controller' => 'site_inspections', 'action' => 'approve', $site_inspection['id']), array('escape' => false), __('Are you sure you want to approve site inspection # %s?', $site_inspection['id']));
                   }
                   
                 } else {
                   echo $this->Html->link('<span class="label label-success"> Edit </span>',
                      array('action' => 'view', $application['Application']['id'], 'inspection_id' => $site_inspection['id']), array('escape'=>false));
+                  echo "&nbsp;";
+                  if (($this->Session->read('Auth.User.group_id') === '2' or $site_inspection['user_id'] == $this->Session->read('Auth.User.id'))) {                    
+                      echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'site_inspections', 'action' => 'delete', $site_inspection['id']), array('escape' => false), __('Are you sure you want to delete site inspection # %s?', $site_inspection['id']));
+                  }
                 }
               ?>                      
             </td>

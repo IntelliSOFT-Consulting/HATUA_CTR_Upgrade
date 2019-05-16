@@ -327,13 +327,20 @@ class SiteInspectionsController extends AppController {
         }
         $this->SiteInspection->id = $id;
         if (!$this->SiteInspection->exists()) {
-            throw new NotFoundException(__('Invalid site inspection'));
+            throw new NotFoundException(__('Invalid site inspection'), 'alerts/flash_error');
         }
         if ($this->SiteInspection->delete()) {
-            $this->Session->setFlash(__('Site inspection deleted'));
-            $this->redirect(array('action' => 'index'));
+            $this->Session->setFlash(__('Site inspection deleted'), 'alerts/flash_success');
+            $this->redirect($this->referer());
         }
-        $this->Session->setFlash(__('Site inspection was not deleted'));
-        $this->redirect(array('action' => 'index'));
+        // $this->Session->setFlash(__('Site inspection was not deleted'), 'alerts/flash_error');
+        // $this->redirect('/');
+        $this->redirect($this->referer());
+    }
+    public function manager_delete($id = null) {
+        $this->delete($id);
+    }
+    public function inspector_delete($id = null) {
+        $this->delete($id);
     }
 }
