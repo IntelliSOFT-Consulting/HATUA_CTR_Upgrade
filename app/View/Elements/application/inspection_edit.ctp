@@ -33,7 +33,7 @@
                                    array('action' => 'view', $application['Application']['id'], 'inspection_id' => $site_inspection['id']), array('escape'=>false));
                   echo "&nbsp;";
                   echo $this->Html->link(__('<label class="label">PDF</label>'),
-                    array('controller' => 'site_inspections', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id'], 'inspection_id' => $site_inspection['id']),
+                    array('controller' => 'site_inspections', 'ext' => 'pdf', 'action' => 'download_inspection', $site_inspection['id']),
                     array('escape' => false));
                   echo "&nbsp;";
 
