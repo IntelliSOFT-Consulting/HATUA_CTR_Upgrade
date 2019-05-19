@@ -30,4 +30,4 @@
       $(this).closest('.attacho').remove();        
     }
 
-  })(jQuery);
+  });

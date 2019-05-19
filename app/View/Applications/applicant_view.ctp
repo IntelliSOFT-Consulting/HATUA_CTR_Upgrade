@@ -210,8 +210,11 @@ $this->end();
         }
     });
     $(".morecontent").expander();
+
     // var editor = $('#ApplicationFinalReport').ckeditor();
-    var editor = CKEDITOR.editor.replace('ApplicationFinalReport');
+    if ($('#ApplicationFinalReport').length) {
+      var editor = CKEDITOR.editor.replace('ApplicationFinalReport');
+    }
     $(document).on('click', '#ApplicationViewSaveReport', function() {
           var data_save = $('#ApplicationId').serializeArray();
           //var value = $('#ApplicationFinalReport').val();

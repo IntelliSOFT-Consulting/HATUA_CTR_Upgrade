@@ -1,4 +1,4 @@
-    <!-- start view -->
+<!-- start view -->
 
 <h2 style="text-align: center;"> AVAREF</h2>   
 <hr class="soften" style="margin: 10px 0px;">

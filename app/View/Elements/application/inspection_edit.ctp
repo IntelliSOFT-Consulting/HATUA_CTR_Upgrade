@@ -6,8 +6,10 @@
       <thead>
         <tr>
           <th>ID</th>
+          <?php if($redir !== 'applicant') { ?>
           <th>Inspector</th>
           <th>Status</th>
+          <?php } ?>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
         </tr>
@@ -18,13 +20,17 @@
         ?>
           <tr>
             <td><?php echo $site_inspection['id'] ?></td>
+          <?php if($redir !== 'applicant') { ?>
             <td><?php echo $site_inspection['User']['name'] ?></td>
             <td><p><?php 
                     if($site_inspection['approved'] == 0) echo 'Unsubmitted';
                     elseif($site_inspection['approved'] == 1) echo 'Awaiting Peer Review';
-                    elseif($site_inspection['approved'] == 2) echo 'Approved';
+                    elseif($site_inspection['approved'] == 2) { 
+                        echo "Approved"." <small class='muted'> by ".$users[($site_inspection['approved_by']) ? $site_inspection['approved_by'] : $site_inspection['user_id']]; 
+                      }
                     ?></p>
             </td>
+          <?php } ?>
             <td><?php echo $site_inspection['created'] ?></td> 
             <td>
               <?php
@@ -72,13 +78,14 @@
   ?>
 
   <ul id="assessment_tab" class="nav nav-tabs">
-    <li class="active"><a href="#assessment_form">Assessment Form</a></li>
+    <?php if($redir !== 'applicant') { ?><li class="active"><a href="#assessment_form">Assessment Form</a></li> <?php } ?>
     <li><a href="#summary_report">Summary Report</a></li>
     <?php if($redir !== 'applicant') { ?><li><a href="#internal_comments">Internal Comments</a></li> <?php } ?>
     <li><a href="#external_comments">PI Comments</a></li>
   </ul>
 
   <div class="tab-content">
+    <?php if($redir !== 'applicant') { ?>
     <div class="tab-pane active" id="assessment_form">
       <div style="position: relative; border-top: 1px solid #ddd;">        
         <?php
@@ -89,6 +96,7 @@
         ?>
       </div>
     </div>
+    <?php } ?>
     <div class="tab-pane" id="summary_report">
       <div style="position: relative; border-top: 1px solid #ddd;">  
         <?php
@@ -180,8 +188,8 @@ $(function() {
 
     var assessmentTab = localStorage.getItem('assessmentTab');
     if (assessmentTab != null) {
-        console.log("select tab");
-        console.log($('#assessment_tab a[href="' + assessmentTab + '"]'));
+        // console.log("select tab");
+        // console.log($('#assessment_tab a[href="' + assessmentTab + '"]'));
         $('#assessment_tab a[href="' + assessmentTab + '"]').tab('show');
     }
 

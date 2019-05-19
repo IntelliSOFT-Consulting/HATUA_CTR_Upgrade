@@ -563,6 +563,13 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/applicant_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
+        $this->Acl->allow($group, 'controllers/SiteInspections/applicant_download_summary');
+        $this->Acl->allow($group, 'controllers/Comments/applicant_add_si_external');
+        $this->Acl->allow($group, 'controllers/Saes/applicant_add');
+        $this->Acl->allow($group, 'controllers/Saes/applicant_edit');
+        $this->Acl->allow($group, 'controllers/Saes/applicant_index');
+        $this->Acl->allow($group, 'controllers/Saes/applicant_view');
+        $this->Acl->allow($group, 'controllers/Saes/applicant_delete');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

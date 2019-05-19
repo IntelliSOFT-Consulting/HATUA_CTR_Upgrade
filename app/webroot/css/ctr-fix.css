@@ -387,3 +387,13 @@ th.table-noline, td.table-noline {
 #tabs-12 .delete_file_link {
   margin-left:10px;
 }
+
+.sae-form {
+  background-color: #eff1f4;
+  border: 2px solid #3E58A7;
+  border-radius: 4px;
+  padding: 4px;
+}
+.sae-group {  
+  background-color: #eff1f4;
+}

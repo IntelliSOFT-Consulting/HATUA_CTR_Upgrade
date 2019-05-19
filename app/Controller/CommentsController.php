@@ -78,6 +78,9 @@ class CommentsController extends AppController {
     public function inspector_add_si_external() {
         $this->add_si_external();
     }
+    public function applicant_add_si_external() {
+        $this->add_si_external();
+    }
 
 /**
  * manager_edit method

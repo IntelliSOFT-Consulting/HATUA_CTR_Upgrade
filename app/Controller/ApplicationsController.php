@@ -314,7 +314,7 @@ public function index() {
 
         $this->set('application', $application);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 2, 6), 'User.is_active' => 1))));
 
         $this->request->data = $application;
 

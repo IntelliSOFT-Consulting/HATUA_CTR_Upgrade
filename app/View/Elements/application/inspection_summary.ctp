@@ -25,9 +25,9 @@
       ));
       echo $this->Form->input('SiteInspection.'.$akey.'.id', array('value' => $site_inspection['id'], 'type' => 'hidden'));
       echo $this->Form->input('SiteInspection.'.$akey.'.conclusion',
-        array('label' => array('class' => 'control-label required', 'text' => 'Conclusion <span class="sterix">*</span>')));
+        array('class' => 'input-xxlarge', 'label' => array('class' => 'control-label required', 'text' => 'Conclusion <span class="sterix">*</span>')));
       echo $this->Form->input('SiteInspection.'.$akey.'.summary_report',
-        array('label' => array('class' => 'control-label required', 'text' => 'Summary Report <span class="sterix">*</span>')));
+        array('class' => 'input-xxlarge', 'label' => array('class' => 'control-label required', 'text' => 'Summary Report <span class="sterix">*</span>')));
       ?>
 
       <?php if (!empty($site_inspection['Attachment'])) { ?>

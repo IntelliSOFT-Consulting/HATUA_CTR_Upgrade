@@ -241,7 +241,7 @@ class SiteInspectionsController extends AppController {
             throw new NotFoundException(__('Invalid site inspection'), 'alerts/flash_error');
         }
         $site_inspection = $this->SiteInspection->read(null, $id);
-        if ($this->SiteInspection->save(array('approved' => 2, 'summary_approved' => 2))) {
+        if ($this->SiteInspection->save(array('approved' => 2, 'summary_approved' => 2, 'approved_by' => $this->Session->read('Auth.User.id')))) {
             $this->Session->setFlash(__('Site inspection approved'), 'alerts/flash_success');
             $this->redirect($this->referer());
         }
@@ -314,6 +314,9 @@ class SiteInspectionsController extends AppController {
     public function inspector_download_summary($id = null) {
         $this->download_summary($id);
     }
+    public function applicant_download_summary($id = null) {
+        $this->download_summary($id);
+    }
 
     private function download_inspection($id = null) {
         $this->SiteInspection->id = $id;
@@ -339,6 +342,9 @@ class SiteInspectionsController extends AppController {
     }
     public function inspector_download_inspection($id = null) {
         $this->download_inspection($id);
+    }
+    public function applicant_download_inspection($id = null) {
+        $this->download_summary($id);
     }
 /**
  * delete method
