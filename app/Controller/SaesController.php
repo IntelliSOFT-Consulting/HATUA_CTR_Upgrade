@@ -15,7 +15,19 @@ class SaesController extends AppController {
     public function applicant_index() {
         $this->Sae->recursive = 0;
         $this->paginate['contain'] = array('Application', 'Country');
+        $this->paginate['conditions'] = array('Sae.user_id' => $this->Auth->User('id'));
         $this->set('saes', $this->paginate());
+    }
+    public function index() {
+        $this->Sae->recursive = 0;
+        $this->paginate['contain'] = array('Application', 'Country');
+        $this->set('saes', $this->paginate());
+    }
+    public function manager_index() {
+        $this->index();
+    }
+    public function inspector_index() {
+        $this->index();
     }
 
 /**
@@ -30,6 +42,15 @@ class SaesController extends AppController {
         if (!$this->Sae->exists()) {
             throw new NotFoundException(__('Invalid sae'));
         }
+        $sae = $this->Sae->read(null, $id);
+        if ($sae['Sae']['approved'] < 1) {
+                $this->Session->setFlash(__('The sae has been submitted'), 'alerts/flash_info');
+                $this->redirect(array('action' => 'edit', $this->Sae->id));
+        }
+        if ($sae['Sae']['user_id'] !== $this->Auth->User('id')) {
+                $this->Session->setFlash(__('You don\'t have permission to access!!'), 'alerts/flash_error');
+                $this->redirect('/');
+        }
         $this->set('sae', $this->Sae->find('first', array(
             'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route')),
             'conditions' => array('Sae.id' => $id)
@@ -39,7 +60,31 @@ class SaesController extends AppController {
             $this->pdfConfig = array('filename' => 'SAE_' . $id,  'orientation' => 'portrait');
         }
     }
+    public function aview($id = null) {
+        $this->Sae->id = $id;
+        if (!$this->Sae->exists()) {
+            throw new NotFoundException(__('Invalid sae'));
+        }
+        $sae = $this->Sae->read(null, $id);
+        if ($sae['Sae']['approved'] < 1) {
+            $this->Session->setFlash(__('The sae has not been submitted'), 'alerts/flash_info');
+        }
 
+        $this->set('sae', $this->Sae->find('first', array(
+            'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route')),
+            'conditions' => array('Sae.id' => $id)
+            )
+        ));
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'SAE_' . $id,  'orientation' => 'portrait');
+        }
+    }
+    public function manager_view($id = null) {
+      $this->aview($id);
+    }
+    public function inspector_view($id = null) {
+      $this->aview($id);
+    }
 /**
  * add method
  *
@@ -71,6 +116,11 @@ class SaesController extends AppController {
         $this->Sae->id = $id;
         if (!$this->Sae->exists()) {
             throw new NotFoundException(__('Invalid sae'));
+        }
+        $sae = $this->Sae->read(null, $id);
+        if ($sae['Sae']['approved'] > 0) {
+                $this->Session->setFlash(__('The sae has been submitted'), 'alerts/flash_info');
+                $this->redirect(array('action' => 'view', $this->Sae->id));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->Sae->saveAssociated($this->request->data, array('deep' => true))) {
@@ -106,7 +156,7 @@ class SaesController extends AppController {
  * @param string $id
  * @return void
  */
-    public function delete($id = null) {
+    public function applicant_delete($id = null) {
         if (!$this->request->is('post')) {
             throw new MethodNotAllowedException();
         }

@@ -6,7 +6,7 @@ App::uses('AppController', 'Controller');
  * @property Message $Message
  */
 class MessagesController extends AppController {
-
+	public $paginate = array();
 /**
  * index method
  *
@@ -14,6 +14,7 @@ class MessagesController extends AppController {
  */
 	public function admin_index() {
 		$this->Message->recursive = 0;
+		$this->paginate['order'] = array('Message.created' => 'desc');
 		$this->set('messages', $this->paginate());
 		// pr($this->Message->find('list', array(
   //                                             'conditions' => array('Message.name' => array('reviewer_new_application')),

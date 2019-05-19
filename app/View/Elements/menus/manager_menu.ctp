@@ -26,6 +26,12 @@
             array('controller' => 'applications', 'action'=>'index', 'manager' => true ), array('escape' => false ));
             ?>
        </li>
+       <li class="<?php echo $this->fetch('SAE') ?>">
+          <?php
+              echo $this->Html->link('<i class="icon-list-alt"></i> SAE',
+                  array('controller' => 'saes', 'action'=>'index', 'manager' => true ), array('escape' => false ));
+              ?>
+       </li>
        <li class="<?php echo $this->fetch('Profile') ?>">
         <?php
           echo $this->Html->link('<i class="icon-user"></i> My Profile',

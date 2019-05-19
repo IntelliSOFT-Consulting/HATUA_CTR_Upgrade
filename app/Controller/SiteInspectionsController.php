@@ -130,6 +130,13 @@ class SiteInspectionsController extends AppController {
                       'protocol_no' => $application['Application']['protocol_no'],
                       'trial_phase' => $trial, 'investigators' => $investigators, 'co_investigators' => $co_investigators, 'inspection_country' => $inspection_country);
         if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
+            #Send notification and email
+            $datum = array('id' => $this->SiteInspection->id, 
+                'application_id' => $application['Application']['id'], 
+                'group_id' => $this->Auth->User('group_id'), 
+                'protocol_no' => ($application['Application']['protocol_no']) ? $application['Application']['protocol_no'] : $application['Application']['short_title'],
+                'user_id' => $this->Auth->User('id'));
+            CakeResque::enqueue('default', 'InspectionShell', array('newInspectionNotifyInspector', $datum));
             $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');
             $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'inspection_id' => $this->SiteInspection->id));
         } else {

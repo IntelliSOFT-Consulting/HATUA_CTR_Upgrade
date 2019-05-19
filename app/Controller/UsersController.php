@@ -8,7 +8,7 @@ App::uses('AppController', 'Controller');
 class UsersController extends AppController {
 
     public $paginate = array();
-    public $uses = array('User', 'Application');
+    public $uses = array('User', 'Application', 'Sae');
     public $components = array('Search.Prg');
     public $presetVars = array(
             'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
@@ -97,6 +97,9 @@ class UsersController extends AppController {
         $this->set('notifications', $this->User->Notification->find('all', array(
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
             )));
+        $this->set('saes', $this->Sae->find('all', array(
+            'conditions' => array('Sae.user_id' => $this->Auth->User('id')), 'order' => 'Sae.created DESC'
+            )));
     }
 
     public function manager_dashboard() {
@@ -113,6 +116,9 @@ class UsersController extends AppController {
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
         )));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('saes', $this->Sae->find('all', array(
+            'order' => 'Sae.created DESC'
+            )));
     }
 
     public function inspector_dashboard() {
@@ -129,6 +135,9 @@ class UsersController extends AppController {
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
         )));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('saes', $this->Sae->find('all', array(
+            'order' => 'Sae.created DESC'
+            )));
     }
 
     public function reviewer_dashboard() {
@@ -500,6 +509,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/edit');
         $this->Acl->allow($group, 'controllers/SiteInspections');
         $this->Acl->allow($group, 'controllers/Comments');
+        $this->Acl->allow($group, 'controllers/Saes');
 
         //Allow Inpectors
         $group->id = 6;
@@ -514,6 +524,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/edit');
         $this->Acl->allow($group, 'controllers/SiteInspections');
         $this->Acl->allow($group, 'controllers/Comments');
+        $this->Acl->allow($group, 'controllers/Saes');
 
         //Allow Reviewers
         $group->id = 3;

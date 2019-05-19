@@ -23,11 +23,12 @@
 	<?php
 		echo $this->Form->input('id');
 		echo $this->Form->input('name');
+		echo $this->Form->input('subject');
 		echo $this->Form->input('content', array(
               'label' => array('class' => 'control-label required', 'text' => 'Content <span class="sterix">*</span>'),
               'between'=>'<div class="controls">', 'placeholder' => 'study title' , 'class' => 'input-large',
             ));
-		echo $this->Form->input('type');
+		echo $this->Form->input('type', array('type' => 'select', 'empty' => true, 'options' => array('notification' => 'notification', 'email' => 'email', 'notification email' => 'notification email')));
 		echo $this->Form->input('description', array('class' => 'input-xlarge'));
 	?>
 	</fieldset>

@@ -102,11 +102,18 @@
                         'label' => 'Create',
                         'value' => 'Create',
                         'class' => 'btn btn-primary btn-small',
-                        // 'div' => array(
-                            // 'class' => 'form-actions',
-                        // )
                     ));
-                    // echo $this->Form->end(__('Submit'), array('class' => 'btn btn-large btn-success'));
+                    echo '<ol>';
+                    foreach ($saes as $sae) {
+                      if($sae['Sae']['approved'] < 1) {
+                          echo $this->Html->link('<li>'.$sae['Sae']['created'].'</li>', array('controller' => 'saes', 'action' => 'edit', $sae['Sae']['id']),
+                            array('escape' => false));   
+                      } else {
+                          echo $this->Html->link('<li>'.$sae['Sae']['created'].'</li>', array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id']),
+                            array('escape' => false));   
+                      }
+                    }
+                    echo '</ol>';
                 ?>
             </div>
         </div>
