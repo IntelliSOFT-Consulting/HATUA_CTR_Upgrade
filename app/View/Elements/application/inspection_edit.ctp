@@ -80,8 +80,8 @@
   <ul id="assessment_tab" class="nav nav-tabs">
     <?php if($redir !== 'applicant') { ?><li class="active"><a href="#assessment_form">Assessment Form</a></li> <?php } ?>
     <li><a href="#summary_report">Summary Report</a></li>
-    <?php if($redir !== 'applicant') { ?><li><a href="#internal_comments">Internal Comments</a></li> <?php } ?>
-    <li><a href="#external_comments">PI Comments</a></li>
+    <?php if($redir !== 'applicant') { ?><li><a href="#internal_comments">Internal Comments (<?php echo count($site_inspection['InternalComment']); ?>)</a></li> <?php } ?>
+    <li><a href="#external_comments">PI Comments (<?php echo count($site_inspection['ExternalComment']); ?>)</a></li>
   </ul>
 
   <div class="tab-content">

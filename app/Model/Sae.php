@@ -79,6 +79,12 @@ class Sae extends AppModel {
             'dependent' => true,
             'conditions' => array('Attachment.model' => 'Sae', 'Attachment.group' => 'sae'),
         ),
+        'Comment' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Comment.model' => 'Sae', 'Comment.category' => 'external' ),
+        ),
     );
 
     public function beforeSave() {

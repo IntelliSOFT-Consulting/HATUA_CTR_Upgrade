@@ -82,6 +82,31 @@ class CommentsController extends AppController {
         $this->add_si_external();
     }
 
+
+    private function add_sae_external() {
+        if ($this->request->is('post')) {
+            $this->Comment->create();
+            if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+                $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            }
+        }
+        $users = $this->Comment->User->find('list');
+        $this->set(compact('users'));
+    }
+    public function manager_add_sae_external() {
+        $this->add_sae_external();
+    }
+    public function inspector_add_sae_external() {
+        $this->add_sae_external();
+    }
+    public function applicant_add_sae_external() {
+        $this->add_sae_external();
+    }
+
 /**
  * manager_edit method
  *

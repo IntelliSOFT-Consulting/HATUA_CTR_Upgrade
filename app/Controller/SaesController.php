@@ -52,7 +52,7 @@ class SaesController extends AppController {
                 $this->redirect('/');
         }
         $this->set('sae', $this->Sae->find('first', array(
-            'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route')),
+            'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
             'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -71,7 +71,7 @@ class SaesController extends AppController {
         }
 
         $this->set('sae', $this->Sae->find('first', array(
-            'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route')),
+            'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
             'conditions' => array('Sae.id' => $id)
             )
         ));
