@@ -97,12 +97,22 @@
                 <h4>Create SAE or SUSAR</h4>
                 <?php
                     echo $this->Form->create('Sae', array('controller' => 'saes', 'action' => 'add'));
+                    echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
                     echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
-                    echo $this->Form->end(array(
-                        'label' => 'Create',
-                        'value' => 'Create',
-                        'class' => 'btn btn-primary btn-small',
+                    echo $this->Form->button('<i class="icon-save"></i> Create SAE', array(
+                      'name' => 'createSAE',
+                      'class' => 'btn btn-success btn-small',
+                      'id' => 'SaeCreate', 
+                      'div' => false,
                     ));
+                    echo "&nbsp;";
+                    echo $this->Form->button('<i class="icon-thumbs-up"></i> Create SUSAR', array(
+                      'name' => 'createSUSAR',
+                      'class' => 'btn btn-primary btn-small',
+                      'id' => 'SusarCreate', 
+                      'div' => false,
+                    ));
+                    echo $this->Form->end();
                     echo '<ol>';
                     foreach ($saes as $sae) {
                       if($sae['Sae']['approved'] < 1) {

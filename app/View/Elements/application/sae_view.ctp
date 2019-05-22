@@ -3,8 +3,15 @@
     $nChecked = '<i class="icon-check-empty" aria-hidden="true"></i>';
 ?>
 
-<div class="sae-form">
-    <div class="styled_title"><h5 style="text-align: right;">CIOMS FORM</h5></div>
+<div class="sae-form">    
+    <table class="table  table-condensed">
+      <tbody>
+        <tr>
+          <td><h5> <?php echo $sae['Sae']['reference_no']; ?> </h5> </td>
+          <td><h5 style="text-align: right;"> <span>CIOMS FORM</span></h5></td>
+        </tr>
+      </tbody>
+    </table>
     <hr>
     <h4 style="text-decoration: underline;"> <?php echo $sae['Application']['protocol_no']; ?> </h4>
 

@@ -582,6 +582,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Saes/applicant_index');
         $this->Acl->allow($group, 'controllers/Saes/applicant_view');
         $this->Acl->allow($group, 'controllers/Saes/applicant_delete');
+        $this->Acl->allow($group, 'controllers/Saes/applicant_followup');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

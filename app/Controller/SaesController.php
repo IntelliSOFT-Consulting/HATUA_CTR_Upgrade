@@ -94,15 +94,64 @@ class SaesController extends AppController {
         if ($this->request->is('post')) {
             $this->Sae->create();
             if ($this->Sae->save($this->request->data)) {
+                if (isset($this->request->data['createSAE'])) {
+                    $count = $this->Sae->find('count',  array('conditions' => array(
+                        'Sae.form_type' => 'SAE',
+                        'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
+                    $count++;
+                    $count = ($count < 10) ? "0$count" : $count;
+                    $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
+                    $this->Sae->saveField('form_type', 'SAE');
+                } elseif (isset($this->request->data['createSUSAR'])) {
+                    $count = $this->Sae->find('count',  array('conditions' => array(
+                        'Sae.form_type' => 'SUSAR',
+                        'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
+                    $count++;
+                    $count = ($count < 10) ? "0$count" : $count;
+                    $this->Sae->saveField('reference_no', 'SUSAR'.date('Y').'/'.$count);
+                    $this->Sae->saveField('form_type', 'SUSAR');
+                }
                 $this->Session->setFlash(__('The sae has been saved'), 'alerts/flash_success');
                 $this->redirect(array('action' => 'edit', $this->Sae->id));
             } else {
                 $this->Session->setFlash(__('The sae could not be saved. Please, try again.'), 'alerts/flash_error');
             }
         }
-        // $applications = $this->Sae->Application->find('list');
-        // $users = $this->Sae->User->find('list');
-        // $this->set(compact('applications', 'users'));
+    }
+    public function applicant_followup($id = null) {
+        if ($this->request->is('post')) {
+            $this->Sae->id = $id;
+            if (!$this->Sae->exists()) {
+                throw new NotFoundException(__('Invalid sae'));
+            }
+            $sae = Hash::remove($this->Sae->find('first', array(
+                        'contain' => array('SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route')),
+                        'conditions' => array('Sae.id' => $id)
+                        )
+                    ), 'Sae.id');
+
+            $sae = Hash::remove($sae, 'SuspectedDrug.{n}.id');
+            $sae = Hash::remove($sae, 'ConcomittantDrug.{n}.id');
+            $data_save = $sae['Sae'];
+            $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
+            $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
+
+            $count = $this->Sae->find('count',  array('conditions' => array(
+                        'Sae.reference_no LIKE' => $sae['Sae']['reference_no'].'%',
+                        )));
+            $count = ($count < 10) ? "0$count" : $count;
+            $data_save['reference_no'] = $sae['Sae']['reference_no'].'_F'.$count;
+            $data_save['report_type'] = 'Followup';
+            $data_save['approved'] = 0;
+
+            if ($this->Sae->saveAssociated($data_save, array('deep' => true))) {
+                    $this->Session->setFlash(__('Follow up'.$data_save['reference_no'].' has been created'), 'alerts/flash_info');
+                    $this->redirect(array('action' => 'edit', $this->Sae->id));               
+            } else {
+                $this->Session->setFlash(__('The followup could not be saved. Please, try again.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        }
     }
 
 /**

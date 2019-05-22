@@ -14,6 +14,13 @@
       echo $this->Html->link(__('<i class="icon-download-alt"></i> Download PDF'),
                     array('controller' => 'saes', 'ext' => 'pdf', 'action' => 'view', $sae['Sae']['id']),
                     array('escape' => false, 'class' => 'btn btn-primary'));
+      echo "&nbsp;";
+      // echo $this->Html->link(__('<i class="icon-facebook"></i> Follow Up'),
+      //               array('controller' => 'saes', 'action' => 'followup', $sae['Sae']['id']),
+      //               array('escape' => false, 'class' => 'btn btn-success'));
+
+      echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $sae['Sae']['id']), array('class' => 'btn btn-info', 'escape' => false), __('Create followup for %s?', $sae['Sae']['reference_no']));
+      echo "<br>";
       echo $this->element('application/sae_view'); 
     ?>
   </div>
