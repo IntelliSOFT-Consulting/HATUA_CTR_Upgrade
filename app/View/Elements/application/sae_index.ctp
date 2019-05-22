@@ -30,6 +30,7 @@
      <thead>
             <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
+        <th><?php echo $this->Paginator->sort('reference_no'); ?></th>
         <th><?php echo $this->Paginator->sort('application_id'); ?></th>
         <th><?php echo $this->Paginator->sort('patient_initials'); ?></th>
         <th><?php echo $this->Paginator->sort('country_id'); ?></th>
@@ -42,6 +43,7 @@
     foreach ($saes as $sae): ?>
     <tr class="">
         <td><?php echo h($sae['Sae']['id']); ?>&nbsp;</td>
+        <td><?php echo h($sae['Sae']['reference_no']); ?>&nbsp;</td>
         <td><?php echo h($sae['Application']['protocol_no']); ?>&nbsp;</td>
         <td><?php echo h($sae['Sae']['patient_initials']); ?>&nbsp;</td>
         <td><?php echo h($sae['Country']['name']); ?>&nbsp;</td>
