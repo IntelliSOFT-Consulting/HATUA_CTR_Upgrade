@@ -24,6 +24,11 @@
              ),
       ));
       echo $this->Form->input('SiteInspection.'.$akey.'.id', array('value' => $site_inspection['id'], 'type' => 'hidden'));
+      echo $this->Form->input('SiteInspection.'.$akey.'.outcome',
+            array('type' => 'select', 'empty' => true,
+              'options' =>  array('Passed' => 'Passed', 'Under Review' => 'Under Review', 
+                                  'Failed Inspection' => 'Failed Inspection'), 
+              'label' => array('class' => 'control-label required', 'text' => 'Inspection Outcome <span class="sterix">*</span>')));
       echo $this->Form->input('SiteInspection.'.$akey.'.conclusion',
         array('class' => 'input-xxlarge', 'label' => array('class' => 'control-label required', 'text' => 'Conclusion <span class="sterix">*</span>')));
       echo $this->Form->input('SiteInspection.'.$akey.'.summary_report',

@@ -72,7 +72,13 @@ class Sae extends AppModel {
             'exclusive' => '',
             'finderQuery' => '',
             'counterQuery' => ''
-        ),      
+        ), 
+        'SaeFollowup' => array(
+            'className' => 'Sae',
+            'foreignKey' => 'sae_id',
+            'dependent' => true,
+            'conditions' => array('SaeFollowup.report_type' => 'Followup'),
+        ),
         'Attachment' => array(
             'className' => 'Attachment',
             'foreignKey' => 'foreign_key',

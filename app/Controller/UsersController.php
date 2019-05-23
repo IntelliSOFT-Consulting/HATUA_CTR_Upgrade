@@ -510,6 +510,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/SiteInspections');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
+        $this->Acl->allow($group, 'controllers/Reports');
 
         //Allow Inpectors
         $group->id = 6;
@@ -525,6 +526,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/SiteInspections');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
+        $this->Acl->allow($group, 'controllers/Reports');
 
         //Allow Reviewers
         $group->id = 3;

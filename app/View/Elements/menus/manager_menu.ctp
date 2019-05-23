@@ -22,7 +22,7 @@
        </li>
        <li class="<?php echo $this->fetch('Applications') ?>">
         <?php
-          echo $this->Html->link('<i class="icon-file"></i> Applications',
+          echo $this->Html->link('<i class="icon-file-text"></i> Applications',
             array('controller' => 'applications', 'action'=>'index', 'manager' => true ), array('escape' => false ));
             ?>
        </li>
@@ -31,6 +31,23 @@
               echo $this->Html->link('<i class="icon-list-alt"></i> SAE',
                   array('controller' => 'saes', 'action'=>'index', 'manager' => true ), array('escape' => false ));
               ?>
+       </li>
+       <li class="dropdown <?php echo $this->fetch('Reports') ?>">
+         <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop4" href="#">
+            <i class="icon-bar-chart"></i> Reports <b class="caret"></b></a>
+          <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
+             <li><?php
+                        echo $this->Html->link('<i class="icon-signal"></i> Monthly Site Inspections',  array('controller' => 'reports', 'action'=>'si_per_month', 'inspector' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+             <li class="divider"></li>
+             <li><?php
+                        echo $this->Html->link('<i class="icon-signal"></i> Monthly SAE/SUSAR',  array('controller' => 'reports', 'action'=>'sae_per_month', 'inspector' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+        </ul>
        </li>
        <li class="<?php echo $this->fetch('Profile') ?>">
         <?php

@@ -22,7 +22,7 @@
        </li>
        <li class="<?php echo $this->fetch('Applications') ?>">
         <?php
-          echo $this->Html->link('<i class="icon-file"></i> My Applications',
+          echo $this->Html->link('<i class="icon-file-text"></i> My Applications',
             array('controller' => 'applications', 'action'=>'index', 'partner' => true ), array('escape' => false ));
             ?>
        </li>

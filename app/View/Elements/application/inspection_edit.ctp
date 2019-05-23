@@ -2,10 +2,23 @@
     if(!empty($application['SiteInspection'])) {
   ?>
   <br>
+  <div class="row-fluid">
+    <div class="span12">      
+        <?php     
+          if($redir !== 'applicant') {
+              echo $this->Html->link(__('<i class="icon-skype"></i> Add Site Inspection'),
+                        array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
+                        array('escape' => false, 'class' => 'btn btn-info'));
+          }
+        ?>
+    </div>
+  </div>
+  <br>
     <table class="table table-condensed table-bordered" style="margin-bottom: 2px;">
       <thead>
         <tr>
           <th>ID</th>
+          <th>Reference No</th>
           <?php if($redir !== 'applicant') { ?>
           <th>Inspector</th>
           <th>Status</th>
@@ -20,6 +33,7 @@
         ?>
           <tr>
             <td><?php echo $site_inspection['id'] ?></td>
+            <td><?php echo $site_inspection['reference_no'] ?></td>
           <?php if($redir !== 'applicant') { ?>
             <td><?php echo $site_inspection['User']['name'] ?></td>
             <td><p><?php 
@@ -110,7 +124,6 @@
 
     <?php if($redir !== 'applicant') { ?>
     <div class="tab-pane" id="internal_comments">
-      <hr>
       <div class="row-fluid">
           <div class="span12">
           <br>
@@ -138,7 +151,6 @@
 
     <div class="tab-pane" id="external_comments">
 
-      <hr>
       <div class="row-fluid">
           <div class="span12">
           <br>

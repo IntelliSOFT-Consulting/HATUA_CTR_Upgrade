@@ -116,10 +116,10 @@
                     echo '<ol>';
                     foreach ($saes as $sae) {
                       if($sae['Sae']['approved'] < 1) {
-                          echo $this->Html->link('<li>'.$sae['Sae']['created'].'</li>', array('controller' => 'saes', 'action' => 'edit', $sae['Sae']['id']),
+                          echo $this->Html->link('<li>'.$sae['Sae']['reference_no'].'</li>', array('controller' => 'saes', 'action' => 'edit', $sae['Sae']['id']),
                             array('escape' => false));   
                       } else {
-                          echo $this->Html->link('<li>'.$sae['Sae']['created'].'</li>', array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id']),
+                          echo $this->Html->link('<li>'.$sae['Sae']['reference_no'].'</li>', array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id']),
                             array('escape' => false));   
                       }
                     }

@@ -126,8 +126,13 @@ class SiteInspectionsController extends AppController {
         foreach ($application['InvestigatorContact'] as $key => $value) {
             $co_investigators .= ($key+1)." ".$value['given_name']." ".$value['family_name']." Email: ".$value['email']."\n";
         }
+        $count = $this->SiteInspection->find('count',  array('conditions' => array(
+                        'SiteInspection.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
+        $count++;
+        $count = ($count < 10) ? "0$count" : $count;
         $data = array('application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'study_title' => $application['Application']['study_title'], 
                       'protocol_no' => $application['Application']['protocol_no'],
+                      'reference_no' => 'SI/'.date('Y').'/'.$count,
                       'trial_phase' => $trial, 'investigators' => $investigators, 'co_investigators' => $co_investigators, 'inspection_country' => $inspection_country);
         if ($this->SiteInspection->saveAssociated(array('SiteInspection' => $data, 'SiteAnswer' => $answers))) {
             #Send notification and email
@@ -171,6 +176,7 @@ class SiteInspectionsController extends AppController {
                     $results = Hash::extract($this->request->data['SiteInspection'], '{n}.SiteAnswer.{n}.finding');
                     if (isset(array_count_values($results)['Major']) && array_count_values($results)['Major'] > 4 || array_count_values($results)['Critical'] > 0) {
                         $this->SiteInspection->saveField('conclusion', 'Site did not meet criteria!');
+                        $this->SiteInspection->saveField('outcome', 'Failed Inspection');
                     }
                 }
                 $this->Session->setFlash(__('The site inspection has been saved'), 'alerts/flash_success');

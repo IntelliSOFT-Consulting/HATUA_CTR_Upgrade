@@ -131,7 +131,6 @@
            echo $this->Html->link(__('<i class="icon-search"></i> Site Inspection'),
                   array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
                   array('escape' => false, 'class' => 'btn btn-info'));
-
            ?>
       </div>
       <?php

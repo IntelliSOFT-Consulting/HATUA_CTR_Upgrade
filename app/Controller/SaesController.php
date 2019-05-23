@@ -108,7 +108,7 @@ class SaesController extends AppController {
                         'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
                     $count++;
                     $count = ($count < 10) ? "0$count" : $count;
-                    $this->Sae->saveField('reference_no', 'SUSAR'.date('Y').'/'.$count);
+                    $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
                     $this->Sae->saveField('form_type', 'SUSAR');
                 }
                 $this->Session->setFlash(__('The sae has been saved'), 'alerts/flash_success');
@@ -135,6 +135,7 @@ class SaesController extends AppController {
             $data_save = $sae['Sae'];
             $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
             $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
+            $data_save['sae_id'] = $id;
 
             $count = $this->Sae->find('count',  array('conditions' => array(
                         'Sae.reference_no LIKE' => $sae['Sae']['reference_no'].'%',
@@ -145,7 +146,7 @@ class SaesController extends AppController {
             $data_save['approved'] = 0;
 
             if ($this->Sae->saveAssociated($data_save, array('deep' => true))) {
-                    $this->Session->setFlash(__('Follow up'.$data_save['reference_no'].' has been created'), 'alerts/flash_info');
+                    $this->Session->setFlash(__('Follow up '.$data_save['reference_no'].' has been created'), 'alerts/flash_info');
                     $this->redirect(array('action' => 'edit', $this->Sae->id));               
             } else {
                 $this->Session->setFlash(__('The followup could not be saved. Please, try again.'), 'alerts/flash_error');
