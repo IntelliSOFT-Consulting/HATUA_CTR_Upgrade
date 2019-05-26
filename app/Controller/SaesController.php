@@ -1,5 +1,10 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('String', 'Utility');
+App::uses('ThemeView', 'View');
+App::uses('HtmlHelper', 'View/Helper');
+App::uses('Sanitize', 'Utility');
+
 /**
  * Saes Controller
  *
@@ -7,21 +12,66 @@ App::uses('AppController', 'Controller');
  */
 class SaesController extends AppController {
     public $paginate = array();
-/**
- * index method
- *
- * @return void
- */
+    public $components = array('Search.Prg');
+    public $presetVars = true; // using the model configuration
+
+    public function beforeFilter() {
+        parent::beforeFilter();
+        // $this->Auth->allow('index', 'view', 'view.pdf');
+    }
+  /**
+   * index method
+   *
+   * @return void
+   */
     public function applicant_index() {
-        $this->Sae->recursive = 0;
+        // $this->Sae->recursive = 0;
+        // $this->paginate['contain'] = array('Application', 'Country');
+        // $this->paginate['conditions'] = array('Sae.user_id' => $this->Auth->User('id'));
+        // $this->set('saes', $this->paginate());
+
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Sae->parseCriteria($this->passedArgs);
+        $criteria['Sae.user_id'] = $this->Auth->User('id');
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Sae.created' => 'desc');
         $this->paginate['contain'] = array('Application', 'Country');
-        $this->paginate['conditions'] = array('Sae.user_id' => $this->Auth->User('id'));
-        $this->set('saes', $this->paginate());
+
+        $this->set('page_options', $page_options);
+        $this->set('saes', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
     public function index() {
-        $this->Sae->recursive = 0;
+        // $this->Sae->recursive = 0;
+        // $this->paginate['contain'] = array('Application', 'Country');
+        // $this->paginate['conditions'] = array('Sae.approved' => array(1, 2));
+        // $this->set('saes', $this->paginate());
+
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Sae->parseCriteria($this->passedArgs);
+        if (!isset($this->passedArgs['approved'])) $criteria['Sae.approved'] = array(0, 1, 2);
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Sae.created' => 'desc');
         $this->paginate['contain'] = array('Application', 'Country');
-        $this->set('saes', $this->paginate());
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Sae->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('saes', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
     public function manager_index() {
         $this->index();
@@ -30,6 +80,17 @@ class SaesController extends AppController {
         $this->index();
     }
 
+
+    private function csv_export($saes = ''){
+        //todo: check if data exists in $saes
+        $_serialize = 'saes';
+        $_header = array('Reference No.', 'Protocol No', 'Patient Initials', 'Date of birth', 'Created');
+        $_extract = array('Sae.reference_no' , 'Application.protocol_no', 'Sae.patient_initials', 'Sae.date_of_birth', 'Sae.created');
+
+        $this->response->download('saes_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('saes', '_serialize', '_header', '_extract'));
+    }
 /**
  * view method
  *
@@ -102,6 +163,7 @@ class SaesController extends AppController {
                     $count = ($count < 10) ? "0$count" : $count;
                     $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
                     $this->Sae->saveField('form_type', 'SAE');
+                    $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
                 } elseif (isset($this->request->data['createSUSAR'])) {
                     $count = $this->Sae->find('count',  array('conditions' => array(
                         'Sae.form_type' => 'SUSAR',
@@ -110,11 +172,11 @@ class SaesController extends AppController {
                     $count = ($count < 10) ? "0$count" : $count;
                     $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
                     $this->Sae->saveField('form_type', 'SUSAR');
+                    $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
                 }
-                $this->Session->setFlash(__('The sae has been saved'), 'alerts/flash_success');
                 $this->redirect(array('action' => 'edit', $this->Sae->id));
             } else {
-                $this->Session->setFlash(__('The sae could not be saved. Please, try again.'), 'alerts/flash_error');
+                $this->Session->setFlash(__('The SAE/SUSAR could not be saved. Please, try again.'), 'alerts/flash_error');
             }
         }
     }
@@ -162,7 +224,7 @@ class SaesController extends AppController {
  * @param string $id
  * @return void
  */
-    public function applicant_edit($id = null) {
+    public function applicant_edit($id = null) { 
         $this->Sae->id = $id;
         if (!$this->Sae->exists()) {
             throw new NotFoundException(__('Invalid sae'));
@@ -176,9 +238,58 @@ class SaesController extends AppController {
             if ($this->Sae->saveAssociated($this->request->data, array('deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Sae->saveField('approved', 1);
+                    $sae = $this->Sae->read(null, $id);
+
+                    //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                    $this->loadModel('Message');
+                    $html = new HtmlHelper(new ThemeView());
+                    $message = $this->Message->find('first', array('conditions' => array('name' => 'applicant_sae_submit')));
+                    $variables = array(
+                      'name' => $this->Auth->User('name'), 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                      'reference_link' => $html->link($sae['Sae']['reference_no'], array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'applicant' => true, 'full_base' => true), 
+                        array('escape' => false)),
+                      'protocol_link' => $html->link($sae['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'applicant' => true, 
+                          'full_base' => true), 
+                          array('escape' => false)),
+                      'modified' => $sae['Sae']['modified']
+                      );
+                    $datum = array(
+                        'email' => $sae['Sae']['reporter_email'],
+                        'id' => $id, 'user_id' => $this->Auth->User('id'), 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                    CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                    CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                    $users = $this->Sae->User->find('all', array(
+                        'contain' => array(),
+                        'conditions' => array('OR' => array('User.id' => $this->Auth->User('id'), 'User.group_id' => 2))
+                    ));
+                    foreach ($users as $user) {
+                      $variables = array(
+                        'name' => $user['User']['name'], 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                        'reference_link' => $html->link($sae['Sae']['reference_no'], array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'manager' => true, 'full_base' => true), 
+                          array('escape' => false)),
+                        'protocol_link' => $html->link($sae['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'manager' => true, 
+                            'full_base' => true), 
+                            array('escape' => false)),
+                        'modified' => $sae['Sae']['modified']
+                      );
+                      $datum = array(
+                        'email' => $user['User']['email'],
+                        'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                    }
+                    //**********************************    END   *********************************
+
                     $this->Session->setFlash(__('The sae has been submitted to mcaz'), 'alerts/flash_success');
-                    $this->redirect(array('action' => 'view', $this->Sae->id));               
+                    $this->redirect(array('action' => 'view', $this->Sae->id));      
                 }
+                // debug($this->request->data);
                 $this->Session->setFlash(__('The sae has been saved'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
@@ -188,11 +299,11 @@ class SaesController extends AppController {
             $this->request->data = $this->Sae->read(null, $id);
         }
 
-        $sae = $this->request->data;
+        //$sae = $this->request->data;
 
         $applications = $this->Sae->Application->find('list', array(
             'fields' => array('Application.id', 'Application.protocol_no'),
-            'conditions' => array('Application.user_id' => $this->Session->read('Auth.User.id'))));
+            'conditions' => array('Application.user_id' => $this->Session->read('Auth.User.id') , 'Application.approved' => array(1, 2) )));
         $routes = $this->Sae->SuspectedDrug->Route->find('list');
         $countries = $this->Sae->Country->find('list');
         $this->set(compact('sae', 'routes', 'countries', 'applications'));

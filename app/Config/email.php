@@ -50,13 +50,13 @@ class EmailConfig {
 	);
 	
 	public $gmail = array(
-//        'host' => 'mail.pharmacyboardkenya.org',
-          'host' => 'smtp.gmail.com',
-		'from' => array('pv@pharmacyboardkenya.org' => 'The Pharmacy and Poisons Board'),
-        'port' => 587,
+         'host' => 'ssl://smtp.gmail.com',
+          // 'host' => 'smtp.gmail.com',
+		'from' => array('edwardokemwa@gmail.com' => 'The Pharmacy and Poisons Board'),
+        'port' => 465,
 		'timeout' => 30,
-        'username' => 'drugreg.ppb@gmail.com',
-//        'password' => 'Pass@2word',
+        'username' => 'edwardokemwa@gmail.com',
+        'password' => 'SafComBi234',
         'transport' => 'Smtp'
     );
 	

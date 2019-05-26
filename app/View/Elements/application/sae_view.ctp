@@ -8,6 +8,16 @@
       <tbody>
         <tr>
           <td><h5> <?php echo $sae['Sae']['reference_no']; ?> </h5> </td>
+          <td><h5 style="text-align: center;"> <?php 
+                if($sae['Sae']['report_type'] == 'Followup') {
+                  echo 'Follow Up <br>';
+                  echo 'Initial: '.$this->Html->link(
+                      '<label class="label label-info">'.substr($sae['Sae']['reference_no'], 0, strpos($sae['Sae']['reference_no'], '-')).'</label>', 
+                      array('action' => 'view', $sae['Sae']['sae_id']), array('escape' => false));   
+                }
+                
+              ?> </h5> 
+          </td>
           <td><h5 style="text-align: right;"> <span>CIOMS FORM</span></h5></td>
         </tr>
       </tbody>
@@ -46,6 +56,12 @@
           <td><?php  echo $sae['Sae']['reaction_onset']; ?></td>
           <td class="table-label required"><p>Life Threatening</p></td>
           <td><?php  echo ($sae['Sae']['life_threatening']) ? $checked : $nChecked; ?></td>
+        </tr>
+        <tr>
+          <td class="table-label required"><p>Gender <span class="sterix">*</span></p></td>
+          <td><?php  echo $sae['Sae']['gender']; ?></td>
+          <td class="table-label required"></td>
+          <td></td>
         </tr>
       </tbody>
     </table>

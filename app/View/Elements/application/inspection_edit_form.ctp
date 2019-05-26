@@ -172,7 +172,7 @@
           ));
       ?>
       <?php
-        echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+        echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
             'name' => 'submitReport',
             'onclick'=>"return confirm('Are you sure you wish to submit the inspection report? It will be available for peer review.');",
             'class' => 'btn btn-primary mapop',

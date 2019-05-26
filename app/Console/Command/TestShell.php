@@ -11,7 +11,7 @@ class TestShell extends AppShell {
     public $uses = array('User', 'Application', 'Amendment','Review', 'Notification', 'Message');
 
     public function main() {
-        $this->out('Hello world.');
+       $this->out('Hello world.');
        $email = new CakeEmail();
        $email->config('gmail');
        //$email->template('default');

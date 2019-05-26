@@ -3,18 +3,87 @@
 ?>
 
 <div class="row-fluid">
-    <h2><?php echo __('SAE/SUSARs'); ?></h2>
-   
+  <div class="span12">
+    
+    <div class="marketing">
+      <div class="row-fluid">
+            <div class="span12">
+              <h3>SAE/SUSARs:<small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
+              <hr class="soften" style="margin: 7px 0px;">
+            </div>
+        </div>
+    </div>
+
+    <?php
+        echo $this->Form->create('Sae', array(
+          'url' => array_merge(array('action' => 'index'), $this->params['pass']),
+          'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
+        ));
+      ?>
+      <table class="table table-condensed table-bordered" style="margin-bottom: 2px;">
+        <thead>
+          <tr>
+            <th style="width: 15%;">
+              <?php
+                echo $this->Form->input('reference_no',
+                    array('div' => false, 'class' => 'span12 unauthorized_index', 'label' => array('class' => 'required', 'text' => 'Reference No.')));
+              ?>
+              </th>
+              <th>
+              <?php
+                echo $this->Form->input('protocol_no', array('div' => false, 'class' => 'span12 unauthorized_index',
+                  'label' => array('class' => 'required', 'text' => 'Protocol No.'),
+                  'type' => 'text',
+                  ));
+              ?>
+              </th>
+              <th>
+              <?php
+                echo $this->Form->input('start_date',
+                  array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
+                      'label' => array('class' => 'required', 'text' => 'SAE/SUSAR Create Dates'), 'placeHolder' => 'Start Date'));
+                echo $this->Form->input('end_date',
+                  array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
+                       'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
+                            <em class="accordion-toggle">clear!</em></a>',
+                      'label' => false, 'placeHolder' => 'End Date'));
+              ?>
+              </th>
+              <th>
+                <?php
+                  echo $this->Form->input('pages', array(
+                    'type' => 'select', 'div' => false, 'class' => 'span12', 'selected' => $this->request->params['paging']['Sae']['limit'],
+                    'empty' => true,
+                    'options' => $page_options,
+                    'label' => array('class' => 'required', 'text' => 'Pages'),
+                  ));
+                ?>
+              </th>
+              <th rowspan="2" style="width: 14%;">
+                <?php
+                  echo $this->Form->button('<i class="icon-search icon-white"></i> Search', array(
+                      'class' => 'btn btn-inverse', 'div' => 'control-group', 'div' => false,
+                      'style' => array('margin-bottom: 5px')
+                  ));
+
+                  echo $this->Html->link('<i class="icon-remove"></i> Clear', array('action' => 'index'), array('class' => 'btn', 'escape' => false, 'style' => array('margin-bottom: 5px')));echo "<br>";
+                  echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array('action' => 'index', 'ext' => 'csv'), array('class' => 'btn btn-success', 'escape' => false));
+                ?>
+              </th>
+          </tr>
+        </thead>
+      </table>
     <p>
       <?php
         echo $this->Paginator->counter(array(
         'format' => __('Page <span class="badge">{:page}</span> of <span class="badge">{:pages}</span>,
-                showing <span class="badge">{:current}</span> Users out of
+                showing <span class="badge">{:current}</span> SAEs out of
                 <span class="badge badge-inverse">{:count}</span> total, starting on record <span class="badge">{:start}</span>,
                 ending on <span class="badge">{:end}</span>')
         ));
       ?>
     </p>
+    <?php echo $this->Form->end(); ?>
 
     <div class="pagination">
       <ul>
@@ -31,6 +100,7 @@
             <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('reference_no'); ?></th>
+        <th><?php echo $this->Paginator->sort('report_type'); ?></th>
         <th><?php echo $this->Paginator->sort('application_id'); ?></th>
         <th><?php echo $this->Paginator->sort('patient_initials'); ?></th>
         <th><?php echo $this->Paginator->sort('country_id'); ?></th>
@@ -44,6 +114,14 @@
     <tr class="">
         <td><?php echo h($sae['Sae']['id']); ?>&nbsp;</td>
         <td><?php echo h($sae['Sae']['reference_no']); ?>&nbsp;</td>
+        <td><?php echo h($sae['Sae']['report_type']); 
+                  if($sae['Sae']['report_type'] == 'Followup') {
+                    echo "<br> Initial: ";
+                    echo $this->Html->link(
+                      '<label class="label label-info">'.substr($sae['Sae']['reference_no'], 0, strpos($sae['Sae']['reference_no'], '-')).'</label>', 
+                      array('action' => 'view', $sae['Sae']['sae_id']), array('escape' => false));
+                  }
+              ?>&nbsp;</td>
         <td><?php echo h($sae['Application']['protocol_no']); ?>&nbsp;</td>
         <td><?php echo h($sae['Sae']['patient_initials']); ?>&nbsp;</td>
         <td><?php echo h($sae['Country']['name']); ?>&nbsp;</td>
@@ -52,13 +130,42 @@
             <?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $sae['Sae']['id']), array('escape' => false)); ?>
             <?php if($redir === 'applicant') echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('action' => 'edit', $sae['Sae']['id']), array('escape' => false)); ?>
             <?php
-               if($sae['Sae']['approved'] < 1) {
+              if($sae['Sae']['approved'] < 1) {
                 echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $sae['Sae']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['Sae']['id']));
-               } 
+              } 
+              if($redir === 'applicant' && $sae['Sae']['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $sae['Sae']['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['Sae']['reference_no']));
             ?>            
         </td>
     </tr>
 <?php endforeach; ?>
         </tbody>
     </table>
+  </div>
 </div>
+
+<script type="text/javascript">
+$(function() {
+  $(".morecontent").expander();
+  var adates = $('#SaeStartDate, #SaeEndDate').datepicker({
+          minDate:"-100Y",
+          maxDate:"-0D",
+          dateFormat:'dd-mm-yy',
+          format: 'dd-mm-yyyy',
+          endDate: '-0d',
+          showButtonPanel:true,
+          changeMonth:true,
+          changeYear:true,
+          showAnim:'show',
+          onSelect: function( selectedDate ) {
+            var option = this.id == "SaeStartDate" ? "minDate" : "maxDate",
+              instance = $( this ).data( "datepicker" ),
+              date = $.datepicker.parseDate(
+                instance.settings.dateFormat ||
+                $.datepicker._defaults.dateFormat,
+                selectedDate, instance.settings );
+            adates.not( this ).datepicker( "option", option, date );
+          }
+        });
+
+});
+</script>

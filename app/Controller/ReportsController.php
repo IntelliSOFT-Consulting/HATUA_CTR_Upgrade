@@ -8,6 +8,7 @@ App::uses('AppController', 'Controller');
 class ReportsController extends AppController {
     public $uses = array('SiteInspection', 'Application', 'Sae');
 
+
     /**
      * site inspections per month method
      *
@@ -47,6 +48,26 @@ class ReportsController extends AppController {
     }
     public function manager_sae_per_month(){
         $this->sae_per_month();
+    }
+
+    public function sae_by_type() {
+        $data = $this->Sae->find('all', array(
+            'fields' => array('Sae.form_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
+            'contain' => array('Application'),
+            'conditions' => array('Sae.approved' => array(1, 2)),
+            'group' => array('Sae.form_type', 'Application.protocol_no'),
+            'having' => array('COUNT(*) >' => 0),
+          ));        
+
+        $this->set(compact('data'));
+        $this->set('_serialize', 'data');
+        $this->render('sae_by_type');
+    }
+    public function inspector_sae_by_type(){
+        $this->sae_by_type();
+    }
+    public function manager_sae_by_type(){
+        $this->sae_by_type();
     }
     
   /**

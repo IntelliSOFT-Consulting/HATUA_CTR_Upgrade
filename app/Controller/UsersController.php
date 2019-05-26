@@ -98,6 +98,7 @@ class UsersController extends AppController {
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
             )));
         $this->set('saes', $this->Sae->find('all', array(
+            'limit' => 5,
             'conditions' => array('Sae.user_id' => $this->Auth->User('id')), 'order' => 'Sae.created DESC'
             )));
     }

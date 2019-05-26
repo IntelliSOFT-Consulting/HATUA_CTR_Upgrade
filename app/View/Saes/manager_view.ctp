@@ -5,7 +5,7 @@
 
 <ul id="cioms_tab" class="nav nav-tabs">
   <li class="active"><a href="#sae_form">SAE/SUSAR</a></li> 
-  <li><a href="#external_comments">Comments (<?php echo count($sae['Comment']); ?>)</a></li>
+  <li><a href="#external_comments">Feedback (<?php echo count($sae['Comment']); ?>)</a></li>
 </ul>
 
 <div class="tab-content">
@@ -24,7 +24,7 @@
       <div class="span12">
         <br>
           <div class="amend-form">
-            <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
+            <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
             <div class="row-fluid">
               <div class="span8">    
                 <?php echo $this->element('comments/list', ['comments' => $sae['Comment']]) ?> 

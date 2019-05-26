@@ -22,10 +22,8 @@ class ApplicationsController extends AppController {
  *
  * @return void
  */
-    // public function index() {
-    //  $this->Application->recursive = 0;
-    //  $this->set('applications', $this->paginate());
-    // }
+
+
 public function index() {
         $this->Prg->commonProcess();
         $page_options = array('5' => '5', '10' => '10');
@@ -65,6 +63,14 @@ public function index() {
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
         $this->paginate['contain'] = array('InvestigatorContact', 'SiteDetail' => array('County'));
+            
+            //in case of csv export
+            if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+              $this->csv_export($this->Application->find('all', 
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                  ));
+            }
+            //end pdf export
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -82,12 +88,21 @@ public function index() {
 
             $criteria = $this->Application->parseCriteria($this->passedArgs);
             if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
-        $this->paginate['conditions'] = $criteria;
-        $this->paginate['order'] = array('Application.created' => 'desc');
 
-        $this->paginate['contain'] = array(
-            'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-            'InvestigatorContact', 'SiteDetail' => array('County'));
+            $this->paginate['conditions'] = $criteria;
+            $this->paginate['order'] = array('Application.created' => 'desc');
+
+            $this->paginate['contain'] = array(
+                'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
+                'InvestigatorContact', 'SiteDetail' => array('County'));
+
+            //in case of csv export
+            if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+              $this->csv_export($this->Application->find('all', 
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                  ));
+            }
+            //end pdf export
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -95,6 +110,17 @@ public function index() {
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
+    }
+
+    private function csv_export($applications = ''){
+        //todo: check if data exists in $applications
+        $_serialize = 'applications';
+        $_header = array('Protocol No', 'Study Title', 'Short Title', 'Created');
+        $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 'Application.created');
+
+        $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('applications', '_serialize', '_header', '_extract'));
     }
 
     public function inspector_index() {
@@ -179,6 +205,13 @@ public function index() {
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
             'InvestigatorContact', 'SiteDetail' => array('County'));
+           //in case of csv export
+            if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+              $this->csv_export($this->Application->find('all', 
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                  ));
+            }
+            //end pdf export
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));

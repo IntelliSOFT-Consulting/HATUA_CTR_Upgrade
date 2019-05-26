@@ -52,7 +52,28 @@
                 echo $this->Form->input('reaction_onset', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Reaction Onset <span class="sterix">*</span>')
                 ));
+                echo $this->Form->input('gender', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'gender',
+                  'before' => '<div class="control-group ">   <label class="control-label required">
+                    Gender <span class="sterix">*</span></label>  <div class="controls">
+                    <input type="hidden" value="" id="SaeGender_" name="data[Sae][gender]"> <label class="radio inline">',
+                  'after' => '</label>',
+                  'options' => array('Male' => 'Male'),
+                ));
+                echo $this->Form->input('gender', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'gender',
+                  'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                  'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+                  'before' => '<label class="radio inline">',
+                  'after' => '</label>
+                        <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                        onclick="$(\'.gender\').removeAttr(\'checked disabled\')">
+                        <em class="accordion-toggle">clear!</em></a> </span>
 
+                        </div> </div>',
+                  'options' => array('Female' => 'Female'),
+                ));
                 ?>
         </div><!--/span-->
         <div class="span6">
@@ -118,7 +139,7 @@
 
     <div class="controls">
       <?php
-        echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+        echo $this->Form->button('<i class="icon-list-alt"></i> Save Changes', array(
             'name' => 'saveChanges',
             'class' => 'btn btn-success mapop',
             'id' => 'SaeSaveChanges', 'title'=>'Save & continue editing',
@@ -128,7 +149,7 @@
           ));
       ?>
       <?php
-        echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+        echo $this->Form->button('<i class="icon-credit-card"></i> Submit', array(
             'name' => 'submitReport',
             'onclick'=>"return confirm('Are you sure you wish to submit the SAE/SUSAR report? It will not be editable.');",
             'class' => 'btn btn-primary mapop',

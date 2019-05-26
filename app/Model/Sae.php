@@ -8,8 +8,21 @@ App::uses('AppModel', 'Model');
  */
 class Sae extends AppModel {
 
-        public $actsAs = array('Containable', 'SoftDelete');
+    public $actsAs = array('Containable', 'Search.Searchable', 'SoftDelete');
+    public $filterArgs = array(
+            'reference_no' => array('type' => 'like', 'encode' => true),
+            'protocol_no' => array('type' => 'like', 'encode' => true),
+            'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Sae.created BETWEEN ? AND ?'),
+        );
+    public function makeRangeCondition($data = array()) {
+            if(!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
+            else $start_date = date('Y-m-d', strtotime('2012-05-01'));
 
+            if(!empty($data['end_date'])) $end_date = date('Y-m-d', strtotime($data['end_date']));
+            else $end_date = date('Y-m-d');
+
+            return array($start_date, $end_date);
+        }
     //The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
@@ -92,6 +105,16 @@ class Sae extends AppModel {
             'conditions' => array('Comment.model' => 'Sae', 'Comment.category' => 'external' ),
         ),
     );
+
+    public $validate = array(
+        'application_id' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please select an approved protocol!'
+            ),
+        ),
+      );
 
     public function beforeSave() {
         if (!empty($this->data['Sae']['date_of_birth'])) {

@@ -108,6 +108,14 @@
     <table class="table  table-condensed">
       <tbody>
        <tr>
+        <td class="table-label required"><p>Outcome: <span class="sterix">*</span></p></td>
+        <td>
+          <?php 
+               echo $site_inspection['outcome'];
+          ?>
+        </td>
+       </tr>
+       <tr>
         <td class="table-label required"><p>Conclusion: <span class="sterix">*</span></p></td>
         <td>
           <?php 
@@ -124,7 +132,7 @@
         </td>
        </tr>
        <tr>
-        <td class="table-label required"><p>Summary Report: <span class="sterix">*</span></p></td>
+        <td class="table-label required"><p>Attachments: <span class="sterix">*</span></p></td>
         <td>
           <?php
           

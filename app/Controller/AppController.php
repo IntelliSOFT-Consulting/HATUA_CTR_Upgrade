@@ -39,7 +39,9 @@ class AppController extends Controller {
                 'Actions' => array('actionPath' => 'controllers')
             )
         ),
-        'RequestHandler',
+        'RequestHandler' => array(
+			'viewClassMap' => array('csv' => 'CsvView.Csv')
+		),
         'Session',
         'DebugKit.Toolbar' => array('panels' => array('DebugKit.history'))
     );

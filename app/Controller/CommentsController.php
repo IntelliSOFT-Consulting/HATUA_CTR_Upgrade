@@ -1,5 +1,8 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('String', 'Utility');
+App::uses('ThemeView', 'View');
+App::uses('HtmlHelper', 'View/Helper');
 /**
  * Comments Controller
  *
@@ -42,6 +45,44 @@ class CommentsController extends AppController {
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+
+                //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                  $this->loadModel('Message');
+                  $html = new HtmlHelper(new ThemeView());
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_si_feedback')));
+                  $this->loadModel('SiteInspection');
+                  $sae = $this->SiteInspection->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('SiteInspection.id' => $this->request->data['Comment']['foreign_key'])
+                  ));
+
+                  $users = $this->Comment->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $sae['SiteInspection']['user_id'], 'User.group_id' => array(2, 6)))
+                  ));
+                  foreach ($users as $user) {
+                      if($user['User']['group_id'] == 2) $actioner =  'manager';
+                      if($user['User']['group_id'] == 6) $actioner =  'inspector';
+                      if($user['User']['group_id'] == 5) $actioner =  'applicant';
+
+                      $variables = array(
+                        'name' => $user['User']['name'], 'reference_no' => $sae['SiteInspection']['reference_no'], 
+                        'comment_subject' => $this->request->data['Comment']['subject'],
+                        'comment_content' => $this->request->data['Comment']['content'],
+                        'reference_link' => $html->link($sae['SiteInspection']['reference_no'], array('controller' => 'site_inspections', 'action' => 'view', $sae['SiteInspection']['id'], $actioner => true, 'full_base' => true), 
+                          array('escape' => false)),
+                      );
+                      $datum = array(
+                        'email' => ($sae['SiteInspection']['reporter_email'] && $actioner == 'applicant') ? $sae['SiteInspection']['reporter_email'] : $user['User']['email'],
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_sae_feedback', 'model' => 'SiteInspection',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }
+                //**********************************    END   *********************************
+
                 $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
@@ -56,6 +97,44 @@ class CommentsController extends AppController {
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+
+                //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                  $this->loadModel('Message');
+                  $html = new HtmlHelper(new ThemeView());
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_si_feedback')));
+                  $this->loadModel('SiteInspection');
+                  $sae = $this->SiteInspection->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('SiteInspection.id' => $this->request->data['Comment']['foreign_key'])
+                  ));
+
+                  $users = $this->Comment->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $sae['SiteInspection']['user_id'], 'User.group_id' => array(2, 6)))
+                  ));
+                  foreach ($users as $user) {
+                      if($user['User']['group_id'] == 2) $actioner =  'manager';
+                      if($user['User']['group_id'] == 6) $actioner =  'inspector';
+                      if($user['User']['group_id'] == 5) $actioner =  'applicant';
+
+                      $variables = array(
+                        'name' => $user['User']['name'], 'reference_no' => $sae['SiteInspection']['reference_no'], 
+                        'comment_subject' => $this->request->data['Comment']['subject'],
+                        'comment_content' => $this->request->data['Comment']['content'],
+                        'reference_link' => $html->link($sae['SiteInspection']['reference_no'], array('controller' => 'site_inspections', 'action' => 'view', $sae['SiteInspection']['id'], $actioner => true, 'full_base' => true), 
+                          array('escape' => false)),
+                      );
+                      $datum = array(
+                        'email' => ($sae['SiteInspection']['reporter_email'] && $actioner == 'applicant') ? $sae['SiteInspection']['reporter_email'] : $user['User']['email'],
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_sae_feedback', 'model' => 'SiteInspection',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }
+                //**********************************    END   *********************************
+                  
                 $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
@@ -87,7 +166,42 @@ class CommentsController extends AppController {
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
-                $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
+                
+                //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                  $this->loadModel('Message');
+                  $html = new HtmlHelper(new ThemeView());
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_sae_feedback')));
+                  $this->loadModel('Sae');
+                  $sae = $this->Sae->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('Sae.id' => $this->request->data['Comment']['foreign_key'])
+                  ));
+
+                  $users = $this->Comment->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $sae['Sae']['user_id'], 'User.group_id' => 2))
+                  ));
+                  foreach ($users as $user) {
+                      $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'applicant';
+                      $variables = array(
+                        'name' => $user['User']['name'], 'reference_no' => $sae['Sae']['reference_no'], 
+                        'comment_subject' => $this->request->data['Comment']['subject'],
+                        'comment_content' => $this->request->data['Comment']['content'],
+                        'reference_link' => $html->link($sae['Sae']['reference_no'], array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], $actioner => true, 'full_base' => true), 
+                          array('escape' => false)),
+                      );
+                      $datum = array(
+                        'email' => ($sae['Sae']['reporter_email'] && $actioner == 'applicant') ? $sae['Sae']['reporter_email'] : $user['User']['email'],
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_sae_feedback', 'model' => 'Sae',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }
+                //**********************************    END   *********************************
+
+                $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
                 $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');

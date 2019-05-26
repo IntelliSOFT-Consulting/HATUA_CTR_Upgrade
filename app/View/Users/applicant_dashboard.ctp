@@ -99,14 +99,14 @@
                     echo $this->Form->create('Sae', array('controller' => 'saes', 'action' => 'add'));
                     echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
                     echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
-                    echo $this->Form->button('<i class="icon-save"></i> Create SAE', array(
+                    echo $this->Form->button('<i class="icon-list-alt"></i> Create SAE', array(
                       'name' => 'createSAE',
                       'class' => 'btn btn-success btn-small',
                       'id' => 'SaeCreate', 
                       'div' => false,
                     ));
                     echo "&nbsp;";
-                    echo $this->Form->button('<i class="icon-thumbs-up"></i> Create SUSAR', array(
+                    echo $this->Form->button('<i class="icon-credit-card"></i> Create SUSAR', array(
                       'name' => 'createSUSAR',
                       'class' => 'btn btn-primary btn-small',
                       'id' => 'SusarCreate', 
@@ -150,6 +150,10 @@
                         echo "<blockquote><p> ".$notification['Notification']['user_message']."</p><small>PPB Comment</small></blockquote>";
                     } elseif ($notification['Notification']['type'] == 'applicant_new_amendment') {
                         echo "<p>".$notification['Notification']['system_message']."</p>";
+                    } else {
+                        echo "<strong>".$notification['Notification']['title']."</strong>";
+                        echo "<br/><small>".$notification['Notification']['system_message']."</small>";
+                        echo "<p> ".$notification['Notification']['user_message']."</p>";
                     }
                     echo '</div>';
                 }
