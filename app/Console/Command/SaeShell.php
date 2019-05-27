@@ -10,7 +10,7 @@ App::import('Core', 'Helper');
 
 class SaeShell extends Shell {
     public $uses = array('User','Sae', 'Notification', 'Message');
-
+    
     public function perform() {
       $this->initialize();
       $this->{array_shift($this->args)}();

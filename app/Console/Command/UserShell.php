@@ -9,7 +9,7 @@ App::uses('CakeEmail', 'Network/Email');
 
 class UserShell extends Shell {
     public $uses = array('User', 'Message');
-
+    
     public function perform() {
       $this->initialize();
       $this->{array_shift($this->args)}();

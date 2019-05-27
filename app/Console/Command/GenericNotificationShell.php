@@ -9,7 +9,7 @@ App::uses('CakeEmail', 'Network/Email');
 
 class GenericNotificationShell extends Shell {
     public $uses = array('User','Sae', 'Notification', 'Message');
-
+    
     public function perform() {
       $this->initialize();
       $this->{array_shift($this->args)}();

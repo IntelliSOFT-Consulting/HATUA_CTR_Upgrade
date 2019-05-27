@@ -9,7 +9,7 @@ App::uses('CakeEmail', 'Network/Email');
 
 class InspectionShell extends Shell {
     public $uses = array('User', 'Application', 'Amendment','Review', 'Notification', 'Message');
-
+    
     public function perform() {
       $this->initialize();
       $this->{array_shift($this->args)}();

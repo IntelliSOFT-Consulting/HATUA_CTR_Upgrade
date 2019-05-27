@@ -9,7 +9,7 @@ App::uses('CakeEmail', 'Network/Email');
 
 class TestShell extends AppShell {
     public $uses = array('User', 'Application', 'Amendment','Review', 'Notification', 'Message');
-
+    
     public function main() {
        $this->out('Hello world.');
        $email = new CakeEmail();

@@ -9,12 +9,12 @@ App::uses('CakeEmail', 'Network/Email');
 
 class NotificationShell extends Shell {
     public $uses = array('User', 'Application', 'Amendment','Review', 'Notification', 'Message');
-
+    
     public function perform() {
       $this->initialize();
       $this->{array_shift($this->args)}();
     }
-
+    
 /*   public function testEmail(){
         $messages = $this->Message->find('list', array(
                                               'conditions' => array('Message.name' => array('registration_email_subject', 'registration_email')),
