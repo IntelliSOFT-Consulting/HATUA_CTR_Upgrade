@@ -32,18 +32,23 @@
                   array('controller' => 'saes', 'action'=>'index', 'inspector' => true ), array('escape' => false ));
               ?>
        </li>
+       <li class="<?php echo $this->fetch('SI') ?>">
+          <?php
+              echo $this->Html->link('<i class="icon-search"></i> Site Inspections',
+                  array('controller' => 'site_inspections', 'action'=>'index', 'inspector' => true ), array('escape' => false ));
+              ?>
+       </li>
        <li class="dropdown <?php echo $this->fetch('Reports') ?>">
          <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop4" href="#">
             <i class="icon-bar-chart"></i> Reports <b class="caret"></b></a>
           <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
-             <li><?php
-                        echo $this->Html->link('<i class="icon-arrow-right"></i> Monthly Site Inspections',  array('controller' => 'reports', 'action'=>'si_per_month', 'inspector' => true ),
-                                  array('escape' => false, 'tabindex' => '-1'));
-                    ?>
+            <li><?php
+                      echo $this->Html->link('<i class="icon-arrow-right"></i> Monthly Site Inspections',  array('controller' => 'reports', 'action'=>'si_per_month', 'inspector' => true ),
+                                array('escape' => false, 'tabindex' => '-1'));
+                  ?>
             </li>
-          <li cla
-             <li class="divider"></li>
-             <li><?php
+           <li class="divider"></li>
+           <li><?php
                         echo $this->Html->link('<i class="icon-signal"></i> Monthly SAE/SUSAR',  array('controller' => 'reports', 'action'=>'sae_per_month', 'inspector' => true ),
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>

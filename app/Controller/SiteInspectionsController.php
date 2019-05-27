@@ -1,24 +1,94 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('String', 'Utility');
+App::uses('ThemeView', 'View');
+App::uses('HtmlHelper', 'View/Helper');
+App::uses('Sanitize', 'Utility');
+
 /**
  * SiteInspections Controller
  *
  * @property SiteInspection $SiteInspection
  */
 class SiteInspectionsController extends AppController {
-
+    public $paginate = array();
+    public $components = array('Search.Prg');
+    public $presetVars = true; // using the model configuration
     public $uses = array('SiteInspection', 'Application', 'SiteQuestion');
 
-/**
- * index method
- *
- * @return void
- */
+
+    // public function index() {
+    //     $this->SiteInspection->recursive = 0;
+    //     $this->set('siteInspections', $this->paginate());
+    // }
+    /**
+   * index method
+   *
+   * @return void
+   */
+    public function applicant_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->SiteInspection->parseCriteria($this->passedArgs);
+        $criteria['Application.user_id'] = $this->Auth->User('id');
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('SiteInspection.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->SiteInspection->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+        $this->set('page_options', $page_options);
+        $this->set('siteInspections', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
     public function index() {
-        $this->SiteInspection->recursive = 0;
-        $this->set('siteInspections', $this->paginate());
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->SiteInspection->parseCriteria($this->passedArgs);
+        if (!isset($this->passedArgs['approved'])) $criteria['SiteInspection.approved'] = array(0, 1, 2); #todo: remove option 0
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('SiteInspection.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->SiteInspection->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('siteInspections', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
+    public function manager_index() {
+        $this->index();
+    }
+    public function inspector_index() {
+        $this->index();
     }
 
+    private function csv_export($siteInspections = ''){
+        //todo: check if data exists in $siteInspections
+        $_serialize = 'siteInspections';
+        $_header = array('Reference No.', 'Protocol No', 'PACTR No.', 'Created');
+        $_extract = array('SiteInspection.reference_no' , 'Application.protocol_no', 'SiteInspection.pactr_no', 'SiteInspection.created');
+
+        $this->response->download('Site_Inspection_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('siteInspections', '_serialize', '_header', '_extract'));
+    }
 /**
  * view method
  *

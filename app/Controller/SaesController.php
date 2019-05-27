@@ -42,6 +42,13 @@ class SaesController extends AppController {
         $this->paginate['order'] = array('Sae.created' => 'desc');
         $this->paginate['contain'] = array('Application', 'Country');
 
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Sae->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
         $this->set('page_options', $page_options);
         $this->set('saes', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
@@ -87,7 +94,7 @@ class SaesController extends AppController {
         $_header = array('Reference No.', 'Protocol No', 'Patient Initials', 'Date of birth', 'Created');
         $_extract = array('Sae.reference_no' , 'Application.protocol_no', 'Sae.patient_initials', 'Sae.date_of_birth', 'Sae.created');
 
-        $this->response->download('saes_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->response->download('SAEs_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';
         $this->set(compact('saes', '_serialize', '_header', '_extract'));
     }

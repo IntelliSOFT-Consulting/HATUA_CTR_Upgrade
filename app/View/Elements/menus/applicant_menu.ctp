@@ -32,6 +32,12 @@
                         array('controller' => 'saes', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
                     ?>
              </li>
+             <li class="<?php echo $this->fetch('SI') ?>">
+                <?php
+                    echo $this->Html->link('<i class="icon-search"></i> Site Inspections',
+                        array('controller' => 'site_inspections', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
+                    ?>
+             </li>
              <li class="<?php echo $this->fetch('ContactUs') ?>">
                 <?php
                     echo $this->Html->link('<i class="icon-comment-alt"></i> My Messages',

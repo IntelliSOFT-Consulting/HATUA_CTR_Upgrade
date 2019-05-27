@@ -32,6 +32,12 @@
                   array('controller' => 'saes', 'action'=>'index', 'manager' => true ), array('escape' => false ));
               ?>
        </li>
+       <li class="<?php echo $this->fetch('SI') ?>">
+          <?php
+              echo $this->Html->link('<i class="icon-search"></i> Site Inspections',
+                  array('controller' => 'site_inspections', 'action'=>'index', 'manager' => true ), array('escape' => false ));
+              ?>
+       </li>
        <li class="dropdown <?php echo $this->fetch('Reports') ?>">
          <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop4" href="#">
             <i class="icon-bar-chart"></i> Reports <b class="caret"></b></a>

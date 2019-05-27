@@ -1,5 +1,5 @@
 <?php
-    $this->assign('SAE', 'active');
+    $this->assign('SI', 'active');
 ?>
 
 <div class="row-fluid">
@@ -8,14 +8,14 @@
     <div class="marketing">
       <div class="row-fluid">
             <div class="span12">
-              <h3>SAE/SUSARs:<small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
+              <h3>Site Inspections: <small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
               <hr class="soften" style="margin: 7px 0px;">
             </div>
         </div>
     </div>
 
     <?php
-        echo $this->Form->create('Sae', array(
+        echo $this->Form->create('SiteInspection', array(
           'url' => array_merge(array('action' => 'index'), $this->params['pass']),
           'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
         ));
@@ -41,7 +41,7 @@
               <?php
                 echo $this->Form->input('start_date',
                   array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
-                      'label' => array('class' => 'required', 'text' => 'SAE/SUSAR Create Dates'), 'placeHolder' => 'Start Date'));
+                      'label' => array('class' => 'required', 'text' => 'Inspection Create Dates'), 'placeHolder' => 'Start Date'));
                 echo $this->Form->input('end_date',
                   array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
                        'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
@@ -52,7 +52,7 @@
               <th>
                 <?php
                   echo $this->Form->input('pages', array(
-                    'type' => 'select', 'div' => false, 'class' => 'span12', 'selected' => $this->request->params['paging']['Sae']['limit'],
+                    'type' => 'select', 'div' => false, 'class' => 'span12', 'selected' => $this->request->params['paging']['SiteInspection']['limit'],
                     'empty' => true,
                     'options' => $page_options,
                     'label' => array('class' => 'required', 'text' => 'Pages'),
@@ -77,7 +77,7 @@
       <?php
         echo $this->Paginator->counter(array(
         'format' => __('Page <span class="badge">{:page}</span> of <span class="badge">{:pages}</span>,
-                showing <span class="badge">{:current}</span> SAEs out of
+                showing <span class="badge">{:current}</span> Site Inspections out of
                 <span class="badge badge-inverse">{:count}</span> total, starting on record <span class="badge">{:start}</span>,
                 ending on <span class="badge">{:end}</span>')
         ));
@@ -100,43 +100,34 @@
             <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('reference_no'); ?></th>
-        <th><?php echo $this->Paginator->sort('report_type'); ?></th>
         <th><?php echo $this->Paginator->sort('application_id'); ?></th>
-        <th><?php echo $this->Paginator->sort('patient_initials'); ?></th>
-        <th><?php echo $this->Paginator->sort('country_id'); ?></th>
+        <th><?php echo $this->Paginator->sort('pactr_number'); ?></th>
+        <th><?php echo $this->Paginator->sort('country'); ?></th>
         <th><?php echo $this->Paginator->sort('created'); ?></th>
         <th class="actions"><?php echo __('Actions'); ?></th>
           </tr>
        </thead>
       <tbody>
     <?php
-    foreach ($saes as $sae): ?>
+    foreach ($siteInspections as $siteInspection): ?>
     <tr class="">
-        <td><?php echo h($sae['Sae']['id']); ?>&nbsp;</td>
-        <td><?php echo h($sae['Sae']['reference_no']); ?>&nbsp;</td>
-        <td><?php echo h($sae['Sae']['report_type']); 
-                  if($sae['Sae']['report_type'] == 'Followup') {
-                    echo "<br> Initial: ";
-                    echo $this->Html->link(
-                      '<label class="label label-info">'.substr($sae['Sae']['reference_no'], 0, strpos($sae['Sae']['reference_no'], '-')).'</label>', 
-                      array('action' => 'view', $sae['Sae']['sae_id']), array('escape' => false));
-                  }
-              ?>&nbsp;</td>
+        <td><?php echo h($siteInspection['SiteInspection']['id']); ?>&nbsp;</td>
+        <td><?php echo h($siteInspection['SiteInspection']['reference_no']); ?>&nbsp;</td>
         <td><?php 
-          // echo h($sae['Application']['protocol_no']); 
-        echo $this->Html->link($sae['Application']['protocol_no'], array('controller' => 'applications' , 'action' => 'view', $sae['Application']['id']), array('escape' => false));
+          // echo h($siteInspection['Application']['protocol_no']); 
+        echo $this->Html->link($siteInspection['Application']['protocol_no'], array('controller' => 'applications' , 'action' => 'view', $siteInspection['Application']['id']), array('escape' => false));
         ?>&nbsp;</td>
-        <td><?php echo h($sae['Sae']['patient_initials']); ?>&nbsp;</td>
-        <td><?php echo h($sae['Country']['name']); ?>&nbsp;</td>
-        <td><?php echo h($sae['Sae']['created']); ?>&nbsp;</td>
+        <td><?php echo h($siteInspection['SiteInspection']['pactr_number']); ?>&nbsp;</td>
+        <td><?php echo h($siteInspection['SiteInspection']['inspection_country']); ?>&nbsp;</td>
+        <td><?php echo h($siteInspection['SiteInspection']['created']); ?>&nbsp;</td>
         <td class="actions">
-            <?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $sae['Sae']['id']), array('escape' => false)); ?>
-            <?php if($redir === 'applicant') echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('action' => 'edit', $sae['Sae']['id']), array('escape' => false)); ?>
+            <?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $siteInspection['SiteInspection']['id']), array('escape' => false)); ?>
+            <?php if($redir === 'applicant') echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('action' => 'edit', $siteInspection['SiteInspection']['id']), array('escape' => false)); ?>
             <?php
-              if($sae['Sae']['approved'] < 1) {
-                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $sae['Sae']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['Sae']['id']));
+              if($siteInspection['SiteInspection']['approved'] < 1) {
+                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $siteInspection['SiteInspection']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $siteInspection['SiteInspection']['id']));
               } 
-              if($redir === 'applicant' && $sae['Sae']['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $sae['Sae']['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['Sae']['reference_no']));
+              if($redir === 'applicant' && $siteInspection['SiteInspection']['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $siteInspection['SiteInspection']['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $siteInspection['SiteInspection']['reference_no']));
             ?>            
         </td>
     </tr>
@@ -149,7 +140,7 @@
 <script type="text/javascript">
 $(function() {
   $(".morecontent").expander();
-  var adates = $('#SaeStartDate, #SaeEndDate').datepicker({
+  var adates = $('#SiteInspectionStartDate, #SiteInspectionEndDate').datepicker({
           minDate:"-100Y",
           maxDate:"-0D",
           dateFormat:'dd-mm-yy',
@@ -160,7 +151,7 @@ $(function() {
           changeYear:true,
           showAnim:'show',
           onSelect: function( selectedDate ) {
-            var option = this.id == "SaeStartDate" ? "minDate" : "maxDate",
+            var option = this.id == "SiteInspectionStartDate" ? "minDate" : "maxDate",
               instance = $( this ).data( "datepicker" ),
               date = $.datepicker.parseDate(
                 instance.settings.dateFormat ||
