@@ -4,7 +4,7 @@
 <hr class="soften" style="margin: 10px 0px;">
 
 <?php
-  if ($site_inspection['approved'] < 1) {
+  if (($this->Session->read('Auth.User.id') == $site_inspection['user_id'] or $this->Session->read('Auth.User.group_id') == '2') and $site_inspection['approved'] < 1) {
 
   echo $this->Form->create('SiteInspection', array(
         'url' => array('controller' => 'site_inspections','action' => 'edit', $site_inspection['id'], $site_inspection['application_id']),
@@ -187,7 +187,7 @@
     <?php
         echo $this->Form->end();
       }
-      if ($site_inspection['approved'] >= 1) {
+      if ($this->Session->read('Auth.User.id') !== $site_inspection['user_id'] or $site_inspection['approved'] >= 1) {
     ?>   
 
 

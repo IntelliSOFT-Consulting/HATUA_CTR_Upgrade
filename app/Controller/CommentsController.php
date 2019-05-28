@@ -74,7 +74,7 @@ class CommentsController extends AppController {
                       );
                       $datum = array(
                         'email' => ($sae['SiteInspection']['reporter_email'] && $actioner == 'applicant') ? $sae['SiteInspection']['reporter_email'] : $user['User']['email'],
-                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_sae_feedback', 'model' => 'SiteInspection',
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_si_feedback', 'model' => 'SiteInspection',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                       );

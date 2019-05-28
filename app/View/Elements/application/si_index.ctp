@@ -115,14 +115,15 @@
         <td><?php echo h($siteInspection['SiteInspection']['reference_no']); ?>&nbsp;</td>
         <td><?php 
           // echo h($siteInspection['Application']['protocol_no']); 
-        echo $this->Html->link($siteInspection['Application']['protocol_no'], array('controller' => 'applications' , 'action' => 'view', $siteInspection['Application']['id']), array('escape' => false));
+        echo $this->Html->link($siteInspection['Application']['protocol_no'], array('controller' => 'applications' , 'action' => 'view', $siteInspection['Application']['id'], 
+              'inspection_id' => $siteInspection['SiteInspection']['id']), array('escape' => false));
         ?>&nbsp;</td>
         <td><?php echo h($siteInspection['SiteInspection']['pactr_number']); ?>&nbsp;</td>
         <td><?php echo h($siteInspection['SiteInspection']['inspection_country']); ?>&nbsp;</td>
         <td><?php echo h($siteInspection['SiteInspection']['created']); ?>&nbsp;</td>
         <td class="actions">
-            <?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $siteInspection['SiteInspection']['id']), array('escape' => false)); ?>
-            <?php if($redir === 'applicant') echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('action' => 'edit', $siteInspection['SiteInspection']['id']), array('escape' => false)); ?>
+            <?php echo $this->Html->link('<label class="label label-info">View</label>',
+                             array('controller' => 'applications' ,'action' => 'view', $siteInspection['Application']['id'], 'inspection_id' => $siteInspection['SiteInspection']['id']), array('escape'=>false)); ?>
             <?php
               if($siteInspection['SiteInspection']['approved'] < 1) {
                 echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $siteInspection['SiteInspection']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $siteInspection['SiteInspection']['id']));

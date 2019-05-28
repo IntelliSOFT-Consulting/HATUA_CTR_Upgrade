@@ -269,7 +269,11 @@ class SiteInspectionsController extends AppController {
         $this->edit($id, $application_id);
     }
         
-    public function inspector_edit($id = null, $application_id = null) {
+    public function inspector_edit($id = null, $application_id = null) {        
+        $si = $this->SiteInspection->read(null, $id);
+        if ($si['SiteInspection']['user_id'] != $this->Auth->User('id')) {
+            $this->redirect(array('controller' => 'applications' ,'action' => 'view', $application_id, 'inspection_id' => $site_inspection['id']));
+        }
         $this->edit($id, $application_id);
     }
 
@@ -306,6 +310,60 @@ class SiteInspectionsController extends AppController {
     }
     public function inspector_summary($id = null, $application_id = null) {
         $this->summary($id, $application_id);
+    }
+
+    public function send_to_pi($id = null) {
+        $this->SiteInspection->id = $id;
+        if (!$this->SiteInspection->exists()) {
+            throw new NotFoundException(__('Invalid site inspection'));
+        }
+        $si = $this->SiteInspection->read(null, $id);
+        $this->SiteInspection->saveField('sent_to_pi', 1);
+
+        //******************       Send Email and Notifications to Applicant and Managers          *****************************
+          $this->loadModel('Message');
+          $html = new HtmlHelper(new ThemeView());
+          $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_send_summary')));
+
+          $users = $this->SiteInspection->User->find('all', array(
+              'contain' => array(),
+              'conditions' => array('OR' => array('User.id' => $si['SiteInspection']['user_id'], 'User.group_id' => array(2, 6)))
+          ));
+          foreach ($users as $user) {
+              if($user['User']['group_id'] == 2) $actioner =  'manager';
+              if($user['User']['group_id'] == 6) $actioner =  'inspector';
+              if($user['User']['group_id'] == 5) $actioner =  'applicant';
+
+              $variables = array(
+                'name' => $user['User']['name'], 
+                'reference_no' => $si['SiteInspection']['reference_no'], 
+                'outcome' => $si['SiteInspection']['outcome'],
+                'conclusion' => $si['SiteInspection']['conclusion'],
+                'summary_report' => $si['SiteInspection']['summary_report'],
+                'reference_link' => $html->link($si['SiteInspection']['reference_no'], array('controller' => 'applications', 'action' => 'view', $si['SiteInspection']['application_id'], $actioner => true, 
+                      'inspection_id' => $id,  'full_base' => true), 
+                  array('escape' => false)),
+              );
+              $datum = array(
+                'email' => $user['User']['email'],
+                'id' => $si['SiteInspection']['id'], 'user_id' => $user['User']['id'], 'type' => 'manager_send_summary', 'model' => 'SiteInspection',
+                'subject' => String::insert($message['Message']['subject'], $variables),
+                'message' => String::insert($message['Message']['content'], $variables)
+              );
+              CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+              CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+          }
+        //**********************************    END   *********************************
+
+        $this->Session->setFlash(__('The site inspection summary has been sent to the PI'), 'alerts/flash_success');
+        $this->redirect($this->referer());
+        
+    }
+    public function manager_send_to_pi($id = null, $application_id = null) {
+        $this->send_to_pi($id, $application_id);
+    }
+    public function inspector_send_to_pi($id = null, $application_id = null) {
+        $this->send_to_pi($id, $application_id);
     }
 /**
  * approve method

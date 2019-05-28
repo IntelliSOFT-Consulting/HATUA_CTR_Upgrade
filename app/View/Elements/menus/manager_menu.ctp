@@ -34,7 +34,7 @@
        </li>
        <li class="<?php echo $this->fetch('SI') ?>">
           <?php
-              echo $this->Html->link('<i class="icon-search"></i> Site Inspections',
+              echo $this->Html->link('<i class="icon-skype"></i> Site Inspections',
                   array('controller' => 'site_inspections', 'action'=>'index', 'manager' => true ), array('escape' => false ));
               ?>
        </li>

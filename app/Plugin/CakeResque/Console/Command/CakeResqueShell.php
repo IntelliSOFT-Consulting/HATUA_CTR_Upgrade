@@ -307,6 +307,7 @@ class CakeResqueShell extends Shell {
 		));
 
 		$workersCountBefore = Resque::Redis()->scard('workers');
+		// $this->log($cmd, 'divinemercy');
 		passthru($cmd);
 
 		$this->out(__d('cake_resque', 'Starting worker '), 0);

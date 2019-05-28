@@ -270,6 +270,11 @@
                           array('escape'=>false, 'class' => 'btn btn-block',  'style'=>'padding:7px; margin-top: 10px;'));
                         echo "<br><br>";
 
+                       if ($redir === 'inspector' || $redir === 'manager') {
+                         echo $this->Html->link(__('<span class="label label-info"> Site Inspection </span>'),
+                            array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
+                            array('escape' => false));
+                       }
                        if ($this->fetch('is-admin') == 'true') {
                           if ($application['Application']['deleted']) {
                               echo $this->Html->link('<span class="label label-inverse"> Undelete </span>',

@@ -4,7 +4,7 @@
 
 <div class="tab-pane" id="summary_report">
 
-<?php if($site_inspection['summary_approved'] < 1) { ?>
+<?php if(($this->Session->read('Auth.User.id') == $site_inspection['user_id'] or $this->Session->read('Auth.User.group_id') == '2') and $site_inspection['summary_approved'] < 1) { ?>
   <div class="page-header">
     <div class="styled_title"><h3>Summary Report</h3></div>
   </div>
