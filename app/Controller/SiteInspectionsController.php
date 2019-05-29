@@ -336,6 +336,7 @@ class SiteInspectionsController extends AppController {
 
               $variables = array(
                 'name' => $user['User']['name'], 
+                'protocol_no' => $si['Application']['protocol_no'], 
                 'reference_no' => $si['SiteInspection']['reference_no'], 
                 'outcome' => $si['SiteInspection']['outcome'],
                 'conclusion' => $si['SiteInspection']['conclusion'],

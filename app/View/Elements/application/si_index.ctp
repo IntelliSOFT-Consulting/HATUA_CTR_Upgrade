@@ -8,7 +8,7 @@
     <div class="marketing">
       <div class="row-fluid">
             <div class="span12">
-              <h3>Site Inspections: <small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
+              <h3><i class="icon-skype"></i> Site Inspections: <small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
               <hr class="soften" style="margin: 7px 0px;">
             </div>
         </div>
@@ -125,10 +125,9 @@
             <?php echo $this->Html->link('<label class="label label-info">View</label>',
                              array('controller' => 'applications' ,'action' => 'view', $siteInspection['Application']['id'], 'inspection_id' => $siteInspection['SiteInspection']['id']), array('escape'=>false)); ?>
             <?php
-              if($siteInspection['SiteInspection']['approved'] < 1) {
-                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $siteInspection['SiteInspection']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $siteInspection['SiteInspection']['id']));
+              if(($siteInspection['SiteInspection']['user_id'] == $this->Session->read('Auth.User.id') || $redir === 'manager') && $siteInspection['SiteInspection']['approved'] < 1) {
+                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $siteInspection['SiteInspection']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $siteInspection['SiteInspection']['reference_no']));
               } 
-              if($redir === 'applicant' && $siteInspection['SiteInspection']['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $siteInspection['SiteInspection']['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $siteInspection['SiteInspection']['reference_no']));
             ?>            
         </td>
     </tr>

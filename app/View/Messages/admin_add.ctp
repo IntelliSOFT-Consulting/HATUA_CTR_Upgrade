@@ -24,6 +24,10 @@
 		echo $this->Form->input('id');
 		echo $this->Form->input('name');
 		echo $this->Form->input('subject');
+      	echo $this->Form->input('style',
+            array('type' => 'select', 'empty' => true,
+              'options' =>  array('info' => 'Blue', 'success' => 'Green', 'error' => 'Red', 'warning' => 'Orange'), 
+              'label' => array('class' => 'control-label', 'text' => 'Notification Style')));
 		echo $this->Form->input('content', array(
               'label' => array('class' => 'control-label required', 'text' => 'Content <span class="sterix">*</span>'),
               'between'=>'<div class="controls">', 'placeholder' => 'study title' , 'class' => 'input-large',

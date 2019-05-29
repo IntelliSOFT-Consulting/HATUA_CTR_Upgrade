@@ -112,17 +112,6 @@ public function index() {
         $this->set(compact('trial_statuses'));
     }
 
-    private function csv_export($applications = ''){
-        //todo: check if data exists in $applications
-        $_serialize = 'applications';
-        $_header = array('Protocol No', 'Study Title', 'Short Title', 'Created');
-        $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 'Application.created');
-
-        $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
-        $this->viewClass = 'CsvView.Csv';
-        $this->set(compact('applications', '_serialize', '_header', '_extract'));
-    }
-
     public function inspector_index() {
         $this->Prg->commonProcess();
         $page_options = array('5' => '5', '10' => '10');
@@ -898,5 +887,24 @@ public function index() {
             $this->redirect(array('action' => 'index'));
         }
         return $response;
+    }
+
+
+    private function csv_export($applications = ''){
+        //todo: check if data exists in $applications
+        $_serialize = 'applications';
+        $_header = array('Protocol No', 'Study Title', 'Short Title', 
+            'Version No', 'Date of Protocol', 'Study Drug', 'Disease Condition',
+            'Approval Date of Protocol',
+            'Created',
+            );
+        $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 
+            'Application.version_no', 'Application.date_of_protocol', 'Application.study_drug', 'Application.disease_condition',
+            'Application.approval_date',
+            'Application.created');
+
+        $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('applications', '_serialize', '_header', '_extract'));
     }
 }

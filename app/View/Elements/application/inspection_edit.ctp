@@ -122,7 +122,7 @@
             echo $this->Html->link(__('<i class="icon-envelope-alt"></i> Send Report to PI'),
                   array('controller' => 'site_inspections', 'action' => 'send_to_pi', $site_inspection['id']),
                   array('escape' => false, 'class' => 'btn btn-small btn-warning'));
-          } elseif ($site_inspection['sent_to_pi'] == 1) {
+          } elseif ($site_inspection['sent_to_pi'] == 1 && $redir !== 'applicant') {
             echo "<p class='text-success'>Email sent to PI</p>";
           }
           
@@ -136,7 +136,6 @@
       <div class="row-fluid">
           <div class="span12">
           <br>
-          <?php //if(strpos($this->request->here, 'pdf') !== false) { ?>
             <div class="amend-form">
               <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
               <div class="row-fluid">
@@ -145,14 +144,13 @@
                 </div>
                 <div class="span4 lefty">
                   <?php  
-                        echo $this->element('comments/add', [
-                                 'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
-                                             'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add_si_internal']]) 
+                       echo $this->element('comments/add', [
+                                'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
+                                            'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add_si_internal']]) 
                   ?>
                 </div>
               </div>
             </div>
-          <?php //} ?>
           </div><!--/span-->
       </div><!--/row-->
     </div>
@@ -163,7 +161,6 @@
       <div class="row-fluid">
           <div class="span12">
           <br>
-          <?php //if(strpos($this->request->here, 'pdf') !== false) { ?>
             <div class="amend-form">
               <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
               <div class="row-fluid">
@@ -172,14 +169,14 @@
                 </div>
                 <div class="span4 lefty">
                   <?php  
-                        echo $this->element('comments/add', [
-                                 'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
-                                             'model' => 'SiteInspection', 'category' => 'external', 'url' => 'add_si_external']]) 
+                       echo $this->element('comments/add', [
+                                // 'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
+                                'model' => ['model_id' => '1', 'foreign_key' => '1', 
+                                            'model' => 'SiteInspection', 'category' => 'external', 'url' => 'add_si_external']]) 
                   ?>
                 </div>
               </div>
             </div>
-          <?php //} ?>
           </div><!--/span-->
       </div><!--/row-->
 

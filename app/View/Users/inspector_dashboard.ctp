@@ -35,28 +35,7 @@
 			<dl>
 	  <?php
 		// pr($notifications);
-		foreach ($notifications as $notification) {
-			echo '<div class="alert" id="'.$notification['Notification']['id'].'">';
-			echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
-			if ($notification['Notification']['type'] == 'manager_new_application') {
-				echo "<p><i class='icon-star-empty'></i>".$notification['Notification']['title']."</p>";
-				echo "<p>".$notification['Notification']['system_message']."</p>";
-			} elseif ($notification['Notification']['type'] == 'manager_reviewer_response') {
-				echo "<p>".$notification['Notification']['system_message']." ".$this->Html->link($notification['Notification']['title'], array('controller' => 'applications', 'action' => 'view_notification', $notification['Notification']['foreign_key'], $notification['Notification']['id']), array('escape' => false, ))."</p>";
-			}  elseif ($notification['Notification']['type'] == 'new_reviewer_comment') {
-				echo "<p>".$notification['Notification']['system_message']." ".$this->Html->link($notification['Notification']['title'], array('controller' => 'applications', 'action' => 'view_notification', $notification['Notification']['foreign_key'], $notification['Notification']['id']), array('escape' => false, ))."</p>";
-			}  elseif ($notification['Notification']['type'] == 'managers_approve_message') {
-				echo "<p>".$notification['Notification']['title']."</p>";
-				echo "<p>".$notification['Notification']['system_message']."</p>";
-				echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
-			} else {
-				// pr($notification);
-				echo "<p>".$notification['Notification']['title']."</p>";
-				echo "<p>".$notification['Notification']['system_message']."</p>";
-				echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
-			}
-			echo '</div>';
-		}
+		echo $this->element('alerts/notifications', ['notifications' => $notifications]); 
 	  ?>
 			</dl>
 		  </div>

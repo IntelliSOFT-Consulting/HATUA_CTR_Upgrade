@@ -73,10 +73,13 @@
 		<div class="thumbnail">
 		  <img alt="" src="/img/authenticated/preferences_desktop_notification.png">
 		  <div class="caption">
-			<h4>Notifications</h4>
-			<p>You will also get notifications concerning the status of the application in this panel.
-				</p>
-		  </div>
+            <h4>Notifications <small>Actions that require your attention</small> </h4>
+            <dl>
+            <?php
+                echo $this->element('alerts/notifications', ['notifications' => $notifications]);               
+            ?>
+            </dl>
+          </div>
 		</div>
 	  </li>
 	 <!--  <li class="span3">

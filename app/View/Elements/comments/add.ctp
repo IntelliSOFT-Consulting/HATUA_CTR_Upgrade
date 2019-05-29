@@ -8,11 +8,25 @@
     <div class="bs-example">
       <?php 
         // echo $this->Form->create(null, ['type' => 'file','url' => ['controller' => 'Comments', 'action' => $model['url']]]); 
-        echo $this->Form->create('Comment', array(
+        // echo $this->Form->create('Comment', array(
+        //     'url' => array('controller' => 'comments','action' => $model['url']),
+        //     'type' => 'file',
+        //     'class' => false,
+        // ));
+      echo $this->Form->create('Comment', array(
             'url' => array('controller' => 'comments','action' => $model['url']),
             'type' => 'file',
             'class' => false,
-        ));
+            'inputDefaults' => array(
+              'div' => array('class' => 'control-group'),
+              'label' => array('class' => 'control-label'),
+              'between' => '<div class="controls">',
+              'after' => '</div>',
+              'class' => '',
+              'format' => array('before', 'label', 'between', 'input', 'after','error'),
+              'error' => array('attributes' => array( 'class' => 'controls help-block')),
+             ),
+      ));
       ?>
                   <?php
                         echo $this->Form->input('model_id', ['type' => 'hidden', 'value' => $model['model_id'], 'escape' => false]);
