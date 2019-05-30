@@ -82,6 +82,15 @@
                         echo $this->Html->link('<li>'.$ndata.'</li>', array('controller' => 'applications', 'action' => 'edit', $application['Application']['id']),
                             array('escape' => false));                      
                     }
+                    if ($application['Application']['submitted']) {
+                      echo "<br>";
+                      echo $this->Html->link('<i class="icon-list-alt"></i> Create SAE', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
+                            array('escape' => false, 'class' => 'btn btn-success btn-mini')); 
+                      echo "&nbsp;";
+                      echo $this->Html->link('<i class="icon-credit-card"></i> Create SUSAR', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
+                            array('escape' => false, 'class' => 'btn btn-primary btn-mini'));   
+                    }
+                    
                  }
                  ?>
             </ol>
@@ -94,25 +103,25 @@
         <br>
         <div class="thumbnail">
             <div class="caption">               
-                <h4>Create SAE or SUSAR</h4>
+                <h4>SAE / SUSAR</h4>
                 <?php
-                    echo $this->Form->create('Sae', array('controller' => 'saes', 'action' => 'add'));
-                    echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
-                    echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
-                    echo $this->Form->button('<i class="icon-list-alt"></i> Create SAE', array(
-                      'name' => 'createSAE',
-                      'class' => 'btn btn-success btn-small',
-                      'id' => 'SaeCreate', 
-                      'div' => false,
-                    ));
-                    echo "&nbsp;";
-                    echo $this->Form->button('<i class="icon-credit-card"></i> Create SUSAR', array(
-                      'name' => 'createSUSAR',
-                      'class' => 'btn btn-primary btn-small',
-                      'id' => 'SusarCreate', 
-                      'div' => false,
-                    ));
-                    echo $this->Form->end();
+                    // echo $this->Form->create('Sae', array('controller' => 'saes', 'action' => 'add'));
+                    // echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
+                    // echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
+                    // echo $this->Form->button('<i class="icon-list-alt"></i> Create SAE', array(
+                    //   'name' => 'createSAE',
+                    //   'class' => 'btn btn-success btn-small',
+                    //   'id' => 'SaeCreate', 
+                    //   'div' => false,
+                    // ));
+                    // echo "&nbsp;";
+                    // echo $this->Form->button('<i class="icon-credit-card"></i> Create SUSAR', array(
+                    //   'name' => 'createSUSAR',
+                    //   'class' => 'btn btn-primary btn-small',
+                    //   'id' => 'SusarCreate', 
+                    //   'div' => false,
+                    // ));
+                    // echo $this->Form->end();
                     echo '<ol>';
                     foreach ($saes as $sae) {
                       if($sae['Sae']['approved'] < 1) {
@@ -136,27 +145,7 @@
             <!-- <dl class="notifications"> -->
             <?php
                 // pr($notifications);
-                foreach ($notifications as $notification) {
-                    echo '<div class="alert" id="'.$notification['Notification']['id'].'">';
-                    echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
-                    if ($notification['Notification']['type'] == 'registration_welcome') {
-                        echo '<strong>'.$notification['Notification']['title'].'</strong>';
-                        echo "<br/><small>".$notification['Notification']['system_message']."</small>";
-                    } elseif ($notification['Notification']['type'] == 'manager_comment_applicant') {
-                        echo '<strong>'.$notification['Notification']['system_message'].'</strong>';
-                    } elseif ($notification['Notification']['type'] == 'applicant_approve_message') {
-                        echo "<strong>".$notification['Notification']['title']."</strong>";
-                        echo "<br/><small>".$notification['Notification']['system_message']."</small>";
-                        echo "<blockquote><p> ".$notification['Notification']['user_message']."</p><small>PPB Comment</small></blockquote>";
-                    } elseif ($notification['Notification']['type'] == 'applicant_new_amendment') {
-                        echo "<p>".$notification['Notification']['system_message']."</p>";
-                    } else {
-                        echo "<strong>".$notification['Notification']['title']."</strong>";
-                        echo "<br/><small>".$notification['Notification']['system_message']."</small>";
-                        echo "<p> ".$notification['Notification']['user_message']."</p>";
-                    }
-                    echo '</div>';
-                }
+                
             ?>
             <!-- </dl> -->
           </div>

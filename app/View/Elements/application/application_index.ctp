@@ -265,10 +265,19 @@
                            if(!$application['Application']['deleted'])  echo $this->Html->link('<span class="label label-info"> View </span>',
                                            array('action' => 'view', $application['Application']['id']), array('escape'=>false));
                         }
-                       if ($this->fetch('quick-pdf') == 'true') echo $this->Html->link('<i class="icon-download-alt"></i> PDF Download',
+                        if ($this->fetch('quick-pdf') == 'true') echo $this->Html->link('<i class="icon-download-alt"></i> PDF Download',
                           array('action' => 'view', 'ext' => 'pdf', $application['Application']['id']),
                           array('escape'=>false, 'class' => 'btn btn-block',  'style'=>'padding:7px; margin-top: 10px;'));
                         echo "<br><br>";
+
+                        if ($redir == 'applicant' && $application['Application']['submitted']) {
+                          echo $this->Html->link('<span class="label label-success"> New SAE </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
+                                array('escape' => false)); 
+                          echo "<br><br>";
+                          echo $this->Html->link('<span class="label label-primary"> New SUSAR </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
+                                array('escape' => false));   
+                          echo "<br>";
+                        }
 
                        if ($redir === 'inspector' || $redir === 'manager') {
                          echo $this->Html->link(__('<span class="label label-info"> Site Inspection </span>'),

@@ -12,6 +12,7 @@ App::uses('Sanitize', 'Utility');
  */
 class SaesController extends AppController {
     public $paginate = array();
+    public $uses = array('Sae', 'Application');
     public $components = array('Search.Prg');
     public $presetVars = true; // using the model configuration
 
@@ -158,34 +159,40 @@ class SaesController extends AppController {
  *
  * @return void
  */
-    public function applicant_add() {
-        if ($this->request->is('post')) {
-            $this->Sae->create();
-            if ($this->Sae->save($this->request->data)) {
-                if (isset($this->request->data['createSAE'])) {
-                    $count = $this->Sae->find('count',  array('conditions' => array(
-                        'Sae.form_type' => 'SAE',
-                        'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
-                    $count++;
-                    $count = ($count < 10) ? "0$count" : $count;
-                    $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
-                    $this->Sae->saveField('form_type', 'SAE');
-                    $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
-                } elseif (isset($this->request->data['createSUSAR'])) {
-                    $count = $this->Sae->find('count',  array('conditions' => array(
-                        'Sae.form_type' => 'SUSAR',
-                        'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
-                    $count++;
-                    $count = ($count < 10) ? "0$count" : $count;
-                    $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
-                    $this->Sae->saveField('form_type', 'SUSAR');
-                    $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
-                }
-                $this->redirect(array('action' => 'edit', $this->Sae->id));
-            } else {
-                $this->Session->setFlash(__('The SAE/SUSAR could not be saved. Please, try again.'), 'alerts/flash_error');
-            }
+    public function applicant_add($id = null, $type = null) {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            throw new NotFoundException(__('Invalid application'));
         }
+        
+        if ($type == 'sae') {
+            $count = $this->Sae->find('count',  array('conditions' => array(
+                'Sae.form_type' => 'SAE',
+                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
+            $count++;
+            $count = ($count < 10) ? "0$count" : $count;
+            // $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
+            // $this->Sae->saveField('form_type', 'SAE');
+            $this->Sae->create();
+            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
+                'form_type' => 'SAE'
+                ]], false);
+            $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
+        } elseif ($type == 'susar') {
+            $count = $this->Sae->find('count',  array('conditions' => array(
+                'Sae.form_type' => 'SUSAR',
+                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
+            $count++;
+            $count = ($count < 10) ? "0$count" : $count;
+            // $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
+            // $this->Sae->saveField('form_type', 'SUSAR');
+            $this->Sae->create();
+            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
+                'form_type' => 'SAE'
+                ]], false);
+            $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
+        }
+            $this->redirect(array('action' => 'edit', $this->Sae->id));
     }
     public function applicant_followup($id = null) {
         if ($this->request->is('post')) {
