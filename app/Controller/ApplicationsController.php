@@ -330,7 +330,7 @@ public function index() {
             'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review', 
+                'AnnualApproval', 'Document', 'Review', 'Sae',
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
 
@@ -868,7 +868,7 @@ public function index() {
             'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'SiteInspection', 
+                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae',
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),
                         'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')

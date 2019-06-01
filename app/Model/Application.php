@@ -183,6 +183,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'Sae' => array(
+            'className' => 'Sae',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
                           'Attachment' => array(
                                     'className' => 'Attachment',
                                     'foreignKey' => 'foreign_key',

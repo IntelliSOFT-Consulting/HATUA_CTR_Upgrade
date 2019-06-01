@@ -37,6 +37,7 @@
                    ?>)</small></a></li>
           <?php
               echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections ('.count($application['SiteInspection']).')</a></li>';
+              echo  '<li><a href="#tab7" data-toggle="tab">SAE/SUSAR ('.count($application['Sae']).')</a></li>';
           ?>
       </ul>
       <div class="tab-content my-tab-content">
@@ -386,10 +387,60 @@
             echo $this->element('/application/inspection_edit');
           ?>
 
-          </div>
         </div>
       </div>
+    </div>
+    
+    <div class="tab-pane" id="tab7">   
+      <div class="row-fluid">
+        <div class="span12">
 
+          <table  class="table  table-bordered table-striped">
+             <thead>
+                    <tr>
+                <th>Id</th>
+                <th>Reference No.</th>
+                <th>Report Type</th>
+                <th>Patient Initials</th>
+                <th>Created</th>
+                <th class="actions"><?php echo __('Actions'); ?></th>
+                  </tr>
+               </thead>
+              <tbody>
+            <?php
+            foreach ($application['Sae'] as $sae): ?>
+            <tr class="">
+                <td><?php echo h($sae['id']); ?>&nbsp;</td>
+                <td><?php echo h($sae['reference_no']); ?>&nbsp;</td>
+                <td><?php echo h($sae['report_type']); 
+                          if($sae['report_type'] == 'Followup') {
+                            echo "<br> Initial: ";
+                            echo $this->Html->link(
+                              '<label class="label label-info">'.substr($sae['reference_no'], 0, strpos($sae['reference_no'], '-')).'</label>', 
+                              array('controller' => 'saes', 'action' => 'view', $sae['sae_id']), array('escape' => false));
+                          }
+                      ?>&nbsp;
+                </td>
+                <td><?php echo h($sae['patient_initials']); ?>&nbsp;</td>
+                <td><?php echo h($sae['created']); ?>&nbsp;</td>
+                <td class="actions">
+                    <?php if($sae['approved'] > 0) echo $this->Html->link(__('<label class="label label-info">View</label>'), array('controller' => 'saes', 'action' => 'view', $sae['id']), array('escape' => false)); ?>
+                    <?php if($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('escape' => false)); ?>
+                    <?php
+                      if($sae['approved'] < 1) {
+                        echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
+                      } 
+                      if($redir === 'applicant' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
+                    ?>            
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+          </table>
+
+          </div>
+      </div>
+    </div>
 
 </div>
 </div>

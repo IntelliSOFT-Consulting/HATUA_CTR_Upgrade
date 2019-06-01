@@ -32,7 +32,7 @@ class SaesController extends AppController {
         // $this->set('saes', $this->paginate());
 
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '15' => '15');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
             else $this->paginate['limit'] = reset($page_options);
@@ -113,7 +113,7 @@ class SaesController extends AppController {
         }
         $sae = $this->Sae->read(null, $id);
         if ($sae['Sae']['approved'] < 1) {
-                $this->Session->setFlash(__('The sae has been submitted'), 'alerts/flash_info');
+                $this->Session->setFlash(__('The sae has not been submitted'), 'alerts/flash_info');
                 $this->redirect(array('action' => 'edit', $this->Sae->id));
         }
         if ($sae['Sae']['user_id'] !== $this->Auth->User('id')) {
