@@ -394,7 +394,7 @@
     <div class="tab-pane" id="tab7">   
       <div class="row-fluid">
         <div class="span12">
-
+          
           <table  class="table  table-bordered table-striped">
              <thead>
                     <tr>
@@ -424,7 +424,8 @@
                 <td><?php echo h($sae['patient_initials']); ?>&nbsp;</td>
                 <td><?php echo h($sae['created']); ?>&nbsp;</td>
                 <td class="actions">
-                    <?php if($sae['approved'] > 0) echo $this->Html->link(__('<label class="label label-info">View</label>'), array('controller' => 'saes', 'action' => 'view', $sae['id']), array('escape' => false)); ?>
+                    <?php if($sae['approved'] > 0) echo $this->Html->link(__('<label class="label label-info">View</label>'), array('controller' => 'saes', 'action' => 'view', $sae['id']), 
+                      array('target' => '_blank', 'escape' => false)); ?>
                     <?php if($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('escape' => false)); ?>
                     <?php
                       if($sae['approved'] < 1) {

@@ -37,7 +37,7 @@ public function index() {
             $criteria['Application.deactivated'] = 0;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -62,7 +62,7 @@ public function index() {
             $criteria['Application.user_id'] = $this->Auth->User('id');
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
             
             //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -94,7 +94,7 @@ public function index() {
 
             $this->paginate['contain'] = array(
                 'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-                'InvestigatorContact', 'SiteDetail' => array('County'));
+                'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
             //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -126,7 +126,7 @@ public function index() {
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-            'InvestigatorContact', 'SiteDetail' => array('County'));
+            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -152,7 +152,7 @@ public function index() {
             $criteria['Application.id'] = $my_applications;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -172,7 +172,7 @@ public function index() {
             $criteria['Application.user_id'] = $this->Auth->User('id');
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -193,7 +193,7 @@ public function index() {
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-            'InvestigatorContact', 'SiteDetail' => array('County'));
+            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
            //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
               $this->csv_export($this->Application->find('all', 
@@ -895,12 +895,13 @@ public function index() {
         $_serialize = 'applications';
         $_header = array('Protocol No', 'Study Title', 'Short Title', 
             'Version No', 'Date of Protocol', 'Study Drug', 'Disease Condition',
-            'Approval Date of Protocol',
+            'Approval Date of Protocol', 'Biologicals', 'Proteins', 'Immunologicals', 'Vaccines', 'Hormones', 'Toxoid', 'Chemical', 'Chemical Name', 'Medical Device', 'Medical Device Name', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
             'Created',
             );
         $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 
             'Application.version_no', 'Application.date_of_protocol', 'Application.study_drug', 'Application.disease_condition',
-            'Application.approval_date',
+            'Application.approval_date', 'Application.product_type_biologicals', 'Application.product_type_proteins',
+            'Application.product_type_immunologicals', 'Application.product_type_vaccines', 'Application.product_type_hormones', 'Application.product_type_toxoid', 'Application.product_type_chemical', 'Application.product_type_chemical_name', 'Application.product_type_medical_device', 'Application.product_type_medical_device_name', 'Application.investigator1_given_name', 'Application.investigator1_qualification', 'Application.investigator1_telephone', 'Application.investigator1_email', 'InvestigatorContact.0.given_name', 'InvestigatorContact.0.qualification', 'InvestigatorContact.0.telephone', 'InvestigatorContact.0.email', 'Sponsor.0.sponsor', 'Sponsor.0.cell_number', 'Sponsor.0.email_address', 
             'Application.created');
 
         $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
