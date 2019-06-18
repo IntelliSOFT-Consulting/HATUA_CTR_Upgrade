@@ -37,6 +37,12 @@
 					'div' => array('class' => 'control-group required'),
 					'label' => array('class' => 'control-label required', 'text' => 'E-MAIL ADDRESS')
 				));
+				echo $this->Form->input('sponsor_email', array(
+					'type' => 'email',
+					'div' => array('class' => 'control-group required'),
+					'label' => array('class' => 'control-label required', 'text' => 'Sponsor\'s E-MAIL')
+				));
+				echo $this->Form->input('qualification', array('label' => array('class' => 'control-label', 'text' => 'Qualification'),));
 				echo $this->Form->input('phone_no', array('label' => array('class' => 'control-label', 'text' => 'Phone Number'),));
 				echo $this->Form->input('name_of_institution', array(
 					'label' => array('class' => 'control-label', 'text' => 'Name of Institution'),

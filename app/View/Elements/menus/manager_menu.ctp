@@ -53,10 +53,16 @@
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>
             </li>
-          <li><?php  
+            <li><?php  
             echo $this->Html->link('<i class="icon-arrow-right"></i> SAE by Type by Study',  
                  array('controller' => 'reports', 'action'=>'sae_by_type', 'manager' => true ), array('escape' => false, 'tabindex' => '-1'));?>
-          </li>
+            </li>
+          <li class="divider"></li>
+             <li><?php
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Protocols by status',  array('controller' => 'reports', 'action'=>'protocols_by_status', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
         </ul>
        </li>
        <li class="<?php echo $this->fetch('Profile') ?>">

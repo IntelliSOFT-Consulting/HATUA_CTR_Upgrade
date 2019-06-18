@@ -26,6 +26,10 @@
 				<dd><?php echo $user['User']['name']; ?> &nbsp; </dd>
 				<dt>Email</dt>
 				<dd><?php echo $user['User']['email']; ?> &nbsp; </dd>
+				<dt>Sponsor's Email</dt>
+				<dd><?php echo $user['User']['sponsor_email']; ?> &nbsp; </dd>
+				<dt>Qualification</dt>
+				<dd><?php echo $user['User']['qualification']; ?> &nbsp; </dd>
 				<dt>Phone No</dt>
 				<dd><?php echo $user['User']['phone_no']; ?> &nbsp; </dd>
 				<dt>Name of institution</dt>

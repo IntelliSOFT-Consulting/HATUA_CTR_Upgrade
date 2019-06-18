@@ -69,6 +69,26 @@ class ReportsController extends AppController {
     public function manager_sae_by_type(){
         $this->sae_by_type();
     }
+
+    public function protocols_by_status() {
+        $data = $this->Application->find('all', array(
+            'fields' => array('TrialStatus.name', 'COUNT(*) as cnt'),
+            'contain' => array('TrialStatus'),
+            'conditions' => array('Application.approved' => array(1, 2)),
+            'group' => array('TrialStatus.name'),
+            'having' => array('COUNT(*) >' => 0),
+          ));        
+
+        $this->set(compact('data'));
+        $this->set('_serialize', 'data');
+        $this->render('protocols_by_status');
+    }
+    public function inspector_protocols_by_status(){
+        $this->protocols_by_status();
+    }
+    public function manager_protocols_by_status(){
+        $this->protocols_by_status();
+    }
     
   /**
    * view method

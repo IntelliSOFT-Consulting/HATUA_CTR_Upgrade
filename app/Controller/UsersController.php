@@ -1,5 +1,6 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('Validation', 'Utility');
 /**
  * Users Controller
  *
@@ -203,7 +204,18 @@ class UsersController extends AppController {
             $this->redirect('/', null, false);
         }
         if ($this->request->is('post')) {
+
+            if (Validation::email($this->request->data['User']['username'])) {                
+                $this->Auth->authenticate = array(
+                    'Form' => ['fields' => ['username' => 'email']]
+                );
+                $this->Auth->constructAuthenticate();
+                $this->request->data['User']['email'] = $this->request->data['User']['username'];
+                unset($this->request->data['User']['username']);
+            }
+
             if ($this->Auth->login()) {
+
                 if($this->Auth->User('is_active') == 0) {
                     $this->Session->setFlash('Your account is not activated! If you have just registered, please click the activation link
                         sent to your email. Remember to check you spam folder too!', 'alerts/flash_error');
@@ -262,9 +274,20 @@ class UsersController extends AppController {
             $criteria = $this->User->parseCriteria($this->passedArgs);
             // $criteria['User.deactivated'] = 0;
         $this->paginate['conditions'] = $criteria;
+
         $this->paginate['order'] = array('User.created' => 'desc');
         // $this->User->recursive = -1;
-        $this->paginate['contain'] = array('Group');
+        $this->paginate['contain'] = array('Group', 'County', 'Country');
+
+
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+
+              $this->csv_export($this->User->find('all', 
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                  ));
+        }
+        //end csv export
 
             $this->set('page_options', $page_options);
             $this->set('users', $this->paginate());
@@ -488,6 +511,23 @@ class UsersController extends AppController {
         }
 
         $this->redirect($this->referer());
+    }
+
+    private function csv_export($cusers = ''){
+        //todo: check if data exists in $users
+        $_serialize = 'cusers';
+        $_header = array('Id', 'Username', 'Name', 'Phone No', 'Email', 'Sponsor\'s Email' , 'Qualification', 'Role', 'Name of institution',
+            'Physical Address', 'Institution Address', 'Institution Contact', 'County', 'Country', 
+            'Created',
+            );
+        $_extract = array('User.id', 'User.username', 'User.name', 'User.phone_no', 'User.email', 'User.sponsor_email', 'User.qualification',
+            'Group.name', 'User.name_of_institution', 'User.institution_physical', 'User.institution_address', 'User.institution_contact', 
+            'County.county_name', 'Country.name', 
+            'User.created');
+
+        $this->response->download('users_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('cusers', '_serialize', '_header', '_extract'));
     }
 
     public function initDB() {

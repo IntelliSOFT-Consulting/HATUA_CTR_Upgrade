@@ -102,7 +102,7 @@ public function index() {
                       array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
                   ));
             }
-            //end pdf export
+            //end csv export
 
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
@@ -890,9 +890,9 @@ public function index() {
     }
 
 
-    private function csv_export($applications = ''){
+    private function csv_export($capplications = ''){
         //todo: check if data exists in $applications
-        $_serialize = 'applications';
+        $_serialize = 'capplications';
         $_header = array('Protocol No', 'Study Title', 'Short Title', 
             'Version No', 'Date of Protocol', 'Study Drug', 'Disease Condition',
             'Approval Date of Protocol', 'Biologicals', 'Proteins', 'Immunologicals', 'Vaccines', 'Hormones', 'Toxoid', 'Chemical', 'Chemical Name', 'Medical Device', 'Medical Device Name', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
@@ -906,6 +906,6 @@ public function index() {
 
         $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';
-        $this->set(compact('applications', '_serialize', '_header', '_extract'));
+        $this->set(compact('capplications', '_serialize', '_header', '_extract'));
     }
 }

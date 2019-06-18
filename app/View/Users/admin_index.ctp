@@ -48,6 +48,9 @@
               ));
 
               echo $this->Html->link('<i class="icon-remove"></i> Clear', array('action' => 'index'), array('class' => 'btn', 'escape' => false));
+                 
+              echo "<br>";
+              echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array('action' => 'index', 'ext' => 'csv'), array('class' => 'btn btn-success', 'escape' => false));
             ?>
           </div>
        </div>
