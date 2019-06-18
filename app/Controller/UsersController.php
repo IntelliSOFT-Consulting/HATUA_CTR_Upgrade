@@ -424,7 +424,7 @@ class UsersController extends AppController {
     public function edit() {
         if ($this->request->is('post') || $this->request->is('put')) {
             $fieldlist = array('name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address',
-                'institution_contact', 'county_id', 'country_id');
+                'institution_contact', 'county_id', 'country_id', 'sponsor_email', 'qualification');
             if ($this->User->save($this->request->data, true, $fieldlist)) {
                 $this->Session->setFlash(__('Your registration details have been updated.'), 'alerts/flash_success');
                 $this->redirect(array('action' => 'profile'));
