@@ -35,6 +35,11 @@
               echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections ('.count($application['SiteInspection']).')</a></li>';
               echo  '<li><a href="#tab7" data-toggle="tab">SAE/SUSAR ('.count($application['Sae']).')</a></li>';
           ?>
+          <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approvals</a></li>    
+          <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
+          <?php if ($application['Application']['approved'] == 2) { ?>
+            <li><a href="#tab9"  data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
+          <?php } ?>    
       </ul>
       <div class="tab-content my-tab-content">
         <div class="tab-pane active" id="tab1">
@@ -141,10 +146,10 @@ $this->end();
   <li><a href="#tabs-12">12. Checklist </a></li>
   <li><a href="#tabs-13">13. Declaration</a></li>
   <li><a href="#tabs-14">14. Notifications</a></li>
-  <li><a href="#tabs-15" style="color: #52A652;">15. Annual Approval</a></li>
-  <?php if ($application['Application']['approved'] == 2) { ?>
-    <li><a href="#tabs-16" style="color: #52A652;">16. Final Study Report</a></li>
-  <?php } ?>
+  <!-- <li><a href="#tabs-15" style="color: #52A652;">15. Annual Approval</a></li> -->
+  <?php //if ($application['Application']['approved'] == 2) { ?>
+    <!-- <li><a href="#tabs-16" style="color: #52A652;">16. Final Study Report</a></li> -->
+  <?php //} ?>
 </ul>
 <?php $this->end(); ?>
 
@@ -247,6 +252,22 @@ $this->end();
           </table>
 
           </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab8">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/approval'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab9">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/final'); ?>
+        </div>
       </div>
     </div>
 

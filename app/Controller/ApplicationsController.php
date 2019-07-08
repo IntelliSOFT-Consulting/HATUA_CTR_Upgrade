@@ -327,10 +327,10 @@ public function index() {
 
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review', 'Sae',
+                'AnnualApproval', 'ParticipantFlow', 'Document', 'Review', 'Sae',
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
 
@@ -363,10 +363,10 @@ public function index() {
 
         $this->set('application', $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review'
+                'AnnualApproval', 'ParticipantFlow', 'Document', 'Review'
                 ))));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
         $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -489,10 +489,10 @@ public function index() {
             if ($my_applications[$id] == 'accepted') {
                 $application = $this->Application->find('first', array(
                     'conditions' => array('Application.id' => $id),
-                    'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization',
+                    'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee',  'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization',
                         'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
                         'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 
-                        'AnnualApproval', 'Document', 'Registration', 'Fee', 'Review' => array(
+                        'AnnualApproval', 'ParticipantFlow', 'Document', 'Registration', 'Fee', 'Review' => array(
                             'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment')))));
                 $this->set('counties', $this->Application->SiteDetail->County->find('list'));
                 $this->set('application', $application);
@@ -588,6 +588,7 @@ public function index() {
             $this->redirect(array('action' => 'view', $id));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
+            // debug($this->request->data);
             if (isset($this->request->data['cancelReport'])) {
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
@@ -846,7 +847,7 @@ public function index() {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                     'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                     'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee')));
         if($response['Application']['user_id'] != $this->Auth->user('id')) {
@@ -865,10 +866,10 @@ public function index() {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae',
+                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow',
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),
                         'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')
@@ -893,12 +894,12 @@ public function index() {
     private function csv_export($capplications = ''){
         //todo: check if data exists in $applications
         $_serialize = 'capplications';
-        $_header = array('Protocol No', 'Study Title', 'Short Title', 
+        $_header = array('Protocol No', 'Study Title', 'Short Title', 'Date Submitted', 'Approval Date',
             'Version No', 'Date of Protocol', 'Study Drug', 'Disease Condition',
             'Approval Date of Protocol', 'Biologicals', 'Proteins', 'Immunologicals', 'Vaccines', 'Hormones', 'Toxoid', 'Chemical', 'Chemical Name', 'Medical Device', 'Medical Device Name', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
             'Created',
             );
-        $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 
+        $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 'Application.date_submitted', 'Application.approval_date',
             'Application.version_no', 'Application.date_of_protocol', 'Application.study_drug', 'Application.disease_condition',
             'Application.approval_date', 'Application.product_type_biologicals', 'Application.product_type_proteins',
             'Application.product_type_immunologicals', 'Application.product_type_vaccines', 'Application.product_type_hormones', 'Application.product_type_toxoid', 'Application.product_type_chemical', 'Application.product_type_chemical_name', 'Application.product_type_medical_device', 'Application.product_type_medical_device_name', 'Application.investigator1_given_name', 'Application.investigator1_qualification', 'Application.investigator1_telephone', 'Application.investigator1_email', 'InvestigatorContact.0.given_name', 'InvestigatorContact.0.qualification', 'InvestigatorContact.0.telephone', 'InvestigatorContact.0.email', 'Sponsor.0.sponsor', 'Sponsor.0.cell_number', 'Sponsor.0.email_address', 

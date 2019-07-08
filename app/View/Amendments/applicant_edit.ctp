@@ -204,6 +204,19 @@ $this->start('form-actions');
    </tr>
 <?php $this->end(); ?>
 
+<?php $this->start('laymans_summary'); ?>
+     <tr class="table-amendlabel"><td class="table-amendlabel"></td></tr>
+     <tr class="table-amendlabel">
+      <td class="table-noline">
+        <?php
+          echo $this->Form->input('Amendment.laymans_summary', array(
+            'label' => false, 'between'=>'<div class="nocontrols">', 'placeholder' => 'Laymans Summary' , 'class' => 'input-large',
+          ));
+        ?>
+    </td>
+   </tr>
+<?php $this->end(); ?>
+
 <?php $this->start('abstract_of_study'); ?>
      <tr class="table-amendlabel"><td class="table-amendlabel"></td></tr>
      <tr class="table-amendlabel">

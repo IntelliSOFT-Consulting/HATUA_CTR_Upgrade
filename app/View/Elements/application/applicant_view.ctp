@@ -33,6 +33,21 @@
              <?php echo $this->fetch('study_title'); ?>
             </tbody>
           </table>
+          <table class="table table-condensed">
+            <thead>
+            <tr><th class="table-label required"><h5 style="text-align: center;">Laymans Summary: <span class="sterix">*</span></h5></th></tr>
+            </thead>
+            <tbody>
+            <tr><td><?php echo $application['Application']['laymans_summary'] ?></td> </tr>
+            <?php
+              foreach($application['Amendment'] as $key => $amendment) {
+                if($amendment['submitted'] == 1 && !empty($amendment['laymans_summary'])){      ?>
+               <tr class="table-viewlabel"><td class="table-viewlabel"><?php echo $key+1; ?></td></tr>
+               <tr class="table-viewlabel"><td class="table-noline"> <?php echo $amendment['laymans_summary'];  ?></td></tr>
+             <?php   } } ?>
+             <?php echo $this->fetch('laymans_summary'); ?>
+            </tbody>
+          </table>
           <table class="table  table-condensed">
             <tbody>
              <tr>
@@ -189,6 +204,44 @@
                   </tr>
              <?php   } } ?>
             <?php echo $this->fetch('previous_dates'); ?>
+            </tbody>
+          </table>
+
+            <?php foreach($application['EthicalCommittee'] as $key => $date) { ?>
+            <span class="badge badge-info"><?php echo $key+1;?></span>
+            <table class="table  table-condensed">
+              <tbody>
+              <tr>
+                <td class="table-label"><p>Ethical Committee</p></td>
+                <td><?php    echo "<p>". $date['ethical_committee']."</p>";  ?></td>
+              </tr>
+              <tr>
+                <td class="table-label"><p>Submission Date</p></td>
+                <td><?php    echo "<p>". $date['submission_date']."</p>";  ?></td>
+              </tr>
+              <tr>
+                <td class="table-label"><p>ERC Number</p></td>
+                <td><?php    echo "<p>". $date['erc_number']."</p>";  ?></td>
+              </tr>
+              <tr>
+                <td class="table-label"><p>Approval date</p></td>
+                <td><?php    echo "<p>". $date['initial_approval']."</p>";  ?></td>
+              </tr>
+              </tbody>
+            </table>
+            <?php } ?>
+
+          <table>
+            <tbody>
+            <?php
+              foreach($application['Amendment']  as $key => $amendment) {
+                if($amendment['submitted'] == 1 && !empty($amendment['ethical_committees'])){      ?>
+                  <tr class="table-viewlabel">
+                    <td class="table-viewlabel"><?php echo $key+1; ?></td>
+                    <td class=" table-noline"><?php echo $amendment['ethical_committees'] ; ?></td>
+                  </tr>
+             <?php   } } ?>
+            <?php echo $this->fetch('ethical_committees'); ?>
 
             <tr>
               <td class="table-label required">
@@ -1992,17 +2045,17 @@
 
         </div>
         <div id="tabs-15">              
-          <?php echo $this->element('multi/approval'); ?>
+          <?php // echo $this->element('multi/approval'); ?>
         </div>
         <?php  if ($this->fetch('is-applicant') == 'true') { ?>
           <?php  if ($application['Application']['approved']) { ?>
             <div id="tabs-16">
-              <?php echo $this->element('multi/final'); ?>
+              <?php // echo $this->element('multi/final'); ?>
             </div>
           <?php } ?>
         <?php } else { ?>
           <div id="tabs-16">
-              <?php echo $this->element('multi/final'); ?>
+              <?php // echo $this->element('multi/final'); ?>
             </div>
         <?php } ?>
 

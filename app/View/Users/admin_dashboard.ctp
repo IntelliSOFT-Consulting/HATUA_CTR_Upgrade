@@ -130,6 +130,18 @@
           array('controller' => 'site_questions', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-money"></i> Annual Approval Financial Breakdown <small class="muted">(in annual approvals page)</small>',
+          array('controller' => 'pockets', 'action' => 'edit', 1, 'admin' => true), array('escape' => false));
+        ?>
+        </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-check"></i> Annual Approval Checklist',
+          array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
+        ?>
+        </li>
       </ul>
     </div>
       </div> <!-- /row -->
