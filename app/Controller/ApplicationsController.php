@@ -62,7 +62,7 @@ public function index() {
             $criteria['Application.user_id'] = $this->Auth->User('id');
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'Review' => array('User'));
             
             //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -93,7 +93,8 @@ public function index() {
             $this->paginate['order'] = array('Application.created' => 'desc');
 
             $this->paginate['contain'] = array(
-                'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
+                'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
+                'TrialStatus',
                 'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
             //in case of csv export
@@ -329,7 +330,7 @@ public function index() {
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval', 'ParticipantFlow', 'Document', 'Review', 'Sae',
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
@@ -365,7 +366,7 @@ public function index() {
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval', 'ParticipantFlow', 'Document', 'Review'
                 ))));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -492,7 +493,7 @@ public function index() {
                     'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee',  'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization',
                         'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
                         'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 
-                        'AnnualApproval', 'ParticipantFlow', 'Document', 'Registration', 'Fee', 'Review' => array(
+                        'AnnualApproval', 'ParticipantFlow', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
                             'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment')))));
                 $this->set('counties', $this->Application->SiteDetail->County->find('list'));
                 $this->set('application', $application);
@@ -849,7 +850,7 @@ public function index() {
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                     'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                    'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee')));
+                    'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist')));
         if($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('id'),'debug');
             $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
@@ -895,11 +896,19 @@ public function index() {
         //todo: check if data exists in $applications
         $_serialize = 'capplications';
         $_header = array('Protocol No', 'Study Title', 'Short Title', 'Date Submitted', 'Approval Date',
+            'Assigned Reviewer 1', 'Reviewer response 1', 'Assigned Reviewer 2', 'Reviewer response 2', 'Assigned Reviewer 3', 'Reviewer response 3', 'Assigned Reviewer 4', 'Reviewer response 4',
+            'Trial Status', 'Trial Phase I', 'Trial Phase II', 'Trial Phase III', 'Trial Phase IV', 
+            'Study Site', 'Approved Participants',
+            'Scope: Diagnosis', 'Scope: Prophylaxis', 'Scope: Therapy', 'Scope: Safety', 'Scope: Efficacy', 'Scope: Pharmacokinetic', 'Scope: Pharmacodynamic', 'Scope: Bioequivalence', 'Scope: Dose Response', 'Scope: Pharmacogenetic', 'Scope: Pharmacogenomic', 'Scope: Pharmacoecomomic', 'Scope: Others', 'Scope: Others Specify', 
             'Version No', 'Date of Protocol', 'Study Drug', 'Disease Condition',
             'Approval Date of Protocol', 'Biologicals', 'Proteins', 'Immunologicals', 'Vaccines', 'Hormones', 'Toxoid', 'Chemical', 'Chemical Name', 'Medical Device', 'Medical Device Name', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
             'Created',
             );
         $_extract = array('Application.protocol_no', 'Application.study_title', 'Application.short_title', 'Application.date_submitted', 'Application.approval_date',
+            'Review.0.User.name', 'Review.0.accepted', 'Review.1.User.name', 'Review.1.accepted', 'Review.2.User.name', 'Review.2.accepted', 'Review.4.User.name', 'Review.4.accepted', 
+            'TrialStatus.name', 'Application.trial_human_pharmacology', 'Application.trial_therapeutic_exploratory', 'Application.trial_therapeutic_confirmatory', 'Application.trial_therapeutic_use',
+            'Application.single_site_member_state_f', 'Application.number_participants',
+            'Application.scope_diagnosis', 'Application.scope_prophylaxis', 'Application.scope_therapy', 'Application.scope_safety', 'Application.scope_efficacy', 'Application.scope_pharmacokinetic', 'Application.scope_pharmacodynamic', 'Application.scope_bioequivalence', 'Application.scope_dose_response', 'Application.scope_pharmacogenetic', 'Application.scope_pharmacogenomic', 'Application.scope_pharmacoecomomic', 'Application.scope_others', 'Application.scope_others_specify', 
             'Application.version_no', 'Application.date_of_protocol', 'Application.study_drug', 'Application.disease_condition',
             'Application.approval_date', 'Application.product_type_biologicals', 'Application.product_type_proteins',
             'Application.product_type_immunologicals', 'Application.product_type_vaccines', 'Application.product_type_hormones', 'Application.product_type_toxoid', 'Application.product_type_chemical', 'Application.product_type_chemical_name', 'Application.product_type_medical_device', 'Application.product_type_medical_device_name', 'Application.investigator1_given_name', 'Application.investigator1_qualification', 'Application.investigator1_telephone', 'Application.investigator1_email', 'InvestigatorContact.0.given_name', 'InvestigatorContact.0.qualification', 'InvestigatorContact.0.telephone', 'InvestigatorContact.0.email', 'Sponsor.0.sponsor', 'Sponsor.0.cell_number', 'Sponsor.0.email_address', 

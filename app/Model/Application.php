@@ -312,6 +312,12 @@ class Application extends AppModel {
             'dependent' => true,
             'conditions' => array('Fee.model' => 'Application', 'Fee.group' => 'fee'),
         ),
+        'Checklist' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Checklist.model' => 'Checklist'),
+        ),
     );
 
     public $validate = array(

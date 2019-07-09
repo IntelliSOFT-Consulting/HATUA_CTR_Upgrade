@@ -23,7 +23,6 @@
 		<td><?php echo h($county['County']['created']); ?>&nbsp;</td>
 		<td><?php echo h($county['County']['modified']); ?>&nbsp;</td>
 		<td class="actions">
-			<?php echo $this->Html->link(__('View'), array('action' => 'view', $county['County']['id'])); ?>
 			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $county['County']['id'])); ?>
 			<?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $county['County']['id']), null, __('Are you sure you want to delete # %s?', $county['County']['id'])); ?>
 		</td>
