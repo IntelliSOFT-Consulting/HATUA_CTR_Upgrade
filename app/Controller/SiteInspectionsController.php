@@ -60,7 +60,7 @@ class SiteInspectionsController extends AppController {
         if (!isset($this->passedArgs['approved'])) $criteria['SiteInspection.approved'] = array(0, 1, 2); #todo: remove option 0
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('SiteInspection.created' => 'desc');
-        $this->paginate['contain'] = array('Application');
+        $this->paginate['contain'] = array('Application' => array('InvestigatorContact', 'Sponsor'), 'User');
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
           $this->csv_export($this->SiteInspection->find('all', 
@@ -82,8 +82,17 @@ class SiteInspectionsController extends AppController {
     private function csv_export($siteInspections = ''){
         //todo: check if data exists in $siteInspections
         $_serialize = 'siteInspections';
-        $_header = array('Reference No.', 'Protocol No', 'PACTR No.', 'Created');
-        $_extract = array('SiteInspection.reference_no' , 'Application.protocol_no', 'SiteInspection.pactr_no', 'SiteInspection.created');
+        $_header = array('Reference No.', 'Protocol No', 'PACTR No.', 
+            'Study Title', 'Short Title', 'Study Site', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 
+            'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
+            'Trial Phase', 'Inspector', 'Inspection date',
+            'Created');
+        $_extract = array('SiteInspection.reference_no' , 'Application.protocol_no', 'SiteInspection.pactr_no', 
+            'Application.study_title', 'Application.short_title', 'Application.single_site_member_state_f', 'Application.investigator1_given_name', 
+            'Application.investigator1_qualification', 'Application.investigator1_telephone', 'Application.investigator1_email', 'InvestigatorContact.0.given_name', 
+            'Application.InvestigatorContact.0.qualification', 'Application.InvestigatorContact.0.telephone', 'Application.InvestigatorContact.0.email', 'Application.Sponsor.0.sponsor', 'Application.Sponsor.0.cell_number', 'Application.Sponsor.0.email_address',
+            'trial_phase', 'SiteInspection.User.name', 'SiteInspection.inspection_dates',
+            'SiteInspection.created');
 
         $this->response->download('Site_Inspection_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';

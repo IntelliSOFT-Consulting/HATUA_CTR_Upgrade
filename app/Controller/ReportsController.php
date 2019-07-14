@@ -89,6 +89,34 @@ class ReportsController extends AppController {
     public function manager_protocols_by_status(){
         $this->protocols_by_status();
     }
+
+    public function protocols_by_phase() {
+        $data = $this->Application->find('all', array(
+            'fields' => array('((case when Application.trial_human_pharmacology then "Phase I" 
+                                      when Application.trial_therapeutic_exploratory then "Phase II" 
+                                      when Application.trial_therapeutic_confirmatory then "Phase III" 
+                                      when Application.trial_therapeutic_use then "Phase IV" 
+                                      else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
+            'contain' => array(),
+            'conditions' => array('Application.approved' => array(1, 2)),
+            'group' => array('((case when Application.trial_human_pharmacology then "Phase I" 
+                                      when Application.trial_therapeutic_exploratory then "Phase II" 
+                                      when Application.trial_therapeutic_confirmatory then "Phase III" 
+                                      when Application.trial_therapeutic_use then "Phase IV" 
+                                      else "Unk" end))'),
+            'having' => array('COUNT(*) >' => 0),
+          ));        
+
+        $this->set(compact('data'));
+        $this->set('_serialize', 'data');
+        $this->render('protocols_by_phase');
+    }
+    public function inspector_protocols_by_phase(){
+        $this->protocols_by_phase();
+    }
+    public function manager_protocols_by_phase(){
+        $this->protocols_by_phase();
+    }
     
   /**
    * view method

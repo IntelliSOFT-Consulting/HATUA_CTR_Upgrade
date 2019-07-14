@@ -11,16 +11,16 @@
         ));
         echo $this->Form->input('EthicalCommittee.0.submission_date', array(
           'type' => 'text',
-          'label' => array('class' => 'control-label required', 'text' => 'Submission Date'),
+          'label' => array('class' => 'control-label required', 'text' => 'Initial complete submission date'),
           'placeholder' => ' ' , 'class' => 'datepickers',
         ));
         echo $this->Form->input('EthicalCommittee.0.erc_number', array(
-          'label' => array('class' => 'control-label required', 'text' => 'ERC Number'),
+          'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number'),
           'placeholder' => ' ' , 'class' => 'input-xxlarge',
         ));
         echo $this->Form->input('EthicalCommittee.0.initial_approval', array(
                 'div' => array('class' => 'control-group', 'id' => 'EthicalCommittee0'),    'type' => 'text', 'class' => 'datepickers',
-                'label' => array('class' => 'control-label', 'text' => 'Approval date'),
+                'label' => array('class' => 'control-label', 'text' => 'Initial approval date'),
                 'after'=>'<span class="help-inline"> format (dd-mm-yyyy)
                             </span>
                         </div>',
@@ -42,16 +42,16 @@
                     ));
                     echo $this->Form->input('EthicalCommittee.0.submission_date', array(
                       'type' => 'text',
-                      'label' => array('class' => 'control-label required', 'text' => 'Submission Date'),
+                      'label' => array('class' => 'control-label required', 'text' => 'Initial complete submission date'),
                       'placeholder' => ' ' , 'class' => 'datepickers',
                     ));
                     echo $this->Form->input('EthicalCommittee.0.erc_number', array(
-                      'label' => array('class' => 'control-label required', 'text' => 'ERC Number'),
+                      'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge',
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.initial_approval', array(
                         'div' => array('class' => 'control-group'), 'type' => 'text', 'class' => 'datepickers',
-                        'label' => array('class' => 'control-label required', 'text' => ''),
+                        'label' => array('class' => 'control-label required', 'text' => 'Initial approval date'),
                         'after'=>'
                                 </div>',
                   ));

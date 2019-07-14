@@ -35,7 +35,9 @@
               echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections ('.count($application['SiteInspection']).')</a></li>';
               echo  '<li><a href="#tab7" data-toggle="tab">SAE/SUSAR ('.count($application['Sae']).')</a></li>';
           ?>
-          <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approvals</a></li>    
+          <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Checklist</a></li>    
+          <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>    
+          <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Annual Budget</a></li>    
           <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
           <?php if ($application['Application']['approved'] == 2) { ?>
             <li><a href="#tab9"  data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
@@ -206,7 +208,20 @@ $this->end();
     <div class="tab-pane" id="tab7">   
       <div class="row-fluid">
         <div class="span12">
-
+        <?php
+          if ($application['Application']['submitted']) {
+              if ($application['Application']['submitted']) {
+                      echo "<br>";
+                      echo $this->Html->link('<i class="icon-list-alt"></i> Create SAE', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
+                            array('escape' => false, 'class' => 'btn btn-success btn-mini')); 
+                      echo "&nbsp;";
+                      echo $this->Html->link('<i class="icon-credit-card"></i> Create SUSAR', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
+                            array('escape' => false, 'class' => 'btn btn-primary btn-mini'));   
+                      echo "<br>";
+                      echo "<br>";
+              }
+          }
+        ?>
           <table  class="table  table-bordered table-striped">
              <thead>
                     <tr>
@@ -269,6 +284,20 @@ $this->end();
           <?php echo $this->element('multi/final'); ?>
         </div>
       </div>
+    </div>
+
+    <div class="tab-pane" id="tab10">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/approval_participants'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab11">   
+      
+          <?php echo $this->element('multi/approval_budget'); ?>
+       
     </div>
 
 </div>

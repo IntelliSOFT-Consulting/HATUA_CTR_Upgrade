@@ -58,12 +58,16 @@
 					 <hr>
 					<table style="width: 100%;">
 						<tr>
-							<td style="width: 25%;">Abstract of Study:</td>
-							<td style="width: 75%;"><strong><?php echo $application['Application']['abstract_of_study']; ?></strong></td>
-						</tr>
-						<tr>
 							<td style="width: 25%;">Study Title:</td>
 							<td style="width: 75%;"><strong><?php echo $application['Application']['study_title']; ?></strong></td>
+						</tr>
+						<tr>
+							<td style="width: 25%;">Laymans Summary:</td>
+							<td style="width: 75%;"><strong><?php echo $application['Application']['laymans_summary']; ?></strong></td>
+						</tr>
+						<tr>
+							<td style="width: 25%;">Abstract of Study:</td>
+							<td style="width: 75%;"><strong><?php echo $application['Application']['abstract_of_study']; ?></strong></td>
 						</tr>
 					</table>
 					<hr>

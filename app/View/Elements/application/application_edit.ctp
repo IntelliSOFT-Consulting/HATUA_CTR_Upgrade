@@ -52,16 +52,17 @@
               'label' => array('class' => 'control-nolabel required', 'text' => 'Study Title <span class="sterix">*</span>'),
               'between'=>'<div class="nocontrols">', 'placeholder' => 'study title' , 'class' => 'input-large',
             ));
-            echo $this->Form->input('laymans_summary', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => 'Laymans Summary <span class="sterix">*</span>'),
-              'between'=>'<div class="nocontrols">', 'placeholder' => 'study title' , 'class' => 'input-large',
-            ));
             echo $this->Form->input('short_title', array(
               'label' => array('class' => 'control-label required', 'text' => 'Short Title <span class="sterix">*</span>'),
+              'maxlength' => 30,
               'placeholder' => ' ' , 'class' => 'input-xxlarge',
             )); 
+            echo $this->Form->input('laymans_summary', array(
+              'label' => array('class' => 'control-nolabel required', 'text' => '<hr>Laymans Summary <span class="sterix">*</span>'),
+              'between'=>'<div class="nocontrols">', 'placeholder' => 'study title' , 'class' => 'input-large',
+            ));
             echo $this->Form->input('abstract_of_study', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => '<hr>ABSTRACT OF THE STUDY <span class="sterix">*</span>'),
+              'label' => array('class' => 'control-nolabel required', 'text' => 'ABSTRACT OF THE STUDY <span class="sterix">*</span>'),
               'between'=>'<div class="nocontrols">', 'placeholder' => '' , 'class' => 'input-xxlarge',
             ));
             // echo $this->Form->input('protocol_no', array(
@@ -173,7 +174,7 @@
                     // </label>
                     // </span>', 'placeholder' => ' ' , 'class' => 'span4',
             // ));
-            echo $this->element('multi/previous_dates');
+            // echo $this->element('multi/previous_dates');
             echo $this->element('multi/ethical_committees');
             // echo $this->Form->input('protocol_reviewers_names', array(
               // 'label' => array('class' => 'control-label', 'text' => 'Names of Protocol Reviewers'),

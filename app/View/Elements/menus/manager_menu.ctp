@@ -63,6 +63,11 @@
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>
             </li>
+             <li><?php
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Protocols by phase',  array('controller' => 'reports', 'action'=>'protocols_by_phase', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
         </ul>
        </li>
        <li class="<?php echo $this->fetch('Profile') ?>">

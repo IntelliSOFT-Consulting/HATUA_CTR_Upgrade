@@ -192,9 +192,13 @@ public function index() {
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
 
+        // $this->paginate['contain'] = array(
+        //     'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
+        //     'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
         $this->paginate['contain'] = array(
-            'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
+                'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
+                'TrialStatus',
+                'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
            //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
               $this->csv_export($this->Application->find('all', 
@@ -331,7 +335,7 @@ public function index() {
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'ParticipantFlow', 'Document', 'Review', 'Sae',
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review', 'Sae',
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
 
@@ -367,7 +371,7 @@ public function index() {
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'ParticipantFlow', 'Document', 'Review'
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review'
                 ))));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
         $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -493,7 +497,7 @@ public function index() {
                     'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee',  'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization',
                         'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
                         'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 
-                        'AnnualApproval', 'ParticipantFlow', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
+                        'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
                             'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment')))));
                 $this->set('counties', $this->Application->SiteDetail->County->find('list'));
                 $this->set('application', $application);
@@ -870,7 +874,7 @@ public function index() {
             'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow',
+                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),
                         'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')

@@ -39,7 +39,9 @@
               echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections ('.count($application['SiteInspection']).')</a></li>';
               echo  '<li><a href="#tab7" data-toggle="tab">SAE/SUSAR ('.count($application['Sae']).')</a></li>';
           ?>
-          <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approvals</a></li>    
+          <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Checklist</a></li>    
+          <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>    
+          <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Annual Budget</a></li>      
           <?php if ($application['Application']['approved'] == 2) { ?>
             <li><a href="#tab9"  data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
           <?php } ?>    
@@ -463,6 +465,21 @@
       </div>
     </div>
 
+
+    <div class="tab-pane" id="tab10">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/approval_participants'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab11">   
+      
+          <?php echo $this->element('multi/approval_budget'); ?>
+       
+    </div>
+    
 </div>
 </div>
 

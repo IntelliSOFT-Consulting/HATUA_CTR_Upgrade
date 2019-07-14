@@ -210,6 +210,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false
         ),
+        'Budget' => array(
+            'className' => 'Budget',
+            'foreignKey' => 'application_id',
+            'dependent' => false
+        ),
                           'Document' => array(
                                     'className' => 'Attachment',
                                     'foreignKey' => 'foreign_key',

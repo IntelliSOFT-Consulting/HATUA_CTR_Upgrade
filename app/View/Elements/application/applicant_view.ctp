@@ -33,6 +33,27 @@
              <?php echo $this->fetch('study_title'); ?>
             </tbody>
           </table>
+          <table class="table  table-condensed">
+            <tbody>
+             <tr>
+              <td class="table-label required"><p>Short Title: <span class="sterix">*</span></p></td>
+              <td>
+              <?php 
+                if(!empty($application['Application']['short_title'])) { 
+                     echo $application['Application']['short_title'];
+                } else { ?>                  
+                    <input name="data[Application][short_title]" class="input-xxlarge" placeholder=" " maxlength="30" 
+                          id="ApplicationShortTitle" type="text">
+                    <button name="submitStudyTitle" class="btn btn-info" id="ApplicationViewSaveShortTitle" type="button">
+                      <i class="icon-save"></i> Save
+                    </button>          
+               <?php }  ?>
+              </td>
+             </tr>
+            </tbody>
+          </table>
+          <hr class="my-view">
+
           <table class="table table-condensed">
             <thead>
             <tr><th class="table-label required"><h5 style="text-align: center;">Laymans Summary: <span class="sterix">*</span></h5></th></tr>
@@ -48,27 +69,7 @@
              <?php echo $this->fetch('laymans_summary'); ?>
             </tbody>
           </table>
-          <table class="table  table-condensed">
-            <tbody>
-             <tr>
-              <td class="table-label required"><p>Short Title: <span class="sterix">*</span></p></td>
-              <td>
-              <?php 
-                if(!empty($application['Application']['short_title'])) { 
-                     echo $application['Application']['short_title'];
-                } else { ?>                  
-                    <input name="data[Application][short_title]" class="input-xxlarge" placeholder=" " maxlength="255" 
-                          id="ApplicationShortTitle" type="text">
-                    <button name="submitStudyTitle" class="btn btn-info" id="ApplicationViewSaveShortTitle" type="button">
-                      <i class="icon-save"></i> Save
-                    </button>          
-               <?php }  ?>
-              </td>
-             </tr>
-            </tbody>
-          </table>
-          <hr class="my-view">
-
+          
           <table class="table table-condensed">
             <thead>
             <tr><th class="table-label required"><h5 style="text-align: center;">Abstract of the study: <span class="sterix">*</span></h5></th></tr>
@@ -216,15 +217,15 @@
                 <td><?php    echo "<p>". $date['ethical_committee']."</p>";  ?></td>
               </tr>
               <tr>
-                <td class="table-label"><p>Submission Date</p></td>
+                <td class="table-label"><p>Initial complete submission date</p></td>
                 <td><?php    echo "<p>". $date['submission_date']."</p>";  ?></td>
               </tr>
               <tr>
-                <td class="table-label"><p>ERC Number</p></td>
+                <td class="table-label"><p>ERC Reference Number</p></td>
                 <td><?php    echo "<p>". $date['erc_number']."</p>";  ?></td>
               </tr>
               <tr>
-                <td class="table-label"><p>Approval date</p></td>
+                <td class="table-label"><p>Initial approval date</p></td>
                 <td><?php    echo "<p>". $date['initial_approval']."</p>";  ?></td>
               </tr>
               </tbody>

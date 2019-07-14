@@ -1,6 +1,6 @@
 <!-- start view -->
 
-<h2 style="text-align: center;"> AVAREF</h2>   
+<h3 style="text-align: center;"> Site Inspection(s)</h3>   
 <hr class="soften" style="margin: 10px 0px;">
 
 <?php
