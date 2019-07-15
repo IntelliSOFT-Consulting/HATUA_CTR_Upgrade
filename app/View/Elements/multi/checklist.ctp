@@ -446,7 +446,7 @@ echo $this->Form->input('applicant_pictorial_sample', array(
                             'class' => false, 'hiddenField' => false,
                             'between' => '<div class="checkcontrols"><input type="hidden" value="0" id="ApplicationApplicantProtocol_" name="data[Application][applicant_pictorial_sample]">
                                             <label class="checkbox required pull-left">',
-                            'after' => 'Certificate of Analysis of the investigational product <span class="sterix">*</span> </label>'.$add_checklist,));
+                            'after' => 'Pictorial Sample of the investigational products. This sample should include the text of the labeling to be used <span class="sterix">*</span> </label>'.$add_checklist,));
 ?>
 <div id="Checklist" class="checkcontrols" title="applicant_pictorial_sample">
 <?php

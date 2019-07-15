@@ -1625,10 +1625,13 @@
 
         <div id="tabs-12">
           <h5>CHECKLIST <span class="sterix">*</span></h5>
+          <?php
+              $num = 1;
+          ?>
           <table class="table  table-condensed">
             <tbody>
             <tr>
-              <td style="width:5%;"><p  class="control-checklabel">1. </p></td>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
               <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_covering_letter']   ? $ichecked : $nchecked ); ?> Cover Letter <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['CoverLetter'])) {
@@ -1644,21 +1647,29 @@
                 ?>
                 </td>
             </tr>
-            <?php
-            /*/ pr($application['Amendment']);
-              foreach($application['Amendment']  as $key => $amendment) {
-                if($amendment['submitted'] == 1){      ?>
-                  <tr class="table-viewlabel">
-                      <td class="table-viewlabel"><?php echo $key+1; ?></td>
-                      <td class=" table-noline"><?php  echo $amendment['CoverLetter'][0]['basename'];  ?></td>
-                   </tr>
-             <?php   } } ?>
-             <?php echo $this->fetch('other_details_regulatory_halted'); */ ?>
             <tr>
-              <td><p  class="control-checklabel">2. </p></td>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_complete_form']   ? $ichecked : $nchecked ); ?> Completed application form <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_complete_form') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
               <td><p class="control-nolabel required">
-                        <?php echo ($application['Application']['applicant_protocol']   ? $ichecked : $nchecked ); ?> Protocol
-                        <span class="sterix">*</span></p>
+                        <?php echo ($application['Application']['applicant_protocol']   ? $ichecked : $nchecked ); ?> The Study Protocol <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['Protocol'])) {
                     foreach ($application['Protocol'] as $key => $value) {
@@ -1674,7 +1685,7 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">3. </p></td>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
               <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_patient_information']   ? $ichecked : $nchecked ); ?> Patient Information leaflet and Informed consent form <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['PatientLeaflet'])) {
@@ -1691,8 +1702,9 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">4. </p></td>
-              <td><p class="control-nolabel required"> <?php echo ($application['Application']['applicant_investigators_brochure']   ? $ichecked : $nchecked ); ?> Investigators Brochure/Package inserts or Investigational Medicinal Product Dossier (IMPD) <span class="sterix">*</span></p>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"> <?php echo ($application['Application']['applicant_investigators_brochure']   ? $ichecked : $nchecked ); ?> 
+              Investigators Brochure/Package inserts <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['Brochure'])) {
                     foreach ($application['Brochure'] as $key => $value) {
@@ -1708,8 +1720,68 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">5. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_gmp_certificate']   ? $ichecked : $nchecked ); ?> GMP certificate of the investigational product <span class="sterix">*</span></p>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_impd']   ? $ichecked : $nchecked ); ?> 
+                Investigational Medicinal Product Dossier (IMPD) <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_impd') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_prev_data']   ? $ichecked : $nchecked ); ?> 
+                Adequate data and information on previous studies and phases <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_prev_data') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_stability_data']   ? $ichecked : $nchecked ); ?> 
+                Stability data of the investigational product <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_stability_data') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_gmp_certificate']   ? $ichecked : $nchecked ); ?> GMP certificate of the investigational product from the site of manufacture <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['GmpCertificate'])) {
                     foreach ($application['GmpCertificate'] as $key => $value) {
@@ -1725,8 +1797,48 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">6. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_investigators_cv']   ? $ichecked : $nchecked ); ?> Signed investigator(s) CV(s) <span class="sterix">*</span></p>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_analysis_cert']   ? $ichecked : $nchecked ); ?> 
+                Certificate of Analysis of the investigational product <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_analysis_cert') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_pictorial_sample']   ? $ichecked : $nchecked ); ?> 
+                Pictorial Sample of the investigational products. This sample should include the text of the labeling to be used <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_pictorial_sample') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_investigators_cv']   ? $ichecked : $nchecked ); ?> Signed investigator(s) CV(s) including that of study Pharmacist <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['Cv'])) {
                     foreach ($application['Cv'] as $key => $value) {
@@ -1742,7 +1854,67 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">7. </p></td>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_gcp_training']   ? $ichecked : $nchecked ); ?> 
+                Evidence of recent GCP training of the core study staff <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_gcp_training') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_dsmb_charter']   ? $ichecked : $nchecked ); ?> 
+                DSMB Charter including the composition and meeting schedule <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_dsmb_charter') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_detailed_budget']   ? $ichecked : $nchecked ); ?> 
+                Detailed budget of the study <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_detailed_budget') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
               <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_financial_declaration']   ? $ichecked : $nchecked ); ?> Financial declaration by Sponsor and/or PI <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['Finance'])) {
@@ -1759,8 +1931,8 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">8. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_signed_declaration']   ? $ichecked : $nchecked ); ?> Signed Declaration by Sponsor or Principal investigator.  <span class="sterix">*</span></p>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_signed_declaration']   ? $ichecked : $nchecked ); ?> Signed Declaration by Sponsor or Principal investigator that the study will be carried out according to protocol and applicable laws and regulations. <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['Declaration'])) {
                     foreach ($application['Declaration'] as $key => $value) {
@@ -1776,8 +1948,28 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">9. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_indemnity_cover']   ? $ichecked : $nchecked ); ?> Indemnity cover and Insurance Certificate for the participants <span class="sterix">*</span></p>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_indemnity_pi']   ? $ichecked : $nchecked ); ?> 
+                Indemnity cover for PI and investigators <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_indemnity_pi') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_indemnity_cover']   ? $ichecked : $nchecked ); ?> Indemnity cover and Insurance Certificate for the study participants <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['IndemnityCover'])) {
                     foreach ($application['IndemnityCover'] as $key => $value) {
@@ -1793,9 +1985,8 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">10. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_opinion_letter']   ? $ichecked : $nchecked ); ?> Copy of favourable opinion letter from the local Institutional Review Board (IRB)
-                    and Ethics committee. <span class="sterix">*</span></p>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_opinion_letter']   ? $ichecked : $nchecked ); ?> Copy of favorable opinion letter from the local Ethics Review Committee (ERC). <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['OpinionLetter'])) {
                     foreach ($application['OpinionLetter'] as $key => $value) {
@@ -1811,7 +2002,27 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">11. </p></td>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_practice_license']   ? $ichecked : $nchecked ); ?> 
+                Copy of current Practice Licenses for the Investigators and study Pharmacist <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_practice_license') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
               <td><p class="control-nolabel"><?php echo ($application['Application']['applicant_approval_letter']   ? $ichecked : $nchecked ); ?> Copy of approval letter(s) from collaborating institutions or other regulatory authorities, if applicable</p>
                 <?php
                   if (!empty($application['ApprovalLetter'])) {
@@ -1828,25 +2039,7 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">12. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_statement']   ? $ichecked : $nchecked ); ?> A signed statement by the applicant indicating that all information contained in, or
-                    referenced by, the application is complete and accurate and is not false or misleading. <span class="sterix">*</span></p>
-                <?php
-                  if (!empty($application['Statement'])) {
-                    foreach ($application['Statement'] as $key => $value) {
-                      echo '<p>';
-                       echo $this->Html->link(__($value['basename']),
-                         array('controller' => 'attachments',  'action' => 'download', $value['id'],
-                           'full_base' => true),
-                         array('class' => 'btn btn-info'));
-                       echo '</p>';
-                      }
-                    }
-                ?>
-                </td>
-            </tr>
-            <tr>
-              <td><p  class="control-checklabel">13. </p></td>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
               <td><p class="control-nolabel"><?php echo ($application['Application']['applicant_participating_countries']   ? $ichecked : $nchecked ); ?> Where the trial is part of an international study, sufficient information regarding the other participating countries and the scope of the study in these countries.</p>
                 <?php
                   if (!empty($application['ParticipatingStudy'])) {
@@ -1863,8 +2056,8 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">14. </p></td>
-              <td><p class="control-nolabel"><?php echo ($application['Application']['applicant_addendum']   ? $ichecked : $nchecked ); ?> For multicentre/multi-site studies, an addendum for each of the sites should be provided upon initial application.</p>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel"><?php echo ($application['Application']['applicant_addendum']   ? $ichecked : $nchecked ); ?> For multicentre/multi-site studies, a site specific addendum for each of the proposed sites including among other things the sites’ capacity to carry out the study i.e personnel, equipment, laboratory etc </p>
                 <?php
                   if (!empty($application['Addendum'])) {
                     foreach ($application['Addendum'] as $key => $value) {
@@ -1880,9 +2073,65 @@
                 </td>
             </tr>
             <tr>
-              <td><p  class="control-checklabel">15. </p></td>
-              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_fees']   ? $ichecked : $nchecked ); ?> Fees - <small>A receipt to the sum of US$ 1000.00 (or equivalent in Kenya Shillings) per
-              proposal towards payment of application fees (paid at the PPB&rsquo;s accounts office). </small> <span class="sterix">*</span></p>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_registration_ctr']   ? $ichecked : $nchecked ); ?> 
+                Registration at the clinical trial registry at www.ctr.pharmacyboardkenya.org <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_registration_ctr') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_pan_african']   ? $ichecked : $nchecked ); ?> 
+                Registration of the study at Pan African Clinical Trials Registry https://pactr.samrc.ac.za <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_pan_african') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_statement']   ? $ichecked : $nchecked ); ?> A signed statement by the applicant indicating that all information contained in, or referenced by, the application is complete and accurate and is not false or misleading. <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Statement'])) {
+                    foreach ($application['Statement'] as $key => $value) {
+                      echo '<p>';
+                       echo $this->Html->link(__($value['basename']),
+                         array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                           'full_base' => true),
+                         array('class' => 'btn btn-info'));
+                       echo '</p>';
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_fees']   ? $ichecked : $nchecked ); ?> Payment of fees <span class="sterix">*</span></p>
                 <?php
                   if (!empty($application['Fee'])) {
                     foreach ($application['Fee'] as $key => $value) {
@@ -1892,6 +2141,46 @@
                            'full_base' => true),
                          array('class' => 'btn btn-info'));
                        echo '</p>';
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_hard_copies']   ? $ichecked : $nchecked ); ?> 
+                Four bound hard copies of all the above documents <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_hard_copies') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
+                      }
+                    }
+                ?>
+                </td>
+            </tr>
+            <tr>
+              <td style="width:5%;"><p  class="control-checklabel"><?php echo $num++; ?>. </p></td>
+              <td><p class="control-nolabel required"><?php echo ($application['Application']['applicant_signed_checklist']   ? $ichecked : $nchecked ); ?> 
+                Signed checklist <span class="sterix">*</span></p>
+                <?php
+                  if (!empty($application['Checklist'])) {
+                    foreach ($application['Checklist'] as $key => $value) {
+                      if ($value['group'] == 'applicant_signed_checklist') {
+                          echo '<p>';
+                          echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'attachments',  'action' => 'download', $value['id'],
+                             'full_base' => true),
+                           array('class' => 'btn btn-info'));
+                          echo '</p>';
+                        }                      
                       }
                     }
                 ?>

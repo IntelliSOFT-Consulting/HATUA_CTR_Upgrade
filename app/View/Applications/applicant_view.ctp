@@ -38,9 +38,10 @@
           <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Checklist</a></li>    
           <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>    
           <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Annual Budget</a></li>    
+          <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Annual Approval Letter</a></li>    
           <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
           <?php if ($application['Application']['approved'] == 2) { ?>
-            <li><a href="#tab9"  data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
+            <li><a href="#tab9"  data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
           <?php } ?>    
       </ul>
       <div class="tab-content my-tab-content">
@@ -292,6 +293,13 @@ $this->end();
           <?php echo $this->element('multi/approval_participants'); ?>
         </div>
       </div>
+    </div>
+
+    <div class="tab-pane" id="tab12">   
+        
+          <h3>Annual Approval Letter</h3>
+          <p>Annual Approval Letter</p>
+       
     </div>
 
     <div class="tab-pane" id="tab11">   
