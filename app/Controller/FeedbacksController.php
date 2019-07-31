@@ -8,6 +8,11 @@ App::uses('AppController', 'Controller');
 class FeedbacksController extends AppController {
 
 	public $paginate = array('order' => array('Feedback.created' => 'desc'));
+	// var $components = array('Captcha.Captcha'=>array('Model'=>'Feedback', 'field'=>'captcha'));//'Captcha.Captcha'
+
+
+    public $helpers = array('Tools.Captcha' => array('type' => 'active'));
+
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->Auth->allow('add');
@@ -58,6 +63,7 @@ class FeedbacksController extends AppController {
 		if ($this->request->is('post')) {
 			$this->Feedback->create();
 			// if($this->Auth->User('id')) $this->request->data['Feedback']['user_id'] = $this->Auth->User('id');
+			$this->Feedback->Behaviors->attach('Tools.Captcha');
 			if (empty($this->data['Feedback']['bot_stop']) && $this->Feedback->save($this->request->data)) {
 				$this->Session->setFlash(__('The feedback has been saved'), 'alerts/flash_success');
 				$this->redirect(array('action' => 'add'));

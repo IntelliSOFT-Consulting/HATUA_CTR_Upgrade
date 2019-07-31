@@ -285,3 +285,5 @@ Cache::config('_cake_model_', array(
 	'mask' => 0777,
 	'duration' => $duration
 ));
+
+Configure::write('Config.language', 'eng');

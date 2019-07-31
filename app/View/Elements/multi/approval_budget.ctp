@@ -47,18 +47,10 @@
             <td><?php echo $Budget['it']; ?></td>
           </tr>
           <tr>
-            <td class="table-label required"><p>HDSS:</p></td>
-            <td><?php echo $Budget['hdss_currency']; ?></td>
-            <td><?php echo $Budget['hdss']; ?></td>
-            <td class="table-label required"><p>KEMRI</p></td>
-            <td><?php echo $Budget['kemri_currency']; ?></td>
-            <td><?php echo $Budget['kemri']; ?></td>
-          </tr>
-          <tr>
-            <td class="table-label required"><p>WRAIR:</p></td>
-            <td><?php echo $Budget['wrair_currency']; ?></td>
-            <td><?php echo $Budget['wrair']; ?></td>
-            <td class="table-label required"><p></p></td>
+            <td class="table-label required"><p>Others:</p></td>
+            <td><?php echo $Budget['others_currency']; ?></td>
+            <td><?php echo $Budget['others']; ?></td>
+            <td class="table-label required"></td>
             <td></td>
             <td></td>
           </tr>
@@ -190,21 +182,9 @@
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
-            <td> <p>HDSS</p> </td>
-            <td> <?php  echo $this->Form->input('hdss_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
-            <td> <?php  echo $this->Form->input('hdss', array('label' => false)); ?> </td>
-          </tr>
-          <tr>
-            <td><?php echo $num++; ?></td>
-            <td> <p>KEMRI</p> </td>
-            <td> <?php  echo $this->Form->input('kemri_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
-            <td> <?php  echo $this->Form->input('kemri', array('label' => false)); ?> </td>
-          </tr>
-          <tr>
-            <td><?php echo $num++; ?></td>
-            <td> <p>WRAIR</p> </td>
-            <td> <?php  echo $this->Form->input('wrair_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
-            <td> <?php  echo $this->Form->input('wrair', array('label' => false)); ?> </td>
+            <td> <p>Others</p> </td>
+            <td> <?php  echo $this->Form->input('others_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
+            <td> <?php  echo $this->Form->input('others', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>

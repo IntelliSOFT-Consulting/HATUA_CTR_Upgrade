@@ -45,6 +45,7 @@
 			echo $this->Form->input('bot_stop', array(
 									'div' => array('style' => 'display:none')
 								));
+			echo $this->Captcha->input('Feedback', array('label' => false, 'type' => 'number'));
 			echo $this->Form->end(array(
 				'label' => 'Submit',
 				'value' => 'Save',
@@ -88,9 +89,15 @@
 	</div>
 </div>
 
-<script type="text/javascript">
-$.expander.defaults.slicePoint = 70;
-$(function() {
-  $(".morecontent").expander();
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+jQuery('.creload').on('click', function() {
+    var mySrc = $(this).prev().attr('src');
+    var glue = '?';
+    if(mySrc.indexOf('?')!=-1)  {
+        glue = '&';
+    }
+    $(this).prev().attr('src', mySrc + glue + new Date().getTime());
+    return false;
 });
 </script>

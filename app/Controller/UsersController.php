@@ -17,6 +17,8 @@ class UsersController extends AppController {
             'end_date' => array('type' => 'value'),
         );
 
+    public $helpers = array('Tools.Captcha' => array('type' => 'active'));
+    
     public function beforeFilter() {
         parent::beforeFilter();
         // $this->Auth->allow('*');
@@ -344,6 +346,7 @@ class UsersController extends AppController {
             $this->request->data['User']['group_id'] = 5;
             $this->request->data['User']['emailed'] = 1;
             $this->request->data['User']['activation_key'] = $this->Auth->password($this->request->data['User']['email']);
+            $this->User->Behaviors->attach('Tools.Captcha');
             if (empty($this->data['User']['bot_stop']) && $this->User->save($this->request->data)) {
                 $id = $this->User->id;
                 $this->request->data['User'] = array_merge($this->request->data['User'], array('id' => $id));

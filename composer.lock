@@ -1,0 +1,290 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "cdac296aebe80b1acd64582716bd01c2",
+    "packages": [
+        {
+            "name": "cakephp/cakephp",
+            "version": "2.10.19",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cakephp/cakephp.git",
+                "reference": "8f08a834747301656bbb4db6fe8c355d489261fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/8f08a834747301656bbb4db6fe8c355d489261fe",
+                "reference": "8f08a834747301656bbb4db6fe8c355d489261fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "cakephp/cakephp-codesniffer": "^1.0.0",
+                "phpunit/phpunit": "^3.7"
+            },
+            "suggest": {
+                "ext-mcrypt": "You need to install ext-openssl or ext-mcrypt to use AES-256 encryption",
+                "ext-openssl": "You need to install ext-openssl or ext-mcrypt to use AES-256 encryption"
+            },
+            "bin": [
+                "lib/Cake/Console/cake"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CakePHP Community",
+                    "homepage": "https://github.com/cakephp/cakephp/graphs/contributors"
+                }
+            ],
+            "description": "The CakePHP framework",
+            "homepage": "https://cakephp.org",
+            "keywords": [
+                "framework"
+            ],
+            "time": "2019-07-25T01:32:25+00:00"
+        },
+        {
+            "name": "composer/installers",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/installers.git",
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/installers/zipball/cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0"
+            },
+            "replace": {
+                "roundcube/plugin-installer": "*",
+                "shama/baton": "*"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev",
+                "phpunit/phpunit": "^4.8.36"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Composer\\Installers\\Plugin",
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\Installers\\": "src/Composer/Installers"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Robinson Young",
+                    "email": "kyle@dontkry.com",
+                    "homepage": "https://github.com/shama"
+                }
+            ],
+            "description": "A multi-framework Composer library installer",
+            "homepage": "https://composer.github.io/installers/",
+            "keywords": [
+                "Craft",
+                "Dolibarr",
+                "Eliasis",
+                "Hurad",
+                "ImageCMS",
+                "Kanboard",
+                "Lan Management System",
+                "MODX Evo",
+                "Mautic",
+                "Maya",
+                "OXID",
+                "Plentymarkets",
+                "Porto",
+                "RadPHP",
+                "SMF",
+                "Thelia",
+                "WolfCMS",
+                "agl",
+                "aimeos",
+                "annotatecms",
+                "attogram",
+                "bitrix",
+                "cakephp",
+                "chef",
+                "cockpit",
+                "codeigniter",
+                "concrete5",
+                "croogo",
+                "dokuwiki",
+                "drupal",
+                "eZ Platform",
+                "elgg",
+                "expressionengine",
+                "fuelphp",
+                "grav",
+                "installer",
+                "itop",
+                "joomla",
+                "kohana",
+                "laravel",
+                "lavalite",
+                "lithium",
+                "magento",
+                "majima",
+                "mako",
+                "mediawiki",
+                "modulework",
+                "modx",
+                "moodle",
+                "osclass",
+                "phpbb",
+                "piwik",
+                "ppi",
+                "puppet",
+                "pxcms",
+                "reindex",
+                "roundcube",
+                "shopware",
+                "silverstripe",
+                "sydes",
+                "symfony",
+                "typo3",
+                "wordpress",
+                "yawik",
+                "zend",
+                "zikula"
+            ],
+            "time": "2018-08-27T06:10:37+00:00"
+        },
+        {
+            "name": "dereuromark/cakephp-shim",
+            "version": "0.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dereuromark/cakephp-shim.git",
+                "reference": "02a12cd83a0ccf22c1d544041f4518f27f495476"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dereuromark/cakephp-shim/zipball/02a12cd83a0ccf22c1d544041f4518f27f495476",
+                "reference": "02a12cd83a0ccf22c1d544041f4518f27f495476",
+                "shasum": ""
+            },
+            "require": {
+                "cakephp/cakephp": ">=2.0 <3.0",
+                "composer/installers": "*",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "fig-r/psr2r-sniffer": "dev-master",
+                "mobiledetect/mobiledetectlib": "2.*"
+            },
+            "suggest": {
+                "ircmaxell/password-compat": "PHP5.4 compatability for the PHP5.5 password hashing functionality.",
+                "mobiledetect/mobiledetectlib": "Better up-to-date mobile/tablet detection."
+            },
+            "type": "cakephp-plugin",
+            "extra": {
+                "installer-name": "Shim"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark Scherer",
+                    "role": "Maintainer",
+                    "homepage": "http://www.dereuromark.de"
+                }
+            ],
+            "description": "A CakePHP plugin to shim applications between major framework versions.",
+            "homepage": "https://github.com/dereuromark/cakephp-shim",
+            "keywords": [
+                "cakephp",
+                "helpers",
+                "plugin",
+                "shim"
+            ],
+            "time": "2018-04-13T22:04:53+00:00"
+        },
+        {
+            "name": "dereuromark/cakephp-tools",
+            "version": "2.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dereuromark/cakephp-tools.git",
+                "reference": "7527387c3ff014bf7dfdbb2d132bdf8a23e8ab36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dereuromark/cakephp-tools/zipball/7527387c3ff014bf7dfdbb2d132bdf8a23e8ab36",
+                "reference": "7527387c3ff014bf7dfdbb2d132bdf8a23e8ab36",
+                "shasum": ""
+            },
+            "require": {
+                "cakephp/cakephp": ">=2.0 <3.0",
+                "composer/installers": "*",
+                "dereuromark/cakephp-shim": "^0.5.0 || ^0.6.0",
+                "php": ">=5.4"
+            },
+            "suggest": {
+                "pelago/emogrifier": "When using InlineCss lib and CSS to inline HTML transformation."
+            },
+            "type": "cakephp-plugin",
+            "extra": {
+                "installer-name": "Tools"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark Scherer",
+                    "role": "Maintainer",
+                    "homepage": "http://www.dereuromark.de"
+                }
+            ],
+            "description": "A CakePHP plugin containing lots of useful and reusable tools",
+            "homepage": "https://github.com/dereuromark/cakephp-tools",
+            "keywords": [
+                "behaviors",
+                "cakephp",
+                "components",
+                "datasources",
+                "helpers",
+                "plugin",
+                "tools",
+                "utils"
+            ],
+            "time": "2019-01-14T11:06:01+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "dereuromark/cakephp-tools": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

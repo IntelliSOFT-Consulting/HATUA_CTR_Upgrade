@@ -15,6 +15,7 @@ class Feedback extends AppModel {
  *
  * @var array
  */
+
 	public $belongsTo = array(
 		'User' => array(
 			'className' => 'User',

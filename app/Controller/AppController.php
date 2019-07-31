@@ -53,35 +53,36 @@ class AppController extends Controller {
     public $helpers = array('Html', 'Form', 'Session');
 
     public function beforeFilter() {
-    $this->Auth->allow('display');
-        //Configure AuthComponent
-    $redir = '';
-    if($this->Auth->User('group_id') == '1')  $redir = 'admin';
-    if($this->Auth->User('group_id') == '2')  $redir = 'manager';
-    if($this->Auth->User('group_id') == '3')  $redir = 'reviewer';
-    if($this->Auth->User('group_id') == '4')  $redir = 'partner';
-    if($this->Auth->User('group_id') == '5')  $redir = 'applicant';
-    if($this->Auth->User('group_id') == '6')  $redir = 'inspector';
+      $this->Auth->allow('display');
+          //Configure AuthComponent
+        // $this->set( 'domain', 'tools' );
+      $redir = '';
+      if($this->Auth->User('group_id') == '1')  $redir = 'admin';
+      if($this->Auth->User('group_id') == '2')  $redir = 'manager';
+      if($this->Auth->User('group_id') == '3')  $redir = 'reviewer';
+      if($this->Auth->User('group_id') == '4')  $redir = 'partner';
+      if($this->Auth->User('group_id') == '5')  $redir = 'applicant';
+      if($this->Auth->User('group_id') == '6')  $redir = 'inspector';
 
-        $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login', 'admin' => false);
-        $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login', 'admin' => false);
-        $this->Auth->loginRedirect = array('controller' => 'users', 'action' => 'dashboard', $redir => true);
+          $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login', 'admin' => false);
+          $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login', 'admin' => false);
+          $this->Auth->loginRedirect = array('controller' => 'users', 'action' => 'dashboard', $redir => true);
 
-    $this->Auth->authError = __('<div class="alert alert-error">
-                    <button data-dismiss="alert" class="close">&times;</button>
-                    <h4><strong>Sorry!</strong> You don\'t have sufficient permissions to access the location.</h4>
-                   </div>', true);
-    $this->Auth->loginError = __('<div class="alert alert-error">
-                    <button data-dismiss="alert" class="close">&times;</button>
-                    <h4>Invalid e-mail / password combination.  Please try again.</h4>
-                   </div>', true);
-    $this->set('redir', $redir);
-         // $this->Auth->authenticate = array(
-         //     'all' => array (
-         //         'scope' => array('User.is_active' => 1)
-         //     ),
-         //     'Form'
-         // );
+      $this->Auth->authError = __('<div class="alert alert-error">
+                      <button data-dismiss="alert" class="close">&times;</button>
+                      <h4><strong>Sorry!</strong> You don\'t have sufficient permissions to access the location.</h4>
+                     </div>', true);
+      $this->Auth->loginError = __('<div class="alert alert-error">
+                      <button data-dismiss="alert" class="close">&times;</button>
+                      <h4>Invalid e-mail / password combination.  Please try again.</h4>
+                     </div>', true);
+      $this->set('redir', $redir);
+           // $this->Auth->authenticate = array(
+           //     'all' => array (
+           //         'scope' => array('User.is_active' => 1)
+           //     ),
+           //     'Form'
+           // );
     }
 
   // public function isAuthorized($user) {

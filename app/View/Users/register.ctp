@@ -72,6 +72,8 @@
         echo $this->Form->input('country_id', array(
           'empty' => true,
           'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>') ));
+
+      echo $this->Captcha->input('User', array('label' => false, 'type' => 'number'));
         ?>
     </div><!--/span-->
   </div><!--/row-->

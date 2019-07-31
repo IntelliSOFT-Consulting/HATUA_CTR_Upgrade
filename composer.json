@@ -1,0 +1,5 @@
+{
+    "require": {
+        "dereuromark/cakephp-tools": "2.x-dev"
+    }
+}

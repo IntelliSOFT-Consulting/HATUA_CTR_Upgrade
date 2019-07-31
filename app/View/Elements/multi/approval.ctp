@@ -22,6 +22,7 @@
     <div class="page-header">
       <div class="styled_title"><h3>Annual Approval Checklist</h3></div>
     </div>
+      <h5>All submitted documents should be version referenced and dated.</h5>
 
     <?php
         // pr($application['AnnualApproval']);
