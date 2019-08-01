@@ -136,4 +136,10 @@ $(function() {
       $(this).parent('div').remove();
     }
   }
+  console.log("waa gwan? today");
+  $( ".pickadate" ).datepicker({
+      minDate:"-100Y", maxDate:"-0D", format:'dd-mm-yyyy', showButtonPanel:true, changeMonth:true, changeYear:true, startDate: '01-01-1990',
+          endDate: '-1d',
+      buttonImageOnly:true, showAnim:'show', showOn:'both', buttonImage:'/img/calendar.gif'
+    });
 });

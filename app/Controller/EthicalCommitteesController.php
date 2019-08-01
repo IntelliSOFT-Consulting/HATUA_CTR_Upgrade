@@ -37,18 +37,17 @@ class EthicalCommitteesController extends AppController {
  *
  * @return void
  */
-	public function add() {
+	public function applicant_add() {
 		if ($this->request->is('post')) {
 			$this->EthicalCommittee->create();
 			if ($this->EthicalCommittee->save($this->request->data)) {
-				$this->Session->setFlash(__('The ethical committee has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->Session->setFlash(__('The ethical committee has been saved'), 'alerts/flash_success');
+				$this->redirect($this->referer());
 			} else {
-				$this->Session->setFlash(__('The ethical committee could not be saved. Please, try again.'));
+				$this->Session->setFlash(__('The ethical committee could not be saved. Please, try again.'), 'alerts/flash_error');
 			}
 		}
-		$applications = $this->EthicalCommittee->Application->find('list');
-		$this->set(compact('applications'));
+		$this->redirect($this->referer());
 	}
 
 /**

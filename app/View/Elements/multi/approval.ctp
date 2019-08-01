@@ -1,5 +1,9 @@
 <div class="row-fluid">
    <div class="span12">
+
+      <?php 
+        echo $this->Session->flash();
+      ?>
     <br>
       <?php
       if ($this->fetch('is-applicant') == 'true') {
@@ -13,12 +17,90 @@
       ?>
       </div>
   </div>
+
+  <div class="row-fluid">
+   <div class="span12">
+    <h3>Ethical Committees</h3><hr>
+    <?php foreach($application['EthicalCommittee'] as $key => $date) { ?>
+      <span class="badge badge-info"><?php echo $key+1;?></span>
+      <table class="table  table-condensed">
+        <tbody>
+        <tr>
+          <td class="table-label"><p>Ethical Committee</p></td>
+          <td><?php    echo "<p>". $date['ethical_committee']."</p>";  ?></td>
+        </tr>
+        <tr>
+          <td class="table-label"><p>Initial complete submission date</p></td>
+          <td><?php    echo "<p>". $date['submission_date']."</p>";  ?></td>
+        </tr>
+        <tr>
+          <td class="table-label"><p>ERC Reference Number</p></td>
+          <td><?php    echo "<p>". $date['erc_number']."</p>";  ?></td>
+        </tr>
+        <tr>
+          <td class="table-label"><p>Initial approval date</p></td>
+          <td><?php    echo "<p>". $date['initial_approval']."</p>";  ?></td>
+        </tr>
+        </tbody>
+      </table>
+      <?php } ?>
+
+      <?php
+
+      if ($redir == 'applicant') {
+        echo "<h4>Ethical Committes Form</h4><hr>";
+        echo $this->Form->create('EthicalCommittee', array(
+            'url' => array('controller' => 'ethical_committees', 'action' => 'add'),
+           'class' => 'form-horizontal',
+           'inputDefaults' => array(
+            'div' => array('class' => 'control-group'),
+            'label' => array('class' => 'control-label'),
+            'between' => '<div class="controls">',
+            'after' => '</div>',
+            'class' => '',
+            'format' => array('before', 'label', 'between', 'input', 'after','error'),
+            'error' => array('attributes' => array('class' => 'controls help-block')),
+           ),
+        ));        
+        echo $this->Form->input('application_id', array('type' => 'hidden' ,'value' => $application['Application']['id']));
+        echo $this->Form->input('ethical_committee', array(
+          'label' => array('class' => 'control-label required', 'text' => 'Ethical Committee'),
+          'placeholder' => ' ' , 'class' => 'input-xxlarge',
+        ));
+        echo $this->Form->input('submission_date', array(
+          'type' => 'text',
+          'label' => array('class' => 'control-label required', 'text' => 'Initial complete submission date'),
+          'placeholder' => ' ' , 'class' => 'pickadate',
+        ));
+        echo $this->Form->input('erc_number', array(
+          'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number'),
+          'placeholder' => ' ' , 'class' => 'input-xxlarge',
+        ));
+        echo $this->Form->input('initial_approval', array(
+                'div' => array('class' => 'control-group', 'id' => 'EthicalCommittee0'),    'type' => 'text', 'class' => 'pickadate',
+                'label' => array('class' => 'control-label', 'text' => 'Initial approval date'),
+                'after'=>'<span class="help-inline"> format (dd-mm-yyyy)
+                            </span>
+                        </div>',
+        ));
+        echo $this->Html->tag('hr', '', array('id' => 'EthicalCommitteeHr0'));
+        echo $this->Form->end(array(
+          'label' => 'Submit',
+          'value' => 'Save',
+          'class' => 'btn btn-primary',
+          'id' => 'EthicalSaveChanges',
+          'div' => array(
+            'class' => 'form-actions',
+          )
+        ));
+
+      } 
+      ?>
+      </div>
+  </div>
   
 <div class="row-fluid">
   <div class="span12">
-      <?php 
-        echo $this->Session->flash();
-      ?>
     <div class="page-header">
       <div class="styled_title"><h3>Annual Approval Checklist</h3></div>
     </div>

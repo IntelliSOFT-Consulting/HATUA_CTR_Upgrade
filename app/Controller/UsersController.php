@@ -637,6 +637,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Saes/applicant_followup');
         $this->Acl->allow($group, 'controllers/ParticipantFlows/applicant_add');
         $this->Acl->allow($group, 'controllers/Budgets/applicant_add');
+        $this->Acl->allow($group, 'controllers/EthicalCommittees/applicant_add');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

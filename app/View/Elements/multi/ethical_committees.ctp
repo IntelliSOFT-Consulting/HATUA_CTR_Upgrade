@@ -3,7 +3,7 @@
 <div class="ctr-groups">
     <div id="ethical_committee_group">
     <?php
-        $this->Html->script('multi/ethical_committees?v2', array('inline' => false));
+        $this->Html->script('multi/ethical_committees', array('inline' => false));
         echo $this->Form->input('EthicalCommittee.0.id');
         echo $this->Form->input('EthicalCommittee.0.ethical_committee', array(
           'label' => array('class' => 'control-label required', 'text' => 'Ethical Committee'),
