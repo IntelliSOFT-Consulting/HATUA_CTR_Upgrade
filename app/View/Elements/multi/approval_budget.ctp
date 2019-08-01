@@ -11,46 +11,56 @@
   <?php foreach ($application['Budget'] as $Budget) { ?>
   <table class="table table-bordered table-condensed">
       <thead>
-        <th colspan="6"><h4 class="text-danger">Budget (<?php echo $Budget['year']; ?>)</h4></th>
+        <th colspan="8"><h4 class="text-danger">Budget (<?php echo $Budget['year']; ?>)</h4></th>
       </thead>
       <tbody>
           <tr>
             <td class="table-label required"><p>Personnel:</p></td>
             <td><?php echo $Budget['personnel_currency']; ?></td>
             <td><?php echo $Budget['personnel']; ?></td>
+            <td>Kshs: <?php echo $Budget['personnel_kshs']; ?></td>
             <td class="table-label required"><p>Transport</p></td>
             <td><?php echo $Budget['transport_currency']; ?></td>
             <td><?php echo $Budget['transport']; ?></td>
+            <td>Kshs: <?php echo $Budget['transport_kshs']; ?></td>
           </tr>
           <tr>
             <td class="table-label required"><p>Field:</p></td>
             <td><?php echo $Budget['field_currency']; ?></td>
             <td><?php echo $Budget['field']; ?></td>
+            <td>Kshs: <?php echo $Budget['field_kshs']; ?></td>
             <td class="table-label required"><p>Clinical Supplies</p></td>
             <td><?php echo $Budget['supplies_currency']; ?></td>
             <td><?php echo $Budget['supplies']; ?></td>
+            <td>Kshs: <?php echo $Budget['supplies_kshs']; ?></td>
           </tr>
           <tr>
             <td class="table-label required"><p>Pharmacy:</p></td>
             <td><?php echo $Budget['pharmacy_currency']; ?></td>
             <td><?php echo $Budget['pharmacy']; ?></td>
+            <td>Kshs: <?php echo $Budget['pharmacy_kshs']; ?></td>
             <td class="table-label required"><p>Travel</p></td>
             <td><?php echo $Budget['travel_currency']; ?></td>
             <td><?php echo $Budget['travel']; ?></td>
+            <td>Kshs: <?php echo $Budget['travel_kshs']; ?></td>
           </tr>
           <tr>
             <td class="table-label required"><p>Regulatory:</p></td>
             <td><?php echo $Budget['regulatory_currency']; ?></td>
             <td><?php echo $Budget['regulatory']; ?></td>
+            <td>Kshs: <?php echo $Budget['regulatory_kshs']; ?></td>
             <td class="table-label required"><p>IT</p></td>
             <td><?php echo $Budget['it_currency']; ?></td>
             <td><?php echo $Budget['it']; ?></td>
+            <td>Kshs: <?php echo $Budget['it_kshs']; ?></td>
           </tr>
           <tr>
             <td class="table-label required"><p>Others:</p></td>
             <td><?php echo $Budget['others_currency']; ?></td>
             <td><?php echo $Budget['others']; ?></td>
+            <td>Kshs: <?php echo $Budget['others_kshs']; ?></td>
             <td class="table-label required"></td>
+            <td></td>
             <td></td>
             <td></td>
           </tr>
@@ -58,15 +68,17 @@
             <td colspan="2" class="table-label required"><p>Grand Total:</p></td>
             <td colspan="2"><?php echo $Budget['grand_currency']; ?></td>
             <td colspan="2"><?php echo $Budget['grand_total']; ?></td>
+            <td colspan="2">Kshs: <?php echo $Budget['grand_total_kshs']; ?></td>
           </tr>
           <tr>
             <td colspan="2" class="table-label required"><p>Per Subject:</p></td>
             <td colspan="2"><?php echo $Budget['subject_currency']; ?></td>
             <td colspan="2"><?php echo $Budget['subject']; ?></td>
+            <td colspan="2">Kshs: <?php echo $Budget['subject_kshs']; ?></td>
           </tr>
           <tr>
             <td colspan="2" class="table-label required"><p>Study Information:</p></td>
-            <td colspan="4"><?php echo $Budget['study_information']; ?></td>
+            <td colspan="6"><?php echo $Budget['study_information']; ?></td>
           </tr>
           
       </tbody>
@@ -129,6 +141,7 @@
             <th style="width: 40%;">Budget Categories  </th>
             <th style="width: 9%;">Currency</th>
             <th>Total Cost</th>
+            <th>Total Cost (Kshs) <small class="muted">(conversion)</small></th>
           </tr>
         </thead>
         <tbody>
@@ -137,66 +150,77 @@
             <td> <p>Personnel</p> </td>
             <td> <?php  echo $this->Form->input('personnel_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('personnel', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('personnel_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Transport</p> </td>
             <td> <?php  echo $this->Form->input('transport_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('transport', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('transport_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Field</p> </td>
             <td> <?php  echo $this->Form->input('field_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('field', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('field_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Clinical Supplies</p> </td>
             <td> <?php  echo $this->Form->input('supplies_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('supplies', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('supplies_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Pharmacy</p> </td>
             <td> <?php  echo $this->Form->input('pharmacy_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('pharmacy', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('pharmacy_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Travel</p> </td>
             <td> <?php  echo $this->Form->input('travel_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('travel', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('travel_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Regulatory</p> </td>
             <td> <?php  echo $this->Form->input('regulatory_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('regulatory', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('regulatory_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>IT</p> </td>
             <td> <?php  echo $this->Form->input('it_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('it', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('it_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Others</p> </td>
             <td> <?php  echo $this->Form->input('others_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('others', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('others_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Grand Total</p> </td>
             <td> <?php  echo $this->Form->input('grand_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('grand_total', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('grand_total_kshs', array('label' => false)); ?> </td>
           </tr>
           <tr>
             <td><?php echo $num++; ?></td>
             <td> <p>Per Subject</p> </td>
             <td> <?php  echo $this->Form->input('subject_currency', array('label' => false, 'type' => 'select', 'options' => $curr));  ?>  </td>
             <td> <?php  echo $this->Form->input('subject', array('label' => false)); ?> </td>
+            <td> <?php  echo $this->Form->input('subject_kshs', array('label' => false)); ?> </td>
           </tr>
         </tbody>
       </table>

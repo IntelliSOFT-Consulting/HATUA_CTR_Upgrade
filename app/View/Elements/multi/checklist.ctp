@@ -5,6 +5,7 @@
     $num = 1;
 ?>
 <h5>CHECKLIST <span class="sterix">*</span></h5>
+<h5>All submitted documents should be version referenced and dated.</h5>
 <hr>
 <?php
 
@@ -131,6 +132,50 @@ echo $this->Form->input('applicant_protocol', array(
     }
     echo "</div>";
    }
+  }
+?>
+</div></div>
+<?php
+$num++;
+echo $this->Form->input('applicant_pan_african', array(
+                            'label' => array('class' => 'control-checklabel', 'text' => $num.'.'),
+                            'error' => array('attributes' => array( 'class' => 'checkcontrols help-block')),
+                            'class' => false, 'hiddenField' => false,
+                            'between' => '<div class="checkcontrols"><input type="hidden" value="0" id="ApplicationApplicantProtocol_" name="data[Application][applicant_pan_african]">
+                                            <label class="checkbox required pull-left">',
+                            'after' => 'Registration of the study at Pan African Clinical Trials Registry https://pactr.samrc.ac.za  <span class="sterix">*</span> </label>'.$add_checklist,));
+?>
+<div id="Checklist" class="checkcontrols" title="applicant_pan_african">
+<?php
+ if(isset($this->request->data['Checklist'])){
+    if ($protocol['group'] == 'applicant_pan_african') {
+        foreach ($this->request->data['Checklist'] as $bKey => $protocol) {
+            echo '<div style="margin-top: 5px; margin-bottom: 5px;">';
+            echo $this->Form->input('Checklist.'.$bKey.'.id');
+            echo $this->Form->input('Checklist.'.$bKey.'.basename', array('type'=>'hidden'));
+            if (!empty($protocol['id']) && !empty($protocol['basename'])) {
+                echo $this->Html->link(__($protocol['basename']),
+                    array('controller' => 'attachments',   'action' => 'download', $protocol['id']),
+                    array('class' => 'btn btn-info')
+                    );
+
+                echo '<button value="'.$protocol['id'].'" type="button" class="btn btn-mini btn-danger delete_file_link">
+                        &nbsp;<i class="icon-trash"></i>&nbsp;</button>';
+            } else {
+                echo $this->Form->input('Checklist.'.$bKey.'.model', array('type'=>'hidden', 'value'=>'Checklist'));
+                echo $this->Form->input('Checklist.'.$bKey.'.group', array('type'=>'hidden', 'value'=>'applicant_pan_african'));
+                echo $this->Form->input('Checklist.'.$bKey.'.dirname', array('type'=>'hidden'));
+                echo $this->Form->input('Checklist.'.$bKey.'.checksum', array('type'=>'hidden'));
+                echo $this->Form->input('Checklist.'.$bKey.'.file', array(
+                    'type' => 'file', 'label' => false, 'div' => false,
+                    'error' => array('attributes' => array( 'class' => 'error help-block')),
+                    'between' => false,
+                    'after'=>'<span id="applicant_pan_african-Help'.$bKey.'" class="help-inline"> Upload! </span>'
+            ));
+            }
+            echo "</div>";
+       }
+    }   
   }
 ?>
 </div></div>
@@ -1030,6 +1075,7 @@ if(isset($this->request->data['ParticipatingStudy'])){
 }
 ?>
 </div></div>
+<?php /* ?>
 <?php
 $num++;
 echo $this->Form->input('applicant_registration_ctr', array(
@@ -1074,50 +1120,8 @@ echo $this->Form->input('applicant_registration_ctr', array(
   }
 ?>
 </div></div>
-<?php
-$num++;
-echo $this->Form->input('applicant_pan_african', array(
-                            'label' => array('class' => 'control-checklabel', 'text' => $num.'.'),
-                            'error' => array('attributes' => array( 'class' => 'checkcontrols help-block')),
-                            'class' => false, 'hiddenField' => false,
-                            'between' => '<div class="checkcontrols"><input type="hidden" value="0" id="ApplicationApplicantProtocol_" name="data[Application][applicant_pan_african]">
-                                            <label class="checkbox required pull-left">',
-                            'after' => 'Registration of the study at Pan African Clinical Trials Registry https://pactr.samrc.ac.za  <span class="sterix">*</span> </label>'.$add_checklist,));
-?>
-<div id="Checklist" class="checkcontrols" title="applicant_pan_african">
-<?php
- if(isset($this->request->data['Checklist'])){
-    if ($protocol['group'] == 'applicant_pan_african') {
-        foreach ($this->request->data['Checklist'] as $bKey => $protocol) {
-            echo '<div style="margin-top: 5px; margin-bottom: 5px;">';
-            echo $this->Form->input('Checklist.'.$bKey.'.id');
-            echo $this->Form->input('Checklist.'.$bKey.'.basename', array('type'=>'hidden'));
-            if (!empty($protocol['id']) && !empty($protocol['basename'])) {
-                echo $this->Html->link(__($protocol['basename']),
-                    array('controller' => 'attachments',   'action' => 'download', $protocol['id']),
-                    array('class' => 'btn btn-info')
-                    );
+<?php */ ?>
 
-                echo '<button value="'.$protocol['id'].'" type="button" class="btn btn-mini btn-danger delete_file_link">
-                        &nbsp;<i class="icon-trash"></i>&nbsp;</button>';
-            } else {
-                echo $this->Form->input('Checklist.'.$bKey.'.model', array('type'=>'hidden', 'value'=>'Checklist'));
-                echo $this->Form->input('Checklist.'.$bKey.'.group', array('type'=>'hidden', 'value'=>'applicant_pan_african'));
-                echo $this->Form->input('Checklist.'.$bKey.'.dirname', array('type'=>'hidden'));
-                echo $this->Form->input('Checklist.'.$bKey.'.checksum', array('type'=>'hidden'));
-                echo $this->Form->input('Checklist.'.$bKey.'.file', array(
-                    'type' => 'file', 'label' => false, 'div' => false,
-                    'error' => array('attributes' => array( 'class' => 'error help-block')),
-                    'between' => false,
-                    'after'=>'<span id="applicant_pan_african-Help'.$bKey.'" class="help-inline"> Upload! </span>'
-            ));
-            }
-            echo "</div>";
-       }
-    }   
-  }
-?>
-</div></div>
 <?php
 $num++;
 echo $this->Form->input('applicant_statement', array(
@@ -1202,6 +1206,7 @@ echo $this->Form->input('applicant_statement', array(
 }
 ?>
 </div></div>
+<?php /* ?>
 <?php
 $num++;
 echo $this->Form->input('applicant_hard_copies', array(
@@ -1246,6 +1251,7 @@ echo $this->Form->input('applicant_hard_copies', array(
   }
 ?>
 </div></div>
+<?php */ ?>
 <?php
 $num++;
 echo $this->Form->input('applicant_signed_checklist', array(
