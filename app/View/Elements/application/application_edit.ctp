@@ -32,7 +32,7 @@
       <div id="tabs">
         <ul>
           <li><a href="#tabs-1">1. Abstract</a></li>
-          <li><a href="#tabs-2">2. Investigator</a></li>
+          <li><a href="#tabs-2">2. Investigator &amp; Pharmacist</a></li>
           <li><a href="#tabs-3">3. Sponsor</a></li>
           <li><a href="#tabs-4">4. Participants</a></li>
           <li><a href="#tabs-5">5. Sites</a></li>
@@ -232,6 +232,12 @@
           <?php
             echo $this->element('multi/investigators');
           ?>
+          <hr>
+          <div>
+          <?php
+            echo $this->element('multi/pharmacists');
+          ?>
+          </div>
         </div>
         <div id="tabs-3" >
                     <?php
