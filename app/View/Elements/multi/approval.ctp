@@ -204,7 +204,7 @@
                   $i++;
             ?>
             <tr>
-            <td><?php $key++; echo $i; ?></td>
+            <td><?php $key = 0; $key++; echo $i; ?></td>
             <td>
               <?php
                 echo $this->Form->input('AnnualApproval.'.$key.'.model', array('type'=>'hidden', 'value'=>'Application'));
