@@ -1,7 +1,7 @@
 <?php
 if ($redir === 'reviewer') {
     foreach ($notifications as $notification) {
-        echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].' id="'.$notification['Notification']['id'].'">';
+        echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
         echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
         if ($notification['Notification']['type'] == 'reviewer_new_application') {
             echo "<p>".$notification['Notification']['title']."</p>";
@@ -17,7 +17,7 @@ if ($redir === 'reviewer') {
     }
 } elseif ($redir === 'partner') {
   foreach ($notifications as $notification) {
-      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].' id="'.$notification['Notification']['id'].'">';
+      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
       echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
       if ($notification['Notification']['type'] == 'manager_new_application') {
         echo "<p><i class='icon-star-empty'></i>".$notification['Notification']['title']."</p>";
@@ -40,7 +40,7 @@ if ($redir === 'reviewer') {
   }
 } elseif ($redir === 'manager') {
   foreach ($notifications as $notification) {
-      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].' id="'.$notification['Notification']['id'].'">';
+      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
       echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
       if ($notification['Notification']['type'] == 'manager_new_application') {
         echo "<p><i class='icon-star-empty'></i>".$notification['Notification']['title']."</p>";
@@ -63,7 +63,7 @@ if ($redir === 'reviewer') {
   }
 } elseif ($redir === 'applicant') {
   foreach ($notifications as $notification) {
-        echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].' id="'.$notification['Notification']['id'].'">';
+        echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
         echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
         if ($notification['Notification']['type'] == 'registration_welcome') {
             echo '<strong>'.$notification['Notification']['title'].'</strong>';
@@ -85,7 +85,7 @@ if ($redir === 'reviewer') {
     }
 } elseif ($redir === 'admin') {
   foreach ($notifications as $notification) {
-      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].' id="'.$notification['Notification']['id'].'">';
+      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
       echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
       if ($notification['Notification']['type'] == 'manager_new_application') {
         echo "<p><i class='icon-star-empty'></i>".$notification['Notification']['title']."</p>";
@@ -108,7 +108,7 @@ if ($redir === 'reviewer') {
     }
 } elseif ($redir === 'inspector') {
   foreach ($notifications as $notification) {
-      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].' id="'.$notification['Notification']['id'].'">';
+      echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
       echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
       if ($notification['Notification']['type'] == 'manager_new_application') {
         echo "<p><i class='icon-star-empty'></i>".$notification['Notification']['title']."</p>";

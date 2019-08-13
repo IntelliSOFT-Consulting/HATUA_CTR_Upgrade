@@ -136,7 +136,7 @@ $this->end();
 <?php $this->start('tabs'); ?>
 <ul>
   <li><a href="#tabs-1">1. Abstract</a></li>
-  <li><a href="#tabs-2">2. Investigator</a></li>
+  <li><a href="#tabs-2">2. Investigator &amp; Pharmacist</a></li>
   <li><a href="#tabs-3">3. Sponsor</a></li>
   <li><a href="#tabs-4">4. Participants</a></li>
   <li><a href="#tabs-5">5. Sites</a></li>
@@ -279,6 +279,7 @@ $this->end();
       </div>
     </div>
 
+
     <div class="tab-pane" id="tab9">   
       <div class="row-fluid">
         <div class="span12">
@@ -295,17 +296,16 @@ $this->end();
       </div>
     </div>
 
-    <div class="tab-pane" id="tab12">   
-        
-          <h3>Annual Approval Letter</h3>
-          <p>Annual Approval Letter</p>
-       
+    <div class="tab-pane" id="tab11">   
+          <?php echo $this->element('multi/approval_budget'); ?>
     </div>
 
-    <div class="tab-pane" id="tab11">   
-      
-          <?php echo $this->element('multi/approval_budget'); ?>
-       
+    <div class="tab-pane" id="tab12">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/annual_letters'); ?>
+        </div>
+      </div>                
     </div>
 
 </div>
@@ -325,6 +325,7 @@ $this->end();
     // var editor = $('#ApplicationFinalReport').ckeditor();
     if ($('#ApplicationFinalReport').length) {
       var editor = CKEDITOR.editor.replace('ApplicationFinalReport');
+      var editor = CKEDITOR.editor.replace('ApplicationLaymansSummary');
     }
     $(document).on('click', '#ApplicationViewSaveReport', function() {
           var data_save = $('#ApplicationId').serializeArray();

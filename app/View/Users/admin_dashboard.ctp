@@ -132,14 +132,14 @@
         </li>
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-money"></i> Annual Approval Financial Breakdown <small class="muted">(in annual approvals page)</small>',
-          array('controller' => 'pockets', 'action' => 'edit', 1, 'admin' => true), array('escape' => false));
+        echo $this->Html->link('<i class="icon-check"></i> Annual Approval Checklist <small class="muted">(Files required)</small>',
+          array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
         ?>
         </li>
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-check"></i> Annual Approval Checklist',
-          array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
+        echo $this->Html->link('<i class="icon-calendar"></i> Annual Approval Letter <small class="muted">(Edit content)</small>',
+          array('controller' => 'pockets', 'action' => 'edit', 17, 'admin' => true), array('escape' => false));
         ?>
         </li>
       </ul>

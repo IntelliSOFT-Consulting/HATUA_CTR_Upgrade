@@ -168,6 +168,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'AnnualLetter' => array(
+            'className' => 'AnnualLetter',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
         'Organization' => array(
             'className' => 'Organization',
             'foreignKey' => 'application_id',

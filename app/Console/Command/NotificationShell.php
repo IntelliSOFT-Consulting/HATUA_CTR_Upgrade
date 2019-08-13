@@ -365,11 +365,12 @@ class NotificationShell extends Shell {
          }
 
         $this->Notification->Create();
-         if (!$this->Notification->saveMany($save_data)) {
+        if (!$this->Notification->saveMany($save_data)) {
              $this->log('The Notifications were not sent at managerApproveApplication.', 'notifications_error');
              $this->log($this->args[0], 'notifications_error');
-         }
+        }
 
+        
     }
 
    public function  newAmndtNotifyApplicant() {

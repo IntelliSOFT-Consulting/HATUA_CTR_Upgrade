@@ -8,102 +8,102 @@
       <div class="styled_title"><h3>BUDGET AND JUSTIFICATION</h3></div>
     </div>
     
-  <?php foreach ($application['Budget'] as $Budget) { ?>
-  <table class="table table-bordered table-condensed">
-      <thead>
-        <th colspan="8"><h4 class="text-danger">Budget (<?php echo $Budget['year']; ?>)</h4></th>
-      </thead>
-      <tbody>
-          <tr>
-            <td class="table-label required"><p>Personnel:</p></td>
-            <td><?php echo $Budget['personnel_currency']; ?></td>
-            <td><?php echo $Budget['personnel']; ?></td>
-            <td>Kshs: <?php echo $Budget['personnel_kshs']; ?></td>
-            <td class="table-label required"><p>Transport</p></td>
-            <td><?php echo $Budget['transport_currency']; ?></td>
-            <td><?php echo $Budget['transport']; ?></td>
-            <td>Kshs: <?php echo $Budget['transport_kshs']; ?></td>
-          </tr>
-          <tr>
-            <td class="table-label required"><p>Field:</p></td>
-            <td><?php echo $Budget['field_currency']; ?></td>
-            <td><?php echo $Budget['field']; ?></td>
-            <td>Kshs: <?php echo $Budget['field_kshs']; ?></td>
-            <td class="table-label required"><p>Clinical Supplies</p></td>
-            <td><?php echo $Budget['supplies_currency']; ?></td>
-            <td><?php echo $Budget['supplies']; ?></td>
-            <td>Kshs: <?php echo $Budget['supplies_kshs']; ?></td>
-          </tr>
-          <tr>
-            <td class="table-label required"><p>Pharmacy:</p></td>
-            <td><?php echo $Budget['pharmacy_currency']; ?></td>
-            <td><?php echo $Budget['pharmacy']; ?></td>
-            <td>Kshs: <?php echo $Budget['pharmacy_kshs']; ?></td>
-            <td class="table-label required"><p>Travel</p></td>
-            <td><?php echo $Budget['travel_currency']; ?></td>
-            <td><?php echo $Budget['travel']; ?></td>
-            <td>Kshs: <?php echo $Budget['travel_kshs']; ?></td>
-          </tr>
-          <tr>
-            <td class="table-label required"><p>Regulatory:</p></td>
-            <td><?php echo $Budget['regulatory_currency']; ?></td>
-            <td><?php echo $Budget['regulatory']; ?></td>
-            <td>Kshs: <?php echo $Budget['regulatory_kshs']; ?></td>
-            <td class="table-label required"><p>IT</p></td>
-            <td><?php echo $Budget['it_currency']; ?></td>
-            <td><?php echo $Budget['it']; ?></td>
-            <td>Kshs: <?php echo $Budget['it_kshs']; ?></td>
-          </tr>
-          <tr>
-            <td class="table-label required"><p>Others:</p></td>
-            <td><?php echo $Budget['others_currency']; ?></td>
-            <td><?php echo $Budget['others']; ?></td>
-            <td>Kshs: <?php echo $Budget['others_kshs']; ?></td>
-            <td class="table-label required"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td colspan="2" class="table-label required"><p>Grand Total:</p></td>
-            <td colspan="2"><?php echo $Budget['grand_currency']; ?></td>
-            <td colspan="2"><?php echo $Budget['grand_total']; ?></td>
-            <td colspan="2">Kshs: <?php echo $Budget['grand_total_kshs']; ?></td>
-          </tr>
-          <tr>
-            <td colspan="2" class="table-label required"><p>Per Subject:</p></td>
-            <td colspan="2"><?php echo $Budget['subject_currency']; ?></td>
-            <td colspan="2"><?php echo $Budget['subject']; ?></td>
-            <td colspan="2">Kshs: <?php echo $Budget['subject_kshs']; ?></td>
-          </tr>
-          <tr>
-            <td colspan="2" class="table-label required"><p>Study Information:</p></td>
-            <td colspan="6"><?php echo $Budget['study_information']; ?></td>
-          </tr>
-          
-      </tbody>
-  </table>
-  <?php } ?>
-
-
-
-  <?php if($redir == 'applicant') { ?>
-  <h4>Budget Summary</h4>
-  <div class="well">
-
-  <div class="row-fluid">
-      <div class="span12">
-
+    <?php foreach ($application['Budget'] as $Budget) { ?>
+    <table class="table table-bordered table-condensed">
+        <thead>
+          <th colspan="8"><h4 class="text-danger">Budget (<?php echo $Budget['year']; ?>)</h4></th>
+        </thead>
+        <tbody>
+            <tr>
+              <td class="table-label required"><p>Personnel:</p></td>
+              <td><?php echo $Budget['personnel_currency']; ?></td>
+              <td><?php echo $Budget['personnel']; ?></td>
+              <td>Kshs: <?php echo $Budget['personnel_kshs']; ?></td>
+              <td class="table-label required"><p>Transport</p></td>
+              <td><?php echo $Budget['transport_currency']; ?></td>
+              <td><?php echo $Budget['transport']; ?></td>
+              <td>Kshs: <?php echo $Budget['transport_kshs']; ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Field:</p></td>
+              <td><?php echo $Budget['field_currency']; ?></td>
+              <td><?php echo $Budget['field']; ?></td>
+              <td>Kshs: <?php echo $Budget['field_kshs']; ?></td>
+              <td class="table-label required"><p>Clinical Supplies</p></td>
+              <td><?php echo $Budget['supplies_currency']; ?></td>
+              <td><?php echo $Budget['supplies']; ?></td>
+              <td>Kshs: <?php echo $Budget['supplies_kshs']; ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Pharmacy:</p></td>
+              <td><?php echo $Budget['pharmacy_currency']; ?></td>
+              <td><?php echo $Budget['pharmacy']; ?></td>
+              <td>Kshs: <?php echo $Budget['pharmacy_kshs']; ?></td>
+              <td class="table-label required"><p>Travel</p></td>
+              <td><?php echo $Budget['travel_currency']; ?></td>
+              <td><?php echo $Budget['travel']; ?></td>
+              <td>Kshs: <?php echo $Budget['travel_kshs']; ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Regulatory:</p></td>
+              <td><?php echo $Budget['regulatory_currency']; ?></td>
+              <td><?php echo $Budget['regulatory']; ?></td>
+              <td>Kshs: <?php echo $Budget['regulatory_kshs']; ?></td>
+              <td class="table-label required"><p>IT</p></td>
+              <td><?php echo $Budget['it_currency']; ?></td>
+              <td><?php echo $Budget['it']; ?></td>
+              <td>Kshs: <?php echo $Budget['it_kshs']; ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Others:</p></td>
+              <td><?php echo $Budget['others_currency']; ?></td>
+              <td><?php echo $Budget['others']; ?></td>
+              <td>Kshs: <?php echo $Budget['others_kshs']; ?></td>
+              <td class="table-label required"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="table-label required"><p>Grand Total:</p></td>
+              <td colspan="2"><?php echo $Budget['grand_currency']; ?></td>
+              <td colspan="2"><?php echo $Budget['grand_total']; ?></td>
+              <td colspan="2">Kshs: <?php echo $Budget['grand_total_kshs']; ?></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="table-label required"><p>Per Subject:</p></td>
+              <td colspan="2"><?php echo $Budget['subject_currency']; ?></td>
+              <td colspan="2"><?php echo $Budget['subject']; ?></td>
+              <td colspan="2">Kshs: <?php echo $Budget['subject_kshs']; ?></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="table-label required"><p>Study Information:</p></td>
+              <td colspan="6"><?php echo $Budget['study_information']; ?></td>
+            </tr>
+            
+        </tbody>
+      </table>
+    <?php } ?>
+    
+    <?php if($redir == 'applicant') { ?>
+    <h4>Budget Summary</h4>
       <?php
 
         echo $this->Form->create('Budget', array(
-            'url' => array('controller' => 'budgets', 'action' => 'add'),
-           'class' => 'form-inline',
+            'class' => 'form-inline',
+       'inputDefaults' => array(
+        'div' => array('class' => 'control-group'),
+        'label' => array('class' => 'control-label'),
+        'between' => '<div class="controls">',
+        'after' => '</div>',
+        'class' => '',
+        'format' => array('before', 'label', 'between', 'input', 'after','error'),
+        'error' => array('attributes' => array('class' => 'controls help-block')),
+       ),
         ));
         $num = 1;
         $curr = ['KES' => 'KES', 'USD' => 'USD', 'EUR' => 'EUR'];
       ?>
-
       <div class="row-fluid">
         <div class="span6">
           <?php
@@ -129,10 +129,6 @@
             ?>
         </div><!--/span-->
       </div><!--/row-->
-
-
-    
-      
 
       <table  class="table table-bordered  table-condensed table-striped">
         <thead>
@@ -225,20 +221,16 @@
         </tbody>
       </table>
        <hr>
-
-       <?php
+      
+      <?php
             echo $this->Form->input('study_information', array(
               'type' => 'textarea',
               'label' => array('class' => 'control-label', 'text' => 'Study Center Informaiton'),       
                 'after'=>'<p class="help-block">  </p></div>',
             ));
+      ?>
 
-            ?>
-
-     </div>  
-    </div>
-
-        <?php
+      <?php
           echo $this->Form->end(array(
             'label' => 'Submit',
             'value' => 'Save',
@@ -250,10 +242,9 @@
           ));
         ?>
 
-    </div>   <!-- ctr-groups -->
     <hr>
     <?php } ?>
-    
+
     </div>
   </div>
 

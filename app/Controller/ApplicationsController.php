@@ -1,5 +1,8 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('String', 'Utility');
+App::uses('ThemeView', 'View');
+App::uses('HtmlHelper', 'View/Helper');
 App::uses('Sanitize', 'Utility');
 /**
  * Applications Controller
@@ -24,7 +27,7 @@ class ApplicationsController extends AppController {
  */
 
 
-public function index() {
+    public function index() {
         $this->Prg->commonProcess();
         $page_options = array('5' => '5', '10' => '10');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
@@ -296,7 +299,7 @@ public function index() {
                                 'content' => $this->Application->Attachment->find('first',
                                     array('conditions' =>array('Attachment.id' => $this->Application->AnnualApproval->id),
                                            'contain' => array()))));
-                            CakeResque::enqueue('default', 'ManagerShell', array('newAnnualApproval', $response));
+                            // CakeResque::enqueue('default', 'ManagerShell', array('newAnnualApproval', $response));
                         if (isset($this->request->data['Document'])) 
                             $this->set('response', array(
                                 'message' => 'Success',
@@ -320,6 +323,20 @@ public function index() {
         
     }
 
+    public function applicant_final_report($id = null) {
+        if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        } else {
+          if ($this->Application->save($this->request->data, true, array('id', 'final_report', 'laymans_summary', 'final_date'))) {
+              $this->Session->setFlash(__('Final report successfully submitted.'), 'alerts/flash_success');
+              $this->redirect(array('action' => 'view', $id));
+          } else {
+              $this->Session->setFlash(__('Error. Unable to submit final report.'), 'alerts/flash_error');
+              $this->redirect(array('action' => 'view', $id));
+          }
+        }
+    }
+
     private function aview($id = null) {
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
@@ -335,7 +352,7 @@ public function index() {
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review', 'Sae',
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review', 'Sae', 'AnnualLetter', 
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
 
@@ -370,7 +387,7 @@ public function index() {
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist', 'AnnualLetter', 
                 'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review'
                 ))));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -426,6 +443,63 @@ public function index() {
                             'message' => $this->request->data['Application']['approved_reason'],
                             'manager' => $this->Auth->User('id'));
                         CakeResque::enqueue('default', 'NotificationShell', array('managerApproveApplication', $data));
+                        
+                        //Create  annual approval letter
+                        $this->loadModel('Pocket');
+                        $this->loadModel('AnnualLetter');
+                        $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'approval_letter')));
+                        $this->Application->read();
+                        $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $this->Application->id)));
+                        $cnt++;
+                        $year = date('Y', strtotime($this->Application->field('approval_date')));
+                        $approval_no = 'APL/'.$cnt.'/'.$year.'-'.$this->Application->field('protocol_no');
+                        $expiry_date = date('Y-m-d', strtotime($this->Application->field('approval_date') . " +1 year"));
+                        $variables = array('approval_no' => $approval_no, 'protocol_no' => $this->Application->field('protocol_no'),
+                                      'year' => $year, 'expiry_date' => $expiry_date);
+                        $save_data = array('AnnualLetter' => array(
+                                'application_id' => $this->Application->id,
+                                'approval_no' => $approval_no,
+                                'approver' => $this->Session->read('Auth.User.name'),
+                                'approval_date' => date('Y-m-d H:i:s'),
+                                'expiry_date' => $expiry_date,
+                                'status' => 'AnnualApprovalLetter',
+                                'content' => String::insert($approval_letter['Pocket']['content'], $variables)
+                              ),
+                            );
+                        $this->AnnualLetter->Create();
+                        if (!$this->AnnualLetter->save($save_data)) {
+                             $this->log('Annual approval letter was not saved!!', 'annual_letter_error');
+                             $this->log($save_data, 'annual_letter_error');
+                        }                        
+
+                        //******************       Send Email and Notifications to Applicant and Managers and Reviewers    *****************************
+                        $this->loadModel('Message');
+                        $html = new HtmlHelper(new ThemeView());
+                        $message = $this->Message->find('first', array('conditions' => array('name' => 'annual_approval_letter')));
+                        
+                        $users = $this->Application->User->find('all', array(
+                            'contain' => array('Group'),
+                            'conditions' => array('OR' => array('User.id' => $this->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+                        ));
+                        foreach ($users as $user) {
+                          $variables = array(
+                            'name' => $user['User']['name'], 'approval_no' => $approval_no, 'protocol_no' => $this->Application->field('protocol_no'),
+                            'protocol_link' => $html->link($this->Application->field('protocol_no'), array('controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true, 
+                                'full_base' => true), array('escape' => false)),
+                            'approval_date' => date('Y-m-d H:i:s')
+                          );
+                          $datum = array(
+                            'email' => $user['User']['email'],
+                            'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'annual_approval_letter', 'model' => 'AnnaulLetter',
+                            'subject' => String::insert($message['Message']['subject'], $variables),
+                            'message' => String::insert($message['Message']['content'], $variables)
+                          );
+                          CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                          CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                        }
+                        //**********************************    END   *********************************
+                        //end
+                        
                         $this->Session->setFlash(__('successfully approved the protocol.'), 'alerts/flash_success');
                         $this->redirect(array('action' => 'view', $id));
                     } else {
@@ -438,10 +512,10 @@ public function index() {
                     $this->redirect(array('action' => 'view', $id));
                 }
             }
-        } else {
+          } else {
             $this->Session->setFlash(__('Not post.'), 'alerts/flash_info');
             $this->redirect(array('action' => 'view', $id));
-        }
+          }
     }
 
     public function manager_view_notification($id = null, $notification = null) {
@@ -496,7 +570,7 @@ public function index() {
                     'conditions' => array('Application.id' => $id),
                     'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee',  'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization',
                         'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
-                        'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 
+                        'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'AnnualLetter', 
                         'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
                             'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment')))));
                 $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -853,7 +927,7 @@ public function index() {
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                    'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                    'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 
                     'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist')));
         if($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('id'),'debug');
@@ -874,7 +948,7 @@ public function index() {
             'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 
+                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 'AnnualLetter', 
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),
                         'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')

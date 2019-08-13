@@ -40,7 +40,7 @@
           'placeholder' => ' ' , 'class' => 'input-xxlarge'
         ));
         echo $this->Form->input('Pharmacist.0.email', array(
-          'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'email address <span class="sterix">*</span>'),
+          'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'Email address <span class="sterix">*</span>'),
           'placeholder' => ' ' , 'class' => 'input-xxlarge'
         ));
 		echo $this->Html->tag('hr', '', array('id' => 'PharmacistHr0'));
@@ -87,7 +87,7 @@
 	              'placeholder' => ' ' , 'class' => 'input-xxlarge'
 	            ));
 	            echo $this->Form->input('Pharmacist.'.$i.'.email', array(
-	              'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'email address <span class="sterix">*</span>'),
+	              'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'Email address <span class="sterix">*</span>'),
 	              'placeholder' => ' ' , 'class' => 'input-xxlarge'
 	            ));
 				echo $this->Html->tag('div', '<button id="PharmacistButton'.$i.'" class="btn btn-mini btn-danger removePIContact" type="button">Remove Pharmacist</button>', array(

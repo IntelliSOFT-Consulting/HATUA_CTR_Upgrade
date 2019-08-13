@@ -94,6 +94,6 @@ class Attachment extends AppModel {
 		} elseif ($ndata['Attachment']['model'] == 'Amendment') {
 			$application_id = $this->Application->Amendment->field('application_id', array('id' => $ndata['Attachment']['foreign_key']));
 			return $this->Application->field('user_id', array('id' => $application_id)) === $user;
-		}
+		} 
 	}
 }

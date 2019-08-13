@@ -148,8 +148,8 @@ echo $this->Form->input('applicant_pan_african', array(
 <div id="Checklist" class="checkcontrols" title="applicant_pan_african">
 <?php
  if(isset($this->request->data['Checklist'])){
-    if ($protocol['group'] == 'applicant_pan_african') {
-        foreach ($this->request->data['Checklist'] as $bKey => $protocol) {
+    foreach ($this->request->data['Checklist'] as $bKey => $protocol) {
+        if ($protocol['group'] == 'applicant_pan_african') {
             echo '<div style="margin-top: 5px; margin-bottom: 5px;">';
             echo $this->Form->input('Checklist.'.$bKey.'.id');
             echo $this->Form->input('Checklist.'.$bKey.'.basename', array('type'=>'hidden'));

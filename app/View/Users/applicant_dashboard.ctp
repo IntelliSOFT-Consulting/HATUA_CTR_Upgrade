@@ -42,7 +42,7 @@
                     if($application['Application']['submitted']) {
                         $ndata = $application['Application']['study_drug'].' ('.$application['Application']['protocol_no'].')';
                         echo $this->Html->link('<li>'.$ndata.'</li>', array('controller' => 'applications', 'action' => 'view', $application['Application']['id']),
-                            array('escape' => false));
+                            array('escape' => false, 'class' => 'text-success'));
                         ?>
             <!-- Trial status start -->
                 <small>

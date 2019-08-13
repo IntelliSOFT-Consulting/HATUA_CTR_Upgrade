@@ -322,6 +322,7 @@
             <?php echo $this->fetch('coordinating_investigators'); ?>
             </tbody>
           </table>
+
            <h5>2.1 PRINCIPAL INVESTIGATOR (<small>for multicentre trial</small>) </h5>
           <?php foreach ($application['InvestigatorContact'] as $key => $investigatorContact) { ?>
           <span class="badge badge-info"><?php echo $key+1;?></span>
@@ -367,7 +368,7 @@
             </tr>
             </tbody>
           </table>
-          <hr>
+          <hr>          
           <?php } ?>
           <table class="table  table-condensed">
             <tbody>
@@ -380,6 +381,75 @@
                   </tr>
              <?php   } } ?>
             <?php echo $this->fetch('principal_investigators'); ?>
+            </tbody>
+          </table>
+
+           <h5>2.2 PHARMACIST </h5>
+          <?php foreach ($application['Pharmacist'] as $key => $pharmacist) { ?>
+          <span class="badge badge-info"><?php echo $key+1;?></span>
+          <table class="table  table-condensed">
+            <tbody>
+            <tr>
+              <td class="table-label required"><p>Registration Number <span class="sterix">*</span></p></td>
+              <td><?php echo $pharmacist['reg_no']?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Name</p></td>
+              <td><?php echo $pharmacist['given_name'] ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Valid year <span class="sterix">*</span></p></td>
+              <td><?php echo $pharmacist['valid_year'] ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Qualification<span class="sterix">*</span></p></td>
+              <td><?php echo $pharmacist['qualification'] ?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"> <p>Premise <span class="sterix">*</span></p> </td>
+              <td>
+                <p><?php echo $pharmacist['premise_name'];?></p>
+              </td>
+            </tr>
+            <tr>
+              <td class="table-label required"> <p>Physical address  <span class="sterix">*</span></p> </td>
+              <td>
+                <p><?php echo $pharmacist['professional_address'];?></p>
+              </td>
+            </tr>
+            <tr>
+              <td class="table-label required"> <p>Telephone number <span class="sterix">*</span></p> </td>
+              <td>
+                <p><?php echo $pharmacist['telephone'];?></p>
+              </td>
+            </tr>
+            <tr>
+              <td class="table-label required"> <p>Mobile number <span class="sterix">*</span></p> </td>
+              <td>
+                <p><?php echo $pharmacist['mobile'];?></p>
+              </td>
+            </tr>
+            <tr>
+              <td class="table-label required"> <p>Email address <span class="sterix">*</span></p> </td>
+              <td>
+                <p><?php echo $pharmacist['email'];?></p>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <hr>          
+          <?php } ?>
+          <table class="table  table-condensed">
+            <tbody>
+            <?php
+              foreach($application['Amendment']  as $key => $amendment) {
+                if($amendment['submitted'] == 1 && !empty($amendment['pharmacists'])){      ?>
+                  <tr class="table-viewlabel">
+                    <td class="table-label table-viewlabel"><?php echo $key+1; ?></td>
+                    <td class="table-noline"><?php echo $amendment['pharmacists'] ; ?></td>
+                  </tr>
+             <?php   } } ?>
+            <?php echo $this->fetch('pharmacists'); ?>
             </tbody>
           </table>
         </div>

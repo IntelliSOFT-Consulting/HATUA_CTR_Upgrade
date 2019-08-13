@@ -1,7 +1,8 @@
 $(function() {
     $('.alert').bind('close', function (e) {
         e.preventDefault();
-        var intId = parseInt($(this).attr('id'));
+        console.log($("div.alert", this).attr('id'));
+        var intId = parseInt($($(this)[0]).attr('id'));
         var me = $(this);
         $('<div></div>').appendTo('body')
             .html('<div> <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Are you sure you \

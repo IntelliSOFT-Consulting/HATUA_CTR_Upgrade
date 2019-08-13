@@ -86,7 +86,7 @@ $(function() {
           format: " yyyy",
           minViewMode: "years",
           startDate: '2000',
-          endDate: '-1y',
+          endDate: 'y',
           autoclose: true
       });
       yearset();
@@ -95,13 +95,13 @@ $(function() {
       function yearset() {
           if ($('.approvalyear').val() != $('.kayear').val()) {
             $('.kayear').closest('table').find('input[name*="year"]').each(function() {
-                $(this).val($('.kayear').val());
+                $(this).val($('.kayear').val().trim());
             });
           }
       }
 
     $('.add-approval').click(function(){
-      if($(this).closest('td').prev().find('input:file').length) {
+      if($(this).closest('tr').find('input:file').length) {
         alert('Please upload the current file before adding another one');
       } else {
           var fileId = parseInt($(this).closest('tr').find('input[name*="model"]').attr('id').match(/\d+/g), 10);
@@ -109,7 +109,7 @@ $(function() {
 
             var fileInput = '<input type="file" id="AnnualApproval'+fileId+'File" class="span12 input-file" \
             name="data[AnnualApproval]['+fileId+'][file]">';
-            $(this).closest('td').prev().append(fileInput);
+            $(this).closest('tr').find('td.files').append(fileInput);
             setUpload();
           } else {
             alert('We have slight problem. Please refresh this page');
@@ -136,7 +136,7 @@ $(function() {
       $(this).parent('div').remove();
     }
   }
-  console.log("waa gwan? today");
+  // console.log("waa gwan? today");
   $( ".pickadate" ).datepicker({
       minDate:"-100Y", maxDate:"-0D", format:'dd-mm-yyyy', showButtonPanel:true, changeMonth:true, changeYear:true, startDate: '01-01-1990',
           endDate: '-1d',

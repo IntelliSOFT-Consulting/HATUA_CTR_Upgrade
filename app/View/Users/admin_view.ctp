@@ -13,12 +13,12 @@
 		<dt>Username</dt>
 		<dd><?php echo $user['User']['username'] ;?> &nbsp; </dd>
 		<dt>Name</dt>
+		<dd><?php echo $user['User']['name']; ?> &nbsp; </dd>
 		<dt><?php echo __('Group'); ?></dt>
 		<dd>
 			<?php echo $this->Html->link($user['Group']['name'], array('controller' => 'groups', 'action' => 'view', $user['Group']['id'])); ?>
 			&nbsp;
 		</dd>
-		<dd><?php echo $user['User']['name']; ?> &nbsp; </dd>
 		<dt>Email</dt>
 		<dd><?php echo $user['User']['email']; ?> &nbsp; </dd>
 		<dt>Phone No</dt>
