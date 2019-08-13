@@ -72,6 +72,9 @@
               ?>
             </td>
             <td>
+              <?php  echo $this->Form->input('erc_number', array('label' => false, 'class' => 'input-medium' )); ?>
+            </td>
+            <td>
               <?php
                 echo $this->Form->input('submission_date', array(
                   'type' => 'text',
@@ -79,9 +82,6 @@
                   'placeholder' => ' ' , 'class' => 'pickadate input-medium',
                 ));
               ?>
-            </td>
-            <td>
-              <?php  echo $this->Form->input('erc_number', array('label' => false, 'class' => 'input-medium' )); ?>
             </td>
             <td>
               <?php
