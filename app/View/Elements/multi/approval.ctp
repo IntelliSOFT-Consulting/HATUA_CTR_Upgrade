@@ -21,7 +21,7 @@
 <!-- Ethical Committees -->
   <div class="row-fluid">
    <div class="span12">
-    <h4 style="background-color: #4182c4; color: #fff; text-align: center;">Ethical Committees</h4>
+    <h4 style="background-color: #4182c4; color: #fff; text-align: center;">Ethics Review Committees (ERC)</h4>
       
       <?php        
         echo $this->Form->create('EthicalCommittee', array(
@@ -41,10 +41,10 @@
       <table class="table table-bordered table-condensed">
         <thead>
           <tr>
-            <th>Ethical Committee</th>
+            <th>Ethics Review Committee (ERC)</th>
             <th>ERC Reference Number</th>
-            <th>Initial Submission Date <small class="muted"> (dd-mm-yyyy) </small></th>
-            <th>Initial Approval Date <small class="muted"> (dd-mm-yyyy) </small></th>
+            <th>Date of initial complete submission <small class="muted"> (dd-mm-yyyy) </small></th>
+            <th>Initial Approval Date <br><small class="muted"> (dd-mm-yyyy) </small></th>
             <th></th>
           </tr>
         </thead>
@@ -66,8 +66,9 @@
             <td>
               <?php
                 echo $this->Form->input('application_id', array('type' => 'hidden' ,'value' => $application['Application']['id']));
+                $ercs = $this->requestAction('/ercs/checklist');
                 echo $this->Form->input('ethical_committee', array(
-                  'label' => false, 'class' => 'input-medium'
+                  'type' => 'select', 'label' => false, 'class' => 'input-xlarge', 'options' => $ercs
                 ));
               ?>
             </td>
@@ -118,7 +119,7 @@
     <tbody>
     <?php
     App::uses('Hash', 'Utility');
-    $former = $this->requestAction('/pockets/checklist');
+    $former = $this->requestAction('/pockets/checklist/annual');
     $years = array_unique(Hash::extract($application['AnnualApproval'], '{n}.year'));
     rsort($years);
     // debug(Hash::extract($application['AnnualApproval'], '{n}.year'));
@@ -142,8 +143,10 @@
                       array('class' => '')
                     );
                     $version_no = $anc['version_no'];
+                    $file_date = $anc['file_date'];
                     echo "</span>&nbsp;
                           <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>
+                          <span id='fileDate$id' style='margin-left:10px;'>Dated: $file_date</span>
                           <span id='AnnualApproval$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>
                           <br>";
                   }
@@ -191,24 +194,25 @@
                   'class' => 'span12 kayear tiptip'));
               ?>  
             </th>
-            <th style="width: 45%;">Description</th>
+            <th style="width: 40%;">Description</th>
             <th>File <span class="sterix">*</span></th>
-            <th style="width: 5%">Version No.</th>
-            <th style="width: 8%"> </th>
+            <th style="width: 7%">Version No.</th>
+            <th style="width: 12%">Date <small class="muted">(dd-mm-yyyy)</small></th>
+            <th style="width: 7%">Submit</th>
             </tr>
           </thead>
           <tbody>
             <?php
-              $i = 0; 
+              $i = 0; $key = 0; 
                 foreach ($former as $pos => $value) {
                   $i++;
             ?>
             <tr>
-            <td><?php $key = 0; $key++; echo $i; ?></td>
+            <td><?php $key++; echo $i; ?></td>
             <td>
               <?php
-                echo $this->Form->input('AnnualApproval.'.$key.'.model', array('type'=>'hidden', 'value'=>'Application'));
-                echo $this->Form->input('AnnualApproval.'.$key.'.group', array('type'=>'hidden', 'value'=>'annual_approval'));
+                echo $this->Form->input('AnnualApproval.'.$key.'.model', array('type'=>'hidden', 'value'=>'AnnualApproval'));
+                echo $this->Form->input('AnnualApproval.'.$key.'.group', array('type'=>'hidden', 'value'=>$pos));
                 echo $this->Form->input('AnnualApproval.'.$key.'.filesize', array('type' => 'hidden'));
                 echo $this->Form->input('AnnualApproval.'.$key.'.basename', array('type' => 'hidden'));
                 echo $this->Form->input('AnnualApproval.'.$key.'.checksum', array('type' => 'hidden'));
@@ -238,17 +242,25 @@
             <td>
               <?php
                 if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AnnualApproval.'.$key.'.version_no', array(
-                  'label' => false, 'between' => false, 'after' => false, 'div' => false, 'class' => 'span12 input-file',
+                  'label' => false, 'between' => false, 'after' => false, 'div' => false, 'placeholder' => 'Version', 'class' => 'span12 input-file',
+                  'error' => array('escape' => false, 'attributes' => array( 'class' => 'help-block')),
+                ));
+              ?>
+            </td>
+            <td>
+              <?php
+                if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AnnualApproval.'.$key.'.file_date', array(
+                  'type' => 'text','label' => false, 'between' => false, 'after' => false, 'div' => false, 'placeholder' => 'dd-mm-yyyy', 'class' => 'span12 input-file pickadate',
                   'error' => array('escape' => false, 'attributes' => array( 'class' => 'help-block')),
                 ));
               ?>
             </td>
             <td>
                 <?php
-                  echo $this->Form->button('<i class="icon-plus"></i> ', array(
+                  echo $this->Form->button('<i class="icon-save"></i> ', array(
                       'name' => 'addApproval',
                       'type' => 'button',
-                      'class' => 'btn add-approval tiptip',
+                      'class' => 'btn btn-primary add-approval tiptip',
                       'data-original-title' => "Add a file",
                       'div' => false,
                     ));

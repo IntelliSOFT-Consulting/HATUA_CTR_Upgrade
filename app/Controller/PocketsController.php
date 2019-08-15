@@ -10,7 +10,7 @@ class PocketsController extends AppController {
     public function beforeFilter() {
         parent::beforeFilter();
         // $this->Auth->allow('*');
-        $this->Auth->allow('view', 'checklist');
+        $this->Auth->allow('view', 'checklist', 'lchecklist');
     }
 /**
  * index method
@@ -27,10 +27,25 @@ class PocketsController extends AppController {
         $this->paginate = array('conditions' => array('Pocket.type' => 'annual'));
         $this->set('pockets', $this->paginate());
     }
-    public function checklist() {
+    public function admin_lindex() {
+        $this->Pocket->recursive = 0;
+        $this->paginate = array('conditions' => array('Pocket.type' => 'protocol'));
+        $this->set('pockets', $this->paginate());
+    }
+    public function checklist($type = null) {
         $formdata = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.content'),
-            'conditions' => array('Pocket.type' => 'annual'),
+            'conditions' => array('Pocket.type' => $type),
+            'recursive' => 0
+        ));
+        if ($this->request->is('requested')) {
+            return $formdata;
+        }
+    }
+    public function lchecklist($type = null) {
+        $formdata = $this->Pocket->find('list', array(
+            'fields' => array('Pocket.name', 'Pocket.required'),
+            'conditions' => array('Pocket.type' => $type),
             'recursive' => 0
         ));
         if ($this->request->is('requested')) {
@@ -84,6 +99,17 @@ class PocketsController extends AppController {
             }
         }
     }
+    public function admin_ladd() {
+        if ($this->request->is('post')) {
+            $this->Pocket->create();
+            if ($this->Pocket->save($this->request->data)) {
+                $this->Session->setFlash(__('The pocket has been saved'));
+                $this->redirect(array('action' => 'lindex'));
+            } else {
+                $this->Session->setFlash(__('The pocket could not be saved. Please, try again.'));
+            }
+        }
+    }
 
 /**
  * edit method
@@ -101,6 +127,7 @@ class PocketsController extends AppController {
             if ($this->Pocket->save($this->request->data)) {
                 $this->Session->setFlash(__('The pocket has been saved'));
                 $this->redirect(array('action' => 'index'));
+                // $this->redirect($this->referer());
             } else {
                 $this->Session->setFlash(__('The pocket could not be saved. Please, try again.'));
             }
@@ -117,6 +144,23 @@ class PocketsController extends AppController {
             if ($this->Pocket->save($this->request->data)) {
                 $this->Session->setFlash(__('The pocket has been saved'));
                 $this->redirect(array('action' => 'cindex'));
+            } else {
+                $this->Session->setFlash(__('The pocket could not be saved. Please, try again.'));
+            }
+        } else {
+            $this->request->data = $this->Pocket->read(null, $id);
+        }
+    }
+    public function admin_ledit($id = null) {
+        $this->Pocket->id = $id;
+        // $this->Pocket->id = $this->Pocket->field('id', array('name' => $name), 'created DESC');
+        if (!$this->Pocket->exists()) {
+            throw new NotFoundException(__('Invalid pocket'));
+        }
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->Pocket->save($this->request->data)) {
+                $this->Session->setFlash(__('The pocket has been saved'));
+                $this->redirect(array('action' => 'lindex'));
             } else {
                 $this->Session->setFlash(__('The pocket could not be saved. Please, try again.'));
             }

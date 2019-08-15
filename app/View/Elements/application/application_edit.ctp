@@ -82,6 +82,7 @@
               'label' => array('class' => 'control-label required', 'text' => 'Study Drug <span class="sterix">*</span>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge',
             ));
+            echo $this->element('multi/study_routes');
             echo $this->Form->input('disease_condition', array(
               'label' => array('class' => 'control-label required', 'text' => 'Disease condition being investigated <span class="sterix">*</span>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge',
@@ -174,17 +175,11 @@
                     // </label>
                     // </span>', 'placeholder' => ' ' , 'class' => 'span4',
             // ));
-            // echo $this->element('multi/previous_dates');
             echo $this->element('multi/ethical_committees');
             // echo $this->Form->input('protocol_reviewers_names', array(
               // 'label' => array('class' => 'control-label', 'text' => 'Names of Protocol Reviewers'),
               // 'placeholder' => '' , 'class' => 'input-xxlarge',
             // ));
-            echo $this->Form->input('approval_date', array(
-              'div' => array('class' => 'control-group'), 'type' => 'text', 'class' => 'datepickers',
-              'label' => array('class' => 'control-label required', 'text' => 'Approval Date of Protocol <span class="sterix">*</span>'),
-              'after'=>'<span class="help-inline">  Date format (dd-mm-yyyy) </span></div>',
-            ));
             // echo $this->Form->input('current_status_trial', array(
               // 'type' => 'select', 'options' => array('recruiting' => 'recruiting', 'closed' => 'closed'), 'empty' => true,
               // 'label' => array('class' => 'control-label', 'text' => 'Current status of the trial'),

@@ -94,6 +94,39 @@ class Attachment extends AppModel {
 		} elseif ($ndata['Attachment']['model'] == 'Amendment') {
 			$application_id = $this->Application->Amendment->field('application_id', array('id' => $ndata['Attachment']['foreign_key']));
 			return $this->Application->field('user_id', array('id' => $application_id)) === $user;
+		}  elseif ($ndata['Attachment']['model'] == 'Checklist') {
+			return $this->Application->field('user_id',	array('id' => $ndata['Attachment']['foreign_key'])) === $user;
+		}  elseif ($ndata['Attachment']['model'] == 'AnnualApproval') {
+			return $this->Application->field('user_id',	array('id' => $ndata['Attachment']['foreign_key'])) === $user;
 		} 
+	}
+
+	public function beforeSave() {
+		if (!empty($this->data['Attachment']['file_date'])) {
+			$this->data['Attachment']['file_date'] = $this->dateFormatBeforeSave($this->data['Attachment']['file_date']);
+		}
+		if (!empty($this->data['Checklist']['file_date'])) {
+			$this->data['Checklist']['file_date'] = $this->dateFormatBeforeSave($this->data['Checklist']['file_date']);
+		}
+		if (!empty($this->data['AnnualApproval']['file_date'])) {
+			$this->data['AnnualApproval']['file_date'] = $this->dateFormatBeforeSave($this->data['AnnualApproval']['file_date']);
+		}
+		return true;
+	}
+
+
+	function afterFind($results) {
+		foreach ($results as $key => $val) {
+			if (isset($val['Attachment']['file_date'])) {
+				$results[$key]['Attachment']['file_date'] = $this->dateFormatAfterFind($val['Attachment']['file_date']);
+			}
+			if (isset($val['Checklist']['file_date'])) {
+				$results[$key]['Checklist']['file_date'] = $this->dateFormatAfterFind($val['Checklist']['file_date']);
+			}
+			if (isset($val['AnnualApproval']['file_date'])) {
+				$results[$key]['AnnualApproval']['file_date'] = $this->dateFormatAfterFind($val['AnnualApproval']['file_date']);
+			}
+		}
+		return $results;
 	}
 }

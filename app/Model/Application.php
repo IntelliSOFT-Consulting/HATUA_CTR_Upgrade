@@ -203,6 +203,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'StudyRoute' => array(
+            'className' => 'StudyRoute',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
                           'Attachment' => array(
                                     'className' => 'Attachment',
                                     'foreignKey' => 'foreign_key',
@@ -213,7 +218,7 @@ class Application extends AppModel {
                                     'className' => 'Attachment',
                                     'foreignKey' => 'foreign_key',
                                     'dependent' => true,
-                                    'conditions' => array('AnnualApproval.model' => 'Application', 'AnnualApproval.group' => 'annual_approval'),
+                                    'conditions' => array('AnnualApproval.model' => 'AnnualApproval'),
                           ),
         'ParticipantFlow' => array(
             'className' => 'ParticipantFlow',
@@ -375,14 +380,7 @@ class Application extends AppModel {
                 'required' => true,
                 'message'  => 'Abstract : Please enter the Date of protocol.'
             ),
-        ),
-        'approval_date' => array(
-            'notEmpty' => array(
-                'rule'     => 'notEmpty',
-                'required' => true,
-                'message'  => 'Abstract : Please enter the approval date of the protocol.'
-            ),
-        ),
+        ),        
         'study_drug' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
@@ -1413,9 +1411,9 @@ class Application extends AppModel {
         if (!empty($this->data['Application']['approval_date'])) {
             $this->data['Application']['approval_date'] = $this->dateFormatBeforeSave($this->data['Application']['approval_date']);
         }
-                        if (!empty($this->data['Application']['date_submitted'])) {
-                            $this->data['Application']['date_submitted'] = $this->dateFormatBeforeSave($this->data['Application']['date_submitted']);
-                        }
+        if (!empty($this->data['Application']['date_submitted'])) {
+            $this->data['Application']['date_submitted'] = $this->dateFormatBeforeSave($this->data['Application']['date_submitted']);
+        }
         if (!empty($this->data['Application']['declaration_date1'])) {
             $this->data['Application']['declaration_date1'] = $this->dateFormatBeforeSave($this->data['Application']['declaration_date1']);
         }

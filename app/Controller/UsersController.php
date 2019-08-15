@@ -549,6 +549,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/manager_delete');
         $this->Acl->allow($group, 'controllers/Applications/manager_deactivate');
         $this->Acl->allow($group, 'controllers/Attachments/manager_download');
+        $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Notifications/delete');
         $this->Acl->allow($group, 'controllers/Notifications/manager_resend');
         $this->Acl->allow($group, 'controllers/Reviews/manager_add');
@@ -560,6 +561,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
         $this->Acl->allow($group, 'controllers/Reports');
+        $this->Acl->allow($group, 'controllers/AnnualLetters/manager_approve');
+        $this->Acl->allow($group, 'controllers/AnnualLetters/manager_view');
 
         //Allow Inpectors
         $group->id = 6;
@@ -568,6 +571,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/inspector_view');
         $this->Acl->allow($group, 'controllers/Applications/inspector_view_notification');
         $this->Acl->allow($group, 'controllers/Attachments/inspector_download');
+        $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Notifications/delete');
         $this->Acl->allow($group, 'controllers/Users/inspector_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
@@ -583,6 +587,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/reviewer_index');
         $this->Acl->allow($group, 'controllers/Applications/reviewer_view');
         $this->Acl->allow($group, 'controllers/Attachments/reviewer_download');
+        $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Notifications/delete');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_add');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_respond');
@@ -615,11 +620,13 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_final_report');
         $this->Acl->allow($group, 'controllers/Attachments/applicant_download');
+        $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Attachments/delete');
         $this->Acl->allow($group, 'controllers/InvestigatorContacts/delete');
         $this->Acl->allow($group, 'controllers/Notifications/delete');
         $this->Acl->allow($group, 'controllers/Organizations/delete');
         $this->Acl->allow($group, 'controllers/PreviousDates/delete');
+        $this->Acl->allow($group, 'controllers/StudyRoute/delete');
         $this->Acl->allow($group, 'controllers/Placebos/delete');
         $this->Acl->allow($group, 'controllers/SiteDetails/delete');
         $this->Acl->allow($group, 'controllers/Sponsors/delete');
@@ -639,6 +646,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/ParticipantFlows/applicant_add');
         $this->Acl->allow($group, 'controllers/Budgets/applicant_add');
         $this->Acl->allow($group, 'controllers/EthicalCommittees/applicant_add');
+        $this->Acl->allow($group, 'controllers/AnnualLetters/applicant_view');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

@@ -1,26 +1,26 @@
 $(function() {
 	// Multi Dates Handling
-	$("#addPreviousDates").on("click", addPreviousDate);
-	$(document).on('click', '.removePreviousDate', removePrevDate);
+	$("#addRoutes").on("click", addRoute);
+	$(document).on('click', '.removeRoute', removePrevDate);
 	// Multi Dates Handling
-	function addPreviousDate() {
-		var se = $("#previousDates .control-group").last().find('button').attr('id');
+	function addRoute() {
+		var se = $("#Routes .control-group").last().find('button').attr('id');
 		if ( typeof se !== 'undefined' && se !== false && se !== "") {
 			intId = parseFloat(se.replace('removeDate', '')) + 1;
 		} else {
 			intId = 1;
 		}
-		if ($("#previousDates .control-group").length < 9) {
+		if ($("#Routes .control-group").length < 9) {
 			// console.log('intId = '+intId);
 			var newDate = $('<div class="control-group"> <label class="control-label"></label><div class="controls"> \
-							<input type="text" id="PreviousDate'+ intId +'DateOfPreviousProtocol" class="datepickers" \
-							name="data[PreviousDate]['+ intId +'][date_of_previous_protocol]"><span class="help-inline"> format (dd-mm-yyyy) \
-							<button title="Remove Date" id="removeDate'+ intId +'" class="btn btn-mini btn-danger removePreviousDate" \
+							<input type="text" id="Route'+ intId +'DateOfPreviousProtocol" class="datepickers" \
+							name="data[Route]['+ intId +'][date_of_previous_protocol]"><span class="help-inline"> format (dd-mm-yyyy) \
+							<button title="Remove Date" id="removeDate'+ intId +'" class="btn btn-mini btn-danger removeRoute" \
 							type="button">&nbsp;<i class="icon-trash"></i>&nbsp;</button> Remove Date \
 							</span> </div></div>');
-			$("#previousDates").append(newDate);
+			$("#Routes").append(newDate);
 		} else {
-			alert("Sorry, cant add more than "+$("#previousDates .control-group").length+" previous protocol dates!");
+			alert("Sorry, cant add more than "+$("#Routes .control-group").length+" previous protocol dates!");
 		}
 
 		$( ".datepickers" ).datepicker({
@@ -30,7 +30,7 @@ $(function() {
 	}
 	function removePrevDate() {
 		intId = parseFloat($(this).attr('id').replace('removeDate', ''));
-		var inputVal = $('#PreviousDate'+ intId +'Id').val();
+		var inputVal = $('#Route'+ intId +'Id').val();
 		if (inputVal) {
 			$.ajax({
 				type:'POST',

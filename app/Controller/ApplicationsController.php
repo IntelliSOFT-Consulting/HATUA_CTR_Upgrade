@@ -17,7 +17,7 @@ class ApplicationsController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'view', 'view.pdf');
+        $this->Auth->allow('index', 'view', 'view.pdf', 'apl', 'apn');
     }
 
 /**
@@ -444,25 +444,58 @@ class ApplicationsController extends AppController {
                             'manager' => $this->Auth->User('id'));
                         CakeResque::enqueue('default', 'NotificationShell', array('managerApproveApplication', $data));
                         
-                        //Create  annual approval letter
+                        //Create  annual approval letter                 
                         $this->loadModel('Pocket');
                         $this->loadModel('AnnualLetter');
-                        $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'approval_letter')));
+                        $html = new HtmlHelper(new ThemeView());
                         $this->Application->read();
-                        $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $this->Application->id)));
+                        $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'initial_approval_letter'), 'contain' => array('InvestigatorContact')));
+
+                        $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));
+                        $checklist = array();
+                        foreach ($application['Checklist'] as $formdata) {            
+                          $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
+                          (isset($checklist[$formdata['pocket_name']])) ? 
+                            $checklist[$formdata['pocket_name']] .= $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>' : 
+                            $checklist[$formdata['pocket_name']] = $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>';
+                        }
+                        $deeds = $this->Pocket->find('list', array(
+                          'fields' => array('Pocket.name', 'Pocket.content'),
+                          'conditions' => array('Pocket.type' => 'protocol'),
+                          'recursive' => 0
+                        ));
+                        $checkstring='';
+                        $num = 0;
+                        foreach ($checklist as $kech => $check) {
+                          $num++;
+                          $checkstring .= $num.'. '.$deeds[$kech].'<br>'.$check;
+                        }
+
+                        $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('date_format(AnnualLetter.created, "%Y")' => date("Y"))));
                         $cnt++;
                         $year = date('Y', strtotime($this->Application->field('approval_date')));
-                        $approval_no = 'APL/'.$cnt.'/'.$year.'-'.$this->Application->field('protocol_no');
-                        $expiry_date = date('Y-m-d', strtotime($this->Application->field('approval_date') . " +1 year"));
-                        $variables = array('approval_no' => $approval_no, 'protocol_no' => $this->Application->field('protocol_no'),
-                                      'year' => $year, 'expiry_date' => $expiry_date);
+                        $approval_no = 'PPB/'.$year.'/'.$application['Application']['protocol_no']."($cnt)";
+                        $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
+                        $expiry_date_s = date('Y-m-d', strtotime($application['Application']['approval_date'] . " +1 year"));
+                        $variables = array(
+                            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'], 
+                            'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
+                            'qualification' => $application['InvestigatorContact'][0]['qualification'],
+                            'names' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name'],
+                            'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
+                            'telephone' => $application['InvestigatorContact'][0]['telephone'],
+                            'study_title' => $application['Application']['short_title'],
+                            'checklist' => $checkstring,
+                            'expiry_date' => $expiry_date
+                        );
+                        
                         $save_data = array('AnnualLetter' => array(
-                                'application_id' => $this->Application->id,
+                                'application_id' => $application['Application']['id'],
                                 'approval_no' => $approval_no,
                                 'approver' => $this->Session->read('Auth.User.name'),
                                 'approval_date' => date('Y-m-d H:i:s'),
-                                'expiry_date' => $expiry_date,
-                                'status' => 'AnnualApprovalLetter',
+                                'expiry_date' => $expiry_date_s,
+                                'status' => 'submitted',
                                 'content' => String::insert($approval_letter['Pocket']['content'], $variables)
                               ),
                             );
@@ -470,27 +503,29 @@ class ApplicationsController extends AppController {
                         if (!$this->AnnualLetter->save($save_data)) {
                              $this->log('Annual approval letter was not saved!!', 'annual_letter_error');
                              $this->log($save_data, 'annual_letter_error');
-                        }                        
+                        }
+                        // end        
 
-                        //******************       Send Email and Notifications to Applicant and Managers and Reviewers    *****************************
+                        //******************       Send Email and Notifications Managers    *****************************
                         $this->loadModel('Message');
                         $html = new HtmlHelper(new ThemeView());
-                        $message = $this->Message->find('first', array('conditions' => array('name' => 'annual_approval_letter')));
+                        $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_approve_letter')));
                         
                         $users = $this->Application->User->find('all', array(
                             'contain' => array('Group'),
-                            'conditions' => array('OR' => array('User.id' => $this->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+                            // 'conditions' => array('OR' => array('User.id' => $this->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+                            'conditions' => array('User.group_id' => 2) //Applicant and managers
                         ));
                         foreach ($users as $user) {
                           $variables = array(
                             'name' => $user['User']['name'], 'approval_no' => $approval_no, 'protocol_no' => $this->Application->field('protocol_no'),
                             'protocol_link' => $html->link($this->Application->field('protocol_no'), array('controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true, 
                                 'full_base' => true), array('escape' => false)),
-                            'approval_date' => date('Y-m-d H:i:s')
+                            'approval_date' => $this->Application->field('approval_date')
                           );
                           $datum = array(
                             'email' => $user['User']['email'],
-                            'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'annual_approval_letter', 'model' => 'AnnaulLetter',
+                            'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'manager_approve_letter', 'model' => 'AnnaulLetter',
                             'subject' => String::insert($message['Message']['subject'], $variables),
                             'message' => String::insert($message['Message']['content'], $variables)
                           );
@@ -500,7 +535,7 @@ class ApplicationsController extends AppController {
                         //**********************************    END   *********************************
                         //end
                         
-                        $this->Session->setFlash(__('successfully approved the protocol.'), 'alerts/flash_success');
+                        $this->Session->setFlash(__('Successfully approved the protocol. '), 'alerts/flash_success');
                         $this->redirect(array('action' => 'view', $id));
                     } else {
                         $this->Session->setFlash(__('Error. Unable to update protocol.'), 'alerts/flash_error');
@@ -516,6 +551,153 @@ class ApplicationsController extends AppController {
             $this->Session->setFlash(__('Not post.'), 'alerts/flash_info');
             $this->redirect(array('action' => 'view', $id));
           }
+    }
+
+    public function apl() {
+        //Create  annual approval letter
+        $users = $this->Application->User->find('all', array(
+                'contain' => array('Group'),
+                'conditions' => array('OR' => array('User.id' => 6, 'User.group_id' => 2)) //Applicant and managers //Applicant and managers
+            ));
+            // foreach ($users as $user) {
+            //     $this->out('User: ' . $user['User']['name']);
+            //   if (isset($application['AnnualLetter'][0])) {
+            //     $this->out('AnnualLetter ' . $application['AnnualLetter'][0]);
+            //     $variables = array(
+            //             'name' => $user['User']['name'], 'protocol_no' => $application['Application']['protocol_no'],
+            //             'protocol_link' => $html->link($application['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $application['Application']['id'], $user['Group']['redir'] => true, 
+            //                 'full_base' => true), array('escape' => false)),
+            //             'approval_date' => $application['Application']['approval_date'], 'expiry_date' => $application['AnnualLetter'][0]['expiry_date']
+            //           );
+            //       $datum = array(
+            //         'email' => $user['User']['email'],
+            //         'id' => $id, 'user_id' => $user['User']['id'], 'type' => $type, 'model' => 'AnnaulLetter',
+            //         'subject' => String::insert($message['Message']['subject'], $variables),
+            //         'message' => String::insert($message['Message']['content'], $variables)
+            //       );
+            //       $this->sendEmail($datum);
+            //       $this->sendNotification($datum);
+            //       $this->log($datum, 'approval_reminder');
+            //   }              
+            // }
+        debug($users);
+
+        // $this->loadModel('Pocket');
+        // $this->loadModel('AnnualLetter');
+        // $html = new HtmlHelper(new ThemeView());
+        // $this->Application->read(null, 46);
+        // $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'initial_approval_letter'), 'contain' => array('InvestigatorContact')));
+
+        // $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));
+        // $checklist = array();
+        // foreach ($application['Checklist'] as $formdata) {            
+        //   $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
+        //   (isset($checklist[$formdata['pocket_name']])) ? 
+        //     $checklist[$formdata['pocket_name']] .= $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>' : 
+        //     $checklist[$formdata['pocket_name']] = $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>';
+        // }
+        // $deeds = $this->Pocket->find('list', array(
+        //   'fields' => array('Pocket.name', 'Pocket.content'),
+        //   'conditions' => array('Pocket.type' => 'protocol'),
+        //   'recursive' => 0
+        // ));
+        // // debug($deeds);
+        // $checkstring='';
+        // $cnt = 0;
+        // foreach ($checklist as $kech => $check) {
+        //   $cnt++;
+        //   $checkstring .= $cnt.'. '.$deeds[$kech].'<br>'.$check;
+        // }
+
+        // $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $this->Application->id)));
+        // $cnt++;
+        // $year = date('Y', strtotime($this->Application->field('approval_date')));
+        // $approval_no = 'APL/'.$cnt.'/'.$year.'-'.$application['Application']['protocol_no'];
+        // $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
+        // $variables = array(
+        //     'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'], 
+        //     'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
+        //     'qualification' => $application['InvestigatorContact'][0]['qualification'],
+        //     'names' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name'],
+        //     'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
+        //     'telephone' => $application['InvestigatorContact'][0]['telephone'],
+        //     'study_title' => $application['Application']['short_title'],
+        //     'checklist' => $checkstring,
+        //     'expiry_date' => $expiry_date
+        // );
+        
+        // $save_data = array('AnnualLetter' => array(
+        //         'application_id' => $application['Application']['id'],
+        //         'approval_no' => $approval_no,
+        //         'approver' => $this->Session->read('Auth.User.name'),
+        //         'approval_date' => date('Y-m-d H:i:s'),
+        //         'expiry_date' => $expiry_date,
+        //         'status' => 'AnnualApprovalLetter',
+        //         'content' => String::insert($approval_letter['Pocket']['content'], $variables)
+        //       ),
+        //     );
+        // $this->layout = false;
+        // $this->set('save_data', $save_data);
+    }
+
+    public function apn() {
+          //Create  annual approval letter
+          $this->loadModel('Pocket');
+          $this->loadModel('AnnualLetter');
+          $html = new HtmlHelper(new ThemeView());
+          $this->Application->read(null, 46);
+          $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'annual_approval_letter'), 'contain' => array('InvestigatorContact')));
+
+          $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));
+          $checklist = array();
+          foreach ($application['AnnualApproval'] as $formdata) {            
+            $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
+            (isset($checklist[$formdata['pocket_name']])) ? 
+              $checklist[$formdata['pocket_name']] .= $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>' : 
+              $checklist[$formdata['pocket_name']] = $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>';
+          }
+          $deeds = $this->Pocket->find('list', array(
+            'fields' => array('Pocket.name', 'Pocket.content'),
+            'conditions' => array('Pocket.type' => 'annual'),
+            'recursive' => 0
+          ));
+          // debug($deeds);
+          $checkstring='';
+          $cnt = 0;
+          foreach ($checklist as $kech => $check) {
+            $cnt++;
+            $checkstring .= $cnt.'. '.$deeds[$kech].'<br>'.$check;
+          }
+
+          $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $this->Application->id)));
+          $cnt++;
+          $year = date('Y', strtotime($this->Application->field('approval_date')));
+          $approval_no = 'APL/'.$cnt.'/'.$year.'-'.$application['Application']['protocol_no'];
+          $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
+          $variables = array(
+              'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'], 
+              'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
+              'qualification' => $application['InvestigatorContact'][0]['qualification'],
+              'names' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name'],
+              'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
+              'telephone' => $application['InvestigatorContact'][0]['telephone'],
+              'study_title' => $application['Application']['short_title'],
+              'checklist' => $checkstring,
+              'status' => $application['TrialStatus']['name'], 
+              'expiry_date' => $expiry_date
+          );
+          $save_data = array('AnnualLetter' => array(
+                  'application_id' => $application['Application']['id'],
+                  'approval_no' => $approval_no,
+                  'approver' => $this->Session->read('Auth.User.name'),
+                  'approval_date' => date('Y-m-d H:i:s'),
+                  'expiry_date' => $expiry_date,
+                  'status' => 'AnnualApprovalLetter',
+                  'content' => String::insert($approval_letter['Pocket']['content'], $variables)
+                ),
+              );
+          $this->layout = false;
+          $this->set('save_data', $save_data);
     }
 
     public function manager_view_notification($id = null, $notification = null) {
@@ -663,6 +845,8 @@ class ApplicationsController extends AppController {
 
         $response = $this->_isApplicant($id);
 
+                    // debug($this->request->data);
+                    // return;
         if ($response['Application']['deactivated']) {
             $this->redirect(array('action' => 'view', $id));
         }
@@ -744,7 +928,7 @@ class ApplicationsController extends AppController {
                         }
                     }
                 } else {
-                    $message = 'The application was not successfully submitted. Please correct the errors below..';
+                    $message = 'The application was not successfully submitted. Please correct the errors below...';
                     if($this->RequestHandler->isAjax()) {
                         $this->set('response', array('message' => 'Failure', 'errors' => $message));
                     } else {
@@ -947,7 +1131,7 @@ class ApplicationsController extends AppController {
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 'AnnualLetter', 
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),

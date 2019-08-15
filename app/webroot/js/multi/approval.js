@@ -1,7 +1,7 @@
 $(function() {
      $(document).ajaxStop($.unblockUI);
 
-     toggleApproval();
+     // toggleApproval();
      // $('.add-approval').attr('disabled', 'disabled');
      function toggleApproval() {
         $('table .add-approval').each(function() {
@@ -16,6 +16,18 @@ $(function() {
      function setUpload() {
       $('input:file').fileupload({
           dataType: 'json',
+          add: function (e, data) {
+              data.context = $(this).closest('tr');
+              $(this).after(data.files[0].name);
+              $(this).hide();    
+              data.context.find('button.add-approval').off('click').on('click', function () {
+                if(!data.context.find('[name*="version_no"]').val() && !data.context.find('[name*="file_date"]').val()) {
+                  alert('Please enter the document version and date.');
+                } else {
+                  data.submit();
+                }
+              });
+          },
           formData: function(form){
               var fieldData =  new Array();
               fieldData.push({
@@ -25,6 +37,8 @@ $(function() {
               $('#'+$(this.fileInput[0]).attr('id')).closest('tr').find(':input').each(function() {
                 fieldData.push({name: $(this).attr('name'), value: $(this).val()});
               });
+              // console.log(fieldData);
+              // return false;
               return fieldData;
           },
           beforeSend: function () {
@@ -57,7 +71,7 @@ $(function() {
                             class="btn btn-mini btn-danger delete_file_link">&nbsp;<i class="icon-trash"></i>&nbsp;</button></div>');
                 closestTd = $(this).closest('td');
                 $(this).remove();
-                toggleApproval();
+                // toggleApproval();
                 closestTd.find('.progress').fadeOut('slow');
             } else {
                 $(this).closest('td').append('<div class="alert alert-error"> \

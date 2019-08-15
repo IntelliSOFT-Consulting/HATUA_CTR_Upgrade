@@ -62,7 +62,7 @@ if ($redir === 'reviewer') {
       echo '</div>';
   }
 } elseif ($redir === 'applicant') {
-  foreach ($notifications as $notification) {
+  foreach ($notifications as $notification) {        
         echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
         echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
         if ($notification['Notification']['type'] == 'registration_welcome') {

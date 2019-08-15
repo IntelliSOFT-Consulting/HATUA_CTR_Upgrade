@@ -1,17 +1,18 @@
-<h5>ETHICAL COMMITTEE(S) (<small>Click button to add - 
-                          <button type="button" class="btn btn-mini btn-primary" id="addEthicalCommittees" >&nbsp;<i class="icon-plus"></i>&nbsp;</button> Approvals</small>)</h5>
+<h5>KENYA ETHICS REVIEW COMMITTEE(S) (<small>Click button to add - 
+                          <button type="button" class="btn btn-mini btn-primary" id="addEthicalCommittees" >&nbsp;<i class="icon-plus"></i>&nbsp;</button> Committees</small>)</h5>
 <div class="ctr-groups">
     <div id="ethical_committee_group">
     <?php
         $this->Html->script('multi/ethical_committees', array('inline' => false));
         echo $this->Form->input('EthicalCommittee.0.id');
+        $ercs = $this->requestAction('/ercs/checklist');
         echo $this->Form->input('EthicalCommittee.0.ethical_committee', array(
-          'label' => array('class' => 'control-label required', 'text' => 'Ethical Committee'),
-          'placeholder' => ' ' , 'class' => 'input-xxlarge',
+          'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Ethics Review Committee (ERC)'),
+          'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs
         ));
         echo $this->Form->input('EthicalCommittee.0.submission_date', array(
           'type' => 'text',
-          'label' => array('class' => 'control-label required', 'text' => 'Initial complete submission date'),
+          'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission'),
           'placeholder' => ' ' , 'class' => 'datepickers',
         ));
         echo $this->Form->input('EthicalCommittee.0.erc_number', array(
@@ -37,15 +38,15 @@
                   <?php
                     echo $this->Form->input('EthicalCommittee.'.$i.'.id');
                     echo $this->Form->input('EthicalCommittee.'.$i.'.ethical_committee', array(
-                      'label' => array('class' => 'control-label required', 'text' => 'Ethical Committee'),
-                      'placeholder' => ' ' , 'class' => 'input-xxlarge',
+                      'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Ethics Review Committee (ERC)'),
+                      'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs
                     ));
-                    echo $this->Form->input('EthicalCommittee.0.submission_date', array(
+                    echo $this->Form->input('EthicalCommittee.'.$i.'.submission_date', array(
                       'type' => 'text',
-                      'label' => array('class' => 'control-label required', 'text' => 'Initial complete submission date'),
+                      'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission'),
                       'placeholder' => ' ' , 'class' => 'datepickers',
                     ));
-                    echo $this->Form->input('EthicalCommittee.0.erc_number', array(
+                    echo $this->Form->input('EthicalCommittee.'.$i.'.erc_number', array(
                       'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge',
                     ));

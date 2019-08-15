@@ -144,8 +144,8 @@
             <h4>Notifications <small>Actions that require your attention.</small></h4>
             <!-- <dl class="notifications"> -->
             <?php
-                // pr($notifications);
-                
+              echo $this->element('alerts/notifications', ['notifications' => $notifications]);
+            
             ?>
             <!-- </dl> -->
           </div>

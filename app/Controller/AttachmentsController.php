@@ -40,6 +40,35 @@ class AttachmentsController extends AppController {
         }
     }*/
 
+    public function download($id = null) {
+        $this->viewClass = 'Media';
+        $this->Attachment->id = $id;
+        if (!$this->Attachment->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else if ($this->Session->read('Auth.User.group_id') == '5' && !$this->Attachment->isOwnedBy($id, $this->Auth->user('id'))) {
+            $this->Session->setFlash(__('You do not have permission to access this resource
+                                            id = '.$id.' and user = '.$this->Auth->user('id')), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else if($this->Session->read('Auth.User.group_id') == '5' && $this->Attachment->isOwnedBy($id, $this->Auth->user('id'))) {
+            $attachment = $this->Attachment->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Attachment']['basename'],
+                'download'  => true,
+                'path'      => 'media'. DS .'transfer'. DS .$attachment['Attachment']['dirname'] . DS
+            );
+            $this->set($params);
+        } else if($this->Session->read('Auth.User.group_id') == 1 || $this->Session->read('Auth.User.group_id') == 2 || $this->Session->read('Auth.User.group_id') == 3) {
+            $attachment = $this->Attachment->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Attachment']['basename'],
+                'download'  => true,
+                'path'      => 'media'. DS .'transfer'. DS .$attachment['Attachment']['dirname'] . DS
+            );
+            $this->set($params);
+        }        
+    }
+
     public function applicant_download($id = null) {
         $this->viewClass = 'Media';
         $this->Attachment->id = $id;

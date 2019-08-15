@@ -132,14 +132,32 @@
         </li>
         <li>
         <?php
+        echo $this->Html->link('<i class="icon-check-sign"></i> Protocol Approval Checklist <small class="muted">(Files required)</small>',
+          array('controller' => 'pockets', 'action' => 'lindex', 'admin' => true), array('escape' => false));
+        ?>
+        </li>
+        <li>
+        <?php
         echo $this->Html->link('<i class="icon-check"></i> Annual Approval Checklist <small class="muted">(Files required)</small>',
           array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
         ?>
         </li>
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-calendar"></i> Annual Approval Letter <small class="muted">(Edit content)</small>',
+        echo $this->Html->link('<i class="icon-empty"></i> Initial Approval Letter <small class="muted">(Edit content)</small>',
           array('controller' => 'pockets', 'action' => 'edit', 17, 'admin' => true), array('escape' => false));
+        ?>
+        </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-calendar"></i> Annual Approval Letter <small class="muted">(Edit content)</small>',
+          array('controller' => 'pockets', 'action' => 'edit', 18, 'admin' => true), array('escape' => false));
+        ?>
+        </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-user-md"></i> Ethic Review Committees <small class="muted">(ERCs)</small>',
+          array('controller' => 'ercs', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
       </ul>
