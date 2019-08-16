@@ -626,8 +626,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Notifications/delete');
         $this->Acl->allow($group, 'controllers/Organizations/delete');
         $this->Acl->allow($group, 'controllers/PreviousDates/delete');
-        $this->Acl->allow($group, 'controllers/StudyRoute/delete');
-        $this->Acl->allow($group, 'controllers/Manufacturer/delete');
+        $this->Acl->allow($group, 'controllers/StudyRoutes/delete');
+        $this->Acl->allow($group, 'controllers/Manufacturers/delete');
         $this->Acl->allow($group, 'controllers/Placebos/delete');
         $this->Acl->allow($group, 'controllers/SiteDetails/delete');
         $this->Acl->allow($group, 'controllers/Sponsors/delete');
