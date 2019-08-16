@@ -83,6 +83,7 @@
               'placeholder' => ' ' , 'class' => 'input-xxlarge',
             ));
             echo $this->element('multi/study_routes');
+            echo $this->element('multi/manufacturers');
             echo $this->Form->input('disease_condition', array(
               'label' => array('class' => 'control-label required', 'text' => 'Disease condition being investigated <span class="sterix">*</span>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge',

@@ -352,7 +352,7 @@ class ApplicationsController extends AppController {
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review', 'Sae', 'AnnualLetter', 
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review', 'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
 
@@ -387,7 +387,7 @@ class ApplicationsController extends AppController {
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist', 'AnnualLetter', 
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                 'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review'
                 ))));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -1111,7 +1111,7 @@ class ApplicationsController extends AppController {
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                    'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 
+                    'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                     'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist')));
         if($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('id'),'debug');
@@ -1132,7 +1132,7 @@ class ApplicationsController extends AppController {
             'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 'AnnualLetter', 
+                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),
                         'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')

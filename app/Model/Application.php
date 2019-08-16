@@ -208,6 +208,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'Manufacturer' => array(
+            'className' => 'Manufacturer',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
                           'Attachment' => array(
                                     'className' => 'Attachment',
                                     'foreignKey' => 'foreign_key',

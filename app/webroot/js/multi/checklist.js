@@ -112,19 +112,23 @@ $(function() {
                 fileInput: $(this),
                 add: function (e, data) {
                   data.context = $(this).closest('div');
-                  data.context.append('\
-                        <button id="{n}{i}btn" class="btn btn-mini btn-primary up_btn" type="button">&nbsp;<i class="icon-save"></i>&nbsp;Upload</button>\
-                        <button class="btn btn-mini btn-danger remove_file" type="button">&nbsp;<i class="icon-trash"></i>&nbsp;Delete</button>'
+                  if(!data.context.find('.progress').length) {
+                    data.context.append('\
+                        <button id="{n}{i}btn" class="btn btn-mini btn-primary up_btn" type="button">&nbsp;<i class="icon-upload-alt"></i>&nbsp;Upload</button>\
+                        <button class="btn btn-mini btn-danger remove_file" type="button">&nbsp;<i class="icon-remove"></i>&nbsp;Delete</button>'
                     );
+                  }
                     if(!data.context.find('.progress').length) {
                       data.context.append('\
-                        <div class="progress progress-striped active" style="width: 45%; margin-right: 45px; margin-top: 10px; margin-bottom: 5px;"> \
-                      <div class="bar" style="width: 0%;"></div> \
-                    </div>');
-                  }
+                          <div class="progress progress-striped active" style="width: 45%; margin-right: 45px; margin-top: 10px; margin-bottom: 5px;"> \
+                        <div class="bar" style="width: 0%;"></div> \
+                      </div>');
+                    }
                   data.context.find('.progress .bar').css('width', '0%');
                   // data.submit();
-                  $(this).after(data.files[0].name);
+                  // $(this).after(data.files[0].name);
+                  $('label[for=' + $(this).attr('id') + ']').remove();
+                  $(this).after('<label class="btn pull-left" style="background-color: #99C0DD" for="'+$(this).attr('id')+'">'+data.files[0].name+'</label>&nbsp;');
                   // console.log(data.files[0].name);
                   // $(this).css("backgroundColor", "#99C0DD");
                   $(this).hide();

@@ -6,7 +6,22 @@ App::uses('AppController', 'Controller');
  * @property Country $Country
  */
 class CountriesController extends AppController {
+	public function beforeFilter() {
+        parent::beforeFilter();
+        // $this->Auth->allow('*');
+        $this->Auth->allow('countrylist');
+    }
 
+    public function countrylist() {
+    	$this->loadModel('Country');
+        $formdata = $this->Country->find('list', array(
+            'fields' => array('Country.name', 'Country.name'),
+            'recursive' => 0
+        ));
+        if ($this->request->is('requested')) {
+            return $formdata;
+        }
+    }
 /**
  * index method
  *

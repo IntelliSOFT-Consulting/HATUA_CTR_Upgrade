@@ -8,7 +8,7 @@
         $ercs = $this->requestAction('/ercs/checklist');
         echo $this->Form->input('EthicalCommittee.0.ethical_committee', array(
           'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Ethics Review Committee (ERC)'),
-          'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs
+          'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs, 'empty' => true,
         ));
         echo $this->Form->input('EthicalCommittee.0.submission_date', array(
           'type' => 'text',
@@ -39,7 +39,7 @@
                     echo $this->Form->input('EthicalCommittee.'.$i.'.id');
                     echo $this->Form->input('EthicalCommittee.'.$i.'.ethical_committee', array(
                       'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Ethics Review Committee (ERC)'),
-                      'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs
+                      'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs, 'empty' => true,
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.submission_date', array(
                       'type' => 'text',

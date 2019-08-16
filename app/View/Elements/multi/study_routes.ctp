@@ -3,7 +3,7 @@
  	$study_routes = $this->requestAction('/study_routes/routeslist');
 	echo $this->Form->input('StudyRoute.0.id');
 		echo $this->Form->input('StudyRoute.0.study_route', array(
-			'type' => 'select', 'div' => array('class' => 'control-group', 'id' => 'StudyRoute0'), 'class' => 'input-xlarge', 'options' => $study_routes,
+			'type' => 'select', 'div' => array('class' => 'control-group', 'id' => 'StudyRoute0'), 'class' => 'input-xlarge', 'options' => $study_routes, 'empty' => true,
 			'label' => array('class' => 'control-label required', 'text' => 'Route(s) of Administration <span class="sterix">*</span>'),
 			'escape' => false,
 			'after'=>'<span class="help-inline"> 
@@ -19,7 +19,7 @@
 			echo $this->Form->input('StudyRoute.'.$i.'.id');
 
 			echo $this->Form->input('StudyRoute.'.$i.'.study_route', array(
-				'type' => 'select', 'div' => array('class' => 'control-group', 'id' => 'StudyRoute0'), 'class' => 'input-xlarge', 'options' => $study_routes,
+				'type' => 'select', 'div' => array('class' => 'control-group', 'id' => 'StudyRoute0'), 'class' => 'input-xlarge', 'options' => $study_routes, 'empty' => true,
 				'label' => array('class' => 'control-label', 'text' => ''),
 				'after'=>'<span class="help-inline"> 
 							<button type="button" id="removeRoute'.$i.'"

@@ -18,7 +18,9 @@ $(function() {
           dataType: 'json',
           add: function (e, data) {
               data.context = $(this).closest('tr');
-              $(this).after(data.files[0].name);
+              // $(this).after(data.files[0].name);
+              $('label[for=' + $(this).attr('id') + ']').remove();
+              $(this).after('<label class="btn pull-left" style="background-color: #99C0DD" for="'+$(this).attr('id')+'">'+data.files[0].name+'</label>&nbsp;');
               $(this).hide();    
               data.context.find('button.add-approval').off('click').on('click', function () {
                 if(!data.context.find('[name*="version_no"]').val() && !data.context.find('[name*="file_date"]').val()) {
@@ -70,6 +72,7 @@ $(function() {
                   <button id="AnnualApproval'+data.result.content.Attachment.id+'" type="button" style="margin-left:10px;" \
                             class="btn btn-mini btn-danger delete_file_link">&nbsp;<i class="icon-trash"></i>&nbsp;</button></div>');
                 closestTd = $(this).closest('td');
+                $('label[for=' + $(this).attr('id') + ']').remove();
                 $(this).remove();
                 // toggleApproval();
                 closestTd.find('.progress').fadeOut('slow');

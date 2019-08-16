@@ -21,8 +21,8 @@ class PharmacistsController extends AppController {
 	public function fetch($regno = null) {
 		$HttpSocket = new HttpSocket();
 		// string query
-		$response = $HttpSocket->get('https://rhris.pharmacyboardkenya.org/api_version/getPremise/PHARMACIST/'.$regno, '', array(
-			'header' => array('x-api-key' => 'Hg.Vb*BFYv{1OOx<#]ZK$1kv-3&KywL=$LdmBaj1:%{[Y/dknfa/SD+ORAs<cy_P')
+		$response = $HttpSocket->get('https://rhris.pharmacyboardkenya.org/api_version/getPharmacist/'.$regno, '', array(
+			'header' => array('Authorization' => 'qSMOuUlY0ra54]zQrrp30Gtwfm5PKyf4rY0&Q$W]$HSvSGdXu=MX')
 			));
 		$this->set('response', $response->body);
 		$this->set('_serialize', 'response');

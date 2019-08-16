@@ -49,6 +49,7 @@ $(function() {
         reg = $('#Pharmacist'+intId+'RegNo');
         // console.log(reg);
         reg.focusout(function() {
+          if(reg.val()) {
             $.ajax({
                url: "/pharmacists/fetch/"+reg.val()+".json",
                type: "POST",
@@ -56,16 +57,17 @@ $(function() {
                data:{'reg_no': reg.val()},
                success: function( data ) {
                     vals = returnedData = JSON.parse(data);
-                    $('#Pharmacist'+intId+'GivenName').val(vals.Superitendant);
+                    $('#Pharmacist'+intId+'GivenName').val(vals["Pharmacist Name"]);
                     $('#Pharmacist'+intId+'ValidYear').val(vals.ValidYear);
-                    $('#Pharmacist'+intId+'Qualification').val(vals["Superitendant Cadre"]);
+                    $('#Pharmacist'+intId+'Qualification').val(vals["Cadre"]);
                     $('#Pharmacist'+intId+'PremiseName').val(vals.PremiseName);
-                    $('#Pharmacist'+intId+'ProfessionalAddress').val(vals.PremisePhysicalAddress);
-                    $('#Pharmacist'+intId+'Telephone').val(vals.SupNumber);
-                    $('#Pharmacist'+intId+'Mobile').val(vals.PremiseMobile);
-                    $('#Pharmacist'+intId+'Email').val(vals.SupEmail);
+                    // $('#Pharmacist'+intId+'ProfessionalAddress').val(vals.PremisePhysicalAddress);
+                    // $('#Pharmacist'+intId+'Telephone').val(vals.SupNumber);
+                    // $('#Pharmacist'+intId+'Mobile').val(vals.PremiseMobile);
+                    $('#Pharmacist'+intId+'Email').val(vals["Pharmacist Email"]);
                }
             });
+          }
         });
     }
 
