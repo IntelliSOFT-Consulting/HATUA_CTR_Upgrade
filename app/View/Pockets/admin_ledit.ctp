@@ -19,7 +19,7 @@
         ));
     echo $this->Form->input('id'); ?>
     <fieldset>
-        <legend>Edit <strong><?php echo $this->Form->value('Pocket.name');?></strong></legend>
+        <legend style="text-align: center;"><strong><?php echo $this->Form->value('Pocket.name');?></strong></legend>
     <?php
         echo $this->Form->input('id');
         echo $this->Form->input('required');
@@ -40,6 +40,6 @@
         ?>
 
 <script type="text/javascript">
-    CKEDITOR.replace( 'data[Pocket][content]');
+    // CKEDITOR.replace( 'data[Pocket][content]');
 </script>
 </div>

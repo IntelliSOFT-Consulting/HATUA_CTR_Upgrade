@@ -1,6 +1,3 @@
-<?php
-    if(!empty($application['SiteInspection'])) {
-  ?>
   <br>
   <div class="row-fluid">
     <div class="span12">      
@@ -13,6 +10,10 @@
         ?>
     </div>
   </div>
+  
+<?php
+    if(!empty($application['SiteInspection'])) {
+  ?>
   <br>
     <table class="table table-condensed table-bordered" style="margin-bottom: 2px;">
       <thead>

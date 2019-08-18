@@ -269,7 +269,7 @@ class SiteInspectionsController extends AppController {
             'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
+                'AnnualApproval', 'Document', 'Review', 'SiteInspection' => array('SiteAnswer')
                 )));
             $this->request->data = $application;
         }
@@ -396,7 +396,7 @@ class SiteInspectionsController extends AppController {
             $this->Session->setFlash(__('Site inspection approved'), 'alerts/flash_success');
             $this->redirect($this->referer());
         }
-        $this->Session->setFlash(__('Site inspection was not deleted'), 'alerts/flash_error');
+        $this->Session->setFlash(__('Site inspection was not approved'), 'alerts/flash_error');
         $this->redirect(array('controller' => 'site_inspections', 'action' => 'view', $site_inspection['application_id']));
     }
     public function manager_approve($id = null) {

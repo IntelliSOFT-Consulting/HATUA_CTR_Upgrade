@@ -17,7 +17,7 @@ class ApplicationsController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'view', 'view.pdf', 'apl', 'apn');
+        $this->Auth->allow('index', 'view', 'view.pdf', 'apl', 'apn', 'study_title');
     }
 
 /**
@@ -226,6 +226,15 @@ class ApplicationsController extends AppController {
  * @param string $id
  * @return void
  */
+    public function study_title($id = null) {
+        $study_title = $this->Application->field(
+            'study_title', array('id' => $id)
+        );
+        if ($this->request->is('requested')) {
+            return $study_title;
+        }
+    }
+
     public function view($id = null) {
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
@@ -327,7 +336,8 @@ class ApplicationsController extends AppController {
         if (!$this->request->is('post')) {
             throw new MethodNotAllowedException();
         } else {
-          if ($this->Application->save($this->request->data, true, array('id', 'final_report', 'laymans_summary', 'final_date'))) {
+          if ($this->Application->save($this->request->data, true, array('id', 'final_report', 'laymans_summary', 
+                'quantity_imported', 'quantity_dispensed', 'quantity_destroyed', 'quantity_exported', 'balance_site', 'final_date'))) {
               $this->Session->setFlash(__('Final report successfully submitted.'), 'alerts/flash_success');
               $this->redirect(array('action' => 'view', $id));
           } else {
@@ -349,10 +359,13 @@ class ApplicationsController extends AppController {
 
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review', 'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 
+                'Review'  => array('ReviewAnswer'), 
+                'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
+                'Deviation' => array('Attachment', 'ExternalComment' => array('Attachment')),
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
                 )));
 
@@ -385,10 +398,10 @@ class ApplicationsController extends AppController {
 
         $this->set('application', $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Review'
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Review' => array('ReviewAnswer')
                 ))));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
         $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -474,7 +487,7 @@ class ApplicationsController extends AppController {
                         $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('date_format(AnnualLetter.created, "%Y")' => date("Y"))));
                         $cnt++;
                         $year = date('Y', strtotime($this->Application->field('approval_date')));
-                        $approval_no = 'PPB/'.$year.'/'.$application['Application']['protocol_no']."($cnt)";
+                        $approval_no = 'PPB/'.$application['Application']['protocol_no']."/$year"."($cnt)";
                         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
                         $expiry_date_s = date('Y-m-d', strtotime($application['Application']['approval_date'] . " +1 year"));
                         $variables = array(
@@ -750,11 +763,13 @@ class ApplicationsController extends AppController {
             if ($my_applications[$id] == 'accepted') {
                 $application = $this->Application->find('first', array(
                     'conditions' => array('Application.id' => $id),
-                    'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee',  'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization',
+                    'contain' => array('Amendment', 'EthicalCommittee',  'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization',
                         'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
                         'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'AnnualLetter', 
-                        'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
-                            'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment')))));
+                        'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
+                            'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment'),
+                            'InternalComment' => array('Attachment'), 'ReviewAnswer'
+                            ))));
                 $this->set('counties', $this->Application->SiteDetail->County->find('list'));
                 $this->set('application', $application);
                 if ($application['Application']['deactivated']) {
@@ -1110,7 +1125,7 @@ class ApplicationsController extends AppController {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                     'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                     'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist')));
         if($response['Application']['user_id'] != $this->Auth->user('id')) {
@@ -1129,16 +1144,17 @@ class ApplicationsController extends AppController {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment' => array('Attachment'), 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
+                'Deviation' => array('Attachment', 'ExternalComment' => array('Attachment')),
                 'SiteInspection' => array(
                         'conditions' => array('SiteInspection.summary_approved' => 2),
                         'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')
                     )
                 )
-            // 'contain' => array('Amendment' => array('Attachment'), 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail',
+            // 'contain' => array('Amendment' => array('Attachment'), 'InvestigatorContact', 'Sponsor', 'SiteDetail',
             //     'Organization', 'Placebo', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
             //         'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee',
             //         'Attachment', 'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')),

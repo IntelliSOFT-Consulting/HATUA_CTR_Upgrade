@@ -126,25 +126,45 @@
         </li>
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-question-sign"></i> Site Questions <small class="muted">(Site inspection questions)</small>',
+        echo $this->Html->link('<i class="icon-question-sign"></i> Site Inspection Questions <small class="muted">(Site inspection questions)</small>',
           array('controller' => 'site_questions', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-check-sign"></i> Protocol Approval Checklist <small class="muted">(Files required)</small>',
-          array('controller' => 'pockets', 'action' => 'lindex', 'admin' => true), array('escape' => false));
+        echo $this->Html->link('<i class="icon-stethoscope"></i> Reviewer Assessment Questions <small class="muted">(Clinical, Non-clinical and Qauality questions)</small>',
+          array('controller' => 'review_questions', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-check"></i> Annual Approval Checklist <small class="muted">(Files required)</small>',
-          array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
+        echo $this->Html->link('<i class="icon-user-md"></i> Ethics Review Committees <small class="muted">(ERCs)</small>',
+          array('controller' => 'ercs', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
+      </ul>
+
+      <h5>Checklist items <small class="muted">(For protocol and annual approval)</small> </h5>
+      <ul class="nav nav-tabs nav-stacked">
+        <li>
+          <?php
+          echo $this->Html->link('<i class="icon-check-sign"></i> Protocol Approval Checklist <small class="muted">(Files required)</small>',
+            array('controller' => 'pockets', 'action' => 'lindex', 'admin' => true), array('escape' => false));
+          ?>
+        </li>
+        <li>
+          <?php
+          echo $this->Html->link('<i class="icon-check"></i> Annual Approval Checklist <small class="muted">(Files required)</small>',
+            array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
+          ?>
+        </li>
+      </ul>
+
+      <h5>Initial & Annual approval Letters <small class="muted">(Templates)</small> </h5>
+      <ul class="nav nav-tabs nav-stacked">        
         <li>
         <?php
-        echo $this->Html->link('<i class="icon-empty"></i> Initial Approval Letter <small class="muted">(Edit content)</small>',
+        echo $this->Html->link('<i class="icon-calendar-empty"></i> Initial Approval Letter <small class="muted">(Edit content)</small>',
           array('controller' => 'pockets', 'action' => 'edit', 17, 'admin' => true), array('escape' => false));
         ?>
         </li>
@@ -152,12 +172,6 @@
         <?php
         echo $this->Html->link('<i class="icon-calendar"></i> Annual Approval Letter <small class="muted">(Edit content)</small>',
           array('controller' => 'pockets', 'action' => 'edit', 18, 'admin' => true), array('escape' => false));
-        ?>
-        </li>
-        <li>
-        <?php
-        echo $this->Html->link('<i class="icon-user-md"></i> Ethic Review Committees <small class="muted">(ERCs)</small>',
-          array('controller' => 'ercs', 'action' => 'index', 'admin' => true), array('escape' => false));
         ?>
         </li>
       </ul>

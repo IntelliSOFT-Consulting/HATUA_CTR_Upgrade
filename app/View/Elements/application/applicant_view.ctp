@@ -126,6 +126,41 @@
              <?php   } } ?>
               <?php echo $this->fetch('study_drug'); ?>
 
+
+            <tr>
+              <td class="table-label required"><p>Route(s) of Administration <span class="sterix">*</span></p></td>
+              <td><?php
+                foreach($application['StudyRoute'] as $route) {
+                  echo "<p>". $route['study_route']."</p>";
+                }
+               ?></td>
+            </tr>            
+           </tbody>
+          </table>
+
+        <p class="table-label required">MANUFACTURER(S)</p>
+          <?php foreach($application['Manufacturer'] as $key => $manufacturer) { ?>
+          <span class="badge badge-info"><?php echo $key+1;?></span>
+          <table class="table  table-condensed">
+            <tbody>
+            <tr>
+              <td class="table-label"><p>Name of manufacturer</p></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturer_name']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Manufacturing site address</p></td>
+              <td><?php    echo "<p>". $manufacturer['address']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Country of manufacture</p></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturer_country']."</p>";  ?></td>
+            </tr>
+            </tbody>
+          </table>
+          <?php } ?>
+
+         <table class="table  table-condensed">
+          <tbody> 
             <tr>
               <td class="table-label required"><p>Disease condition being investigated <span class="sterix">*</span></p></td>
               <td><?php echo $application['Application']['disease_condition'] ?></td>
@@ -139,12 +174,6 @@
                    </tr>
              <?php   } } ?>
               <?php echo $this->fetch('disease_condition'); ?>
-<!--               </tbody>
-          </table>
-
-         <table>
-          <tbody> -->
-              <?php /*?><?php */?>
             <tr>
               <td class="table-label required"><p>Product Type <span class="sterix">*</span></p></td>
               <td>
@@ -183,41 +212,20 @@
                 </tr>
              <?php   } } ?>
               <?php echo $this->fetch('product_type'); ?>
-<!--               </tbody>
-          </table>
-
-         <table>
-          <tbody> -->
-            <tr>
-              <td class="table-label"><p>Date(s) ECCT approval of previous protocol(s)</p></td>
-              <td><?php
-                foreach($application['PreviousDate'] as $date) {
-                  echo "<p>". $date['date_of_previous_protocol']."</p>";
-                }
-               ?></td>
-            </tr>
-            <?php
-              foreach($application['Amendment']  as $key => $amendment) {
-                if($amendment['submitted'] == 1 && !empty($amendment['previous_dates'])){      ?>
-                  <tr class="table-viewlabel">
-                    <td class="table-viewlabel"><?php echo $key+1; ?></td>
-                    <td class=" table-noline"><?php echo $amendment['previous_dates'] ; ?></td>
-                  </tr>
-             <?php   } } ?>
-            <?php echo $this->fetch('previous_dates'); ?>
             </tbody>
           </table>
 
+          <p class="table-label required">KENYA ETHICS REVIEW COMMITTEE(S)</p>
             <?php foreach($application['EthicalCommittee'] as $key => $date) { ?>
             <span class="badge badge-info"><?php echo $key+1;?></span>
             <table class="table  table-condensed">
               <tbody>
               <tr>
-                <td class="table-label"><p>Ethical Committee</p></td>
+                <td class="table-label"><p>Ethics Review Committee (ERC)</p></td>
                 <td><?php    echo "<p>". $date['ethical_committee']."</p>";  ?></td>
               </tr>
               <tr>
-                <td class="table-label"><p>Initial complete submission date</p></td>
+                <td class="table-label"><p>Date of initial complete submission</p></td>
                 <td><?php    echo "<p>". $date['submission_date']."</p>";  ?></td>
               </tr>
               <tr>
@@ -243,18 +251,6 @@
                   </tr>
              <?php   } } ?>
             <?php echo $this->fetch('ethical_committees'); ?>
-
-            <tr>
-              <td class="table-label required">
-                <p>Approval Date of Protocol <span class="sterix">*</span></p>
-              </td>
-              <td>
-                <p class="xeditable" id="data[Application][approval_date]" data-type="date"
-                      data-pk="<?php echo $application['Application']['id'];?>"
-                      data-original-title="Update approval date">
-                  <?php echo $application['Application']['approval_date'];?></p>
-              </td>
-            </tr>
 
             <?php
               foreach($application['Amendment']  as $key => $amendment) {

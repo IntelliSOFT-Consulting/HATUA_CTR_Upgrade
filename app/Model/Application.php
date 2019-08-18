@@ -129,30 +129,17 @@ class Application extends AppModel {
                          //            'dependent' => true,
                          //            'conditions' => array('Request.type' => 'response'),
                          //  ),
-                         'Acceptance' => array(
-                                    'className' => 'Review',
-                                    'foreignKey' => 'application_id',
-                                    'dependent' => true,
-                                    'conditions' => array('Acceptance.type' => 'acceptance'),
-                          ),
-                          'PreviousDate' => array(
-            'className' => 'PreviousDate',
-            'foreignKey' => 'application_id',
-            'dependent' => false,
-            'conditions' => '',
-            'fields' => '',
-            'order' => '',
-            'limit' => '',
-            'offset' => '',
-            'exclusive' => '',
-            'finderQuery' => '',
-            'counterQuery' => ''
+        'Acceptance' => array(
+                  'className' => 'Review',
+                  'foreignKey' => 'application_id',
+                  'dependent' => true,
+                  'conditions' => array('Acceptance.type' => 'acceptance'),
         ),
-                         'Amendment' => array(
-                                       'className' => 'Amendment',
-                                       'foreignKey' => 'application_id',
-                                       'dependent' => false,
-                          ),
+        'Amendment' => array(
+                     'className' => 'Amendment',
+                     'foreignKey' => 'application_id',
+                     'dependent' => false,
+        ),
         'InvestigatorContact' => array(
             'className' => 'InvestigatorContact',
             'foreignKey' => 'application_id',
@@ -232,6 +219,11 @@ class Application extends AppModel {
         ),
         'Budget' => array(
             'className' => 'Budget',
+            'foreignKey' => 'application_id',
+            'dependent' => false
+        ),
+        'Deviation' => array(
+            'className' => 'Deviation',
             'foreignKey' => 'application_id',
             'dependent' => false
         ),

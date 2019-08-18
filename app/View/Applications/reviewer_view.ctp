@@ -106,49 +106,11 @@
 <?php $this->start('endjs'); ?>
   </div> <!-- End or bootstrab tab1 -->
     <div class="tab-pane" id="tab2">
-        <div class="marketing">
-             <div class="row-fluid">
-                <div class="span12">
-                   <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
-                   <h3 class="text-info" style="text-decoration: underline;">Reviewer's Comments Form</h3>
-                </div>
-             </div>
-              <hr class="soften" style="margin: 10px 0px;">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('application/review'); ?>
         </div>
-        <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no'];?></p>
-        <p><strong>2. Protocol title: </strong><?php echo $application['Application']['study_title'];?></p>
-        <div class="row-fluid">
-          <div class="span8">
-          <?php
-             echo $this->Form->create('Review', array('url' => array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'])));
-                $counter = 0;
-
-                echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-                echo $this->Form->input('text', array('type' => 'textarea', 'rows' => 3,
-                  'label' => array('class' => 'required','text' => '3. Reviewer\'s Comment(s)')));
-                echo $this->Form->input('recommendation', array('type' => 'textarea', 'rows' => 3,
-                  'label' => array('class' => 'required', 'text' => '4. Reviewer\'s recommendation(s)')));
-                echo $this->Form->input('password', array('type' => 'password', 'label' => 'Your Password *'));
-                echo $this->Form->end(array(
-                        'label' => 'Submit Review',
-                        'value' => 'SubmitReviews',
-                       'class' => 'btn btn-success',
-                  ));
-            ?>
-          </div>
-          <div class="span4">
-            <h4 class="text-success">My Previous Comments <small>(<?php echo count($application['Review']);?>)</small></h4>
-            <?php
-                foreach ($application['Review'] as $review) {
-                   $counter++;
-                   echo "<hr><span class=\"badge badge-success\">".$counter."</span> <small class='muted'>created on: ".date('d-m-Y H:i:s', strtotime($review['created']))."</small>";
-                   echo "<div style='padding-left: 29px;' class='morecontent'>".$review['text']."</div>";
-                   // echo "<br>";
-                   echo "<div style='padding-left: 29px;' class='morecontent'>".$review['recommendation']."</div>";
-                }
-            ?>
-          </div>
-       </div>
+      </div>
     </div>
 </div>
 </div>

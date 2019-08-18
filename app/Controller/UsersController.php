@@ -563,6 +563,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Reports');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_approve');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_view');
+        $this->Acl->allow($group, 'controllers/Deviations/manager_index');
+        $this->Acl->allow($group, 'controllers/Deviations/manager_unsubmit');
 
         //Allow Inpectors
         $group->id = 6;
@@ -637,6 +639,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/SiteInspections/applicant_download_summary');
         $this->Acl->allow($group, 'controllers/SiteInspections/applicant_index');
         $this->Acl->allow($group, 'controllers/Comments/applicant_add_si_external');
+        $this->Acl->allow($group, 'controllers/Comments/applicant_add_dev_external');
         $this->Acl->allow($group, 'controllers/Comments/applicant_add_sae_external');
         $this->Acl->allow($group, 'controllers/Saes/applicant_add');
         $this->Acl->allow($group, 'controllers/Saes/applicant_edit');
@@ -648,6 +651,10 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Budgets/applicant_add');
         $this->Acl->allow($group, 'controllers/EthicalCommittees/applicant_add');
         $this->Acl->allow($group, 'controllers/AnnualLetters/applicant_view');
+        $this->Acl->allow($group, 'controllers/Deviations/applicant_add');
+        $this->Acl->allow($group, 'controllers/Deviations/applicant_download_deviation');
+        $this->Acl->allow($group, 'controllers/Deviations/applicant_index');
+        $this->Acl->allow($group, 'controllers/Deviations/applicant_edit');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

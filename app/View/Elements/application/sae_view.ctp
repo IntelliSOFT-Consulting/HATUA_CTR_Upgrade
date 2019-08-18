@@ -24,7 +24,9 @@
     </table>
     <hr>
     <h4 style="text-decoration: underline;"> <?php echo $sae['Application']['protocol_no']; ?> </h4>
-
+    <?php
+      echo $this->requestAction('/applications/study_title/'.$sae['Sae']['application_id']);
+    ?>
     <h4 class="text-center"  style="text-align: center; text-decoration: underline;">REACTION INFORMATION</h4>
     <table class="table  table-condensed">
       <tbody>

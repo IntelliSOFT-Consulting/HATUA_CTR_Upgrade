@@ -6,7 +6,7 @@ App::uses('AppController', 'Controller');
  * @property Review $Review
  */
 class ReviewsController extends AppController {
-
+	public $uses = array('Review', 'Application');
 /**
  * index method
  *
@@ -51,7 +51,7 @@ class ReviewsController extends AppController {
 		$this->set(compact('reviewers'));
 	}*/
 
-	public function manager_add($id = null) {
+	public function manager_edit($id = null) {
 		if ($this->request->is('post')) {
 			$this->Review->create();
 			$message = $this->request->data['Message'];
@@ -129,7 +129,50 @@ class ReviewsController extends AppController {
 		$this->set(compact('users', 'applications'));
 	}
 
-	public function reviewer_add() {
+	public function reviewer_add($application_id = null, $review_type = null) {
+        $this->Review->create();
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+        ));
+        
+        $this->loadModel('ReviewQuestion');
+        $all_questions = $this->ReviewQuestion->find('all', array('conditions' => array('review_type' => $review_type)));
+        $answers = [];
+        foreach ($all_questions as $question) {
+            $dpoint = ['question_type' => $question['ReviewQuestion']['question_type'], 'question_number' => $question['ReviewQuestion']['question_number'], 
+                       'question' => $question['ReviewQuestion']['question']];
+            $answers[] = $dpoint;
+        }
+
+        $data = array('application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'type' => 'reviewer_comment',
+                      'assessment_type' => $review_type
+                );
+        if ($this->Review->saveAssociated(array('Review' => $data, 'ReviewAnswer' => $answers))) {            
+            $this->Session->setFlash(__('The review assessment form has been created. Kindly complete review'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'rreview_view' => $this->Review->id));
+        } else {
+            $this->Session->setFlash(__('The review assessment could not be created. Please contact the administrator.'), 'alerts/flash_error');
+        }
+    }
+
+	public function manager_add($application_id = null, $review_type = null) {
+        $this->Review->create();
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+        ));
+
+        $data = array('application_id' => $application_id,  
+                      'assessment_type' => $review_type
+                );
+        if ($this->Review->saveAssociated(array('Review' => $data))) {            
+            $this->Session->setFlash(__('The review assessment form has been created. Kindly complete review'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'rreview_view' => $this->Review->id));
+        } else {
+            $this->Session->setFlash(__('The review assessment could not be created. Please contact the administrator.'), 'alerts/flash_error');
+        }
+    }
+
+	public function reviewer_edit() {
 		if ($this->request->is('post')) {
 			$this->Review->create();
 			$this->request->data['Review']['user_id'] = $this->Auth->User('id');

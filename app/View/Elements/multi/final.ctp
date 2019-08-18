@@ -5,6 +5,7 @@
         echo $this->Session->flash();
       ?>
       <h4>15. Final Study Report <small>For complete and approved trials</small></h4>
+      <h5 class="text-warning">NB: Limit the font size to 26 and below</h5>
         <hr>
         <div class="row-fluid">
           <div class="span12">
@@ -35,6 +36,28 @@
                       'between'=>'<div class="nocontrols">', 'placeholder' => 'final report' , 'class' => 'input-large',
                       'value' => $application['Application']['laymans_summary']
                     ));
+                  
+                  echo '<h4 style="text-align: center; text-decoration: underline;"> Product Accountability</h4>';
+                  echo $this->Form->input('quantity_imported', array(
+                    'label' => array('class' => 'control-label required', 'text' => 'Quantity imported <span class="sterix">*</span>'),
+                    'placeholder' => ' ' , 'class' => 'input-xxlarge', 'value' => $application['Application']['quantity_imported']
+                  ));
+                  echo $this->Form->input('quantity_dispensed', array(
+                    'label' => array('class' => 'control-label required', 'text' => 'Quantity dispensed <span class="sterix">*</span>'),
+                    'placeholder' => ' ' , 'class' => 'input-xxlarge', 'value' => $application['Application']['quantity_dispensed']
+                  ));
+                  echo $this->Form->input('quantity_destroyed', array(
+                    'label' => array('class' => 'control-label required', 'text' => 'Quantity destroyed <span class="sterix">*</span>'),
+                    'placeholder' => ' ' , 'class' => 'input-xxlarge', 'value' => $application['Application']['quantity_destroyed']
+                  ));
+                  echo $this->Form->input('quantity_exported', array(
+                    'label' => array('class' => 'control-label required', 'text' => 'Quantity exported <span class="sterix">*</span>'),
+                    'placeholder' => ' ' , 'class' => 'input-xxlarge', 'value' => $application['Application']['quantity_exported']
+                  ));
+                  echo $this->Form->input('balance_site', array(
+                    'label' => array('class' => 'control-label required', 'text' => 'Balance at site <span class="sterix">*</span>'),
+                    'placeholder' => ' ' , 'class' => 'input-xxlarge', 'value' => $application['Application']['balance_site']
+                  ));
                   echo $this->Form->end(array(
                     'label' => 'Save',
                     'escape' => false,

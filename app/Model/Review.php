@@ -31,4 +31,18 @@ class Review extends AppModel {
 			'order' => ''
 		)
 	);
+
+	public $hasMany = array(
+        'ReviewAnswer' => array(
+            'className' => 'ReviewAnswer',
+            'foreignKey' => 'review_id',
+            'dependent' => true,
+        ),
+        'InternalComment' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('InternalComment.model' => 'Review', 'InternalComment.category' => 'external' ),
+        ),
+    );
 }

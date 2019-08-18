@@ -19,9 +19,10 @@
         ));
     echo $this->Form->input('id'); ?>
     <fieldset>
-        <legend>Edit <strong><?php echo $this->Form->value('Pocket.name');?></strong></legend>
+        <legend style="text-align: center;"><strong><?php echo $this->Form->value('Pocket.name');?></strong></legend>
     <?php
         echo $this->Form->input('id');
+        echo $this->Form->input('required');
         echo $this->Form->input('content', array(
               'label' => array('class' => 'control-label required', 'text' => 'Content <span class="sterix">*</span>'),
               'between'=>'<div class="controls">', 'placeholder' => 'study title' , 'class' => 'input-large',
