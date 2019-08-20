@@ -8,8 +8,9 @@
 <?php
   if ($this->Session->read('Auth.User.id') == $rreview['user_id'] and $rreview['status'] == 'Unsubmitted') {
 
+  // $this->request->data['Review'] = $rreview['Review'];
   echo $this->Form->create('Review', array(
-        'url' => array('controller' => 'reviews', 'action' => 'edit', $rreview['id'], $rreview['application_id']),
+        'url' => array('controller' => 'reviews', 'action' => 'assess', $rreview['id'], $rreview['application_id']),
         'type' => 'file',
         'class' => 'form-inline',
         'inputDefaults' => array(
@@ -121,16 +122,16 @@
      </tbody>        
     </table>
 
-    <div class="controls">
+    <div class="well controls">
       <?php
-        /*echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+        echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
             'name' => 'saveChanges',
             'class' => 'btn btn-success mapop',
             'id' => 'rreviewSaveChanges', 'title'=>'Save & continue editing',
             'data-content' => 'Save changes to form without submitting it.
                                         The form will still be available for further editing.',
             'div' => false,
-          ));*/
+        ));
       ?>
       <?php
         echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(

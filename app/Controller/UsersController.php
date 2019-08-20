@@ -554,6 +554,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Notifications/manager_resend');
         $this->Acl->allow($group, 'controllers/Reviews/manager_add');
         $this->Acl->allow($group, 'controllers/Reviews/manager_comment');
+        $this->Acl->allow($group, 'controllers/Reviews/manager_assess');
+        $this->Acl->allow($group, 'controllers/Reviews/manager_summary');
         $this->Acl->allow($group, 'controllers/Users/manager_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
@@ -593,6 +595,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Notifications/delete');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_add');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_respond');
+        $this->Acl->allow($group, 'controllers/Reviews/reviewer_assess');
+        $this->Acl->allow($group, 'controllers/Reviews/reviewer_summary');
         $this->Acl->allow($group, 'controllers/Users/reviewer_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');

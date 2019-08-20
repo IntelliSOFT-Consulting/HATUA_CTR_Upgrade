@@ -303,15 +303,7 @@ class SiteInspectionsController extends AppController {
                 $this->Session->setFlash(__('The site inspection could not be saved. Please, try again.'), 'alerts/flash_error');
             }
         } else {
-            $application = $this->Application->find('first', array(
-            'conditions' => array('Application.id' => $application_id),
-            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
-                'AnnualApproval', 'Document', 'Review', 'SiteInspection', 'SiteInspection' => array('SiteAnswer')
-                // => array('conditions' => array('Review.type' => 'response'))
-                )));
-            $this->request->data = $application;
+            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'rreview_view' => $id));
         }
     }
     public function manager_summary($id = null, $application_id = null) {

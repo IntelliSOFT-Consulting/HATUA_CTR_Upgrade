@@ -6,6 +6,9 @@ App::uses('AppController', 'Controller');
  * @property ReviewQuestion $ReviewQuestion
  */
 class ReviewQuestionsController extends AppController {
+
+	public $paginate = array();
+	
 	public function beforeFilter() {
         parent::beforeFilter();
         // $this->Auth->allow('*');
@@ -33,6 +36,8 @@ class ReviewQuestionsController extends AppController {
  */
 	public function admin_index() {
 		$this->ReviewQuestion->recursive = 0;
+		$this->paginate['order'] = array('ReviewQuestion.question_number' => 'desc');
+		// $this->paginate['conditions'] = array('ReviewQuestion.review_type' => 'quality');
 		$this->set('reviewQuestions', $this->paginate());
 	}
 

@@ -40,6 +40,7 @@
         <tr>
           <th>ID</th>
           <th>Recommendation</th>
+          <th>Status</th>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
         </tr>
@@ -51,6 +52,7 @@
           <tr>
             <td><?php echo $rreview['id'] ?></td>
             <td><?php echo $rreview['recommendation'] ?></td>
+            <td><?php echo $rreview['status'] ?></td>
             <td><?php echo $rreview['created'] ?></td> 
             <td>
               <?php
@@ -104,10 +106,10 @@
       </div>
     </div>
 
-    <div class="tab-pane active" id="rreview_summary">
+    <div class="tab-pane" id="rreview_summary">
       <div style="position: relative; border-top: 1px solid #ddd;">        
         <?php
-          echo "summary form";
+          echo $this->element('/application/rreview_summary', array('rreview' => $rreview, 'akey' => $akey));
         ?>
       </div>
     </div>

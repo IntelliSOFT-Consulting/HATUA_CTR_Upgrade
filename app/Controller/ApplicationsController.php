@@ -363,7 +363,7 @@ class ApplicationsController extends AppController {
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 
-                'Review'  => array('ReviewAnswer'), 
+                'Review'  => array('InternalComment' => array('Attachment'), 'ReviewAnswer'), 
                 'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                 'Deviation' => array('Attachment', 'ExternalComment' => array('Attachment')),
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
@@ -384,6 +384,56 @@ class ApplicationsController extends AppController {
     }
     public function inspector_view($id = null) {
         $this->aview($id);
+    }
+
+    public function reviewer_view($id = null) {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            throw new NotFoundException(__('Invalid application'));
+        }
+
+        #TODO: in this condition, add the search for if I have accepted to review the app
+        $my_applications = $this->Application->Review->find('list', array(
+            'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request'),
+            'fields' => array('Review.application_id', 'Review.accepted')));
+        if (isset($my_applications[$id])) {
+            if ($my_applications[$id] == 'accepted') {
+                $application = $this->Application->find('first', array(
+                    'conditions' => array('Application.id' => $id),
+                    'contain' => array('Amendment', 'EthicalCommittee',  'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization',
+                        'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
+                        'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'AnnualLetter', 
+                        'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
+                            'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment'),
+                            'InternalComment' => array('Attachment'), 'ReviewAnswer'
+                            ))));
+                $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+                $this->set('application', $application);
+                if ($application['Application']['deactivated']) {
+                    $this->render('reviewer_minimal_view');
+                }
+            } else {
+                $this->Session->setFlash(__('You have declined to review this protocol.'), 'alerts/flash_info');
+                $this->redirect(array('action' => 'index'));
+            }
+        } else {
+            $application = $this->Application->find('first', array(
+                    'conditions' => array('Application.id' => $id),
+                    'contain' => array('Review' => array('conditions' => array('Review.user_id' => $this->Auth->User('id')))),
+                ));
+            $this->set('application', $application);
+            $this->render('reviewer_minimal_view');
+        }
+
+        if ($application['Application']['deactivated'] || $application['Application']['approved'] == 1) {
+            $this->render('applicant_minimal_view');
+        }
+
+        $this->request->data = $application;
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
+        }
     }
 
     public function admin_view($id = null) {
@@ -749,53 +799,7 @@ class ApplicationsController extends AppController {
         }
     }
 
-    public function reviewer_view($id = null) {
-        $this->Application->id = $id;
-        if (!$this->Application->exists()) {
-            throw new NotFoundException(__('Invalid application'));
-        }
-
-        #TODO: in this condition, add the search for if I have accepted to review the app
-        $my_applications = $this->Application->Review->find('list', array(
-            'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request'),
-            'fields' => array('Review.application_id', 'Review.accepted')));
-        if (isset($my_applications[$id])) {
-            if ($my_applications[$id] == 'accepted') {
-                $application = $this->Application->find('first', array(
-                    'conditions' => array('Application.id' => $id),
-                    'contain' => array('Amendment', 'EthicalCommittee',  'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization',
-                        'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
-                        'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'AnnualLetter', 
-                        'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
-                            'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment'),
-                            'InternalComment' => array('Attachment'), 'ReviewAnswer'
-                            ))));
-                $this->set('counties', $this->Application->SiteDetail->County->find('list'));
-                $this->set('application', $application);
-                if ($application['Application']['deactivated']) {
-                    $this->render('reviewer_minimal_view');
-                }
-            } else {
-                $this->Session->setFlash(__('You have declined to review this protocol.'), 'alerts/flash_info');
-                $this->redirect(array('action' => 'index'));
-            }
-        } else {
-            $application = $this->Application->find('first', array(
-                    'conditions' => array('Application.id' => $id),
-                    'contain' => array('Review' => array('conditions' => array('Review.user_id' => $this->Auth->User('id')))),
-                ));
-            $this->set('application', $application);
-            $this->render('reviewer_minimal_view');
-        }
-
-        if ($application['Application']['deactivated'] || $application['Application']['approved'] == 1) {
-            $this->render('applicant_minimal_view');
-        }
-
-        if (strpos($this->request->url, 'pdf') !== false) {
-            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
-        }
-    }
+    
 
 /**
  * add method

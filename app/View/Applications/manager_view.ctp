@@ -159,7 +159,7 @@
 
 <?php $this->start('endjs'); ?>
 </div> <!-- End or bootstrab tab1 -->
-    <div class="tab-pane" id="tab2">
+    <div class="tab-pane" id="tab2">      
         <p style="text-align: center;"><strong>Protocol Code: </strong><?php echo $application['Application']['protocol_no'];?></p>
         <hr class="soften" style="margin: 10px 0px;">
         <div class="row-fluid">
@@ -215,6 +215,12 @@
     </div>
 
     <div class="tab-pane" id="tab3">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('application/review'); ?>
+        </div>
+      </div>
+      <?php /*?>
         <p style="text-align: center;"><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no'];?></p>
         <hr class="soften" style="margin: 10px 0px;">
         <div class="row-fluid">
@@ -250,6 +256,7 @@
             ?>
        </div>
        </div>
+      <?php */ ?>
     </div>
 
     <div class="tab-pane" id="tab4">
