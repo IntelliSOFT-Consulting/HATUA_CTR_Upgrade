@@ -57,12 +57,19 @@
             <td>
               <?php
                 
-                  echo $this->Html->link('<span class="label label-success"> View </span>',
+                if($rreview['status'] == 'Unsubmitted'){
+                  echo $this->Html->link('<span class="label label-success"> Edit </span>',
                      array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']), array('escape'=>false));
                   echo "&nbsp;";
+                } else {
+                  echo $this->Html->link('<span class="label label-info"> View </span>',
+                     array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']), array('escape'=>false));
+                  echo "&nbsp;";
+                }
+                  
 
                   if (($redir == 'manager')) {                    
-                      echo $this->Form->postLink(__('<label class="label label-inverse">Unsubmit</label>'), array('controller' => 'rreviews', 'action' => 'unsubmit', $rreview['id']), array('escape' => false), __('Are you sure you want to unsubmit the rreview # %s? The applicant will be able to edit it.', $rreview['id']));
+                      // echo $this->Form->postLink(__('<label class="label label-inverse">Unsubmit</label>'), array('controller' => 'rreviews', 'action' => 'unsubmit', $rreview['id']), array('escape' => false), __('Are you sure you want to unsubmit the rreview # %s? The applicant will be able to edit it.', $rreview['id']));
                   }          
 
               ?>                      
@@ -87,7 +94,7 @@
   <ul id="rreview_tab" class="nav nav-tabs">
     <li class="active"><a href="#rreview_form">Assessment Form</a></li>
     <li><a href="#rreview_summary">Summary report</a></li>
-    <li><a href="#rreview_comments">Internal Comments (<?php echo count($rreview['InternalComment']); ?>)</a></li>
+    <li><a href="#rreview_comments">Comments (<?php echo count($rreview['InternalComment']); ?>)</a></li>
   </ul>
 
   <div class="tab-content">
@@ -98,7 +105,7 @@
             echo $this->element('/application/rreview_edit', array('rreview' => $rreview, 'akey' => $akey));
           } else {
             echo $this->Html->link(__('<i class="icon-download-alt"></i> Download PDF'),
-                  array('controller' => 'rreviews', 'ext' => 'pdf', 'action' => 'download_rreview', $rreview['id']),
+                  array('controller' => 'reviews', 'ext' => 'pdf', 'action' => 'download_assessment', $rreview['id']),
                   array('escape' => false, 'class' => 'btn btn-small btn-info topright'));
             echo $this->element('/application/rreview_view', array('rreview' => $rreview, 'akey' => $akey));
           }
@@ -109,6 +116,9 @@
     <div class="tab-pane" id="rreview_summary">
       <div style="position: relative; border-top: 1px solid #ddd;">        
         <?php
+          echo $this->Html->link(__('<i class="icon-download-alt"></i> Download PDF'),
+                  array('controller' => 'reviews', 'ext' => 'pdf', 'action' => 'download_summary', $rreview['id']),
+                  array('escape' => false, 'class' => 'btn btn-small btn-info topright'));
           echo $this->element('/application/rreview_summary', array('rreview' => $rreview, 'akey' => $akey));
         ?>
       </div>
@@ -129,7 +139,7 @@
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $rreview['id'], 'foreign_key' => $rreview['id'], 
                                 'model' => ['model_id' => '1', 'foreign_key' => '1', 
-                                            'model' => 'rreview', 'category' => 'external', 'url' => 'add_dev_external']]) 
+                                            'model' => 'rreview', 'category' => 'external', 'url' => 'add_review_internal']]) 
                   ?>
                 </div>
               </div>

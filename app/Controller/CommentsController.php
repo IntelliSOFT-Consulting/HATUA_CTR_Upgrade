@@ -278,6 +278,62 @@ class CommentsController extends AppController {
         $this->add_dev_external();
     }
 
+    private function add_review_internal() {
+        if ($this->request->is('post')) {
+            $this->Comment->create();
+            if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+                
+                //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                  /*$this->loadModel('Message');
+                  $html = new HtmlHelper(new ThemeView());
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_dev_feedback')));
+                  $this->loadModel('Deviation');
+                  $dev = $this->Deviation->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('Deviation.id' => $this->request->data['Comment']['foreign_key'])
+                  ));
+
+                  $users = $this->Comment->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $dev['Deviation']['user_id'], 'User.group_id' => 2))
+                  ));
+                  foreach ($users as $user) {
+                      $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'applicant';
+                      $variables = array(
+                        'name' => $user['User']['name'], 'reference_no' => $dev['Deviation']['reference_no'], 
+                        'comment_subject' => $this->request->data['Comment']['subject'],
+                        'comment_content' => $this->request->data['Comment']['content'],
+                        'reference_link' => $html->link($dev['Deviation']['reference_no'], array('controller' => 'applications', 'action' => 'view', $dev['Deviation']['application_id'],
+                            'deviation_edit' => $dev['Deviation']['id'], $actioner => true, 'full_base' => true), 
+                          array('escape' => false)),
+                      );
+                      $datum = array(
+                        'email' => ($dev['Deviation']['reporter_email'] && $actioner == 'applicant') ? $dev['Deviation']['reporter_email'] : $user['User']['email'],
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_dev_feedback', 'model' => 'Deviation',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }*/
+                //**********************************    END   *********************************
+
+                $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            }
+        }
+        $users = $this->Comment->User->find('list');
+        $this->set(compact('users'));
+    }
+    public function manager_add_review_internal() {
+        $this->add_review_internal();
+    }
+    public function applicant_add_review_internal() {
+        $this->add_review_internal();
+    }
 /**
  * manager_edit method
  *

@@ -36,7 +36,7 @@ class ReviewQuestionsController extends AppController {
  */
 	public function admin_index() {
 		$this->ReviewQuestion->recursive = 0;
-		$this->paginate['order'] = array('ReviewQuestion.question_number' => 'desc');
+		$this->paginate['order'] = array('ReviewQuestion.id' => 'desc');
 		// $this->paginate['conditions'] = array('ReviewQuestion.review_type' => 'quality');
 		$this->set('reviewQuestions', $this->paginate());
 	}

@@ -199,8 +199,16 @@ class ReviewsController extends AppController {
             if ($this->Review->saveMany($this->request->data['Review'], array('deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Review->saveField('status', 'Submitted');
-                    $results = Hash::extract($this->request->data['Review'], '{n}.ReviewAnswer.{n}.comment');
-                    $this->Review->saveField('summary', implode("\n\n",$results));
+                    // $results = Hash::extract($this->request->data['Review'], '{n}.ReviewAnswer.{n}.comment');
+                    $results = '';
+                    foreach ($this->request->data['Review'] as $ansa) {
+                        foreach ($ansa as $key => $value) {
+                            $results .= $value['question']."\n";
+                            $results .= $value['comment']."\n\n";
+                        }
+                    }
+                    // $this->Review->saveField('summary', implode("\n\n",$results));
+                    $this->Review->saveField('summary', $results);
                 		$this->Session->setFlash(__('The review has been submitted'), 'alerts/flash_success');
                 } else {                	
                 		$this->Session->setFlash(__('The review has been saved'), 'alerts/flash_success');
@@ -362,6 +370,77 @@ class ReviewsController extends AppController {
         }
         $reviewers = $this->Review->Reviewer->find('list');
         $this->set(compact('reviewers'));
+    }
+
+
+/**
+ * download methods
+ *
+ * @throws MethodNotAllowedException
+ * @throws NotFoundException
+ * @param string $id
+ * @return void
+ */
+    private function download_assessment($id = null) {
+        $this->Review->id = $id;
+        if (!$this->Review->exists()) {
+            throw new NotFoundException(__('Invalid review assessment'));
+        }
+        $review = $this->Review->find('first', array(
+            'conditions' => array('Review.id' => $id),
+            'contain' => array('ReviewAnswer', 'Application')
+            )
+        );
+
+        // debug($review['Application']);
+        $disp  = $review['Review'];
+        $disp['ReviewAnswer'] = $review['ReviewAnswer'];
+        // $review  = $this->Review->read(null, $id);
+        $this->set('rreview', $disp);
+        $this->set('application', $review);
+        $this->set('akey', $review['Review']['application_id']);
+        $this->pdfConfig = array('filename' => 'Review_Assessment_' . $id,  'orientation' => 'portrait');
+        $this->render('download_assessment');
+    }
+    public function manager_download_assessment($id = null) {
+        $this->download_assessment($id);
+    }
+    public function inspector_download_assessment($id = null) {
+        $this->download_assessment($id);
+    }
+    public function reviewer_download_assessment($id = null) {
+        $this->download_assessment($id);
+    }
+
+    private function download_summary($id = null) {
+        $this->Review->id = $id;
+        if (!$this->Review->exists()) {
+            throw new NotFoundException(__('Invalid review summary'));
+        }
+        $review = $this->Review->find('first', array(
+            'conditions' => array('Review.id' => $id),
+            'contain' => array('ReviewAnswer', 'Application')
+            )
+        );
+        $disp  = $review['Review'];
+        $disp['ReviewAnswer'] = $review['ReviewAnswer'];
+        $this->set('rreview', $disp);
+        $this->set('application', $review);
+        $this->set('akey', $review['Review']['application_id']);
+        $this->pdfConfig = array('filename' => 'review_Summary_' . $id,  'orientation' => 'portrait');
+        $this->render('download_summary');
+    }
+    public function manager_download_summary($id = null) {
+        $this->download_summary($id);
+    }
+    public function inspector_download_summary($id = null) {
+        $this->download_summary($id);
+    }
+    public function applicant_download_summary($id = null) {
+        $this->download_summary($id);
+    }
+    public function reviewer_download_summary($id = null) {
+        $this->download_summary($id);
     }
 
 /**

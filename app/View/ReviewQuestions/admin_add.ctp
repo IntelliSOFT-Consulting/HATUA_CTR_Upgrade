@@ -33,7 +33,7 @@
 						  'label' => array('class' => 'control-label required', 'text' => 'Question type <span class="sterix">*</span>'),));
 			echo $this->Form->input('review_type',
 					array('type' => 'select', 
-						  'options' =>  array('clinical' => 'clinical', 'quality' => 'quality', 'non-clinical' => 'non-clinical'), 
+						  'options' =>  array('quality' => 'quality', 'clinical' => 'clinical', 'non-clinical' => 'non-clinical'), 
 						  'label' => array('class' => 'control-label required', 'text' => 'Review type <span class="sterix">*</span>'),));
 			?>
 			</fieldset>

@@ -556,6 +556,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Reviews/manager_comment');
         $this->Acl->allow($group, 'controllers/Reviews/manager_assess');
         $this->Acl->allow($group, 'controllers/Reviews/manager_summary');
+        $this->Acl->allow($group, 'controllers/Reviews/manager_download_assessment');
+        $this->Acl->allow($group, 'controllers/Reviews/manager_download_summary');
         $this->Acl->allow($group, 'controllers/Users/manager_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
@@ -597,9 +599,12 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_respond');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_assess');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_summary');
+        $this->Acl->allow($group, 'controllers/Reviews/reviewer_download_assessment');
+        $this->Acl->allow($group, 'controllers/Reviews/reviewer_download_summary');
         $this->Acl->allow($group, 'controllers/Users/reviewer_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
+        $this->Acl->allow($group, 'controllers/Comments');
 
         //Allow Partners
         $group->id = 4;
@@ -659,6 +664,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Deviations/applicant_download_deviation');
         $this->Acl->allow($group, 'controllers/Deviations/applicant_index');
         $this->Acl->allow($group, 'controllers/Deviations/applicant_edit');
+        $this->Acl->allow($group, 'controllers/Reviews/manager_download_summary');
+        $this->Acl->allow($group, 'controllers/Comments');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";
