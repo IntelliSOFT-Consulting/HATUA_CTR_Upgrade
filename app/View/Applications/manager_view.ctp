@@ -168,7 +168,7 @@
             <div class="span12">
             <?php
                echo $this->Form->create('Review',
-                array('url' => array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'])));
+                array('url' => array('controller' => 'reviews', 'action' => 'assign', $application['Application']['id'])));
                   $counter = 0;
                   echo "<ol>";
                    foreach ($users as $user_id => $user) {

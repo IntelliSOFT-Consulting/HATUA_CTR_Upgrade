@@ -168,21 +168,37 @@ class ReviewsController extends AppController {
         $this->add($application_id, $review_type);
     }
 
-    public function manager_add_old($application_id = null, $review_type = null) {
-        $this->Review->create();
-        $application = $this->Application->find('first', array(
-            'conditions' => array('Application.id' => $application_id),
-        ));
+    public function manager_assign($id = null) {
+      if ($this->request->is('post')) {
+              $this->Review->create();
+              $message = $this->request->data['Message'];
+              unset($this->request->data['Message']);
+              if(!empty($this->request->data)) {
+                      foreach ($this->request->data as $key => $value) {
+                              $this->request->data[$key]['Review']['application_id'] = $id;
+                              $this->request->data[$key]['Review']['type'] = 'request';
+                              $this->request->data[$key]['Review']['title'] = 'PPB request';
+                              $this->request->data[$key]['Review']['text'] = $message['text'];
+                      }
 
-        $data = array('application_id' => $application_id,  
-                      'assessment_type' => $review_type
-                );
-        if ($this->Review->saveAssociated(array('Review' => $data))) {            
-            $this->Session->setFlash(__('The review assessment form has been created. Kindly complete review'), 'alerts/flash_success');
-            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'rreview_view' => $this->Review->id));
-        } else {
-            $this->Session->setFlash(__('The review assessment could not be created. Please contact the administrator.'), 'alerts/flash_error');
-        }
+                      if ($this->Review->saveMany($this->request->data)) {
+
+                             CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data));
+
+                              $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
+                              $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+                      } else {
+                              $this->Session->setFlash(__('The reviewers could not be notified. Please, try again.'));
+                              $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+                      }
+              } else {
+                      $this->Session->setFlash(__('Please select at least one reviewer'), 'alerts/flash_error');
+                      $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+              }
+      }
+      $users = $this->Review->User->find('list');
+      $applications = $this->Review->Application->find('list');
+      $this->set(compact('users', 'applications'));
     }
 
     public function reviewer_test($id = null) {
