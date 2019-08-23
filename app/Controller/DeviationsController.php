@@ -120,15 +120,15 @@ class DeviationsController extends AppController {
         }
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->Deviation->saveMany($this->request->data['Deviation'], array('deep' => true))) {
-            	debug($this->request->data);
-                // if (isset($this->request->data['submitReport'])) {
+            	// debug($this->request->data);
+                if (isset($this->request->data['submitReport'])) {
                   $this->Deviation->saveField('status', 'Submitted');                    
 	                $this->Session->setFlash(__('The protocol deviation has been submitted'), 'alerts/flash_success');
 	                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_view' => $id));
-                // } else {
-              	 //  $this->Session->setFlash(__('The protocol deviation has been saved'), 'alerts/flash_success');
-                // 	$this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_view' => $id));
-                // }
+                } else {
+              	   $this->Session->setFlash(__('The protocol deviation has been saved'), 'alerts/flash_success');
+                 	$this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_edit' => $id));
+                }
             } else {
                 $this->Session->setFlash(__('The protocol deviation could not be saved. Please, try again.'), 'alerts/flash_error');
             }

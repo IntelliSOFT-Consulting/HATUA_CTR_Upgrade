@@ -1,3 +1,6 @@
+<?php 
+  echo $this->Session->flash();
+?>
 
   <br>
   <div class="row-fluid">
@@ -108,7 +111,7 @@
                   <?php  
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $deviation['id'], 'foreign_key' => $deviation['id'], 
-                                'model' => ['model_id' => '1', 'foreign_key' => '1', 
+                                'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $deviation['id'], 
                                             'model' => 'Deviation', 'category' => 'external', 'url' => 'add_dev_external']]) 
                   ?>
                 </div>

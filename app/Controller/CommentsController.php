@@ -236,9 +236,11 @@ class CommentsController extends AppController {
                       'conditions' => array('Deviation.id' => $this->request->data['Comment']['foreign_key'])
                   ));
 
+                  $this->loadModel('Application');
+                  $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])));
                   $users = $this->Comment->User->find('all', array(
                       'contain' => array(),
-                      'conditions' => array('OR' => array('User.id' => $dev['Deviation']['user_id'], 'User.group_id' => 2))
+                      'conditions' => array('OR' => array('User.id' => $application['Application']['user_id'], 'User.group_id' => 2))
                   ));
                   foreach ($users as $user) {
                       $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'applicant';
@@ -251,7 +253,7 @@ class CommentsController extends AppController {
                           array('escape' => false)),
                       );
                       $datum = array(
-                        'email' => ($dev['Deviation']['reporter_email'] && $actioner == 'applicant') ? $dev['Deviation']['reporter_email'] : $user['User']['email'],
+                        'email' => $user['User']['email'],
                         'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_dev_feedback', 'model' => 'Deviation',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)

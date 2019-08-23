@@ -1,4 +1,3 @@
-<!-- start view -->
 
 <h3 style="text-align: center;"> Protocol Deviation</h3>   
 <hr class="soften" style="margin: 10px 0px;">

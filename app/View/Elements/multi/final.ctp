@@ -93,13 +93,39 @@
 <?php } else { ?>
   <div class="row-fluid">
     <div class="span12">
+    <?php      
+               echo $application['Application']['final_date'];
+    ?>
       <h4>15. Final Study Report <small>For complete and approved trials</small></h4>
-        <hr>
-
-            <?php      
-               echo $application['Application']['final_report'];
-            ?>
-            <hr>        
+      <hr><?php  echo $application['Application']['final_report']; ?>
+      <h4>Layman's Summary</h4>
+      <hr><?php  echo $application['Application']['laymans_summary']; ?>
+      <hr>   
+      <h4 style="text-align: center; text-decoration: underline;"> Product Accountability</h4>
+  <table class="table table-bordered table-condensed">
+    <tbody>
+      <tr>
+        <th class="my-well" style="width: 40%">Quantity imported</th>
+        <td><?php echo $application['Application']['quantity_imported'];?></td>
+      </tr>
+      <tr>
+        <th class="my-well">Quantity Dispensed</th>
+        <td><?php echo $application['Application']['quantity_dispensed']; ?></td>
+      </tr>        
+      <tr>
+        <th class="my-well">Quantity Destroyed</th>
+        <td><?php echo $application['Application']['quantity_destroyed']; ?></td>
+      </tr>
+      <tr>
+        <th class="my-well">Quantity Exported </th>
+        <td><?php echo $application['Application']['quantity_exported']; ?></td>
+      </tr>
+      <tr>
+        <th class="my-well">Balance at site </th>
+        <td><?php echo $application['Application']['balance_site']; ?></td>
+      </tr>
+    </tbody>        
+  </table>     
             <?php
                 echo $this->element('multi/documents');
             ?>

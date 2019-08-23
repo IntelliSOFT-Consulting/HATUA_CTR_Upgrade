@@ -325,6 +325,12 @@ class ApplicationsController extends AppController {
             }
             $this->set('_serialize', 'response');
         }
+        
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => $this->a_contain));
+        $this->request->data = $application;
+
         if(strpos($this->request->url, 'pdf') === false && !$response['Application']['submitted'] && !$response['Application']['deactivated']) {
             $this->Session->setFlash('This application is not yet submitted', 'alerts/flash_info');
             $this->redirect(array('action' => 'edit', $response['Application']['id']));
@@ -359,15 +365,7 @@ class ApplicationsController extends AppController {
 
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 
-                'Review'  => array('InternalComment' => array('Attachment'), 'ReviewAnswer'), 
-                'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'Deviation' => array('Attachment', 'ExternalComment' => array('Attachment')),
-                'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
-                )));
+            'contain' => $this->a_contain));
 
         $this->set('application', $application);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -398,15 +396,11 @@ class ApplicationsController extends AppController {
             'fields' => array('Review.application_id', 'Review.accepted')));
         if (isset($my_applications[$id])) {
             if ($my_applications[$id] == 'accepted') {
+                $contains = $this->a_contain;
+                $contains['Review']['conditions'] = array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment');
                 $application = $this->Application->find('first', array(
                     'conditions' => array('Application.id' => $id),
-                    'contain' => array('Amendment', 'EthicalCommittee',  'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization',
-                        'Placebo', 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance',
-                        'Declaration', 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'AnnualLetter', 
-                        'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Registration', 'Fee', 'Checklist', 'Review' => array(
-                            'conditions' => array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment'),
-                            'InternalComment' => array('Attachment'), 'ReviewAnswer'
-                            ))));
+                    'contain' => $contains));
                 $this->set('counties', $this->Application->SiteDetail->County->find('list'));
                 $this->set('application', $application);
                 if ($application['Application']['deactivated']) {
@@ -1144,25 +1138,15 @@ class ApplicationsController extends AppController {
     }
 
 
-    protected function _isOwnedBy($id) {
+    private function _isOwnedBy($id) {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
+        $contains = $this->a_contain;
+        $contains['SiteInspection']['conditions'] = array('SiteInspection.summary_approved' => 2);
+        $contains['Review']['conditions'] = array('Review.type' => 'ppb_comment');
+        // debug($contains);
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment' => array('Attachment'), 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')), 'Sae', 'ParticipantFlow', 'Budget', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'Deviation' => array('Attachment', 'ExternalComment' => array('Attachment')),
-                'SiteInspection' => array(
-                        'conditions' => array('SiteInspection.summary_approved' => 2),
-                        'SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')
-                    )
-                )
-            // 'contain' => array('Amendment' => array('Attachment'), 'InvestigatorContact', 'Sponsor', 'SiteDetail',
-            //     'Organization', 'Placebo', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-            //         'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee',
-            //         'Attachment', 'AnnualApproval', 'Document', 'Review' => array('conditions' => array('Review.type' => 'ppb_comment')),
-            //     )
+            'contain' => $contains,
             )
         );
         if($response['Application']['user_id'] != $this->Auth->user('id')) {

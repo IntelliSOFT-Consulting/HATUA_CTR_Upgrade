@@ -32,6 +32,15 @@ App::uses('Controller', 'Controller');
  * @link http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
+  protected $a_contain = array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
+                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 
+                'Review'  => array('InternalComment' => array('Attachment'), 'ReviewAnswer'), 
+                'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
+                'Deviation' => array('ExternalComment' => array('Attachment')),
+                'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
+    );
   public $components = array(
         'Acl',
         'Auth' => array(
