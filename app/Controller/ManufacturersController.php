@@ -37,18 +37,17 @@ class ManufacturersController extends AppController {
  *
  * @return void
  */
-	public function add() {
+	public function applicant_add() {
 		if ($this->request->is('post')) {
 			$this->Manufacturer->create();
 			if ($this->Manufacturer->save($this->request->data)) {
 				$this->Session->setFlash(__('The manufacturer has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->redirect($this->referer());
 			} else {
 				$this->Session->setFlash(__('The manufacturer could not be saved. Please, try again.'));
 			}
 		}
-		$applications = $this->Manufacturer->Application->find('list');
-		$this->set(compact('applications'));
+		$this->redirect($this->referer());
 	}
 
 /**

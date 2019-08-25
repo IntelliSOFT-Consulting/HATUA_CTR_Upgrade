@@ -83,7 +83,6 @@
               'placeholder' => ' ' , 'class' => 'input-xxlarge',
             ));
             echo $this->element('multi/study_routes');
-            echo $this->element('multi/manufacturers');
             echo $this->Form->input('disease_condition', array(
               'label' => array('class' => 'control-label required', 'text' => 'Disease condition being investigated <span class="sterix">*</span>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge',
@@ -176,6 +175,7 @@
                     // </label>
                     // </span>', 'placeholder' => ' ' , 'class' => 'span4',
             // ));
+            echo $this->element('multi/manufacturers');
             echo $this->element('multi/ethical_committees');
             // echo $this->Form->input('protocol_reviewers_names', array(
               // 'label' => array('class' => 'control-label', 'text' => 'Names of Protocol Reviewers'),

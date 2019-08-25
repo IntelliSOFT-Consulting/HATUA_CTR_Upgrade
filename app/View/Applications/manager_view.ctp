@@ -40,8 +40,9 @@
           <li><a href="#tab7" data-toggle="tab">SAE/SUSAR (<?php echo count($application['Sae']) ?>)</a></li>
           <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
           <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>    
-          <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>    
-          <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Annual Budget</a></li>  
+          <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li> 
+          <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
+          <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li>  
           <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Annual Approval Letter</a></li>        
           <?php if ($application['Application']['approved'] == 2) { ?>
             <li><a href="#tab9"  data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
@@ -408,6 +409,14 @@
       <div class="row-fluid">
         <div class="span12">
           <?php echo $this->element('multi/approval_participants'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab14">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/annual_manufacturers'); ?>
         </div>
       </div>
     </div>

@@ -661,6 +661,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/ParticipantFlows/applicant_add');
         $this->Acl->allow($group, 'controllers/Budgets/applicant_add');
         $this->Acl->allow($group, 'controllers/EthicalCommittees/applicant_add');
+        $this->Acl->allow($group, 'controllers/Manufacturers/applicant_add');
         $this->Acl->allow($group, 'controllers/AnnualLetters/applicant_view');
         $this->Acl->allow($group, 'controllers/Deviations/applicant_add');
         $this->Acl->allow($group, 'controllers/Deviations/applicant_download_deviation');

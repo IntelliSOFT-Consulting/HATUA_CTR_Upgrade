@@ -138,27 +138,6 @@
            </tbody>
           </table>
 
-        <p class="table-label required">MANUFACTURER(S)</p>
-          <?php foreach($application['Manufacturer'] as $key => $manufacturer) { ?>
-          <span class="badge badge-info"><?php echo $key+1;?></span>
-          <table class="table  table-condensed">
-            <tbody>
-            <tr>
-              <td class="table-label"><p>Name of manufacturer</p></td>
-              <td><?php    echo "<p>". $manufacturer['manufacturer_name']."</p>";  ?></td>
-            </tr>
-            <tr>
-              <td class="table-label"><p>Manufacturing site address</p></td>
-              <td><?php    echo "<p>". $manufacturer['address']."</p>";  ?></td>
-            </tr>
-            <tr>
-              <td class="table-label"><p>Country of manufacture</p></td>
-              <td><?php    echo "<p>". $manufacturer['manufacturer_country']."</p>";  ?></td>
-            </tr>
-            </tbody>
-          </table>
-          <?php } ?>
-
          <table class="table  table-condensed">
           <tbody> 
             <tr>
@@ -215,6 +194,35 @@
             </tbody>
           </table>
 
+          <p class="table-label required">MANUFACTURER(S)</p>
+          <?php foreach($application['Manufacturer'] as $key => $manufacturer) { ?>
+          <span class="badge badge-info"><?php echo $key+1;?></span>
+          <table class="table  table-condensed">
+            <tbody>
+            <tr>
+              <td class="table-label"><p>Name of manufacturer</p></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturer_name']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Manufacturing site address</p></td>
+              <td><?php    echo "<p>". $manufacturer['address']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Manufacturing activities at site</p></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturing_activities']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>If others, specify</p></td>
+              <td><?php    echo "<p>". $manufacturer['other_specify']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Country of manufacture</p></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturer_country']."</p>";  ?></td>
+            </tr>
+            </tbody>
+          </table>
+          <?php } ?>
+          
           <p class="table-label required">KENYA ETHICS REVIEW COMMITTEE(S)</p>
             <?php foreach($application['EthicalCommittee'] as $key => $date) { ?>
             <span class="badge badge-info"><?php echo $key+1;?></span>

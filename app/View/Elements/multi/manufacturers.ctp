@@ -15,6 +15,16 @@
           'placeholder' => ' ' , 'class' => 'input-xxlarge',
         ));
         
+        echo $this->Form->input('Manufacturer.0.manufacturing_activities', array(
+          'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Manufacturing activities at site'),
+          'placeholder' => ' ' , 'class' => 'input-xlarge', 'empty' => true, 'options' => 
+          ['Complete manufacturing activities' => 'Complete manufacturing activities', 'Partial manufacturing' => 'Partial manufacturing', 'Batch certification' => 'Batch certification',
+            'Packaging' => 'Packaging', 'Quality testing' => 'Quality testing', 'Stability testing' => 'Stability testing', 'Blinding' => 'Blinding', 'Others' => 'Others']
+        ));
+        echo $this->Form->input('Manufacturer.0.other_specify', array(
+          'label' => array('class' => 'control-label', 'text' => 'If others, specify'),
+          'placeholder' => ' ' , 'class' => 'input-xxlarge',
+        ));
         $countries = $this->requestAction('/countries/countrylist');
         echo $this->Form->input('Manufacturer.0.manufacturer_country', array(
           'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Country of manufacture'),
@@ -41,6 +51,18 @@
                       'label' => array('class' => 'control-label required', 'text' => 'Manufacturing site address'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge',
                     ));
+
+                    echo $this->Form->input('Manufacturer.'.$i.'.manufacturing_activities', array(
+                      'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Manufacturing activities at site'),
+                      'placeholder' => ' ' , 'class' => 'input-xlarge', 'empty' => true, 'options' => 
+                      ['Complete manufacturing activities' => 'Complete manufacturing activities', 'Partial manufacturing' => 'Partial manufacturing', 'Batch certification' => 'Batch certification',
+                        'Packaging' => 'Packaging', 'Quality testing' => 'Quality testing', 'Stability testing' => 'Stability testing', 'Blinding' => 'Blinding', 'Others' => 'Others']
+                    ));
+                    echo $this->Form->input('Manufacturer.'.$i.'.other_specify', array(
+                      'label' => array('class' => 'control-label', 'text' => 'If others, specify'),
+                      'placeholder' => ' ' , 'class' => 'input-xxlarge',
+                    ));
+
                     echo $this->Form->input('Manufacturer.'.$i.'.manufacturer_country', array(
                       'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Country of manufacture'),
                       'placeholder' => ' ' , 'class' => 'input-xlarge', 'options' => $countries, 'empty' => true,
