@@ -34,6 +34,36 @@
         <td><?php echo $deviation['reference_no'];?></td>
       </tr>
       <tr>
+        <th class="my-well">Type of deviation <span class="sterix">*</span></th>
+        <td>
+          <?php 
+            // echo $this->Form->input('Deviation.'.$akey.'.deviation_type', array('label' => false, 'value' => $deviation['deviation_type'])); 
+            echo $this->Form->input('id', array('label' => false, 'value' => $deviation['id'])); 
+            echo $this->Form->input('Deviation.'.$akey.'.deviation_type', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+              'class' => 'deviation_type',
+              'before' => '<div class="control-group">
+                <div class="controls">
+                <input type="hidden" value="" id="ApplicationDesignControlled_" name="data[Application][deviation_type]"> <label class="radio inline">',
+              'after' => '</label>',
+              'options' => array('Violation' => 'Violation'),
+            ));
+            echo $this->Form->input('Deviation.'.$akey.'.deviation_type', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'deviation_type',
+              'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+              'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+              'before' => '<label class="radio inline">',
+              'after' => '</label>
+                    <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                    onclick="$(\'.deviation_type\').removeAttr(\'checked disabled\')">
+                    <em class="accordion-toggle">clear!</em></a> </span>
+                    </div> </div>',
+              'options' => array('Deviation' => 'Deviation'),
+            ));
+          ?>            
+      </td>
+      </tr> 
+      <tr>
         <th class="my-well">PI Name</th>
         <td><?php echo $this->Form->input('Deviation.'.$akey.'.pi_name', array('label' => false, 'value' => $deviation['pi_name'])); ?></td>
       </tr>        

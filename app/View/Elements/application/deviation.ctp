@@ -48,7 +48,7 @@
                   }
                   
                 } else {
-                  echo $this->Html->link('<span class="label label-success"> View </span>',
+                  echo $this->Html->link('<span class="label label-info"> View </span>',
                      array('action' => 'view', $application['Application']['id'], 'deviation_view' => $deviation['id']), array('escape'=>false));
                   echo "&nbsp;";
 

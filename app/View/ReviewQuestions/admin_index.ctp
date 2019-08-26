@@ -14,6 +14,7 @@
 	    <th><?php echo $this->Paginator->sort('question_number'); ?></th>
 	    <th><?php echo $this->Paginator->sort('question'); ?></th>
            <th><?php echo $this->Paginator->sort('question_type'); ?></th>
+           <th><?php echo $this->Paginator->sort('review_type'); ?></th>
 	     <th class="actions"><?php echo __('Actions'); ?></th>
 	</tr>
 	<?php
@@ -22,6 +23,7 @@
 		<td><?php echo h($reviewQuestion['ReviewQuestion']['question_number']); ?>&nbsp;</td>
 		<td><?php echo h($reviewQuestion['ReviewQuestion']['question']); ?>&nbsp;</td>
               <td><?php echo $reviewQuestion['ReviewQuestion']['question_type']; ?>&nbsp;</td>
+              <td><?php echo $reviewQuestion['ReviewQuestion']['review_type']; ?>&nbsp;</td>
 		<td class="actions">
 			<?php echo $this->Html->link(__('Edit'), array('controller' => 'review_questions', 'action' => 'edit', $reviewQuestion['ReviewQuestion']['id'], 'admin' => true), array('class' => 'btn btn-success')); ?>
 		</td>

@@ -2,7 +2,7 @@
   echo $this->Session->flash();
 ?>
 
-<h3 style="text-align: center;"> <?php echo $rreview['assessment_type']; ?> Assessment Form</h3>   
+<h3 style="text-align: center;"> <?php echo ucfirst($rreview['assessment_type']); ?> Assessment Form</h3>   
 <hr class="soften" style="margin: 10px 0px;">
 
   <table class="table table-bordered table-condensed">

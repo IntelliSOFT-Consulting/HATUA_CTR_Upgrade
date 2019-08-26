@@ -68,13 +68,21 @@ class AmendmentsController extends AppController {
 			$this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
 		}
 		$amndt = $this->Amendment->find('first', array('conditions' => array('Amendment.id' => $id), 'contain' => array()));
-		$application = $this->Amendment->Application->find('first', array(
+		/*$application = $this->Amendment->Application->find('first', array(
 		  'conditions' => array('Application.id' => $amndt['Amendment']['application_id']),
 		  'contain' => array(
 		  	'Amendment' => array('Attachment', 'CoverLetter'),
-		  	'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Attachment', 'AnnualApproval',
+		  	'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Attachment', 'AnnualApproval',
 		  	'Review' => array('conditions' => array('Review.type' => 'ppb_comment')))
+		));*/
+		$contains = $this->a_contains;
+		$contains['Amendment'] =  array('Attachment', 'CoverLetter');
+		$contains['Review'] = array('conditions' => array('Review.type' => 'ppb_comment'));
+		$application = $this->Amendment->Application->find('first', array(
+		  'conditions' => array('Application.id' => $amndt['Amendment']['application_id']),
+		  'contain' => $contains
 		));
+		
 		$this->_isEditAmndt($application['Application']['user_id'], $application['Application']['id'], $amndt['Amendment']['submitted']);
 
 		if ($this->request->is('post') || $this->request->is('put')) {

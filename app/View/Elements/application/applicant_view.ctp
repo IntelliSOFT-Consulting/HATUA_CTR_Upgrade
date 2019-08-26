@@ -260,7 +260,7 @@
              <?php   } } ?>
             <?php echo $this->fetch('ethical_committees'); ?>
 
-            <?php
+            <?php /*
               foreach($application['Amendment']  as $key => $amendment) {
                 if($amendment['submitted'] == 1 && !empty($amendment['approval_date'])){      ?>
                   <tr class="table-viewlabel">
@@ -268,7 +268,7 @@
                       <td class=" table-noline"><?php  echo $amendment['approval_date'];  ?></td>
                    </tr>
              <?php   } } ?>
-              <?php echo $this->fetch('approval_date'); ?>
+              <?php echo $this->fetch('approval_date'); */?>
             </tbody>
           </table>
         </div>
@@ -1173,7 +1173,20 @@
           <table class="table  table-condensed">
               <tbody>
             <tr>
-              <td class="table-label"><h5>7.0 PRINCIPAL INCLUSION CRITERIA <span class="sterix">*</span></h5></td>
+              <td class="table-label"><h5>7.0 STUDY OBJECTIVES <span class="sterix">*</span></h5></td>
+              <td><p><?php echo $application['Application']['study_objectives'] ; ?> </p></td>
+            </tr>
+            <?php
+              foreach($application['Amendment']  as $key => $amendment) {
+                if($amendment['submitted'] == 1 && !empty($amendment['study_objectives'])){      ?>
+                  <tr class="table-viewlabel">
+                      <td class="table-viewlabel"><?php echo $key+1; ?></td>
+                      <td class=" table-noline"><?php  echo $amendment['study_objectives'];  ?></td>
+                   </tr>
+             <?php   } } ?>
+             <?php echo $this->fetch('study_objectives'); ?>
+            <tr>
+              <td class="table-label"><h5>7.1 PRINCIPAL INCLUSION CRITERIA <span class="sterix">*</span></h5></td>
               <td><p><?php echo $application['Application']['principal_inclusion_criteria'] ; ?> </p></td>
             </tr>
             <?php
@@ -1186,7 +1199,7 @@
              <?php   } } ?>
              <?php echo $this->fetch('principal_inclusion_criteria'); ?>
             <tr>
-              <td class="table-label"><h5>7.1 PRINCIPAL EXCLUSION CRITERIA <span class="sterix">*</span></h5></td>
+              <td class="table-label"><h5>7.2 PRINCIPAL EXCLUSION CRITERIA <span class="sterix">*</span></h5></td>
               <td><p><?php echo $application['Application']['principal_exclusion_criteria'] ; ?> </p></td>
             </tr>
             <?php
@@ -1199,7 +1212,7 @@
              <?php   } } ?>
              <?php echo $this->fetch('principal_exclusion_criteria'); ?>
             <tr>
-              <td class="table-label"><h5>7.2 PRIMARY END POINTS <span class="sterix">*</span></h5></td>
+              <td class="table-label"><h5>7.3 PRIMARY END POINTS <span class="sterix">*</span></h5></td>
               <td><p><?php echo $application['Application']['primary_end_points'] ; ?> </p></td>
             </tr>
             <?php

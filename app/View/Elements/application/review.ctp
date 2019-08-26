@@ -10,25 +10,32 @@
   </div>
 
   <div class="row-fluid">
-    <div class="span4">      
+    <div class="span3">      
         <?php 
           echo $this->Html->link(__('<i class="icon-stethoscope"></i> Add Clinical Assessment'),
                     array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'], 'clinical'),
                     array('escape' => false, 'class' => 'btn btn-primary'));
         ?>
     </div>
-    <div class="span4">      
+    <div class="span3">      
         <?php 
           echo $this->Html->link(__('<i class="icon-tint"></i> Add Non-Clinical Assessment'),
                     array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'], 'non-clinical'),
                     array('escape' => false, 'class' => 'btn btn-success'));
         ?>
     </div>
-    <div class="span4">      
+    <div class="span3">      
         <?php 
           echo $this->Html->link(__('<i class="icon-medkit"></i> Add Quality Assessment'),
                     array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'], 'quality'),
                     array('escape' => false, 'class' => 'btn btn-info'));
+        ?>
+    </div>
+    <div class="span3">      
+        <?php 
+          echo $this->Html->link(__('<i class="icon-list-ol"></i> Add Statistical Assessment'),
+                    array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'], 'statistical'),
+                    array('escape' => false, 'class' => 'btn btn-warning'));
         ?>
     </div>
   </div>

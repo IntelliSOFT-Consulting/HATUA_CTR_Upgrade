@@ -400,6 +400,17 @@ $this->start('form-actions');
    </tr>
 <?php $this->end(); ?>
 
+<?php $this->start('pharmacists'); ?>
+     <tr class="table-amendlabel">
+      <td class="table-label table-amendlabel"></td>
+      <td class="table-noline">
+      <?php
+        echo $this->Form->input('pharmacist', array('placeholder' => ' ' , 'class' => 'input-xxlarge', 'rows' => 4));
+      ?>
+    </td>
+   </tr>
+<?php $this->end(); ?>
+
 <?php $this->start('sponsor_details'); ?>
      <tr class="table-amendlabel">
       <td class="table-label table-amendlabel"></td>
@@ -824,6 +835,17 @@ $this->start('form-actions');
       <td class="table-noline">
       <?php
             echo $this->Form->input('placebos', array('class' => 'input-xxlarge', 'rows' => 3));
+      ?>
+    </td>
+   </tr>
+<?php $this->end(); ?>
+
+<?php $this->start('study_objectives'); ?>
+     <tr class="table-amendlabel">
+      <td class="table-amendlabel"></td>
+      <td class="table-noline">
+      <?php
+            echo $this->Form->input('study_objectives', array('class' => 'input-xxlarge'));
       ?>
     </td>
    </tr>

@@ -942,18 +942,23 @@
         </div>
         <div id="tabs-7">
           <?php
+            echo $this->Form->input('study_objectives', array(
+              'label' => array('class' => 'control-nolabel', 'text' => ' <hr><h5>7.0 STUDY OBJECTIVES <span class="sterix">*</span></h5>'),
+              'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
+              'rows' => '3', 'escape' => false,
+            ));
             echo $this->Form->input('principal_inclusion_criteria', array(
-              'label' => array('class' => 'control-nolabel', 'text' => ' <hr><h5>7.0 PRINCIPAL INCLUSION CRITERIA <span class="sterix">*</span></h5>'),
+              'label' => array('class' => 'control-nolabel', 'text' => ' <hr><h5>7.1 PRINCIPAL INCLUSION CRITERIA <span class="sterix">*</span></h5>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'rows' => '3', 'escape' => false,
             ));
             echo $this->Form->input('principal_exclusion_criteria', array(
-              'label' => array('class' => 'control-nolabel', 'text' => '<hr><h5>7.1 PRINCIPAL EXCLUSION CRITERIA <span class="sterix">*</span></h5> '),
+              'label' => array('class' => 'control-nolabel', 'text' => '<hr><h5>7.2 PRINCIPAL EXCLUSION CRITERIA <span class="sterix">*</span></h5> '),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'rows' => '3', 'escape' => false,
             ));
             echo $this->Form->input('primary_end_points', array(
-              'label' => array('class' => 'control-nolabel', 'text' => '<hr><h5>7.2 PRIMARY END POINTS <span class="sterix">*</span></h5> '),
+              'label' => array('class' => 'control-nolabel', 'text' => '<hr><h5>7.3 PRIMARY END POINTS <span class="sterix">*</span></h5> '),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'rows' => '3', 'escape' => false,
             ));
@@ -1810,6 +1815,7 @@
   CKEDITOR.replace( 'data[Application][study_title]');
   CKEDITOR.replace( 'data[Application][laymans_summary]');
   CKEDITOR.replace( 'data[Application][abstract_of_study]');
+  CKEDITOR.replace( 'data[Application][study_objectives]');
   CKEDITOR.replace( 'data[Application][principal_inclusion_criteria]');
   CKEDITOR.replace( 'data[Application][principal_exclusion_criteria]');
   // CKEDITOR.replace( 'data[Application][staff_numbers]');

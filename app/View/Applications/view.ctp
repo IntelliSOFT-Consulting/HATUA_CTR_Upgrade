@@ -59,16 +59,44 @@
 					<table style="width: 100%;">
 						<tr>
 							<td style="width: 25%;">Study Title:</td>
-							<td style="width: 75%;"><strong><?php echo $application['Application']['study_title']; ?></strong></td>
+							<td style="width: 75%;"><strong><?php echo $application['Application']['study_title']; ?></strong></td>							
 						</tr>
+						<?php
+			              foreach($application['Amendment'] as $key => $amendment) {
+			                if($amendment['submitted'] == 1 && !empty($amendment['study_title'])){      ?>
+			               <tr class="table-viewlabel"><td class="table-viewlabel"><?php echo $key+1; ?></td>
+			                                           <td class="table-noline"> <?php echo $amendment['study_title'];  ?></td></tr>
+			            <?php   } } ?>
+						<tr>
+							<td style="width: 25%;">Study Objectives:</td>
+							<td style="width: 75%;"><strong><?php echo $application['Application']['study_objectives']; ?></strong></td>
+						</tr>
+						<?php
+			              foreach($application['Amendment'] as $key => $amendment) {
+			                if($amendment['submitted'] == 1 && !empty($amendment['study_objectives'])){      ?>
+			               <tr class="table-viewlabel"><td class="table-viewlabel"><?php echo $key+1; ?></td>
+			                                           <td class="table-noline"> <?php echo $amendment['study_objectives'];  ?></td></tr>
+			            <?php   } } ?>
 						<tr>
 							<td style="width: 25%;">Laymans Summary:</td>
 							<td style="width: 75%;"><strong><?php echo $application['Application']['laymans_summary']; ?></strong></td>
 						</tr>
+						<?php
+			              foreach($application['Amendment'] as $key => $amendment) {
+			                if($amendment['submitted'] == 1 && !empty($amendment['laymans_summary'])){      ?>
+			               <tr class="table-viewlabel"><td class="table-viewlabel"><?php echo $key+1; ?></td>
+			                                           <td class="table-noline"> <?php echo $amendment['laymans_summary'];  ?></td></tr>
+			            <?php   } } ?>
 						<tr>
 							<td style="width: 25%;">Abstract of Study:</td>
 							<td style="width: 75%;"><strong><?php echo $application['Application']['abstract_of_study']; ?></strong></td>
 						</tr>
+						<?php
+			              foreach($application['Amendment'] as $key => $amendment) {
+			                if($amendment['submitted'] == 1 && !empty($amendment['abstract_of_study'])){      ?>
+			               <tr class="table-viewlabel"><td class="table-viewlabel"><?php echo $key+1; ?></td>
+			                                           <td class="table-noline"> <?php echo $amendment['abstract_of_study'];  ?></td></tr>
+			            <?php   } } ?>
 					</table>
 					<hr>
 				</div>
