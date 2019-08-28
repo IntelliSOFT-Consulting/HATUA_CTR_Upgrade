@@ -1,5 +1,5 @@
 <?php
-  $this->extend('/Elements/application/application_index');
+  $this->extend('/Elements/application/public_index');
 ?>
 
 <?php $this->start('header'); ?>

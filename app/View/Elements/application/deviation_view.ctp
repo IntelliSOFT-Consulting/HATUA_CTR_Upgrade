@@ -13,6 +13,10 @@
         <td><?php echo $deviation['reference_no'];?></td>
       </tr>
       <tr>
+        <th class="my-well">Type of Deviation.</th>
+        <td><?php echo $deviation['deviation_type'];?></td>
+      </tr>
+      <tr>
         <th class="my-well">PI Name</th>
         <td><?php echo $deviation['pi_name']; ?></td>
       </tr>        

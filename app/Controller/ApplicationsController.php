@@ -17,7 +17,7 @@ class ApplicationsController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'view', 'view.pdf', 'apl', 'apn', 'study_title');
+        $this->Auth->allow('index', 'view', 'view.pdf', 'apl', 'apn', 'study_title', 'myindex');
     }
 
 /**
@@ -50,8 +50,11 @@ class ApplicationsController extends AppController {
     }
 
     public function myindex() {
-        $this->Application->recursive = 0;
-        $this->set('applications', $this->paginate());
+        // $this->response->download("export.csv");
+        $data = $this->Application->find('all');
+        $this->set(compact('data'));
+        $this->layout = false;
+        return;
     }
 
     public function applicant_index() {

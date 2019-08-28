@@ -29,19 +29,7 @@
               <li class="nav-header"> Filter Results By </li>
               <li class="divider"></li>
               <?php echo $this->fetch('admin-sidebar'); ?>
-              <li><i class="icon-th"></i> Trial Status</li>
-              <?php
-                foreach ($trial_statuses as $tkey => $tval) {
-              ?>                
-                <li class="<?php echo (isset($this->request->params['named']['trial_status_id']) && $this->request->params['named']['trial_status_id'] == $tkey) ? 'active': null; ?>">
-                  <?php
-                    echo $this->Html->link('<i class="icon-minus"></i>&nbsp; '.ucfirst($tval),
-                              array('action' => 'index', 'trial_status_id'=> $tkey), array('escape' => false));
-                  ?>
-                </li>
-              <?php } ?>
-              <li class="divider"></li>
-              <li><small><i class="icon-glass"></i> Trial Phase</small></li>
+              <li class="nav-header"><small><i class="icon-glass"></i> Trial Phase</small></li>
               <li class="<?php echo $thp; ?>">
                 <?php
                   echo $this->Html->link('<i class="icon-hand-right"></i>Phase I -  <br> <small class="muted">Human pharmacology</small>',
@@ -282,34 +270,6 @@
                           array('escape'=>false, 'class' => 'btn btn-block',  'style'=>'padding:7px; margin-top: 10px;'));
                         echo "<br><br>";
 
-                        if ($redir == 'applicant' && $application['Application']['submitted']) {
-                          echo $this->Html->link('<span class="label label-success"> New SAE </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
-                                array('escape' => false)); 
-                          echo "<br><br>";
-                          echo $this->Html->link('<span class="label label-primary"> New SUSAR </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
-                                array('escape' => false));   
-                          echo "<br>";
-                        }
-
-                       if ($redir === 'inspector' || $redir === 'manager') {
-                         echo $this->Html->link(__('<span class="label label-info"> Site Inspection </span>'),
-                            array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
-                            array('escape' => false));
-                       }
-                       if ($this->fetch('is-admin') == 'true') {
-                          if ($application['Application']['deleted']) {
-                              echo $this->Html->link('<span class="label label-inverse"> Undelete </span>',
-                                  array('action' => 'delete', $application['Application']['id'], 0, 'admin' => true),   array('escape'=>false));
-                          } elseif (!$application['Application']['deleted']) {
-                              echo $this->Html->link('<span class="label label-important"> Delete </span>',
-                                  array('action' => 'delete', $application['Application']['id'], 'admin' => true),   array('escape'=>false));
-                          }
-                          echo "<br><br>";
-                          if($application['Application']['submitted']) {
-                             echo $this->Form->postLink(__('<span class="label label-warning">Unsubmit</span>'), array('action' => 'unsubmit',
-                              $application['Application']['id']), array('escape' => false), __('Are you sure you want to Unsubmit Application No. %s? The user will be able to edit it!', $application['Application']['id']));
-                          }
-                      }
                   ?>
                 </td>
               </tr>

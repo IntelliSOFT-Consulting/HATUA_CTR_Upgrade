@@ -17,6 +17,7 @@ class Application extends AppModel {
             'approved' => array('type' => 'value'),
             'deactivated' => array('type' => 'value'),
             'deleted' => array('type' => 'value'),
+            'trial_status_id' => array('type' => 'value'),
             'trial_human_pharmacology' => array('type' => 'value'),
             'trial_therapeutic_exploratory' => array('type' => 'value'),
             'trial_therapeutic_confirmatory' => array('type' => 'value'),

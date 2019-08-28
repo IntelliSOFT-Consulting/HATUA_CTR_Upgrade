@@ -8,7 +8,6 @@ App::uses('AppController', 'Controller');
 class DeviationsController extends AppController {
 
     public $paginate = array();
-    public $components = array('Search.Prg');
     public $presetVars = true; // using the model configuration
     public $uses = array('Deviation', 'Application');
 /**
@@ -50,7 +49,7 @@ class DeviationsController extends AppController {
  * @param string $id
  * @return void
  */
-    private function download_deviation($id = null) {
+    public function download_deviation($id = null) {
         $this->Deviation->id = $id;
         if (!$this->Deviation->exists()) {
             throw new NotFoundException(__('Invalid protocol deviation'));
