@@ -226,12 +226,12 @@
           ?>
           <hr>
           <?php
-            echo $this->element('multi/investigators');
+             echo $this->element('multi/investigators');
           ?>
           <hr>
           <div>
           <?php
-            echo $this->element('multi/pharmacists');
+             echo $this->element('multi/pharmacists');
           ?>
           </div>
         </div>
@@ -1504,6 +1504,7 @@
       <?php
         echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
             'name' => 'saveChanges',
+            'formnovalidate' => 'formnovalidate',
             'class' => 'btn btn-success btn-block mapop',
             'id' => 'SadrSaveChanges', 'title'=>'Save & continue editing',
             'data-content' => 'Save changes to form without submitting it.
@@ -1514,6 +1515,7 @@
       <?php
         echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
             'name' => 'submitReport',
+            'formnovalidate' => 'formnovalidate',
             'onclick'=>"return confirm('Are you sure you wish to submit the form to PPB? You will not be able to edit it later.');",
             'class' => 'btn btn-info btn-block mapop',
             'id' => 'ApplicationSubmitReport', 'title'=>'Save and Submit Report',

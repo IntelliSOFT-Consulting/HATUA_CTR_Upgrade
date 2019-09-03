@@ -51,8 +51,8 @@ class ApplicationsController extends AppController {
 
     public function myindex() {
         // $this->response->download("export.csv");
-        $data = $this->Application->find('all');
-        $this->set(compact('data'));
+        $applications = $this->Application->find('all');
+        $this->set(compact('applications'));
         $this->layout = false;
         return;
     }
@@ -73,7 +73,7 @@ class ApplicationsController extends AppController {
             //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
               $this->csv_export($this->Application->find('all', 
-                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
                   ));
             }
             //end pdf export
@@ -106,7 +106,7 @@ class ApplicationsController extends AppController {
             //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
               $this->csv_export($this->Application->find('all', 
-                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
                   ));
             }
             //end csv export
@@ -208,7 +208,7 @@ class ApplicationsController extends AppController {
            //in case of csv export
             if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
               $this->csv_export($this->Application->find('all', 
-                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
                   ));
             }
             //end pdf export
@@ -1161,9 +1161,9 @@ class ApplicationsController extends AppController {
     }
 
 
-    private function csv_export($capplications = ''){
+    private function csv_export($applications = ''){
         //todo: check if data exists in $applications
-        $_serialize = 'capplications';
+        /*$_serialize = 'capplications';
         $_header = array('Protocol No', 'Study Title', 'Short Title', 'Date Submitted', 'Approval Date',
             'Assigned Reviewer 1', 'Reviewer response 1', 'Assigned Reviewer 2', 'Reviewer response 2', 'Assigned Reviewer 3', 'Reviewer response 3', 'Assigned Reviewer 4', 'Reviewer response 4',
             'Trial Status', 'Trial Phase I', 'Trial Phase II', 'Trial Phase III', 'Trial Phase IV', 
@@ -1185,6 +1185,10 @@ class ApplicationsController extends AppController {
 
         $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';
-        $this->set(compact('capplications', '_serialize', '_header', '_extract'));
+        $this->set(compact('capplications', '_serialize', '_header', '_extract'));*/
+        $this->response->download('applications_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->set(compact('applications'));
+        $this->layout = false;
+        $this->render('csv_export');
     }
 }
