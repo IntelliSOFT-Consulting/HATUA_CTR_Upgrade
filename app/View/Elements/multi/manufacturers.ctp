@@ -14,6 +14,14 @@
           'label' => array('class' => 'control-label required', 'text' => 'Manufacturing site address'),
           'placeholder' => ' ' , 'class' => 'input-xxlarge',
         ));
+        echo $this->Form->input('Manufacturer.0.manufacturer_phone', array(
+          'label' => array('class' => 'control-label required', 'text' => 'Phone'),
+          'placeholder' => ' ' , 'class' => 'input-xxlarge',
+        ));
+        echo $this->Form->input('Manufacturer.0.manufacturer_email', array(
+          'label' => array('class' => 'control-label required', 'text' => 'Email'),
+          'placeholder' => ' ' , 'class' => 'input-xxlarge',
+        ));
         
         echo $this->Form->input('Manufacturer.0.manufacturing_activities', array(
           'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Manufacturing activities at site'),
@@ -49,6 +57,14 @@
                     ));
                     echo $this->Form->input('Manufacturer.'.$i.'.address', array(
                       'label' => array('class' => 'control-label required', 'text' => 'Manufacturing site address'),
+                      'placeholder' => ' ' , 'class' => 'input-xxlarge',
+                    ));
+                    echo $this->Form->input('Manufacturer.'.$i.'.manufacturer_phone', array(
+                      'label' => array('class' => 'control-label required', 'text' => 'Phone'),
+                      'placeholder' => ' ' , 'class' => 'input-xxlarge',
+                    ));
+                    echo $this->Form->input('Manufacturer.'.$i.'.manufacturer_email', array(
+                      'label' => array('class' => 'control-label required', 'text' => 'Email'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge',
                     ));
 

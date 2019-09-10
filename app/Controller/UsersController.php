@@ -548,9 +548,10 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/manager_approve');
         $this->Acl->allow($group, 'controllers/Applications/manager_delete');
         $this->Acl->allow($group, 'controllers/Applications/manager_deactivate');
+        $this->Acl->allow($group, 'controllers/Applications/stages');
         $this->Acl->allow($group, 'controllers/Attachments/manager_download');
         $this->Acl->allow($group, 'controllers/Attachments/download');
-        $this->Acl->allow($group, 'controllers/Notifications/delete');
+        $this->Acl->allow($group, 'controllers/Notifications');
         $this->Acl->allow($group, 'controllers/Notifications/manager_resend');
         $this->Acl->allow($group, 'controllers/Reviews/manager_add');
         $this->Acl->allow($group, 'controllers/Reviews/manager_comment');
@@ -578,9 +579,10 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/inspector_index');
         $this->Acl->allow($group, 'controllers/Applications/inspector_view');
         $this->Acl->allow($group, 'controllers/Applications/inspector_view_notification');
+        $this->Acl->allow($group, 'controllers/Applications/stages');
         $this->Acl->allow($group, 'controllers/Attachments/inspector_download');
         $this->Acl->allow($group, 'controllers/Attachments/download');
-        $this->Acl->allow($group, 'controllers/Notifications/delete');
+        $this->Acl->allow($group, 'controllers/Notifications');
         $this->Acl->allow($group, 'controllers/Users/inspector_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
@@ -594,9 +596,10 @@ class UsersController extends AppController {
         $this->Acl->deny($group, 'controllers');
         $this->Acl->allow($group, 'controllers/Applications/reviewer_index');
         $this->Acl->allow($group, 'controllers/Applications/reviewer_view');
+        $this->Acl->allow($group, 'controllers/Applications/stages');
         $this->Acl->allow($group, 'controllers/Attachments/reviewer_download');
         $this->Acl->allow($group, 'controllers/Attachments/download');
-        $this->Acl->allow($group, 'controllers/Notifications/delete');
+        $this->Acl->allow($group, 'controllers/Notifications');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_add');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_respond');
         $this->Acl->allow($group, 'controllers/Reviews/reviewer_assess');
@@ -614,7 +617,8 @@ class UsersController extends AppController {
         // $this->Acl->allow($group, 'controllers/Applications/partner_add');
         $this->Acl->allow($group, 'controllers/Applications/partner_index');
         $this->Acl->allow($group, 'controllers/Applications/partner_edit');
-        $this->Acl->allow($group, 'controllers/Notifications/delete');
+        $this->Acl->allow($group, 'controllers/Applications/stages');
+        $this->Acl->allow($group, 'controllers/Notifications');
         $this->Acl->allow($group, 'controllers/Users/partner_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
@@ -627,16 +631,17 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Amendments/applicant_edit');
         $this->Acl->allow($group, 'controllers/Amendments/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_index');
-        // $this->Acl->allow($group, 'controllers/Applications/applicant_add');
+        // $this->Acl->allow($group, 'controllers/Applications/applicant_add');  //why?
         $this->Acl->allow($group, 'controllers/Applications/applicant_view');
         $this->Acl->allow($group, 'controllers/Applications/applicant_edit');
         $this->Acl->allow($group, 'controllers/Applications/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_final_report');
+        $this->Acl->allow($group, 'controllers/Applications/stages');
         $this->Acl->allow($group, 'controllers/Attachments/applicant_download');
         $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Attachments/delete');
         $this->Acl->allow($group, 'controllers/InvestigatorContacts/delete');
-        $this->Acl->allow($group, 'controllers/Notifications/delete');
+        $this->Acl->allow($group, 'controllers/Notifications');
         $this->Acl->allow($group, 'controllers/Organizations/delete');
         $this->Acl->allow($group, 'controllers/PreviousDates/delete');
         $this->Acl->allow($group, 'controllers/StudyRoutes/delete');

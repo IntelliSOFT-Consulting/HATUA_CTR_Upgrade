@@ -11,7 +11,7 @@
     <?php foreach ($application['Budget'] as $Budget) { ?>
     <table class="table table-bordered table-condensed">
         <thead>
-          <th colspan="8"><h4 class="text-danger">Budget (<?php echo $Budget['year']; ?>)</h4></th>
+          <th colspan="8"><h4 class="text-danger">Budget</h4></th>
         </thead>
         <tbody>
             <tr>
@@ -108,24 +108,24 @@
         <div class="span6">
           <?php
             echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-            $years = [];
+           /* $years = [];
             foreach (range(1986, date('Y')) as $value) {
                $years[$value] = $value;
             }
             arsort($years);
             echo $this->Form->input('year', array('type' => 'select', 'options' => ($years),
                 'label' => array('class' => 'control-label', 'text' => 'Year')
-              ));
+              ));*/
 
             ?>
         </div><!--/span-->
         <div class="span6">
           <?php
-            echo $this->Form->input('budget_period',
+            /*echo $this->Form->input('budget_period',
               array(
                 'label' => array('class' => 'control-label required', 'text' => 'Budget period'),                
                 'after'=>'<p class="help-block"> (years) </p></div>',
-                ));
+                ));*/
             ?>
         </div><!--/span-->
       </div><!--/row-->

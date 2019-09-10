@@ -3,7 +3,7 @@
 ?>
 <div class="row-fluid">
 	<div class="span12">
-		<h4>14. Notification(s) -
+		<h4>15. Notification(s) -
 			<small class="muted">(Notifications may include files (pictures, scanned documents, pdf, word documents) or generic updates</small></h4>
 		<hr>
 

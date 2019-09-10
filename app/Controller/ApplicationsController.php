@@ -4,6 +4,7 @@ App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
 App::uses('HtmlHelper', 'View/Helper');
 App::uses('Sanitize', 'Utility');
+App::uses('CakeTime', 'Utility');
 /**
  * Applications Controller
  *
@@ -21,11 +22,58 @@ class ApplicationsController extends AppController {
     }
 
 /**
+ * stages method
+ *
+ * @return array
+ */
+    public function stages($id = null) {
+        $stages = [];
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id)
+        ));
+        //creation
+        $csd = new DateTime($application['Application']['created']);
+        $ced = ($application['Application']['date_submitted']) ? new DateTime($application['Application']['date_submitted']) : new DateTime();
+        $cdays = $ced->diff($csd)->format('%a');
+        $cstate = ($cdays > 2) ? 'red' : 'green';
+        $stages['Creation'] = ['label' => 'Creation by applicant', 'start_date' => $csd->format('d-M-Y'), 'end_date' => $ced->format('d-M-Y'), 'days' => $cdays, 'color' => '#42f2f5', 'state' => $cstate];
+
+        //Applicant submit
+        if ($application['Application']['submitted']) {
+            $ssd = new DateTime($application['Application']['date_submitted']);
+            $sed = ($application['Application']['date_submitted']) ? new DateTime($application['Application']['date_submitted']) : new DateTime();
+            $sdays = $sed->diff($ssd)->format('%a');
+            $sstate = ($cdays > 2) ? 'red' : 'green';
+            $stages['Submit'] = ['label' => 'Submitted', 'start_date' => $ssd->format('d-M-Y'), 'end_date' => $sed->format('d-M-Y'), 'days' => $sdays, 'color' => '#42f2f5', 'state' => $sstate];
+        }
+
+        if ($this->request->is('requested')) {
+            return $stages;
+        }
+    }    
+    /*public function admin_stages($id = null) {
+        $this->stages($id);
+    }
+    public function manager_stages($id = null) {
+        $this->stages($id);
+    }
+    public function inspector_stages($id = null) {
+        $this->stages($id);
+    }
+    public function reviewer_stages($id = null) {
+        $this->stages($id);
+    }
+    public function partner_stages($id = null) {
+        $this->stages($id);
+    }
+    public function applicant_stages($id = null) {
+        $this->stages($id);
+    }*/
+/**
  * index method
  *
  * @return void
  */
-
 
     public function index() {
         $this->Prg->commonProcess();
@@ -1126,7 +1174,7 @@ class ApplicationsController extends AppController {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+            'contain' => array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Budget',
                     'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
                     'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist')));
         if($response['Application']['user_id'] != $this->Auth->user('id')) {

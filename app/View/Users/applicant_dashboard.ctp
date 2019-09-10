@@ -37,6 +37,12 @@
           <img alt="" src="/img/authenticated/preferences_composer.png">
           <div class="caption">
             <h4>Recent Protocols</h4>
+            <?php
+              $stages = $this->requestAction(
+                'applications/stages/46'
+              );
+              // debug($stages);
+            ?>
             <ol><?php
                  foreach($applications as $application) {
                     if($application['Application']['submitted']) {

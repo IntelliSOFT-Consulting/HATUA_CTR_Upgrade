@@ -40,11 +40,12 @@
           <li><a href="#tabs-7">7. Criteria</a></li>
           <li><a href="#tabs-8">8. Scope</a></li>
           <li><a href="#tabs-9">9. Design</a></li>
-          <li><a href="#tabs-10">10. Organizations</a></li>
-          <li><a href="#tabs-11">11. Other details</a></li>
-          <li><a href="#tabs-12">12. Checklist </a></li>
-          <li><a href="#tabs-13">13. Declaration</a></li>
-          <li><a href="#tabs-14">14. Notifications</a></li>
+          <li><a href="#tabs-15">10. Study Budget</a></li>
+          <li><a href="#tabs-10">11. Organizations</a></li>
+          <li><a href="#tabs-11">12. Other details</a></li>
+          <li><a href="#tabs-12">13. Checklist </a></li>
+          <li><a href="#tabs-13">14. Declaration</a></li>
+          <li><a href="#tabs-14">15. Notifications</a></li>
         </ul>
         <div id="tabs-1">
           <?php
@@ -1407,46 +1408,49 @@
           ?>
           </div>
         </div>
+        <div id="tabs-15">
+          <?php echo $this->element('multi/study_budget');?>
+        </div>
         <div id="tabs-10">
           <?php echo $this->element('multi/organizations');?>
         </div>
         <div id="tabs-11">
-          <h5>11.0 OTHER DETAILS</h5>
+          <h5>12.0 OTHER DETAILS</h5>
           <hr>
           <?php
             echo $this->Form->input('other_details_explanation', array(
-              'label' => array('class' => 'control-nolabel', 'text' => '<h5> 11.1 If the trial is to be conducted in
+              'label' => array('class' => 'control-nolabel', 'text' => '<h5> 12.1 If the trial is to be conducted in
               Kenya and not in the host country of the applicant / sponsor, provide an explanation <span class="sterix">*</span></h5>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'escape' => false,
             ));
             echo $this->Form->input('estimated_duration', array(
               'label' => array('class' => 'control-nolabel required',
-                      'text' => '11.2 Estimated duration of trial <span class="sterix">*</span>'),
+                      'text' => '12.2 Estimated duration of trial <span class="sterix">*</span>'),
               'between' => '<div class="nocontrols">',
               'placeholder' => ' ' , 'class' => 'input-xxlarge'
             ));
             echo $this->Form->input('other_details_regulatory_notapproved', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 11.3 Name other Regulatory Authorities to
+              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 12.3 Name other Regulatory Authorities to
                 which applications to do this trial have been submitted, but approval has not yet been granted. Include date(s)
                 of application: <span class="sterix">*</span></h5>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'escape' => false,
             ));
             echo $this->Form->input('other_details_regulatory_approved', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 11.4 Name other Regulatory Authorities
+              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 12.4 Name other Regulatory Authorities
                 which have approved this trial, date(s) of approval and number of sites per country. <span class="sterix">*</span></h5>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'escape' => false,
             ));
             echo $this->Form->input('other_details_regulatory_rejected', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 11.5 if applicable, name other Regulatory
+              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 12.5 if applicable, name other Regulatory
               Authorities or Ethics Committees which have rejected this trial and give reasons for rejection:</h5>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'escape' => false,
             ));
             echo $this->Form->input('other_details_regulatory_halted', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 11.6 If applicable, details of and reasons
+              'label' => array('class' => 'control-nolabel required', 'text' => '<h5> 12.6 If applicable, details of and reasons
                 for this trial having been halted at any stage by other Regulatory Authorities:</h5>'),
               'placeholder' => ' ' , 'class' => 'input-xxlarge', 'between'=>'<div class="nocontrols">',
               'escape' => false,

@@ -21,6 +21,15 @@ class NotificationsController extends AppController {
 		$this->Notification->recursive = 0;
 		$this->set('notifications', $this->paginate());
 	}
+	public function admin_index() {
+        $this->index();
+    }
+	public function manager_index() {
+        $this->index();
+    }
+    public function inspector_index() {
+        $this->index();
+    }
 
 /**
  * view method

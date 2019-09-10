@@ -19,6 +19,10 @@ $(function() {
 				id="Manufacturer'+ intId +'ManufacturerName"></div></div>\
 				<div class="control-group"><label class="control-label required">Manufacturing site address</label><div class="controls"><input name="data[Manufacturer]['+ intId +'][address]" \
 				class="input-xxlarge" placeholder=" " maxlength="255" type="text" id="Manufacturer'+ intId +'Address"></div></div>\
+				<div class="control-group"><label class="control-label required">Phone</label><div class="controls"><input name="data[Manufacturer]['+ intId +'][phone]" \
+				class="input-xxlarge" placeholder=" " maxlength="255" type="text" id="Manufacturer'+ intId +'Phone"></div></div>\
+				<div class="control-group"><label class="control-label required">Email</label><div class="controls"><input name="data[Manufacturer]['+ intId +'][email]" \
+				class="input-xxlarge" placeholder=" " maxlength="255" type="text" id="Manufacturer'+ intId +'Email"></div></div>\
         <div class="control-group"><label class="control-label required">Manufacturing activities at site</label><div class="controls">\
 				<select name="data[Manufacturer]['+ intId +'][manufacturing_activities]" class="input-xlarge" id="Manufacturer'+ intId +'ManufacturingActivities"></select></div></div>\
 				<div class="control-group"><label class="control-label">If others, specify</label><div class="controls"><input name="data[Manufacturer]['+ intId +'][other_specify]" \

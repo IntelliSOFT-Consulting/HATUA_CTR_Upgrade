@@ -70,6 +70,12 @@
             </li>
         </ul>
        </li>
+       <li class="<?php echo $this->fetch('Notifications') ?>">
+        <?php
+          echo $this->Html->link('<i class="icon-exclamation-sign"></i> Notifications',
+            array('controller' => 'notifications', 'action'=>'index', 'manager' => true ), array('escape' => false ));
+            ?>
+       </li>
        <li class="<?php echo $this->fetch('Profile') ?>">
         <?php
           echo $this->Html->link('<i class="icon-user"></i> My Profile',

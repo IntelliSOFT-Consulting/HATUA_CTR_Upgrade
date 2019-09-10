@@ -208,6 +208,14 @@
               <td><?php    echo "<p>". $manufacturer['address']."</p>";  ?></td>
             </tr>
             <tr>
+              <td class="table-label"><p>Phone</p></td>
+              <td><?php    echo "<p>". $manufacturer['phone']."</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label"><p>Email</p></td>
+              <td><?php    echo "<p>". $manufacturer['email']."</p>";  ?></td>
+            </tr>
+            <tr>
               <td class="table-label"><p>Manufacturing activities at site</p></td>
               <td><?php    echo "<p>". $manufacturer['manufacturing_activities']."</p>";  ?></td>
             </tr>
@@ -1508,8 +1516,118 @@
             </table>
           </div>
         </div>
+
+        <div id="tabs-15">
+          <?php foreach($application['Budget'] as $key => $budget) { ?>
+          
+              <div class="page-header">
+                <div class="styled_title"><h3>BUDGET AND JUSTIFICATION</h3></div>
+              </div>
+        
+                <?php
+                  $num = 1;
+                ?>
+
+                <table  class="table table-bordered table-condensed table-striped">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th style="width: 40%;">Budget Categories  </th>
+                      <th style="width: 9%;">Currency</th>
+                      <th>Total Cost</th>
+                      <th>Total Cost (Kshs) <small class="muted">(conversion)</small></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Personnel</p> </td>
+                      <td> <?php  echo $budget['personnel_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['personnel']; ?> </td>
+                      <td> <?php  echo $budget['personnel_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Transport</p> </td>
+                      <td> <?php  echo $budget['transport_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['transport']; ?> </td>
+                      <td> <?php  echo $budget['transport_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Field</p> </td>
+                      <td> <?php  echo $budget['field_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['field']; ?> </td>
+                      <td> <?php  echo $budget['field_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Clinical Supplies</p> </td>
+                      <td> <?php  echo $budget['supplies_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['supplies']; ?> </td>
+                      <td> <?php  echo $budget['supplies_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Pharmacy</p> </td>
+                      <td> <?php  echo $budget['pharmacy_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['pharmacy']; ?> </td>
+                      <td> <?php  echo $budget['pharmacy_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Travel</p> </td>
+                      <td> <?php  echo $budget['travel_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['travel']; ?> </td>
+                      <td> <?php  echo $budget['travel_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Regulatory</p> </td>
+                      <td> <?php  echo $budget['regulatory_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['regulatory']; ?> </td>
+                      <td> <?php  echo $budget['regulatory_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>IT</p> </td>
+                      <td> <?php  echo $budget['it_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['it']; ?> </td>
+                      <td> <?php  echo $budget['it_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Others</p> </td>
+                      <td> <?php  echo $budget['others_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['others']; ?> </td>
+                      <td> <?php  echo $budget['others_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Grand Total</p> </td>
+                      <td> <?php  echo $budget['grand_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['grand_total']; ?> </td>
+                      <td> <?php  echo $budget['grand_total_kshs']; ?> </td>
+                    </tr>
+                    <tr>
+                      <td><?php echo $num++; ?></td>
+                      <td> <p>Per Subject</p> </td>
+                      <td> <?php  echo $budget['subject_currency'];  ?>  </td>
+                      <td> <?php  echo $budget['subject']; ?> </td>
+                      <td> <?php  echo $budget['subject_kshs']; ?> </td>
+                    </tr>
+                  </tbody>
+                </table>
+                 <hr>
+                
+                <?php
+                      echo $budget['study_information'];
+                ?>
+          <?php }?>
+        </div>
+
         <div id="tabs-10">
-          <h5>10.0 ORGANISATIONS TO WHOM THE SPONSOR HAS TRANSFERRED TRIAL RELATED DUTIES AND FUNCTIONS </h5>
+          <h5>11.0 ORGANISATIONS TO WHOM THE SPONSOR HAS TRANSFERRED TRIAL RELATED DUTIES AND FUNCTIONS </h5>
           <div class="ctr-groups">
             <p class="control-nolabel required">Has the sponsor transferred any major or all the sponsor&rsquo;s trial related duties and functions to another organisation or third party?</p>
             <p><?php echo $application['Application']['organisations_transferred_']; ?></p>
@@ -1604,11 +1722,11 @@
           </div>
         </div>
         <div id="tabs-11">
-          <h5>11.0 OTHER DETAILS</h5>
+          <h5>12.0 OTHER DETAILS</h5>
           <hr>
           <table class="table table-condensed">
             <thead>
-            <tr class="control-nolabel"><th colspan="2"><h5> 11.1 If the trial is to be conducted in Kenya and not in the host country of the applicant / sponsor, provide an explanation <span class="sterix">*</span></h5></th></tr>
+            <tr class="control-nolabel"><th colspan="2"><h5> 12.1 If the trial is to be conducted in Kenya and not in the host country of the applicant / sponsor, provide an explanation <span class="sterix">*</span></h5></th></tr>
             </thead>
             <tbody>
             <tr><td colspan="2"><?php echo $application['Application']['other_details_explanation'] ?></td> </tr>
@@ -1625,7 +1743,7 @@
           </table>
           <table class="table table-condensed">
             <thead>
-            <tr class="control-nolabel"><th colspan="2"><h5> 11.2 Estimated duration of trial <span class="sterix">*</span></h5></th></tr>
+            <tr class="control-nolabel"><th colspan="2"><h5> 12.2 Estimated duration of trial <span class="sterix">*</span></h5></th></tr>
             </thead>
             <tbody>
             <tr><td colspan="2"><?php echo $application['Application']['estimated_duration'] ?></td>  </tr>
@@ -1642,7 +1760,7 @@
           </table>
           <table class="table table-condensed">
             <thead>
-            <tr class="control-nolabel"><th colspan="2"><h5> 11.3 Name other Regulatory Authorities to  which applications to do this trial have been submitted, but approval has not yet been granted. Include date(s) of application: <span class="sterix">*</span></h5></th></tr>
+            <tr class="control-nolabel"><th colspan="2"><h5> 12.3 Name other Regulatory Authorities to  which applications to do this trial have been submitted, but approval has not yet been granted. Include date(s) of application: <span class="sterix">*</span></h5></th></tr>
             </thead>
             <tbody>
             <tr><td colspan="2"><?php echo $application['Application']['other_details_regulatory_notapproved'] ?></td>  </tr>
@@ -1659,7 +1777,7 @@
           </table>
           <table class="table table-condensed">
             <thead>
-            <tr class="control-nolabel"><th colspan="2"><h5> 11.4 Name other Regulatory Authorities which have approved this trial, date(s) of approval and number of sites per country.  <span class="sterix">*</span></h5></th></tr>
+            <tr class="control-nolabel"><th colspan="2"><h5> 12.4 Name other Regulatory Authorities which have approved this trial, date(s) of approval and number of sites per country.  <span class="sterix">*</span></h5></th></tr>
             </thead>
             <tbody>
             <tr><td colspan="2"><?php echo $application['Application']['other_details_regulatory_approved'] ?></td> </tr>
@@ -1676,7 +1794,7 @@
           </table>
           <table class="table table-condensed">
             <thead>
-            <tr class="control-nolabel"><th colspan="2"><h5> 11.5 if applicable, name other Regulatory  Authorities or Ethics Committees which have rejected this trial and give reasons for rejection:<span class="sterix">*</span></h5></th></tr>
+            <tr class="control-nolabel"><th colspan="2"><h5> 12.5 if applicable, name other Regulatory  Authorities or Ethics Committees which have rejected this trial and give reasons for rejection:<span class="sterix">*</span></h5></th></tr>
             </thead>
             <tbody>
             <tr><td colspan="2"><?php echo $application['Application']['other_details_regulatory_rejected'] ?></td> </tr>
@@ -1693,7 +1811,7 @@
           </table>
           <table class="table table-condensed">
             <thead>
-            <tr class="control-nolabel"><th colspan="2"><h5> 11.6 If applicable, details of and reasons for this trial having been halted at any stage by other Regulatory Authorities: <span class="sterix">*</span></h5></th></tr>
+            <tr class="control-nolabel"><th colspan="2"><h5> 12.6 If applicable, details of and reasons for this trial having been halted at any stage by other Regulatory Authorities: <span class="sterix">*</span></h5></th></tr>
             </thead>
             <tbody>
             <tr><td colspan="2"><?php echo $application['Application']['other_details_regulatory_halted'] ?></td> </tr>
@@ -1891,20 +2009,7 @@
           </table>
 
         </div>
-        <div id="tabs-15">              
-          <?php // echo $this->element('multi/approval'); ?>
-        </div>
-        <?php  if ($this->fetch('is-applicant') == 'true') { ?>
-          <?php  if ($application['Application']['approved']) { ?>
-            <div id="tabs-16">
-              <?php // echo $this->element('multi/final'); ?>
-            </div>
-          <?php } ?>
-        <?php } else { ?>
-          <div id="tabs-16">
-              <?php // echo $this->element('multi/final'); ?>
-            </div>
-        <?php } ?>
+        
 
       </div>
       <?php echo $this->Form->end(); ?>
