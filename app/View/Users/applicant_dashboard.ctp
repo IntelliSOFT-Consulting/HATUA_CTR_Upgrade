@@ -5,6 +5,50 @@
     $this->Html->css('bootstrap-editable', null, array('inline' => false));
 ?>
 <section>
+  <?php
+      $apps = array_filter(Hash::combine($applications, '{n}.Application.id', '{n}.Application.protocol_no'), 'strlen');
+      // debug(key($apps));
+
+      $stages = $this->requestAction(
+          'applications/stages/'.key($apps)   //get first element of array
+      );
+         // debug($stages);
+  ?>
+<div class="row-fluid">  
+  <div class="span12">
+      <div class="process">
+        <div class="process-row">
+          <!-- <p style="margin-top: 40px;"></p> -->
+          <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <?php echo $stages['Creation']['application_name']; ?>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <?php
+                foreach ($apps as $ak => $app) {
+                  echo '<li><a id="$ak" href="#">'.$app.'</a></li>';
+                }
+              ?>
+            </ul>
+          </div>
+          <?php
+            foreach ($stages as $stage_name => $stage) {
+          ?>
+            <div id="<?php echo $stage_name; ?>" class="process-step">
+                <button type="button" class="btn btn-<?php echo $stage['color'];?> btn-circle" disabled="disabled">
+                  <h5 style="text-decoration: underline;"><?php echo $stage['label']; ?></h5> 
+                  <small><?php echo (isset($stage['start_date'])) ? $stage['start_date']: ''; ?></small>                  
+                </button>
+                &nbsp; <?php echo (isset($stage['days'])) ? '<span class="badge">'.$stage['days'].'</span>' : ''; ?>
+            </div>
+          <?php } ?>
+        </div>
+    </div>
+  </div>
+</div>
+<br>
+
 <div class="row-fluid">
     <ul class="thumbnails">
       <li class="span4">
@@ -36,13 +80,7 @@
         <div class="thumbnail">
           <img alt="" src="/img/authenticated/preferences_composer.png">
           <div class="caption">
-            <h4>Recent Protocols</h4>
-            <?php
-              $stages = $this->requestAction(
-                'applications/stages/46'
-              );
-              // debug($stages);
-            ?>
+            <h4>Recent Protocols</h4>            
             <ol><?php
                  foreach($applications as $application) {
                     if($application['Application']['submitted']) {
@@ -110,24 +148,7 @@
         <div class="thumbnail">
             <div class="caption">               
                 <h4>SAE / SUSAR</h4>
-                <?php
-                    // echo $this->Form->create('Sae', array('controller' => 'saes', 'action' => 'add'));
-                    // echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
-                    // echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
-                    // echo $this->Form->button('<i class="icon-list-alt"></i> Create SAE', array(
-                    //   'name' => 'createSAE',
-                    //   'class' => 'btn btn-success btn-small',
-                    //   'id' => 'SaeCreate', 
-                    //   'div' => false,
-                    // ));
-                    // echo "&nbsp;";
-                    // echo $this->Form->button('<i class="icon-credit-card"></i> Create SUSAR', array(
-                    //   'name' => 'createSUSAR',
-                    //   'class' => 'btn btn-primary btn-small',
-                    //   'id' => 'SusarCreate', 
-                    //   'div' => false,
-                    // ));
-                    // echo $this->Form->end();
+                <?php                   
                     echo '<ol>';
                     foreach ($saes as $sae) {
                       if($sae['Sae']['approved'] < 1) {

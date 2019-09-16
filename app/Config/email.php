@@ -56,7 +56,7 @@ class EmailConfig {
         'port' => 465,
 		'timeout' => 30,
         'username' => 'edwardokemwa@gmail.com',
-        'password' => 'SafComBi234',
+        'password' => 'SafComBa033',
         'transport' => 'Smtp'
     );
 	

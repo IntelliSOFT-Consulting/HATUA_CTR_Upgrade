@@ -48,6 +48,7 @@
           <th>ID</th>
           <th>Recommendation</th>
           <th>Status</th>
+          <th>Type</th>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
         </tr>
@@ -58,21 +59,31 @@
         ?>
           <tr>
             <td><?php echo $rreview['id'] ?></td>
-            <td><?php echo $rreview['recommendation'] ?></td>
+            <td>
+              <?php
+                if ($rreview['type'] == 'request') {
+                  echo 'Assigned: '.$rreview['accepted'].'<br/>';
+                }
+                echo $rreview['recommendation']; 
+
+              ?>              
+            </td>
             <td><?php echo $rreview['status'] ?></td>
+            <td><?php echo $rreview['type'] ?></td>
             <td><?php echo $rreview['created'] ?></td> 
             <td>
               <?php
-                
-                if($rreview['status'] == 'Unsubmitted'){
-                  echo $this->Html->link('<span class="label label-success"> Edit </span>',
-                     array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']), array('escape'=>false));
-                  echo "&nbsp;";
-                } else {
-                  echo $this->Html->link('<span class="label label-info"> View </span>',
-                     array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']), array('escape'=>false));
-                  echo "&nbsp;";
-                }
+                if ($rreview['type'] != 'request' && $rreview['type'] != 'ppb_comment') {
+                    if($rreview['status'] == 'Unsubmitted'){
+                      echo $this->Html->link('<span class="label label-success"> Edit </span>',
+                         array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']), array('escape'=>false));
+                      echo "&nbsp;";
+                    } else {
+                      echo $this->Html->link('<span class="label label-info"> View </span>',
+                         array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']), array('escape'=>false));
+                      echo "&nbsp;";
+                    }
+                }                 
                   
 
                   if (($redir == 'manager')) {                    
@@ -145,8 +156,8 @@
                   <?php  
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $rreview['id'], 'foreign_key' => $rreview['id'], 
-                                'model' => ['model_id' => '1', 'foreign_key' => '1', 
-                                            'model' => 'rreview', 'category' => 'external', 'url' => 'add_review_internal']]) 
+                                'model' => ['model_id' => '1', 'foreign_key' => $rreview['id'],
+                                            'model' => 'Review', 'category' => 'external', 'url' => 'add_review_internal']]) 
                   ?>
                 </div>
               </div>

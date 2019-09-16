@@ -29,22 +29,79 @@ class ApplicationsController extends AppController {
     public function stages($id = null) {
         $stages = [];
         $application = $this->Application->find('first', array(
-            'conditions' => array('Application.id' => $id)
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('Review')
         ));
-        //creation
-        $csd = new DateTime($application['Application']['created']);
-        $ced = ($application['Application']['date_submitted']) ? new DateTime($application['Application']['date_submitted']) : new DateTime();
-        $cdays = $ced->diff($csd)->format('%a');
-        $cstate = ($cdays > 2) ? 'red' : 'green';
-        $stages['Creation'] = ['label' => 'Creation by applicant', 'start_date' => $csd->format('d-M-Y'), 'end_date' => $ced->format('d-M-Y'), 'days' => $cdays, 'color' => '#42f2f5', 'state' => $cstate];
+        if ($application) {
+            if ($application['Application']['protocol_no']) {
+                $application_name = $application['Application']['protocol_no'];
+            } elseif ($application['Application']['short_title']) {
+                $application_name = $application['Application']['short_title'];
+            } else {
+                $application_name = $application['Application']['created'];
+            }
+        
+            //creation
+            $csd = new DateTime($application['Application']['created']);            
+            $ccolor = 'success';
+            $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Start', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
 
-        //Applicant submit
-        if ($application['Application']['submitted']) {
-            $ssd = new DateTime($application['Application']['date_submitted']);
-            $sed = ($application['Application']['date_submitted']) ? new DateTime($application['Application']['date_submitted']) : new DateTime();
-            $sdays = $sed->diff($ssd)->format('%a');
-            $sstate = ($cdays > 2) ? 'red' : 'green';
-            $stages['Submit'] = ['label' => 'Submitted', 'start_date' => $ssd->format('d-M-Y'), 'end_date' => $sed->format('d-M-Y'), 'days' => $sdays, 'color' => '#42f2f5', 'state' => $sstate];
+            //Applicant submit
+            $stages['Submit'] = ['label' => 'Submit', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            if ($application['Application']['submitted']) {
+                $ced = ($application['Application']['date_submitted']) ? new DateTime($application['Application']['date_submitted']) : new DateTime();
+                $cdays = $ced->diff($csd)->format('%a');
+                $stages['Creation']['end_date'] = $ced->format('d-M-Y');
+                $stages['Creation']['days'] = $cdays;
+
+                $stages['Submit']['start_date'] = $ced->format('d-M-Y');         
+                $stages['Submit']['color'] = 'success';         
+            }
+
+            //Review
+            // debug(Hash::extract($application, 'Review.{n}[id=2].id'));
+            $stages['Review'] = ['label' => 'Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            if (in_array('request', Hash::extract($application, 'Review.{n}.type'))) {
+                $rsd = new DateTime(min(Hash::extract($application, 'Review.{n}.created')));
+                $stages['Submit']['end_date'] = $rsd->format('d-M-Y');
+                $stages['Submit']['days'] = $rsd->diff($ced)->format('%a');
+
+                $stages['Review']['start_date'] = $rsd->format('d-M-Y');
+                $stages['Review']['color'] = 'success';
+            }
+
+            //Feedback
+            $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            if (in_array('ppb_comment', Hash::extract($application, 'Review.{n}.type'))) {
+                // debug(Hash::extract($application, 'Review.{n}[type=ppb_comment].id'));
+                $fsd = new DateTime(min(Hash::extract($application, 'Review.{n}[type=ppb_comment].created')));
+                $stages['Review']['end_date'] = $fsd->format('d-M-Y');
+                $stages['Review']['days'] = $fsd->diff($rsd)->format('%a');
+
+                $stages['Feedback']['start_date'] = $fsd->format('d-M-Y');
+                $stages['Feedback']['color'] = 'success';
+            } 
+
+            //Approval
+            $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            if ($application['Application']['approved']) {
+                $asd = new DateTime($application['Application']['approval_date']);
+                $stages['Feedback']['end_date'] = $asd->format('d-M-Y');
+                $stages['Feedback']['days'] = $asd->diff($fsd)->format('%a');
+
+                $stages['Approval']['start_date'] = $asd->format('d-M-Y');
+                $stages['Approval']['color'] = ($application['Application']['approved'] == '2') ? 'success' : 'warning';
+            } 
+
+            //Completion
+
+
+        } else {            
+            $stages['Creation'] = ['application_name' => '<< protocol no. >>', 'label' => 'Start', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Submit'] = ['label' => 'Submit', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Review'] = ['label' => 'Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
         }
 
         if ($this->request->is('requested')) {

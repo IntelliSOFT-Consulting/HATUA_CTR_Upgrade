@@ -227,7 +227,7 @@
                   if($application['Application']['approved'] == 1) echo 'text-error';
                   if($application['Application']['approved'] == 2) echo 'text-success';
                 } ?>">
-                <td><p class="tablenums"><?php $counder++; echo $counder;?>.</p></td>
+                <td rowspan="2"><p class="tablenums"><?php $counder++; echo $counder;?>.</p></td>
                 <td>
                   <?php
                         if($application['Application']['submitted']) echo $this->Html->link($application['Application']['protocol_no'],
@@ -311,6 +311,16 @@
                           }
                       }
                   ?>
+                </td>
+              </tr>
+              <tr style="background-color: azure;"> 
+                <td colspan="5">
+                  <?php
+                    $stages = $this->requestAction('applications/stages/'.$application['Application']['id']);
+                    foreach ($stages as $sk => $stage) {
+                      echo '<span class="label label-'.$stage['color'].'">'.$stage['label'].' <small style="color: #f9ef9c;">'.$stage['start_date'].'</small>'.'</span><i class="icon-long-arrow-right"></i>'.$stage['days'].'<i class="icon-long-arrow-right"></i>';
+                    }
+                  ?>                  
                 </td>
               </tr>
             <?php endforeach; ?>

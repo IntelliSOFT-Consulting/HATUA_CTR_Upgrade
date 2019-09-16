@@ -79,7 +79,7 @@ class UsersController extends AppController {
             'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no',
                 'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'),
             'order' => array('Application.created' => 'desc'),
-            'contain' => array(),
+            'contain' => array('Review'),
             'conditions' => array('Application.user_id' => $this->Auth->User('id')),
         ));
         $this->set('applications', $applications);
@@ -110,7 +110,7 @@ class UsersController extends AppController {
     public function manager_dashboard() {
         $applications = $this->User->Application->find('all', array(
             'limit' => 5,
-            'fields' => array('Application.id','Application.created', 'Application.study_drug', 'Application.submitted'),
+            'fields' => array('Application.id','Application.created', 'Application.study_drug', 'Application.submitted', 'Application.protocol_no'),
             'order' => array('Application.created' => 'desc'),
             'conditions' => array('submitted' => 1),
             'contain' => array(),
@@ -150,7 +150,7 @@ class UsersController extends AppController {
     public function reviewer_dashboard() {
         // $this->User->Application->recursive = -1;
         $my_applications = $this->User->Review->find('list', array(
-            'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request', 'Review.accepted' => 'accepted'),
+            'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request', 'ifnull(Review.accepted,-1)' => array('accepted', '-1')),
             'fields' => array('Review.application_id'),
             'contain' => array()));
         // pr($my_applications);
@@ -158,7 +158,7 @@ class UsersController extends AppController {
             'limit' => 5, 'fields' => array('id','study_drug', 'created'),
             'order' => array('Application.created' => 'desc'),
             'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
-            'contain' => array(),
+            'contain' => array('Review'),
         )));
 
         $this->set('notifications', $this->User->Notification->find('all', array(

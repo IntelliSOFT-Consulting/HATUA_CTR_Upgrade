@@ -13,12 +13,12 @@
 			<ol><?php
 				 foreach($applications as $application) {
 					if(!empty($application['Application']['study_drug'])) {
-						$ndata = $application['Application']['study_drug'];
+						$ndata = $application['Application']['study_drug'].' ('.$application['Application']['protocol_no'].')';
 					} else {
 						$ndata = date('d-m-Y h:i a', strtotime($application['Application']['created']));
 					}
 					echo $this->Html->link('<li>'.$ndata.'</li>', array('controller' => 'applications', 'action' => 'view', $application['Application']['id']),
-							array('escape' => false));
+							array('escape' => false, 'class' => 'text-success'));
 				 }
 				 ?>
 			</ol>

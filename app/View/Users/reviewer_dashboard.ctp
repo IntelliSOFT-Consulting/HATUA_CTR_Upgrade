@@ -18,8 +18,10 @@
                     } else {
                         $ndata = date('d-m-Y h:i a', strtotime($application['Application']['created']));
                     }
+                    // debug(Hash::extract($application, 'Review.{n}.accepted'));
+                    $color = (in_array('accepted', Hash::extract($application, 'Review.{n}.accepted'))) ? 'text-success' : 'text-warning';
                     echo $this->Html->link('<li>'.$ndata.'</li>', array('controller' => 'applications', 'action' => 'view', $application['Application']['id']),
-                            array('escape' => false));
+                            array('escape' => false, 'class' => $color));
                  }
                  ?>
             </ol>
