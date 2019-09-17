@@ -82,16 +82,16 @@ class SiteInspectionsController extends AppController {
     private function csv_export($siteInspections = ''){
         //todo: check if data exists in $siteInspections
         $_serialize = 'siteInspections';
-        $_header = array('Reference No.', 'Protocol No', 'PACTR No.', 
+        $_header = array('#', 'Reference No.', 'Protocol No', 'PACTR No.', 
             'Study Title', 'Short Title', 'Study Site', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 
             'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
-            'Trial Phase', 'Inspector', 'Inspection date',
+            'Trial Phase', 'Inspector', 'Inspection date', 'Inspection outcome', 'Inspection conclusion', 'Inspection summary',
             'Created');
-        $_extract = array('SiteInspection.reference_no' , 'Application.protocol_no', 'SiteInspection.pactr_no', 
+        $_extract = array('SiteInspection.id','SiteInspection.reference_no' , 'Application.protocol_no', 'SiteInspection.pactr_no', 
             'Application.study_title', 'Application.short_title', 'Application.single_site_member_state_f', 'Application.investigator1_given_name', 
             'Application.investigator1_qualification', 'Application.investigator1_telephone', 'Application.investigator1_email', 'InvestigatorContact.0.given_name', 
             'Application.InvestigatorContact.0.qualification', 'Application.InvestigatorContact.0.telephone', 'Application.InvestigatorContact.0.email', 'Application.Sponsor.0.sponsor', 'Application.Sponsor.0.cell_number', 'Application.Sponsor.0.email_address',
-            'trial_phase', 'SiteInspection.User.name', 'SiteInspection.inspection_dates',
+            'trial_phase', 'SiteInspection.User.name', 'SiteInspection.inspection_dates', 'SiteInspection.outcome', 'SiteInspection.conclusion', 'SiteInspection.summary_report',
             'SiteInspection.created');
 
         $this->response->download('Site_Inspection_'.date('Ymd_Hi').'.csv'); // <= setting the file name

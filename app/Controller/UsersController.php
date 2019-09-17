@@ -564,6 +564,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
         $this->Acl->allow($group, 'controllers/SiteInspections');
+        $this->Acl->allow($group, 'controllers/ParticipantFlows');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
         $this->Acl->allow($group, 'controllers/Reports');
@@ -587,6 +588,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
         $this->Acl->allow($group, 'controllers/SiteInspections');
+        $this->Acl->allow($group, 'controllers/ParticipantFlows');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
         $this->Acl->allow($group, 'controllers/Reports');

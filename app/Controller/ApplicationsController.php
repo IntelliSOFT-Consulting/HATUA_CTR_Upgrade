@@ -1266,7 +1266,7 @@ class ApplicationsController extends AppController {
     }
 
 
-    private function csv_export($applications = ''){
+    private function csv_export($applications = '') {
         //todo: check if data exists in $applications
         /*$_serialize = 'capplications';
         $_header = array('Protocol No', 'Study Title', 'Short Title', 'Date Submitted', 'Approval Date',

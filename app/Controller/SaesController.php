@@ -32,7 +32,7 @@ class SaesController extends AppController {
         // $this->set('saes', $this->paginate());
 
         $this->Prg->commonProcess();
-        $page_options = array('10' => '10', '15' => '15');
+        $page_options = array('25' => '25', '20' => '20');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
             else $this->paginate['limit'] = reset($page_options);
@@ -41,7 +41,7 @@ class SaesController extends AppController {
         $criteria['Sae.user_id'] = $this->Auth->User('id');
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Sae.created' => 'desc');
-        $this->paginate['contain'] = array('Application', 'Country');
+        $this->paginate['contain'] = array('Application', 'Country', 'SuspectedDrug', 'ConcomittantDrug');
 
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -60,7 +60,7 @@ class SaesController extends AppController {
         // $this->set('saes', $this->paginate());
 
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('25' => '25', '20' => '20');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
             else $this->paginate['limit'] = reset($page_options);
@@ -69,7 +69,7 @@ class SaesController extends AppController {
         if (!isset($this->passedArgs['approved'])) $criteria['Sae.approved'] = array(0, 1, 2);
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Sae.created' => 'desc');
-        $this->paginate['contain'] = array('Application', 'Country');
+        $this->paginate['contain'] = array('Application', 'Country', 'SuspectedDrug', 'ConcomittantDrug');
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
           $this->csv_export($this->Sae->find('all', 
@@ -89,7 +89,7 @@ class SaesController extends AppController {
     }
 
 
-    private function csv_export($saes = ''){
+    /*private function csv_export($saes = '') {
         //todo: check if data exists in $saes
         $_serialize = 'saes';
         $_header = array('Reference No.', 'Protocol No', 'Patient Initials', 'Date of birth', 'Created');
@@ -98,6 +98,12 @@ class SaesController extends AppController {
         $this->response->download('SAEs_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';
         $this->set(compact('saes', '_serialize', '_header', '_extract'));
+    }*/
+    private function csv_export($saes = '') {
+        $this->response->download('SAEs_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->set(compact('saes'));
+        $this->layout = false;
+        $this->render('csv_export');
     }
 /**
  * view method

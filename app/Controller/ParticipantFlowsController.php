@@ -1,22 +1,64 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('Sanitize', 'Utility');
 /**
  * ParticipantFlows Controller
  *
  * @property ParticipantFlow $ParticipantFlow
  */
 class ParticipantFlowsController extends AppController {
-
+    public $paginate = array();
+    public $components = array('Search.Prg');
+    public $presetVars = true; // using the model configuration
 /**
  * index method
  *
  * @return void
  */
+    // public function index() {
+    //     $this->ParticipantFlow->recursive = 0;
+    //     $this->set('participantFlows', $this->paginate());
+    // }
     public function index() {
-        $this->ParticipantFlow->recursive = 0;
-        $this->set('participantFlows', $this->paginate());
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->ParticipantFlow->parseCriteria($this->passedArgs);
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('ParticipantFlow.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->ParticipantFlow->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('participantFlows', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
+    public function manager_index() {
+        $this->index();
+    }
+    public function inspector_index() {
+        $this->index();
     }
 
+    private function csv_export($participantFlows = ''){
+        $_serialize = 'participantFlows';
+        $_header = array('#','Protocol No', 'Year', 'Original Subjects', 'Consented', 'Screened', 'Enrolled', 'Lost', 'Reasons for lost', 'Withdrawn', 'Withdrawn reasons', 'Self withdrawal', 'Self Withdrawal reasons', 'Active subjects', 'Completed number',
+            'Created');
+        $_extract = array('ParticipantFlow.id', 'Application.protocol_no', 'ParticipantFlow.year', 'ParticipantFlow.original_subjects', 'ParticipantFlow.consented', 'ParticipantFlow.screened', 'ParticipantFlow.enrolled', 'ParticipantFlow.lost', 'ParticipantFlow.lost_reason', 'ParticipantFlow.withdrawn', 'ParticipantFlow.withdrawal_reason', 'ParticipantFlow.self_withdrawal', 'ParticipantFlow.self_withdrawal_reasons', 'ParticipantFlow.active_subjects', 'ParticipantFlow.completed_number', 
+            'ParticipantFlow.created');
+
+        $this->response->download('Participant_Flow_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('participantFlows', '_serialize', '_header', '_extract'));
+    }
 /**
  * view method
  *

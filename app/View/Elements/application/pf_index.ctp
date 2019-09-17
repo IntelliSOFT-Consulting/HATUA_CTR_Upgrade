@@ -1,5 +1,5 @@
 <?php
-    $this->assign('SI', 'active');
+    $this->assign('PF', 'active');
 ?>
 
 <div class="row-fluid">
@@ -8,14 +8,14 @@
     <div class="marketing">
       <div class="row-fluid">
             <div class="span12">
-              <h3><i class="icon-skype"></i> Site Inspections: <small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
+              <h3><i class="icon-skype"></i> Participant Flows: <small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
               <hr class="soften" style="margin: 7px 0px;">
             </div>
         </div>
     </div>
 
     <?php
-        echo $this->Form->create('SiteInspection', array(
+        echo $this->Form->create('ParticipantFlow', array(
           'url' => array_merge(array('action' => 'index'), $this->params['pass']),
           'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
         ));
@@ -23,12 +23,7 @@
       <table class="table table-condensed table-bordered" style="margin-bottom: 2px;">
         <thead>
           <tr>
-            <th style="width: 15%;">
-              <?php
-                echo $this->Form->input('reference_no',
-                    array('div' => false, 'class' => 'span12 unauthorized_index', 'label' => array('class' => 'required', 'text' => 'Reference No.')));
-              ?>
-              </th>
+            
               <th>
               <?php
                 echo $this->Form->input('protocol_no', array('div' => false, 'class' => 'span12 unauthorized_index',
@@ -52,7 +47,7 @@
               <th>
                 <?php
                   echo $this->Form->input('pages', array(
-                    'type' => 'select', 'div' => false, 'class' => 'span12', 'selected' => $this->request->params['paging']['SiteInspection']['limit'],
+                    'type' => 'select', 'div' => false, 'class' => 'span12', 'selected' => $this->request->params['paging']['ParticipantFlow']['limit'],
                     'empty' => true,
                     'options' => $page_options,
                     'label' => array('class' => 'required', 'text' => 'Pages'),
@@ -99,38 +94,32 @@
      <thead>
             <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
-        <th><?php echo $this->Paginator->sort('reference_no'); ?></th>
         <th><?php echo $this->Paginator->sort('application_id'); ?></th>
-        <th><?php echo $this->Paginator->sort('pactr_number'); ?></th>
-        <th><?php echo $this->Paginator->sort('country'); ?></th>
-        <th><?php echo $this->Paginator->sort('outcome'); ?></th>
+        <th><?php echo $this->Paginator->sort('year'); ?></th>
+        <th><?php echo $this->Paginator->sort('original_subjects'); ?></th>
+        <th><?php echo $this->Paginator->sort('consented'); ?></th>
         <th><?php echo $this->Paginator->sort('created'); ?></th>
         <th class="actions"><?php echo __('Actions'); ?></th>
           </tr>
        </thead>
       <tbody>
     <?php
-    foreach ($siteInspections as $siteInspection): ?>
+    foreach ($participantFlows as $participantFlow): ?>
     <tr class="">
-        <td><?php echo h($siteInspection['SiteInspection']['id']); ?>&nbsp;</td>
-        <td><?php echo h($siteInspection['SiteInspection']['reference_no']); ?>&nbsp;</td>
+        <td><?php echo h($participantFlow['ParticipantFlow']['id']); ?>&nbsp;</td>
         <td><?php 
-          // echo h($siteInspection['Application']['protocol_no']); 
-        echo $this->Html->link($siteInspection['Application']['protocol_no'], array('controller' => 'applications' , 'action' => 'view', $siteInspection['Application']['id'], 
-              'inspection_id' => $siteInspection['SiteInspection']['id']), array('escape' => false));
+          // echo h($participantFlow['Application']['protocol_no']); 
+        echo $this->Html->link($participantFlow['Application']['protocol_no'], array('controller' => 'applications' , 'action' => 'view', $participantFlow['Application']['id'], 
+              'inspection_id' => $participantFlow['ParticipantFlow']['id']), array('escape' => false));
         ?>&nbsp;</td>
-        <td><?php echo h($siteInspection['SiteInspection']['pactr_number']); ?>&nbsp;</td>
-        <td><?php echo h($siteInspection['SiteInspection']['inspection_country']); ?>&nbsp;</td>
-        <td><?php echo h($siteInspection['SiteInspection']['outcome']); ?>&nbsp;</td>
-        <td><?php echo h($siteInspection['SiteInspection']['created']); ?>&nbsp;</td>
+        <td><?php echo h($participantFlow['ParticipantFlow']['year']); ?>&nbsp;</td>
+        <td><?php echo h($participantFlow['ParticipantFlow']['original_subjects']); ?>&nbsp;</td>
+        <td><?php echo h($participantFlow['ParticipantFlow']['consented']); ?>&nbsp;</td>
+        <td><?php echo h($participantFlow['ParticipantFlow']['created']); ?>&nbsp;</td>
         <td class="actions">
             <?php echo $this->Html->link('<label class="label label-info">View</label>',
-                             array('controller' => 'applications' ,'action' => 'view', $siteInspection['Application']['id'], 'inspection_id' => $siteInspection['SiteInspection']['id']), array('escape'=>false)); ?>
-            <?php
-              if(($siteInspection['SiteInspection']['user_id'] == $this->Session->read('Auth.User.id') || $redir === 'manager') && $siteInspection['SiteInspection']['approved'] < 1) {
-                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $siteInspection['SiteInspection']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $siteInspection['SiteInspection']['reference_no']));
-              } 
-            ?>            
+                             array('controller' => 'applications' ,'action' => 'view', $participantFlow['Application']['id'], 'inspection_id' => $participantFlow['ParticipantFlow']['id']), array('escape'=>false)); ?>
+                    
         </td>
     </tr>
 <?php endforeach; ?>
@@ -142,7 +131,7 @@
 <script type="text/javascript">
 $(function() {
   $(".morecontent").expander();
-  var adates = $('#SiteInspectionStartDate, #SiteInspectionEndDate').datepicker({
+  var adates = $('#ParticipantFlowStartDate, #ParticipantFlowEndDate').datepicker({
           minDate:"-100Y",
           maxDate:"-0D",
           dateFormat:'dd-mm-yy',
@@ -153,7 +142,7 @@ $(function() {
           changeYear:true,
           showAnim:'show',
           onSelect: function( selectedDate ) {
-            var option = this.id == "SiteInspectionStartDate" ? "minDate" : "maxDate",
+            var option = this.id == "ParticipantFlowStartDate" ? "minDate" : "maxDate",
               instance = $( this ).data( "datepicker" ),
               date = $.datepicker.parseDate(
                 instance.settings.dateFormat ||
