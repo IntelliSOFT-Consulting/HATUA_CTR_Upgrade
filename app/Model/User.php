@@ -124,6 +124,12 @@ class User extends AppModel {
         'message' => 'Please enter a valid phone number!',
       ),
     ),
+    'sponsor_email' => array(
+      'notEmpty' => array(
+        'rule' => array('email'),
+        'message' => 'Please enter the sponsor\'s email address!',
+      ),
+    ),
     'confirm_password' => array(
             'minLength' => array(
                 'rule' => array('minLength', '6'),

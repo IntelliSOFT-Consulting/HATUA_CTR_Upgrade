@@ -45,7 +45,7 @@
         echo $this->Form->input('sponsor_email', array(
           'type' => 'email',
           'div' => array('class' => 'control-group required'),
-          'label' => array('class' => 'control-label required', 'text' => 'Sponsor\'s E-MAIL')
+          'label' => array('class' => 'control-label required', 'text' => 'Sponsor\'s E-MAIL <span class="sterix">*</span>')
         ));
         echo $this->Form->input('qualification',
           array('label' => array('class' => 'control-label required', 'text' => 'Qualification <span class="muted">(specialization/expertise)</span> <span class="sterix">*</span>'),));
