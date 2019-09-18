@@ -104,9 +104,11 @@ class ApplicationsController extends AppController {
             $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
         }
 
+        $this->set('stages', $stages);
+        $this->set('_serialize', 'stages');
         if ($this->request->is('requested')) {
             return $stages;
-        }
+        }        
     }    
     /*public function admin_stages($id = null) {
         $this->stages($id);

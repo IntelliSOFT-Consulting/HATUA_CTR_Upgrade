@@ -36,4 +36,29 @@ $(function() {
                 }
             });
     });
+
+    $('.lnk').on("click",function(){
+        // var usersid =  $(this).attr("id");
+        $("#main-text").text($(this).text());
+        $(".process-row button").removeClass("btn-default btn-success btn-warning");
+        $.ajax({
+            type:'GET',
+            url:'/applications/stages/'+$(this).attr("id")+'.json',
+            success : function(data) {
+               // console.log(data);
+                for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        // console.log(key + " -> " + data[key]);
+                        // console.log($('#'+key+' > small:first').text());
+                        // console.log(data[key].start_date);
+                        $('#'+key+' > small:first').text(data[key].start_date);
+                        $('#'+key).addClass('btn-'+data[key].color);
+                    }
+                }
+            },
+            error : function(data) {
+              alert("Could not complete action. Please refresh the page.");
+            }
+        });
+    })
 });

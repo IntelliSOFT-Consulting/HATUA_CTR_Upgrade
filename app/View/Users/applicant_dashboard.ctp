@@ -6,9 +6,12 @@
 ?>
 <section>
   <?php
-      $apps = array_filter(Hash::combine($applications, '{n}.Application.id', '{n}.Application.protocol_no'), 'strlen');
+      // $apps = array_filter(Hash::combine($applications, '{n}.Application.id', '{n}.Application.protocol_no'), 'strlen');
       // debug(key($apps));
-
+      $apps = array();
+      foreach ($applications as $key => $value) {
+        $apps[$value['Application']['id']] = ($value['Application']['protocol_no']) ? $value['Application']['protocol_no'] : $value['Application']['created'];
+      }
       $stages = $this->requestAction(
           'applications/stages/'.key($apps)   //get first element of array
       );
@@ -21,13 +24,13 @@
           <!-- <p style="margin-top: 40px;"></p> -->
           <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-              <?php echo $stages['Creation']['application_name']; ?>
+              <span id="main-text"><?php echo $stages['Creation']['application_name']; ?></span>
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
               <?php
                 foreach ($apps as $ak => $app) {
-                  echo '<li><a id="$ak" href="#">'.$app.'</a></li>';
+                  echo '<li><a class="lnk" id="'.$ak.'" href="#">'.$app.'</a></li>';
                 }
               ?>
             </ul>
@@ -35,8 +38,8 @@
           <?php
             foreach ($stages as $stage_name => $stage) {
           ?>
-            <div id="<?php echo $stage_name; ?>" class="process-step">
-                <button type="button" class="btn btn-<?php echo $stage['color'];?> btn-circle" disabled="disabled">
+            <div class="process-step">
+                <button id="<?php echo $stage_name; ?>" type="button" class="btn btn-<?php echo $stage['color'];?> btn-circle" disabled="disabled">
                   <h5 style="text-decoration: underline;"><?php echo $stage['label']; ?></h5> 
                   <small><?php echo (isset($stage['start_date'])) ? $stage['start_date']: ''; ?></small>                  
                 </button>
