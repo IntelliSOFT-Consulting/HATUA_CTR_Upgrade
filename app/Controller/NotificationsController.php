@@ -187,4 +187,49 @@ class NotificationsController extends AppController {
 			}
 		}
 	}
+	public function manager_delete($id = null) {
+		if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Notification->id = $id;
+        if (!$this->Notification->exists()) {
+            throw new NotFoundException(__('Invalid notification'));
+        }
+        if ($this->Notification->delete()) {
+            $this->Session->setFlash(__('Notification deleted'));
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Notification was not deleted'), 'alerts/flash_error');
+		$this->redirect($this->referer());
+	}
+	public function admin_delete($id = null) {
+		if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Notification->id = $id;
+        if (!$this->Notification->exists()) {
+            throw new NotFoundException(__('Invalid notification'));
+        }
+        if ($this->Notification->delete()) {
+            $this->Session->setFlash(__('Notification deleted'));
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Notification was not deleted'), 'alerts/flash_error');
+		$this->redirect($this->referer());
+	}
+	public function inspector_delete($id = null) {
+		if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Notification->id = $id;
+        if (!$this->Notification->exists()) {
+            throw new NotFoundException(__('Invalid notification'));
+        }
+        if ($this->Notification->delete()) {
+            $this->Session->setFlash(__('Notification deleted'));
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Notification was not deleted'), 'alerts/flash_error');
+		$this->redirect($this->referer());
+	}
 }
