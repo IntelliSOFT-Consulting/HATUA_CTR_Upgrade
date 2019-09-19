@@ -21,7 +21,7 @@ class ParticipantFlow extends AppModel {
             else $end_date = date('Y-m-d');
 
             return array($start_date, $end_date);
-        }
+    }
 /**
  * Validation rules
  *

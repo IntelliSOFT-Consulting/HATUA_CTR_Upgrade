@@ -54,9 +54,9 @@
         <div class="span6">          
           <?php
             echo $this->Form->input('SuspectedDrug.0.date_from',
-                        array('type' => 'text', 'class' => 'datepickers', 'label' => array('class' => 'control-label required', 'text' => 'Therapy Date <small class="muted">(from)</small>  <span class="sterix">*</span>'),));
+                        array('type' => 'text', 'class' => 'datepickers', 'label' => array('class' => 'control-label required', 'text' => 'Therapy date <small class="muted">(from)</small>  <span class="sterix">*</span>'),));
             echo $this->Form->input('SuspectedDrug.0.date_to',
-                        array('type' => 'text', 'class' => 'datepickers', 'label' => array('class' => 'control-label required', 'text' => 'Therapy Date <small class="muted">(to)</small> '),));
+                        array('type' => 'text', 'class' => 'datepickers', 'label' => array('class' => 'control-label required', 'text' => 'Therapy date <small class="muted">(to)</small> '),));
             echo $this->Form->input('SuspectedDrug.0.therapy_duration',
                         array('label' => array('class' => 'control-label required', 'text' => 'Therapy duration'),));
             echo '<div class="control-group">';

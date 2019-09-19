@@ -255,7 +255,11 @@ class SaesController extends AppController {
                 $this->redirect(array('action' => 'view', $this->Sae->id));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
-            if ($this->Sae->saveAssociated($this->request->data, array('deep' => true))) {
+            $validate = false;
+            if (isset($this->request->data['submitReport'])) {
+                $validate = 'first';                
+            }
+            if ($this->Sae->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Sae->saveField('approved', 1);
                     $sae = $this->Sae->read(null, $id);

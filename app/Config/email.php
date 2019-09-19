@@ -53,6 +53,7 @@ class EmailConfig {
          'host' => 'ssl://smtp.gmail.com',
           // 'host' => 'smtp.gmail.com',
 		'from' => array('edwardokemwa@gmail.com' => 'The Pharmacy and Poisons Board'),
+		'cc' => array('cta@pharmacyboardkenya.org', 'edwardabwao@pharmacyboardkenya.org', 'lydiatuitai@pharmacyboardkenya.org'),
         'port' => 465,
 		'timeout' => 30,
         'username' => 'edwardokemwa@gmail.com',
@@ -63,6 +64,7 @@ class EmailConfig {
 	public $smtp = array(
 		'transport' => 'Smtp',
 		'from' => array('site@localhost' => 'My Site'),
+		'cc' => array('cta@pharmacyboardkenya.org', 'edwardabwao@pharmacyboardkenya.org', 'lydiatuitai@pharmacyboardkenya.org'),
 		'host' => 'smtp.gmail.com',
 		'port' => 587,
 		'timeout' => 30,

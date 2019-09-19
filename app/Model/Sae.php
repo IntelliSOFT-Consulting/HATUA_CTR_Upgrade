@@ -114,6 +114,45 @@ class Sae extends AppModel {
                 'message'  => 'Please select an approved protocol!'
             ),
         ),
+        'country_id' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please select a country!'
+            ),
+        ),
+        'date_of_birth' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please select a valid date of birth!'
+            ),
+        ),
+        'reaction_onset' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please select a valid reaction onset date!'
+            ),
+            'dateAfterStartDates' => array(
+                'rule' => 'dateAfterStartDates',
+                'message' => 'The reaction onset date must be after the date of drug administration'
+            )
+        ),
+        'gender' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please select the gender!'
+            ),
+        ),
+        'reaction_description' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please describe the reaction(s)!'
+            ),
+        ),
       );
 
     public function beforeSave() {
@@ -125,6 +164,15 @@ class Sae extends AppModel {
         }
         if (!empty($this->data['Sae']['manufacturer_date'])) {
             $this->data['Sae']['manufacturer_date'] = $this->dateFormatBeforeSave($this->data['Sae']['manufacturer_date']);
+        }
+        return true;
+    }
+
+    public function dateAfterStartDates($field = null) {
+        if (!empty($this->data['SuspectedDrug'])) {
+            foreach ($this->data['SuspectedDrug'] as $val) {
+                if(strtotime($field['reaction_onset']) < strtotime($val['date_from']))    return false;
+            }
         }
         return true;
     }

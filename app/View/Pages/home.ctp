@@ -46,11 +46,11 @@
               <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
             </div>
           </div>
-          <p>
+          <!-- <p>
 			Clinical Trials are important in helping discover new medicines to diagnose, treat, manage or prevent the many
 			diseases affecting the human beings. The studies are also used to determine whether to change the initial indications,
 			dosage or even the age group of the initially approved medications.
-		  </p>
+		  </p> -->
 		 <!-- <p>
 			To support the registration of these medicines, the studies need to be carried out according to the approved protocols.
 			These studies should also be monitored/inspected to ensure the integrity of the data generated. In addition, these studies
@@ -75,21 +75,21 @@
         </div>
 
         <div class="span6">
-		  <h4>CHECKLIST FOR SUBMITTING DOCUMENTS TO THE EXPERT COMMITTEE ON CLINICAL TRIALS (ECCT)</h4>
+		  <h4>EXPERT COMMITTEE ON CLINICAL TRIALS (ECCT)</h4>
 		  <p>
-		    As part of the Pharmacy and Poisons Board's (PPB) continued efforts to serve our clients better, the Board has appointed an Expert Committee on
-			Clinical Trials (ECCT) to evaluate all matters pertaining to clinical trials taking place in Kenya.
-			All institutions / organizations / offices / persons wishing to carry out a clinical trial in Kenya are requested to refer to
-			the Checklist for Submitting Documents to the ECCT. 
+		    The number of clinical trials taking place in Kenya has been increasing in the recent past. As the National Medicines Regulatory Authority for Kenya, Pharmacy and Poisons Board (PPB) has the responsibility of regulating all clinical trials taking place in the country. In order to facilitate both the sponsors and investigators, PPB has upgraded the clinical trials online system based on feedback from the stakeholders. The new system also allows for the public to see all the PPB approved trials including theirs details like investigators, study status, sites and study objectives.  
 		  </p>
-          <h3>ECCT</h3>
 		  <p>
-			Applicants are advised to register and submit their applications online.
-			You will get the following benefits if you register
-			<ol>
-			  <li>Automation of the application procedure</li>
-			  <li>Prompt feedback on the issues</li>
-			<ol>
+			Investigators are expected to keep the details of their studies updated all the time. The site also has a link to the most updated reference documents for the conduct of clinical trials in Kenya like the Guideline and checklists.
+		  </p>
+		  <p>
+			Any person intending to carry out a clinical trial in the country is expected to use this site to submit his application to PPB.
+		  </p>
+		  <p>
+			Thank you and hope you enjoy using this improved system. 
+		  </p>
+		  <p>
+			Please feel free to share your feedback  
 		  </p>
 
         </div>
