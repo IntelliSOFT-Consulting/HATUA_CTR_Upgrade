@@ -567,6 +567,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/ParticipantFlows');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
+        $this->Acl->allow($group, 'controllers/Cioms');
         $this->Acl->allow($group, 'controllers/Reports');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_approve');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_view');
@@ -591,6 +592,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/ParticipantFlows');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
+        $this->Acl->allow($group, 'controllers/Cioms/inspector_view');
+        $this->Acl->allow($group, 'controllers/Cioms/inspector_index');
         $this->Acl->allow($group, 'controllers/Reports');
 
         //Allow Reviewers
@@ -665,6 +668,9 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Saes/applicant_view');
         $this->Acl->allow($group, 'controllers/Saes/applicant_delete');
         $this->Acl->allow($group, 'controllers/Saes/applicant_followup');
+        $this->Acl->allow($group, 'controllers/Cioms/applicant_add');
+        $this->Acl->allow($group, 'controllers/Cioms/applicant_view');
+        $this->Acl->allow($group, 'controllers/Cioms/applicant_index');
         $this->Acl->allow($group, 'controllers/ParticipantFlows/applicant_add');
         $this->Acl->allow($group, 'controllers/Budgets/applicant_add');
         $this->Acl->allow($group, 'controllers/EthicalCommittees/applicant_add');

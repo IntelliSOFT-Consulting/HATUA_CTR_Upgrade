@@ -38,6 +38,12 @@
                         array('controller' => 'site_inspections', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
                     ?>
              </li>
+             <li class="<?php echo $this->fetch('CIOM') ?>">
+                <?php
+                    echo $this->Html->link('<i class="icon-upload-alt"></i> CIOMS E2B',
+                        array('controller' => 'cioms', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
+                    ?>
+             </li>
              <li class="<?php echo $this->fetch('ContactUs') ?>">
                 <?php
                     echo $this->Html->link('<i class="icon-comment-alt"></i> My Messages',

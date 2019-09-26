@@ -23,7 +23,7 @@
         <div class="process-row">
           <!-- <p style="margin-top: 40px;"></p> -->
           <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
               <span id="main-text"><?php echo $stages['Creation']['application_name']; ?></span>
               <span class="caret"></span>
             </a>
@@ -136,6 +136,9 @@
                       echo "&nbsp;";
                       echo $this->Html->link('<i class="icon-credit-card"></i> Create SUSAR', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
                             array('escape' => false, 'class' => 'btn btn-primary btn-mini'));   
+                      echo "&nbsp;";
+                      echo $this->Html->link('<i class="icon-upload-alt"></i> Upload E2B CIOMS', array('controller' => 'cioms', 'action' => 'add', $application['Application']['id']), 
+                            array('escape' => false, 'class' => 'btn btn-inverse btn-mini'));   
                     }
                     
                  }

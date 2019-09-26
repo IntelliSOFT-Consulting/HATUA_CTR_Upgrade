@@ -209,11 +209,11 @@
             </tr>
             <tr>
               <td class="table-label"><p>Phone</p></td>
-              <td><?php    echo "<p>". $manufacturer['phone']."</p>";  ?></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturer_phone']."</p>";  ?></td>
             </tr>
             <tr>
               <td class="table-label"><p>Email</p></td>
-              <td><?php    echo "<p>". $manufacturer['email']."</p>";  ?></td>
+              <td><?php    echo "<p>". $manufacturer['manufacturer_email']."</p>";  ?></td>
             </tr>
             <tr>
               <td class="table-label"><p>Manufacturing activities at site</p></td>
