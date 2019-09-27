@@ -99,7 +99,7 @@
      <thead>
             <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
-        <th><?php echo $this->Paginator->sort('basename'); ?></th>
+        <th><?php echo $this->Paginator->sort('basename', 'Filename'); ?></th>
         <th><?php echo $this->Paginator->sort('created'); ?></th>
         <th class="actions"><?php echo __('Actions'); ?></th>
           </tr>
@@ -109,7 +109,17 @@
     foreach ($cioms as $ciom): ?>
     <tr class="">
         <td><?php echo h($ciom['Ciom']['id']); ?>&nbsp;</td>
-        <td><?php echo h($ciom['Ciom']['basename']); ?>&nbsp;</td>
+        <td>
+          <?php 
+            // echo h($ciom['Ciom']['basename']); 
+            echo $this->Html->link(
+                $ciom['Ciom']['basename'],
+                str_replace('/var/www/ctr/app/webroot', '', $ciom['Ciom']['file']),
+                array('class' => 'button', 'target' => '_blank')
+            );
+          ?>
+          &nbsp;
+        </td>
         <td><?php echo h($ciom['Ciom']['created']); ?>&nbsp;</td>
         <td class="actions">
             <?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $ciom['Ciom']['id']), array('escape' => false)); ?>

@@ -83,13 +83,23 @@ class CiomsController extends AppController {
 			throw new NotFoundException(__('Invalid ciom'));
 		}
 		$ciom = $this->Ciom->read(null, $id);
-		$e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
+
+        if ($ciom['Ciom']['user_id'] !== $this->Auth->User('id')) {
+                $this->Session->setFlash(__('You don\'t have permission to access!!'), 'alerts/flash_error');
+                $this->redirect('/');
+        }
+        
+        $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
 		$this->set(compact('ciom', 'e2b'));
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'CIOM_' . $id,  'orientation' => 'portrait');
+        }
 	}
 	public function aview($id = null) {
         $this->Ciom->id = $id;
 		if (!$this->Ciom->exists()) {
-			throw new NotFoundException(__('Invalid ciom'));
+			throw new NotFoundException(__('Invalid ciom'), 'alerts/flash_error');
 		}
 		$ciom = $this->Ciom->read(null, $id);
 		$e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
@@ -116,10 +126,10 @@ class CiomsController extends AppController {
             $this->request->data['Ciom']['e2b_content'] = $file->read();
 
 			if ($this->Ciom->save($this->request->data)) {
-				$this->Session->setFlash(__('The ciom has been saved'));
+				$this->Session->setFlash(__('The ciom has been saved'), 'alerts/flash_success');
 				$this->redirect(array('action' => 'view', $this->Ciom->id));
 			} else {
-				$this->Session->setFlash(__('The ciom could not be saved. Please, try again.'));
+				$this->Session->setFlash(__('The ciom could not be saved. Please, try again.'), 'alerts/flash_error');
 			}
 		}
 		// $applications = $this->Ciom->Application->find('list');
