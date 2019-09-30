@@ -93,23 +93,35 @@ $qualification = ['1' => 'Physician', '2' => 'Pharmacist', '3' => 'Other Health 
         <tr style="background: #DAEDF3;"><td colspan="2"> I. REACTION INFORMATION </td> </tr>
         <tr>
           <td width="30%" class="table-label required"><p>1. Patient Initials <small class="muted">(first, last)</small> </p></td>
-          <td><?php  echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientinitial'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientinitial'] : null; ?></td>
+          <td><?php  
+          // debug(Hash::extract($e2b, 'ichicsr.safetyreport.patient.patientinitial'));
+          // debug(Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.patientinitial'));
+          echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.patient.patientinitial'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.patientinitial')));
+          //echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientinitial'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientinitial'] : null; ?></td>
         </tr>
         <tr>
           <td class="table-label required"><p>1.a Country</p></td>
-          <td><?php  echo (!empty($e2b['ichicsr']['safetyreport']['occurcountry'])) ? $e2b['ichicsr']['safetyreport']['occurcountry'] : null; ?></td>
+          <td><?php  
+            echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.occurcountry'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.occurcountry')));
+            //echo (!empty($e2b['ichicsr']['safetyreport']['occurcountry'])) ? $e2b['ichicsr']['safetyreport']['occurcountry'] : null; ?></td>
         </tr>
         <tr>
           <td class="table-label required"><p>2. Date of birth</p></td>
-          <td><?php  echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientbirthdate'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientbirthdate'] : null; ?></td>
+          <td><?php  
+            echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.patient.patientbirthdate'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.patientbirthdate')));
+          //echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientbirthdate'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientbirthdate'] : null; ?></td>
         </tr>
         <tr>
           <td class="table-label required"><p>2.a Age <small class="muted">(years)</small> </p></td>
-          <td><?php  echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientonsetage'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientonsetage'] : null; ?></td>
+          <td><?php  
+            echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.patient.patientonsetage'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.patientonsetage')));
+          //echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientonsetage'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientonsetage'] : null; ?></td>
         </tr>
         <tr>
           <td class="table-label required"><p>2. Sex </p></td>
-          <td><?php  echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientsex'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientsex'] : null; ?></td>
+          <td><?php  
+            echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.patient.patientsex'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.patientsex')));
+          //echo (!empty($e2b['ichicsr']['safetyreport']['patient']['patientsex'])) ? $e2b['ichicsr']['safetyreport']['patient']['patientsex'] : null; ?></td>
         </tr>
         <tr>
           <td class="table-label required"><p>4-6. Reaction onset </p></td>
@@ -119,13 +131,22 @@ $qualification = ['1' => 'Physician', '2' => 'Pharmacist', '3' => 'Other Health 
           <td class="table-label required"><p>7. Describe reaction(s) </p></td>
           <td>
             <?php
-              echo (!empty($e2b['ichicsr']['safetyreport']['patient']['reaction']['primarysourcereaction'])) ? $e2b['ichicsr']['safetyreport']['patient']['reaction']['primarysourcereaction'] : null; 
+              echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.patient.reaction.primarysourcereaction'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.reaction.{n}.primarysourcereaction')));
+              // echo (!empty($e2b['ichicsr']['safetyreport']['patient']['reaction']['primarysourcereaction'])) ? $e2b['ichicsr']['safetyreport']['patient']['reaction']['primarysourcereaction'] : null; 
               echo "<br/>";
-              echo (!empty($e2b['ichicsr']['safetyreport']['patient']['reaction']['reactionoutcome'])) ? $outcomes[$e2b['ichicsr']['safetyreport']['patient']['reaction']['reactionoutcome']] : null; 
+              echo implode(" | ", array_merge(Hash::extract($e2b, 'ichicsr.safetyreport.patient.reaction.reactionoutcome'), Hash::extract($e2b, 'ichicsr.safetyreport.{n}.patient.reaction.{n}.reactionoutcome')));
+              // echo (!empty($e2b['ichicsr']['safetyreport']['patient']['reaction']['reactionoutcome'])) ? $outcomes[$e2b['ichicsr']['safetyreport']['patient']['reaction']['reactionoutcome']] : null; 
               echo "<br/>";
               echo (!empty($e2b['ichicsr']['safetyreport']['patient']['drug']['actiondrug'])) ? $actiondrug[$e2b['ichicsr']['safetyreport']['patient']['drug']['actiondrug']] : null; 
               echo "<br/>";
               echo (!empty($e2b['ichicsr']['safetyreport']['patient']['summary']['narrativeincludeclinical'])) ? $e2b['ichicsr']['safetyreport']['patient']['summary']['narrativeincludeclinical'] : null; 
+              // echo (!empty($e2b['ichicsr']['safetyreport']['patient']['reaction']['primarysourcereaction'])) ? $e2b['ichicsr']['safetyreport']['patient']['reaction']['primarysourcereaction'] : null; 
+              // echo "<br/>";
+              // echo (!empty($e2b['ichicsr']['safetyreport']['patient']['reaction']['reactionoutcome'])) ? $outcomes[$e2b['ichicsr']['safetyreport']['patient']['reaction']['reactionoutcome']] : null; 
+              // echo "<br/>";
+              // echo (!empty($e2b['ichicsr']['safetyreport']['patient']['drug']['actiondrug'])) ? $actiondrug[$e2b['ichicsr']['safetyreport']['patient']['drug']['actiondrug']] : null; 
+              // echo "<br/>";
+              // echo (!empty($e2b['ichicsr']['safetyreport']['patient']['summary']['narrativeincludeclinical'])) ? $e2b['ichicsr']['safetyreport']['patient']['summary']['narrativeincludeclinical'] : null; 
             ?>
           </td>
         </tr>

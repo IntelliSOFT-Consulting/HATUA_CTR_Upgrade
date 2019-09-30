@@ -177,6 +177,45 @@
                     // </span>', 'placeholder' => ' ' , 'class' => 'span4',
             // ));
             echo $this->element('multi/manufacturers');
+
+            $comparator = '';
+            if ($this->Form->isFieldError('comparator')) $comparator = 'error';
+            echo $this->Form->input('comparator', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+              'class' => 'comparator',
+              'before' => '<div class="control-group '.$comparator.' ">   <label class="control-label required">
+
+                Is there a comparator drug/medical device? <span class="sterix">*</span></label>  <div class="controls">
+                <input type="hidden" value="" id="ApplicationComparator_" name="data[Application][comparator]"> <label class="radio inline">',
+              'after' => '</label>',
+              'options' => array('Yes' => 'Yes'),
+            ));
+            echo $this->Form->input('comparator', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'comparator',
+              'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+              'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+              'before' => '<label class="radio inline">',
+              'after' => '</label>
+                    <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                    onclick="$(\'.comparator\').removeAttr(\'checked disabled\')">
+                    <em class="accordion-toggle">clear!</em></a> </span>
+
+                    </div> </div>',
+              'options' => array('No' => 'No'),
+            ));
+            echo $this->Form->input('comparator_name', array(
+              'label' => array('class' => 'control-label', 'text' => 'If yes, give the name'),
+              'placeholder' => ' ' , 'class' => 'input-xxlarge'
+            ));
+            echo $this->Form->input('comparator_registered', array(
+              'label' => array('class' => 'control-label', 'text' => 'If yes, is the comparator currently registered?'),
+              'placeholder' => ' ' , 'class' => 'input-xxlarge'
+            ));
+            echo $this->Form->input('comparator_countries', array(
+              'label' => array('class' => 'control-label', 'text' => 'List of the countries where the comparator is registered'),
+              'placeholder' => ' ' , 'class' => 'input-xxlarge', 'rows' => '2'
+            ));
+
             echo $this->element('multi/ethical_committees');
             // echo $this->Form->input('protocol_reviewers_names', array(
               // 'label' => array('class' => 'control-label', 'text' => 'Names of Protocol Reviewers'),

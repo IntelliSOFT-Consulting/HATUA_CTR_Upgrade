@@ -20,6 +20,8 @@ $(function() {
 				  Sponsor <span class="sterix">*</span></label><div class="controls"><input type="text" \
 				  id="Sponsor{i}Sponsor" maxlength="255" placeholder=" " class="input-xxlarge" \
 				  name="data[Sponsor][{i}][sponsor]"></div></div> \
+				<div class="control-group"><label for="Sponsor{i}SponsorType" class="control-label required">Type <span class="sterix">*</span></label>\
+				  <div class="controls"><select name="data[Sponsor][{i}][sponsor_type]" class="input-xlarge" placeholder=" " id="Sponsor{i}SponsorType"></select></div></div>\
 				<div class="control-group"><label class="control-label" for="Sponsor{i}ContactPerson">Contact Person</label>\
 				  <div class="controls"><input type="text" id="Sponsor{i}ContactPerson" maxlength="255" placeholder=" " \
 				  class="input-xxlarge" name="data[Sponsor][{i}][contact_person]"></div></div> \
@@ -41,6 +43,7 @@ $(function() {
 				<div class="controls"><button class="btn btn-mini btn-danger removeSponsorDetail" id="SponsorDetail{i}" \
 				  type="button"><i class="icon-trash"></i> Remove Detail </button></div> \
 				  <hr id="SponsorHr{i}"> </div>'.replace(/{i}/g, intId));
+			$(new_sponsordetail).find('[name*="sponsor_type"]').append($("#Sponsor0SponsorType > option").clone()).val('');
 			$("#sponsor_details").append(new_sponsordetail);
 		} else {
 			alert("Sorry, cant add more than "+$("#sponsor_details .sponsor-group").length+" Sponsor Details!");

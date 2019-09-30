@@ -421,6 +421,13 @@ class Application extends AppModel {
                 'message'  => 'Abstract : Please select the type of biologicals'
             ),
         ),
+        'comparator' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Abstract : Please select yes/no for comparator'
+            ),
+        ),
         'site_exists' => array(
             'ifSiteExists' => array(
                 'rule'     => array('ifSiteExists'),

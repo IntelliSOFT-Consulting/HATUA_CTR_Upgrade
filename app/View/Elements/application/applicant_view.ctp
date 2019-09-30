@@ -231,6 +231,27 @@
           </table>
           <?php } ?>
           
+          <table class="table  table-condensed">
+            <tbody> 
+              <tr>
+                <td class="table-label required"><p>Is there a comparator drug/medical device? <span class="sterix">*</span></p></td>
+                <td><?php echo $application['Application']['comparator'] ?></td>
+              </tr>
+              <tr>
+                <td class="table-label"><p>If yes, give the name</p></td>
+                <td><?php echo $application['Application']['comparator_name'] ?></td>
+              </tr>
+              <tr>
+                <td class="table-label"><p>If yes, is the comparator currently registered?</p></td>
+                <td><?php echo $application['Application']['comparator_registered'] ?></td>
+              </tr>
+              <tr>
+                <td class="table-label"><p>List of the countries where the comparator is registered</p></td>
+                <td><?php echo $application['Application']['comparator_countries'] ?></td>
+              </tr>
+            </tbody>
+          </table>
+
           <p class="table-label required">KENYA ETHICS REVIEW COMMITTEE(S)</p>
             <?php foreach($application['EthicalCommittee'] as $key => $date) { ?>
             <span class="badge badge-info"><?php echo $key+1;?></span>
@@ -475,6 +496,10 @@
             <tr>
               <td class="table-label required"><p>Sponsor <span class="sterix">*</span></p></td>
               <td><?php echo $sponsor['sponsor']?></td>
+            </tr>
+            <tr>
+              <td class="table-label required"><p>Type <span class="sterix">*</span></p></td>
+              <td><?php echo $sponsor['sponsor_type']?></td>
             </tr>
             <tr>
               <td class="table-label"><p>Contact Person </p></td>

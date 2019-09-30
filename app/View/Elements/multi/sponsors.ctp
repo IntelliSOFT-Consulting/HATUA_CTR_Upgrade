@@ -11,6 +11,12 @@
 			'label' => array('class' => 'control-label required', 'text' => 'Sponsor <span class="sterix">*</span>'),
 			'placeholder' => ' ' , 'class' => 'input-xxlarge'
 		));
+		echo $this->Form->input('Sponsor.0.sponsor_type', array(
+			'type' => 'select', 'options' => array('Industry' => 'Industry', 'Research Institution' => 'Research Institution', 'Local Kenyan Investigator' => 'Local Kenyan Investigator', 'Others' => 'Others'), 
+			'empty' => true,
+			'label' => array('class' => 'control-label required', 'text' => 'Type <span class="sterix">*</span>'),
+			'placeholder' => ' ' , 'class' => 'input-xlarge'
+		));
 		echo $this->Form->input('Sponsor.0.contact_person', array(
 			'label' => array('class' => 'control-label', 'text' => 'Contact Person'),
 			'placeholder' => ' ' , 'class' => 'input-xxlarge'
@@ -52,6 +58,12 @@
 				echo $this->Form->input('Sponsor.'.$i.'.sponsor', array(
 					'label' => array('class' => 'control-label required', 'text' => 'Sponsor <span class="sterix">*</span>'),
 					'placeholder' => ' ' , 'class' => 'input-xxlarge'
+				));
+				echo $this->Form->input('Sponsor.'.$i.'.sponsor_type', array(
+					'type' => 'select', 'options' => array('Industry' => 'Industry', 'Research Institution' => 'Research Institution', 'Local Kenyan Investigator' => 'Local Kenyan Investigator', 'Others' => 'Others'), 
+					'empty' => true,
+					'label' => array('class' => 'control-label required', 'text' => 'Type <span class="sterix">*</span>'),
+					'placeholder' => ' ' , 'class' => 'input-xlarge'
 				));
 				echo $this->Form->input('Sponsor.'.$i.'.contact_person', array(
 					'label' => array('class' => 'control-label', 'text' => 'Contact Person'),
