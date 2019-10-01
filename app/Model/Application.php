@@ -191,6 +191,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'Ciom' => array(
+            'className' => 'Ciom',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
         'StudyRoute' => array(
             'className' => 'StudyRoute',
             'foreignKey' => 'application_id',

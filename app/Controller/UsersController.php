@@ -75,7 +75,7 @@ class UsersController extends AppController {
 
     public function applicant_dashboard() {
         $applications = $this->User->Application->find('all', array(
-            'limit' => 10,
+            'limit' => 20,
             'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no',
                 'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'),
             'order' => array('Application.created' => 'desc'),

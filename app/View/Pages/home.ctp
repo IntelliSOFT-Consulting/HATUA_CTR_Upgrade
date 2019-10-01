@@ -28,17 +28,52 @@
 		    <div id="myCarousel" class="carousel slide">
               <div class="carousel-inner">
                 <div class="item active">
-                  <img src="/img/pharmacovigilance.jpg" alt="">
+                  <img src="/img/homepage/home1.jpeg" alt="">
                   <div class="carousel-caption">
 				  	<h4>Electronic Pharmacovigilance Reporting System</h4>
 				    <p>check out the electronic pharmacovigilance reporting system at <a href="http://www.pv.pharmacyboardkenya.org" target="_blank">www.pv.pharmacyboardkenya.org</a></p>
                   </div>
                 </div>
                 <div class="item">
-                  <img src="/img/services.jpg" alt="">
+                  <img src="/img/homepage/home3.jpeg" alt="">
                   <div class="carousel-caption">
 				  	<h4><i class="icon-search"></i> Search</h4>
 					<p>Search for all trials in Kenya!!</p>
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home6.jpeg" alt="">
+                  <div class="carousel-caption">
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home4.jpeg" alt="">
+                  <div class="carousel-caption">
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home5.jpeg" alt="">
+                  <div class="carousel-caption">
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home7.jpeg" alt="">
+                  <div class="carousel-caption">
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home2.jpeg" alt="">
+                  <div class="carousel-caption">
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home0.jpeg" alt="">
+                  <div class="carousel-caption">
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="/img/homepage/home10.jpeg" alt="">
+                  <div class="carousel-caption">
                   </div>
                 </div>
               </div>
