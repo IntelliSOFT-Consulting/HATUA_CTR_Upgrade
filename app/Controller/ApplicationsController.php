@@ -813,7 +813,7 @@ class ApplicationsController extends AppController {
           $this->loadModel('AnnualLetter');
           $html = new HtmlHelper(new ThemeView());
           $this->Application->read(null, 46);
-          $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'annual_approval_letter'), 'contain' => array('InvestigatorContact')));
+          $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'annual_approval_letter'), 'contain' => array()));
 
           $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));
           $checklist = array();

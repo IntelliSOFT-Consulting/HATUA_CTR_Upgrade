@@ -29,7 +29,7 @@
                 echo $this->Html->link('<span class="label label-success"> Approve </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape'=>false));
               echo "&nbsp;";
               // if($anl['status'] == 'submitted') 
-                echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'annual_letters','action' => 'view', $anl['id'], 'ext' => 'pdf',), array('escape'=>false));
+                echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'annual_letters', 'action' => 'view', $anl['id'], 'ext' => 'pdf',), array('escape'=>false));
           ?>
         </td>
     </tr>
@@ -44,7 +44,7 @@
   <?php
     if(isset($this->params['named']['anl'])) {
         foreach ($application['AnnualLetter'] as $akey => $annual_letter) {
-            if ($annual_letter['id'] == $this->params['named']['anl']) {               
+            if ($annual_letter['id'] == $this->params['named']['anl'] && $annual_letter['status'] == 'approved') {               
   ?>
     <div class="ctr-groups">
         <?php   echo $anl["content"]; ?> &nbsp;
@@ -55,7 +55,8 @@
   <?php
   if(isset($this->params['named']['ane'])) {
       foreach ($application['AnnualLetter'] as $akey => $annual_letter) {
-          if ($annual_letter['id'] == $this->params['named']['ane']) {               
+          if ($annual_letter['id'] == $this->params['named']['ane'] && $annual_letter['status'] != 'approved') {      
+            // debug($annual_letter['status'] == 'submitted');         
   ?>
     <div class="ctr-groups">
         <?php echo $this->Form->create('AnnualLetter', array(

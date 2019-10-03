@@ -55,7 +55,7 @@ class ApprovalShell extends Shell {
         // fetch all submitted and approved protocols with annual letter 30 days to expiry and reminder not sent
         //send email and notification to renew application and persist reminder
         //Reminders should not be sent to completed studies
-    	  $this->out('Starting...');
+    	$this->out('Starting...');
         $options['joins'] = array(
             array('table' => 'annual_letters',
                 'alias' => 'AnnualLetter',
@@ -112,10 +112,10 @@ class ApprovalShell extends Shell {
     }
 
     public function approval_generate() {
-        // fetch all submitted and approved protocols with annual letter 30 days to expiry and reminder not sent
+        // fetch all submitted and approved protocols with annual letter period exceeding and 
         //send email and notification to renew application and persist reminder
         //Reminders should not be sent to completed studies
-    	  $this->out('Starting...');
+    	$this->out('Starting...');
         $options['joins'] = array(
             array('table' => 'annual_letters',
                 'alias' => 'AnnualLetter',
