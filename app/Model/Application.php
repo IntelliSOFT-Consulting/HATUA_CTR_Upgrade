@@ -218,6 +218,12 @@ class Application extends AppModel {
                                     'dependent' => true,
                                     'conditions' => array('AnnualApproval.model' => 'AnnualApproval'),
                           ),
+                          'Reminder' => array(
+                                    'className' => 'Reminder',
+                                    'foreignKey' => 'foreign_key',
+                                    'dependent' => true,
+                                    'conditions' => array('Reminder.model' => 'Application'),
+                          ),
         'ParticipantFlow' => array(
             'className' => 'ParticipantFlow',
             'foreignKey' => 'application_id',

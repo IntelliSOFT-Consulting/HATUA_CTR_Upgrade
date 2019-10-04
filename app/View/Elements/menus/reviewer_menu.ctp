@@ -1,6 +1,6 @@
 
-    <div class="menu">
-    <ul class="nav nav-pills">
+    <div class="menu text-center">
+    <ul class="nav nav-pills center-pills">
       <li class="<?php echo $this->fetch('Dashboard') ?>">
         <?php
           echo $this->Html->link('<i class="icon-dashboard"></i> Dashboard',

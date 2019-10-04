@@ -33,7 +33,7 @@
                       </p>
                       <a class="btn btn-success" href="#">Learn more &raquo;</a>
                     </div>
-                    <img class="slider_img animate-in" src="/img/homepage/home1.jpeg" alt="">
+                    <img class="slider_img animate-in" src="/img/homepage/home-01.png" alt="">
                   </li>
                   <!-- Layer 2 -->
                   <li>

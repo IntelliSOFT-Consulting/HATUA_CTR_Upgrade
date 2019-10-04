@@ -10,6 +10,13 @@
 }
 
 
+body {
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.6em;
+    color: #666;
+}
+
 /*a {
 	color: #94c045;
 }*/
@@ -34,7 +41,19 @@ footer .nav-list li a:hover,footer ul.regular li a:hover  {
 	color:#81ab35;
 }
 
+.well li a {
+  color: #94c045;
+}
 
+.center-pills {
+    display: flex;
+    justify-content: center;
+}
+
+.nav-pills > .active > a, .nav-pills > .active > a:hover {
+    color: #ffffff;
+    background-color: #94c045;
+}
 
 /* sequence slider */
 

@@ -233,7 +233,7 @@ nav select {
 
 #maincontent {
   z-index: 1000;
-  margin-top: 0px;
+  margin-top: 70px;
 }
 
 /* intro */
@@ -1489,6 +1489,10 @@ blockquote p {
 
 footer {
   padding-top: 30px;
+  color: #7e7e7e;
+}
+
+address a {
   color: #7e7e7e;
 }
 

@@ -56,19 +56,14 @@ class ApprovalShell extends Shell {
         //send email and notification to renew application and persist reminder
         //Reminders should not be sent to completed studies
     	$this->out('Starting...');
-        $options['joins'] = array(
-            array('table' => 'annual_letters',
-                'alias' => 'AnnualLetter',
-                'type' => 'INNER',
-                'conditions' => array(
-                    'Application.id = AnnualLetter.application_id',
-                )
-            )
-        );
+
         $options['conditions'] = array(
                 'Application.submitted' => 1, 
+                'Application.approved' => 2, 
+                'Application.final_date IS ' => null, //Final report not completed
                 // 'Application.trial_status_id' => 5,
                 'Application.deactivated' => 0,
+                ''
         );
         $options['contain'] = array('AnnualLetter' => array('limit' => 1, 'order' => array('AnnualLetter.id DESC')));
         $applications = $this->Application->find('all', $options);
