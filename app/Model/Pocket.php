@@ -5,7 +5,7 @@ App::uses('AppModel', 'Model');
  *
  */
 class Pocket extends AppModel {
-
+	public $actsAs = array('SoftDelete');
 /**
  * Validation rules
  *

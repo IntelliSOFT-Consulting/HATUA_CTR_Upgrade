@@ -60,12 +60,12 @@ section > ul li {
 }
 
 /* Faded out hr */
-hr.soften {
+/*hr.soften {
   height: 1px;
   margin: 70px 0;
   background: #000;
   border: 0;
-}
+}*/
 
 
 

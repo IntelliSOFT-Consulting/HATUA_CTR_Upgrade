@@ -57,4 +57,4 @@
         
     </div>
 
-<hr>
+<hr class="soften">

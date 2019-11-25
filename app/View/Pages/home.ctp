@@ -71,16 +71,12 @@
 <?php $this->end(); ?>
 
 <div class="row-fluid">
-  <div class="span12">
+  <div class="span9">
 
-
-    <div class="row-fluid">
-    <div class="span12">
-      <div class="page-header">
+    <div class="page-header">
       <h1>EXPERT COMMITTEE ON CLINICAL TRIALS (ECCT) <?php  echo $this->element('google-recommend');?></h1>
-      </div>
     </div>
-    </div>
+
 <!--
   <div class="row-fluid">
   <div class="span12">
@@ -91,8 +87,7 @@
   </div>
   </div> -->
 
-      <div class="row-fluid">
-        <div class="span12">
+
           <p>
             The number of clinical trials taking place in Kenya has been increasing in the recent past. As the National Medicines Regulatory Authority for Kenya, Pharmacy and Poisons Board (PPB) has the responsibility of regulating all clinical trials taking place in the country. In order to facilitate both the sponsors and investigators, PPB has upgraded the clinical trials online system based on feedback from the stakeholders. The new system also allows for the public to see all the PPB approved trials including theirs details like investigators, study status, sites and study objectives.  
           </p>
@@ -109,8 +104,45 @@
           Please feel free to share your feedback  
           </p>
 
+  </div>
+  <div class="span3">
+      <h3>
+        Login        
+      </h3>
+      <hr>
+      <?php
+        echo $this->Session->flash();
+        echo $this->Form->create('User', array(
+              'action' => 'login',
+              // 'class' => 'form-horizontal'
+            ));
+      ?>
+      <div class="control-group">
+        <label for="inputEmail" class="control-label">Username</label>
+        <div class="controls">
+        <input type="text" id="UserUsername" maxlength="255" class="span7" name="data[User][username]" placeholder="Username">
         </div>
       </div>
+      <div class="control-group">
+        <label for="inputPassword" class="control-label">Password</label>
+        <div class="controls">
+        <input type="password" id="UserPassword" class="span7" name="data[User][password]" placeholder="Password">
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="controls">
+        
+        <button class="btn" type="submit">Sign in</button>
+        <br>
+        <br>
+        <p class="visible-desktop"><?php echo $this->Html->link('Forgot Password? click here to recover', array('controller' => 'users', 'action' => 'forgotPassword')); ?></p>
+
+        </div>
+      </div>
+            <?php
+        echo $this->Form->end();
+      ?>
+    
   </div>
 </div>
 

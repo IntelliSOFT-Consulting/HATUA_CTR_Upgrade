@@ -1,7 +1,21 @@
+<?php 
+  echo $this->Session->flash();
+?>
 <h3>Annual Approval Letters</h3>
-  <?php 
-    echo $this->Session->flash();
-  ?>
+
+  <br>
+  <div class="row-fluid">
+    <div class="span12">      
+        <?php 
+          if($redir == 'applicant') {
+              echo $this->Html->link(__('<i class="icon-file-alt"></i> Generate approval letter'),
+                        array('controller' => 'annual_letters', 'action' => 'add', $application['Application']['id']),
+                        array('escape' => false, 'class' => 'btn btn-info'));
+          }
+        ?>
+    </div>
+  </div>
+  <br>
 
 <table  class="table  table-bordered table-striped">
      <thead>
