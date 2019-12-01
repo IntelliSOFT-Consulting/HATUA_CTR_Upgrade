@@ -58,6 +58,29 @@
         <div class="thumbnail">
           <img alt="" src="/img/authenticated/text.png">
           <div class="caption">
+            <div>
+              <h4>Pre-Submission Meeting</h4>
+              <p>
+                <small><i class="icon-hand-right"></i> Request for pre-submission meeting to discuss pertinent issues prior to Protocol submission.</small>
+              <br>
+                <small><i class="icon-hand-right"></i> The request for a meeting should propose two different dates for the meeting with the proposed dates being at lease three weeks away.</small>
+              </p>
+              <!-- <h6>Propose dates</h6> -->
+              <?php
+                  echo $this->Form->create('MeetingDate', array('controller' => 'meeting_dates', 'action' => 'add'));
+                  echo $this->Form->input('email', array('type' => 'email', 'label' => false, 'value' => $this->Session->read('Auth.User.email')));
+                  echo $this->Form->input('user_id', array('type' => 'hidden', 'label' => false, 'value' => $this->Session->read('Auth.User.id')));
+                  echo $this->Form->end(array(
+                      'label' => 'Propose',
+                      'value' => 'Propose',
+                      'class' => 'btn btn-info btn-small',
+                      // 'div' => array(
+                          // 'class' => 'form-actions',
+                      // )
+                  ));
+                  // echo $this->Form->end(__('Submit'), array('class' => 'btn btn-large btn-success'));
+              ?>
+            </div>
             <h4>New Application</h4>
             <?php
                 echo $this->Form->create('Application');

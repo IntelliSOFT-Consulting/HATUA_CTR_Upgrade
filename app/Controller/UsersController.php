@@ -574,6 +574,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Deviations/manager_index');
         $this->Acl->allow($group, 'controllers/Deviations/manager_unsubmit');
         $this->Acl->allow($group, 'controllers/Deviations/manager_download_deviation');
+        $this->Acl->allow($group, 'controllers/MeetingDates');
 
         //Allow Inpectors
         $group->id = 6;
@@ -595,6 +596,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Cioms/inspector_view');
         $this->Acl->allow($group, 'controllers/Cioms/inspector_index');
         $this->Acl->allow($group, 'controllers/Reports');
+        $this->Acl->allow($group, 'controllers/MeetingDates');
 
         //Allow Reviewers
         $group->id = 3;
@@ -615,6 +617,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
         $this->Acl->allow($group, 'controllers/Comments');
+        $this->Acl->allow($group, 'controllers/MeetingDates');
 
         //Allow Partners
         $group->id = 4;
@@ -682,6 +685,10 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Deviations/applicant_edit');
         $this->Acl->allow($group, 'controllers/Reviews/manager_download_summary');
         $this->Acl->allow($group, 'controllers/Comments');
+        $this->Acl->allow($group, 'controllers/MeetingDates/applicant_add');
+        $this->Acl->allow($group, 'controllers/MeetingDates/applicant_view');
+        $this->Acl->allow($group, 'controllers/MeetingDates/applicant_index');
+        $this->Acl->allow($group, 'controllers/MeetingDates/applicant_edit');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";
