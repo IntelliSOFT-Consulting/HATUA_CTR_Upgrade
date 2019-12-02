@@ -26,6 +26,15 @@ class MeetingDate extends AppModel {
 		)
 	);
 
+	public $hasMany = array(
+        'Comment' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Comment.model' => 'MeetingDate', 'Comment.category' => 'external' ),
+        ),
+    );
+
 	public function beforeSave() {
         if (!empty($this->data['MeetingDate']['proposed_date1'])) {
             $this->data['MeetingDate']['proposed_date1'] = $this->dateFormatBeforeSave($this->data['MeetingDate']['proposed_date1']);

@@ -17,6 +17,12 @@
                     array('controller' => 'users', 'action'=>'dashboard', 'applicant' => true ), array('escape' => false ));
                     ?>
              </li>
+             <li class="<?php echo $this->fetch('MEETINGS') ?>">
+                <?php
+                    echo $this->Html->link('<i class="icon-group"></i> Meetings',
+                        array('controller' => 'meeting_dates', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
+                    ?>
+             </li>
              <li class="<?php echo $this->fetch('MyApplications') ?>">
                 <?php
                     echo $this->Html->link('<i class="icon-file-text"></i> My Applications',

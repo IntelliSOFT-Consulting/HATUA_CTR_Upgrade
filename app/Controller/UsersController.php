@@ -9,7 +9,7 @@ App::uses('Validation', 'Utility');
 class UsersController extends AppController {
 
     public $paginate = array();
-    public $uses = array('User', 'Application', 'Sae', 'Message');
+    public $uses = array('User', 'Application', 'Sae', 'Message', 'MeetingDate');
     public $components = array('Search.Prg');
     public $presetVars = array(
             'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
@@ -104,6 +104,10 @@ class UsersController extends AppController {
         $this->set('saes', $this->Sae->find('all', array(
             'limit' => 5,
             'conditions' => array('Sae.user_id' => $this->Auth->User('id')), 'order' => 'Sae.created DESC'
+            )));
+        $this->set('meetingDates', $this->MeetingDate->find('all', array(
+            'limit' => 5,
+            'conditions' => array('MeetingDate.user_id' => $this->Auth->User('id')), 'order' => 'MeetingDate.created DESC'
             )));
     }
 

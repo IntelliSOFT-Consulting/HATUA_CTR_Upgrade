@@ -30,7 +30,7 @@
                   <th> <p> <strong> File(s) </strong> </p> </th>
                   <td>
                     <?php
-                    
+                    if(isset($comment['Attachment'])) {
                       foreach ($comment['Attachment'] as $key => $value) {
                         echo '<p>';
                          // echo $this->Html->link(__($value['basename']),
@@ -40,6 +40,7 @@
                         echo $this->Html->link($value['basename'], substr($value['file'], 24), ['fullBase' => true]);
                          echo '</p>';
                         }
+                    }
                       
                     ?>
                   </td>                    

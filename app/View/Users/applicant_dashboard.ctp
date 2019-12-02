@@ -80,6 +80,21 @@
                   ));
                   // echo $this->Form->end(__('Submit'), array('class' => 'btn btn-large btn-success'));
               ?>
+
+                <?php                   
+                    echo '<ol>';
+                    foreach ($meetingDates as $meetingDate) {
+                      if($meetingDate['MeetingDate']['approved'] < 1) {
+                          echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].'</li>', array('controller' => 'meeting_dates', 'action' => 'edit', $meetingDate['MeetingDate']['id']),
+                            array('escape' => false));   
+                      } else {
+                          echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].'</li>', array('controller' => 'meeting_dates', 'action' => 'view', $meetingDate['MeetingDate']['id']),
+                            array('escape' => false, 'class' => 'text-success'));   
+                      }
+                    }
+                    echo '</ol>';
+                ?>
+
             </div>
             <h4>New Application</h4>
             <?php
@@ -185,7 +200,7 @@
                             array('escape' => false));   
                       } else {
                           echo $this->Html->link('<li>'.$sae['Sae']['reference_no'].'</li>', array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id']),
-                            array('escape' => false));   
+                            array('escape' => false, 'class' => 'text-success'));   
                       }
                     }
                     echo '</ol>';

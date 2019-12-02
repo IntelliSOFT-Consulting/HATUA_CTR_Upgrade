@@ -99,7 +99,7 @@
       <?php
         echo $this->Form->button('<i class="icon-credit-card"></i> Submit', array(
             'name' => 'submitReport',
-            'onclick'=>"return confirm('Are you sure you wish to submit the SAE/SUSAR report? It will not be editable.');",
+            'onclick'=>"return confirm('Are you sure you wish to submit the report? It will not be editable.');",
             'class' => 'btn btn-primary mapop',
             'id' => 'MeetingDateSubmitReport', 'title'=>'Save and Submit Report',
             'data-content' => 'Submit report to PPB for review.',
