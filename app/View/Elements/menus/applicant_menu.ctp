@@ -19,7 +19,7 @@
              </li>
              <li class="<?php echo $this->fetch('MEETINGS') ?>">
                 <?php
-                    echo $this->Html->link('<i class="icon-group"></i> Meetings',
+                    echo $this->Html->link('<i class="icon-calendar"></i> Meetings',
                         array('controller' => 'meeting_dates', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
                     ?>
              </li>

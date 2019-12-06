@@ -1,8 +1,9 @@
 <?php
-    $this->assign('MEETINGS', 'active');        
     echo $this->Session->flash();
+    $this->assign('MEETINGS', 'active');        
+    $this->Html->script('jquery.datetimepicker.full', array('inline' => false));
+    $this->Html->css('jquery.datetimepicker', null, array('inline' => false));
 ?>
-
 <div class="sae-form">
   <div class="row-fluid">
     <div class="span12">
@@ -123,11 +124,19 @@
 <script>
     (function( $ ) {
 
-        $( ".datepickers" ).datepicker({
-            minDate:"-100Y", minDate:"+21D", dateFormat:'dd-mm-yy', showButtonPanel:true, changeMonth:true, changeYear:true,
-            yearRange: "+21D:+365D",
-            buttonImageOnly:true, showAnim:'show', showOn:'both', buttonImage:'/img/calendar.gif'
+        // $( ".datepickers" ).datepicker({
+        //     minDate:"-100Y", minDate:"+21D", dateFormat:'dd-mm-yy', showButtonPanel:true, changeMonth:true, changeYear:true,
+        //     yearRange: "+21D:+365D",
+        //     buttonImageOnly:true, showAnim:'show', showOn:'both', buttonImage:'/img/calendar.gif'
+        // });
+        $.datetimepicker.setLocale('en');
+        $( ".datepickers" ).datetimepicker({
+            minDate:"-1969/12/12", format:'d-m-Y H:i', minTime:'8:00', maxTime:'20:00'
         });
+        // $( ".datepickers" ).datetimepicker({
+        //   startDate:'+2020/01/01'//or 1986/12/08
+        // });
+        // $( ".datepickers" ).datetimepicker();
 
         
     })( jQuery );

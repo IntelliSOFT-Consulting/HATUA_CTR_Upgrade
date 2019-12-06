@@ -37,10 +37,10 @@ class MeetingDate extends AppModel {
 
 	public function beforeSave() {
         if (!empty($this->data['MeetingDate']['proposed_date1'])) {
-            $this->data['MeetingDate']['proposed_date1'] = $this->dateFormatBeforeSave($this->data['MeetingDate']['proposed_date1']);
+            $this->data['MeetingDate']['proposed_date1'] = $this->dateTimeFormatBeforeSave($this->data['MeetingDate']['proposed_date1']);
         }
         if (!empty($this->data['MeetingDate']['proposed_date2'])) {
-            $this->data['MeetingDate']['proposed_date2'] = $this->dateFormatBeforeSave($this->data['MeetingDate']['proposed_date2']);
+            $this->data['MeetingDate']['proposed_date2'] = $this->dateTimeFormatBeforeSave($this->data['MeetingDate']['proposed_date2']);
         }
         return true;
     }

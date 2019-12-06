@@ -40,4 +40,12 @@ class AppModel extends Model {
 	public function dateFormatBeforeSave($dateString) {
 		return date('Y-m-d', strtotime($dateString));
 	}
+	
+	function dateTimeFormatAfterFind($dateString) {
+		return date('d-m-Y H:i', strtotime($dateString));
+	}
+
+	public function dateTimeFormatBeforeSave($dateString) {
+		return date('Y-m-d H:i', strtotime($dateString));
+	}
 }

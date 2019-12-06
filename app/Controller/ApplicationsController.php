@@ -87,6 +87,7 @@ class ApplicationsController extends AppController {
             if ($application['Application']['approved']) {
                 $asd = new DateTime($application['Application']['approval_date']);
                 $stages['Feedback']['end_date'] = $asd->format('d-M-Y');
+                if(!isset($fsd)) $fsd = new DateTime($application['Application']['approval_date']);
                 $stages['Feedback']['days'] = $asd->diff($fsd)->format('%a');
 
                 $stages['Approval']['start_date'] = $asd->format('d-M-Y');
