@@ -49,8 +49,66 @@
   <div class="tab-pane" id="final_decision">
     <div class="row-fluid">
       <div class="span12">
-          <h3>Final Decision</h3>
-          <?php  echo $meetingDate['MeetingDate']['final_decision']; ?>
+          <h3>Final Decision</h3>          
+
+
+
+          <?php
+              echo $this->Form->create('MeetingDate', array(
+                  'class' => 'form-horizontal',
+                   'inputDefaults' => array(
+                      'div' => array('class' => 'control-group'),
+                      'label' => array('class' => 'control-label'),
+                      'between' => '<div class="controls">',
+                      'after' => '</div>',
+                      'class' => '',
+                      'format' => array('before', 'label', 'between', 'input', 'after','error'),
+                      'error' => array('attributes' => array('class' => 'controls help-block')),
+                   ),
+              ));
+          ?>
+
+          <div class="row-fluid">
+              <div class="span2"></div>
+              <div class="span6">
+              <?php
+                  echo $this->Form->input('id');
+              ?>
+              </div>
+              <div class="span4"></div>
+          </div>
+
+          <div class="row-fluid">
+              <div class="span12">
+                  <?php            
+                      echo $this->Form->input('final_decision',
+                          array('class' => 'span9',
+                              'label' => array('class' => 'control-label required', 'text' => 'PPB Final decision <span class="sterix">*</span>'),));
+                  ?>
+              </div>
+          </div>
+
+           <hr>
+
+          <div class="controls">
+            <?php
+              echo $this->Form->button('<i class="icon-credit-card"></i> Submit', array(
+                  'name' => 'submitReport',
+                  'onclick'=>"return confirm('Are you sure you wish to submit the report? It will not be editable.');",
+                  'class' => 'btn btn-primary mapop',
+                  'id' => 'MeetingDateSubmitReport', 'title'=>'Save and Submit Report',
+                  'data-content' => 'Submit report to PPB for review.',
+                  'div' => false,
+                ));
+
+            ?>
+           </div>
+
+          <?php
+              echo $this->Form->end();
+          ?>
+
+
         </div>
     </div>
   </div>

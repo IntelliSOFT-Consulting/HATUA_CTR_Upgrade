@@ -69,8 +69,32 @@ class MeetingDatesController extends AppController {
             )
         ));
         if (strpos($this->request->url, 'pdf') !== false) {
-            $this->pdfConfig = array('filename' => 'SAE_' . $id,  'orientation' => 'portrait');
+            $this->pdfConfig = array('filename' => 'MD_' . $id,  'orientation' => 'portrait');
         }
+    }
+    public function aview($id = null) {
+        $this->MeetingDate->id = $id;
+        if (!$this->MeetingDate->exists()) {
+            throw new NotFoundException(__('Invalid meetingDate'));
+        }
+        $meetingDate = $this->MeetingDate->read(null, $id);
+        if ($meetingDate['MeetingDate']['approved'] < 1) {
+                $this->Session->setFlash(__('The meetingDate has not been submitted'), 'alerts/flash_info');
+                $this->redirect(array('action' => 'edit', $this->MeetingDate->id));
+        }
+        $this->set('meetingDate', $this->MeetingDate->find('first', array(
+            'conditions' => array('MeetingDate.id' => $id)
+            )
+        ));
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'MD_' . $id,  'orientation' => 'portrait');
+        }
+    }
+    public function manager_view($id = null) {
+      $this->aview($id);
+    }
+    public function inspector_view($id = null) {
+      $this->aview($id);
     }
 
 /**

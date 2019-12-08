@@ -9,6 +9,19 @@
 		<div class="thumbnail">
 		  <img alt="" src="/img/authenticated/preferences_composer.png">
 		  <div class="caption">
+
+		  	<div>
+              	<h4>Pre-Submission Meetings</h4>
+             	<?php                   
+                    echo '<ol>';
+                    foreach ($meetingDates as $meetingDate) {
+                          echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].'</li>', array('controller' => 'meeting_dates', 'action' => 'view', $meetingDate['MeetingDate']['id']),
+                            array('escape' => false, 'class' => 'text-success'));   
+                    }
+                    echo '</ol>';
+                ?>
+            </div>
+
 			<h4>Submitted Protocols</h4>
 			<ol><?php
 				 foreach($applications as $application) {

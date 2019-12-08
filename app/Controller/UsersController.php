@@ -129,6 +129,10 @@ class UsersController extends AppController {
         $this->set('saes', $this->Sae->find('all', array(
             'order' => 'Sae.created DESC'
             )));
+        $this->set('meetingDates', $this->MeetingDate->find('all', array(
+            'limit' => 5,
+            'conditions' => array('MeetingDate.approved >' => 0), 'order' => 'MeetingDate.created DESC'
+            )));
     }
 
     public function inspector_dashboard() {
@@ -169,6 +173,10 @@ class UsersController extends AppController {
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
             )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
+        $this->set('meetingDates', $this->MeetingDate->find('all', array(
+            'limit' => 5,
+            'conditions' => array('MeetingDate.approved >' => 0), 'order' => 'MeetingDate.created DESC'
+            )));
     }
 
     public function partner_dashboard() {
