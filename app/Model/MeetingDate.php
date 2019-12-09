@@ -7,8 +7,20 @@ App::uses('AppModel', 'Model');
  */
 class MeetingDate extends AppModel {
 
-	//public $actsAs = array('SoftDelete');
+    public $actsAs = array('Containable', 'Search.Searchable');
+    public $filterArgs = array(
+            'email' => array('type' => 'like', 'encode' => true),
+            'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'MeetingDate.proposed_date1 BETWEEN ? AND ?'),
+        );
+    public function makeRangeCondition($data = array()) {
+            if(!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
+            else $start_date = date('Y-m-d', strtotime('2012-05-01'));
 
+            if(!empty($data['end_date'])) $end_date = date('Y-m-d', strtotime($data['end_date']));
+            else $end_date = date('Y-m-d');
+
+            return array($start_date, $end_date);
+        }
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
@@ -45,4 +57,15 @@ class MeetingDate extends AppModel {
         return true;
     }
 
+    function afterFind($results) {
+        foreach ($results as $key => $val) {
+            if (isset($val['MeetingDate']['proposed_date1'])) {
+                $results[$key]['MeetingDate']['proposed_date1'] = $this->dateTimeFormatAfterFind($val['MeetingDate']['proposed_date1']);
+            }
+            if (isset($val['MeetingDate']['proposed_date2'])) {
+                $results[$key]['MeetingDate']['proposed_date2'] = $this->dateTimeFormatAfterFind($val['MeetingDate']['proposed_date2']);
+            }
+        }
+        return $results;
+    }
 }

@@ -49,11 +49,12 @@
   <div class="tab-pane" id="final_decision">
     <div class="row-fluid">
       <div class="span12">
-          <h3>Final Decision</h3>          
+          <h5>Final Decision</h5>          
 
 
 
           <?php
+            if($meetingDate['MeetingDate']['approved'] != 2) {
               echo $this->Form->create('MeetingDate', array(
                   'class' => 'form-horizontal',
                    'inputDefaults' => array(
@@ -72,7 +73,8 @@
               <div class="span2"></div>
               <div class="span6">
               <?php
-                  echo $this->Form->input('id');
+                  echo $this->Form->input('id', array('type' => 'hidden', 'value' => $meetingDate['MeetingDate']['id']));
+                  echo $this->Form->input('approved', array('type' => 'hidden', 'value' => 2));
               ?>
               </div>
               <div class="span4"></div>
@@ -106,6 +108,9 @@
 
           <?php
               echo $this->Form->end();
+            } else {
+              echo $meetingDate['MeetingDate']['final_decision'];
+            }
           ?>
 
 

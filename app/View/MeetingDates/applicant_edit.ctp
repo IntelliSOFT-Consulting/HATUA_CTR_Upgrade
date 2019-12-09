@@ -131,7 +131,7 @@
         // });
         $.datetimepicker.setLocale('en');
         $( ".datepickers" ).datetimepicker({
-            minDate:"-1969/12/12", format:'d-m-Y H:i:00', minTime:'8:00', maxTime:'20:00', step: 15
+            minDate:"-1969/12/12", format:'d-m-Y H:i', minTime:'8:00', maxTime:'20:00', step: 15
         });
         // $( ".datepickers" ).datetimepicker({
         //   startDate:'+2020/01/01'//or 1986/12/08

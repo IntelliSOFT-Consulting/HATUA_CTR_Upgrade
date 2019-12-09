@@ -168,6 +168,21 @@ class Sae extends AppModel {
         return true;
     }
 
+    function afterFind($results) {
+        foreach ($results as $key => $val) {
+            if (isset($val['Sae']['date_of_birth'])) {
+                $results[$key]['Sae']['date_of_birth'] = $this->dateFormatAfterFind($val['Sae']['date_of_birth']);
+            }
+            if (isset($val['Sae']['reaction_onset'])) {
+                $results[$key]['Sae']['reaction_onset'] = $this->dateFormatAfterFind($val['Sae']['reaction_onset']);
+            }
+            if (isset($val['Sae']['manufacturer_date'])) {
+                $results[$key]['Sae']['manufacturer_date'] = $this->dateFormatAfterFind($val['Sae']['manufacturer_date']);
+            }
+        }
+        return $results;
+    }
+
     public function dateAfterStartDates($field = null) {
         if (!empty($this->data['SuspectedDrug'])) {
             foreach ($this->data['SuspectedDrug'] as $val) {

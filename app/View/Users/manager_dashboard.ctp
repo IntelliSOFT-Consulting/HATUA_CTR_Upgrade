@@ -15,8 +15,13 @@
              	<?php                   
                     echo '<ol>';
                     foreach ($meetingDates as $meetingDate) {
-                          echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].'</li>', array('controller' => 'meeting_dates', 'action' => 'view', $meetingDate['MeetingDate']['id']),
-                            array('escape' => false, 'class' => 'text-success'));   
+                    	if (empty($meetingDate['MeetingDate']['final_decision'])) {                    		
+							echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].' - '.$meetingDate['MeetingDate']['email'].'</li>', array('controller' => 'meeting_dates', 'action' => 'view', $meetingDate['MeetingDate']['id']),
+							array('escape' => false));   
+                    	} else {                    		
+							echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].' - '.$meetingDate['MeetingDate']['email'].'</li>', array('controller' => 'meeting_dates', 'action' => 'view', $meetingDate['MeetingDate']['id']),
+							array('escape' => false, 'class' => 'text-success'));   
+                    	}
                     }
                     echo '</ol>';
                 ?>
