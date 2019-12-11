@@ -42,7 +42,7 @@
                
                 echo $this->Form->input('proposed_date1', array('type' => 'text', 'class' => 'datepickers',
                         'label' => array('class' => 'control-label required', 'text' => 'First proposed date <span class="sterix">*</span>'), ));
-            	echo $this->Form->input('email', array('label' => array('class' => 'control-label required', 'text' => 'Email')));    
+            	echo $this->Form->input('email', array('label' => array('class' => 'control-label required', 'text' => 'Email <span class="sterix">*</span>')));    
                 
                 ?>
         </div><!--/span-->
@@ -113,7 +113,7 @@
     <?php
         echo $this->Form->end();
         echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $this->Form->value('MeetingDate.id')), 
-            array('class' => 'btn btn-danger'), 
+            array('class' => 'btn btn-danger', 'prefix' => false), 
             __('Are you sure you want to delete # %s?', $this->Form->value('MeetingDate.id')));
     ?>
 

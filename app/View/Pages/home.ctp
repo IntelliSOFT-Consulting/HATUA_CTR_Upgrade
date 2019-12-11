@@ -112,6 +112,7 @@
       <hr>
       <?php
         echo $this->Session->flash();
+        if(!$this->Session->read('Auth.User')) {
         echo $this->Form->create('User', array(
               'action' => 'login',
               // 'class' => 'form-horizontal'
@@ -141,6 +142,7 @@
       </div>
             <?php
         echo $this->Form->end();
+      }
       ?>
     
   </div>

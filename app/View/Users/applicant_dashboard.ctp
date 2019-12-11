@@ -85,7 +85,7 @@
                     echo '<ol>';
                     foreach ($meetingDates as $meetingDate) {
                       if($meetingDate['MeetingDate']['approved'] < 1) {
-                          echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].'</li>', array('controller' => 'meeting_dates', 'action' => 'edit', $meetingDate['MeetingDate']['id']),
+                          echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].' <small class="muted">(unsubmitted)</small></li>', array('controller' => 'meeting_dates', 'action' => 'edit', $meetingDate['MeetingDate']['id']),
                             array('escape' => false));   
                       } else {
                           echo $this->Html->link('<li>'.$meetingDate['MeetingDate']['proposed_date1'].'</li>', array('controller' => 'meeting_dates', 'action' => 'view', $meetingDate['MeetingDate']['id']),

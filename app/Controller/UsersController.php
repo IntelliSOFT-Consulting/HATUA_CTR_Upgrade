@@ -701,6 +701,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/MeetingDates/applicant_view');
         $this->Acl->allow($group, 'controllers/MeetingDates/applicant_index');
         $this->Acl->allow($group, 'controllers/MeetingDates/applicant_edit');
+        $this->Acl->allow($group, 'controllers/MeetingDates/applicant_delete');
 
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

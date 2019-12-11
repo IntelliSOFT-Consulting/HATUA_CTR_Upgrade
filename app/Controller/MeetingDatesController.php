@@ -214,12 +214,13 @@ class MeetingDatesController extends AppController {
 	public function applicant_add() {
 		if ($this->request->is('post')) {
 			$this->MeetingDate->create();
-			debug($this->request->data);
-			if ($this->MeetingDate->save($this->request->data)) {
+			// debug($this->request->data);
+			if ($this->MeetingDate->save($this->request->data, false)) {
 				$this->Session->setFlash(__('The meeting date has been saved'), 'alerts/flash_success');
 				$this->redirect(array('action' => 'applicant_edit', $this->MeetingDate->id));
 			} else {
 				$this->Session->setFlash(__('The meeting date could not be saved. Please, try again.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
 			}
 		}
 	}
@@ -349,13 +350,22 @@ class MeetingDatesController extends AppController {
 		}
 		$this->MeetingDate->id = $id;
 		if (!$this->MeetingDate->exists()) {
-			throw new NotFoundException(__('Invalid meeting date'));
+			throw new NotFoundException(__('Invalid meeting date'), 'alerts/flash_error');
 		}
 		if ($this->MeetingDate->delete()) {
-			$this->Session->setFlash(__('Meeting date deleted'));
+			$this->Session->setFlash(__('Meeting date deleted'), 'alerts/flash_info');
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->Session->setFlash(__('Meeting date was not deleted'));
+		$this->Session->setFlash(__('Meeting date was not deleted'), 'alerts/flash_error');
 		$this->redirect(array('action' => 'index'));
 	}
+    public function applicant_delete($id = null) {
+      $this->delete($id);
+    }
+    public function manager_delete($id = null) {
+      $this->delete($id);
+    }
+    public function reviewer_delete($id = null) {
+      $this->delete($id);
+    }
 }

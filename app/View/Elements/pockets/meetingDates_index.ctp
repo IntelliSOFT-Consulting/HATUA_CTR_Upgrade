@@ -8,8 +8,26 @@
     <div class="marketing">
       <div class="row-fluid">
             <div class="span12">
-              <h3>Meeting Dates:<small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
-              <hr class="soften" style="margin: 7px 0px;">
+              <!-- <h3>Meeting Dates:<small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view reports</small></h3>
+              <hr class="soften" style="margin: 7px 0px;"> -->
+
+              <h4>Pre-Submission Meeting</h4>
+              <p>
+                <small><i class="icon-hand-right"></i> Request for pre-submission meeting to discuss pertinent issues prior to Protocol submission.</small>
+              <br>
+                <small><i class="icon-hand-right"></i> The request for a meeting should propose two different dates for the meeting with the proposed dates being at lease three weeks away.</small>
+              </p>
+
+
+
+              <?php
+                if($redir == 'applicant') {
+                    echo $this->Form->postLink(__('Create'), array('action' => 'add'), 
+                        array('class' => 'btn btn-primary btn-small', 'prefix' => false), 
+                        __('Create new meeting dates??'));
+                }
+              ?>
+
             </div>
         </div>
     </div>
@@ -131,8 +149,8 @@
 $(function() {
   $(".morecontent").expander();
   var adates = $('#MeetingDateStartDate, #MeetingDateEndDate').datepicker({
-          minDate:"-100Y",
-          maxDate:"-0D",
+          minDate:"-1Y",
+          // maxDate:"-0D",
           dateFormat:'dd-mm-yy',
           format: 'dd-mm-yyyy',
           endDate: '-0d',
