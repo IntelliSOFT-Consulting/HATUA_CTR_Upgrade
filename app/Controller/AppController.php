@@ -39,7 +39,8 @@ class AppController extends Controller {
                 'Review'  => array('InternalComment' => array('Attachment'), 'ReviewAnswer', 'User'), 
                 'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer', 'Ciom',
                 'Deviation' => array('ExternalComment' => array('Attachment')),
-                'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User')
+                'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User'),
+                'ApplicationStage' => array('Comment' => array('Attachment'))
     );
   public $components = array(
         'Acl',

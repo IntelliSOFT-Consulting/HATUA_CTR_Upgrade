@@ -12,6 +12,7 @@
     <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
+          <li><a href="#tab17" data-toggle="tab">Screening</a></li>
           <?php
               $count_reviews = 0;
               $count_comments = 0;
@@ -160,6 +161,45 @@
 
 <?php $this->start('endjs'); ?>
 </div> <!-- End or bootstrab tab1 -->
+
+      <div class="tab-pane" id="tab17">
+        <div class="marketing">
+             <div class="row-fluid">
+                <div class="span12">
+                   <h3 class="text-info">Screening for completeness</h3>
+                   <?php                   
+                      // echo $this->Html->link(
+                      //   '<label class="label label-info">Complete screening</label>', 
+                      //     array('controller' => 'application_stages', 'action' => 'complete', $application['ApplicationStage'][0]['id']), array('escape' => false));
+                   echo $this->Form->postLink(__('<label class="label label-success">Complete screening</label>'), array('controller' => 'application_stages', 'action' => 'complete_screening', $application['ApplicationStage'][0]['id']), 
+                    array('escape' => false), __('Are you sure you want to complete screening ?'));
+                   ?>
+                </div>
+             </div>
+              <hr class="soften" style="margin: 10px 0px;">
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <br>
+              <div class="amend-form">
+                <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php echo $this->element('comments/list', ['comments' => $application['ApplicationStage'][0]['Comment']]) ?> 
+                  </div>
+                  <div class="span4 lefty">
+                  <?php  
+                        echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $application['ApplicationStage'][0]['id'],   
+                                               'model' => 'ApplicationStage', 'category' => 'external', 'url' => 'add_screening_query']]) 
+                  ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+
     <div class="tab-pane" id="tab2">      
         <p style="text-align: center;"><strong>Protocol Code: </strong><?php echo $application['Application']['protocol_no'];?></p>
         <hr class="soften" style="margin: 10px 0px;">

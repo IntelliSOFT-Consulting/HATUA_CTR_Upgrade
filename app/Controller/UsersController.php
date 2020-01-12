@@ -586,6 +586,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Deviations/manager_index');
         $this->Acl->allow($group, 'controllers/Deviations/manager_unsubmit');
         $this->Acl->allow($group, 'controllers/Deviations/manager_download_deviation');
+        $this->Acl->allow($group, 'controllers/ApplicationStages/manager_complete_screening');
         $this->Acl->allow($group, 'controllers/MeetingDates');
 
         //Allow Inpectors

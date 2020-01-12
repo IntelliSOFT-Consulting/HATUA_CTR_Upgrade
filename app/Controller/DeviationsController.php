@@ -152,7 +152,7 @@ class DeviationsController extends AppController {
             throw new NotFoundException(__('Invalid protocol deviation'), 'alerts/flash_error');
         }
         $site_inspection = $this->Deviation->read(null, $id);
-        if ($this->Deviation->saveField('status', 'Unubmitted')) {
+        if ($this->Deviation->saveField('status', 'Unsubmitted')) {
             $this->Session->setFlash(__('Protocol deviation unsubmitted'), 'alerts/flash_success');
             //TODO: notify applicant the protocol deviation can be edited
             $this->redirect($this->referer());

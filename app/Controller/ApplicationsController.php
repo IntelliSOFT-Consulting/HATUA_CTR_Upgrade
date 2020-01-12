@@ -985,6 +985,11 @@ class ApplicationsController extends AppController {
                 $validate = 'first';
                 $this->request->data['Application']['submitted'] = 1;
                 $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
+                //Start application stage
+                $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
+                $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
+                $this->request->data['ApplicationStage'][0]['status'] = 'Submitted';
+                //
                 if (empty($response['Application']['protocol_no'])) {
                     $count = $this->Application->find('count',  array('conditions' => array(
                             'Application.date_submitted BETWEEN ? and ?' => array(date("Y-m-01 00:00:00"), date("Y-m-d H:i:s")))));

@@ -9,7 +9,8 @@ class FriendShell  extends Shell {
     }
 
     public function findNewFriend() {
-    // $this->args == array('John Doe', 'Ghana')
-      $this->log('I am successful here @ login '.$this->args[0], 'test');
-  }
+    	// $this->args == array('John Doe', 'Ghana')
+    	$this->out('Hello world.');
+      	$this->log('I am successful here @ login '.$this->args[0], 'test');
+  	}
 }

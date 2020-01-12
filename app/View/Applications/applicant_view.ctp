@@ -30,6 +30,7 @@
     <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
+          <li><a href="#tab17" data-toggle="tab">Screening</a></li>
           <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments  <small>(<?php echo $reviewers_comments;?>)</small></a></li>          
           <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
           <li><a href="#tab7" data-toggle="tab">SAE/SUSAR (<?php echo count($application['Sae']) ?>)</a></li>
@@ -190,6 +191,37 @@ $this->end();
             ?>
           </div>
        </div>
+    </div>
+
+    <div class="tab-pane" id="tab17">
+        <div class="marketing">
+             <div class="row-fluid">
+                <div class="span12">
+                   <h3 class="text-info">Screening for completeness</h3>
+                </div>
+             </div>
+              <hr class="soften" style="margin: 10px 0px;">
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <br>
+              <div class="amend-form">
+                <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php echo $this->element('comments/list', ['comments' => $application['ApplicationStage'][0]['Comment']]) ?> 
+                  </div>
+                  <div class="span4 lefty">
+                  <?php  
+                        echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $application['ApplicationStage'][0]['id'],   
+                                               'model' => 'ApplicationStage', 'category' => 'external', 'url' => 'add_screening_query']]) 
+                  ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
     </div>
 
     <div class="tab-pane" id="tab6">   

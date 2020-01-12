@@ -146,6 +146,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'ApplicationStage' => array(
+            'className' => 'ApplicationStage',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
         'Pharmacist' => array(
             'className' => 'Pharmacist',
             'foreignKey' => 'application_id',
