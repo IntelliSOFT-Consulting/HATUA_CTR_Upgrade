@@ -1,10 +1,16 @@
 <?php
   $this->extend('/Elements/application/application_index');
+
+
 ?>
 
 <?php $this->start('header'); ?>
     <?php
       $this->assign('Applications', 'active');
+  // debug('Yahoo');
+  //     $h1['Application'] = min(Hash::extract($applications, '{n}.Application[id=76]'));
+  // debug($h1);
+  // debug(Hash::check($applications, '{n}.Application[id=76].id'));
     ?>
     <div class="marketing">
       <div class="row-fluid">

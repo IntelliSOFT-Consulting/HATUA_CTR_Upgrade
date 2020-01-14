@@ -112,7 +112,7 @@ class ApplicationStagesController extends AppController {
 				$this->ApplicationStage->save(array('ApplicationStage' => array(
 						'application_id' => $stage['ApplicationStage']['application_id'],
 						'stage' => 'ScreeningSubmission',
-						'status' => 'Done',
+						'status' => 'Complete',
 						'comment' => 'Direct confirmation',
 						'start_date' => date('Y-m-d'),
 						'end_date' => date('Y-m-d'),
@@ -121,16 +121,16 @@ class ApplicationStagesController extends AppController {
         	} else {
         		$this->ApplicationStage->create();
         		$ssu['ApplicationStage']['status'] = 'Complete';
-        		$ssu['ApplicationStage']['status'] = 'Manager direct complete';
+        		$ssu['ApplicationStage']['comment'] = 'Manager direct complete';
         		$ssu['ApplicationStage']['end_date'] = date('Y-m-d');
 				$this->ApplicationStage->save($ssu);
         	}
 
-        	//Create new review stage.
+        	//Create new assign stage.
         	$this->ApplicationStage->create();
 			$this->ApplicationStage->save(array('ApplicationStage' => array(
 					'application_id' => $stage['ApplicationStage']['application_id'],
-					'stage' => 'Review',
+					'stage' => 'Assign',
 					'status' => 'Start',
 					'start_date' => date('Y-m-d')
 					))

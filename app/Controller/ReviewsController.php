@@ -108,11 +108,108 @@ class ReviewsController extends AppController {
 
             if($this->Auth->password($this->request->data['Review']['password']) === $this->Auth->User('confirm_password')) {
                 if ($this->Review->save($this->request->data)) {
+
+                    //Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission stages if not exists
+                    $stages = $this->Application->ApplicationStage->find('all', array(
+                              'contain' => array(),
+                              'conditions' => array('ApplicationStage.application_id' => $id)
+                    ));
+
+                    if(!Hash::check($stages, '{n}.ApplicationStage[stage=Screening].id')) {
+                        $this->Application->ApplicationStage->create();
+                        $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                           'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'))
+                            )
+                        );
+                    } else {
+                        $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Screening]');
+                        if (!empty($var)) {
+                            $s1['ApplicationStage'] = min($var);
+                            if(empty($s1['ApplicationStage']['end_date'])) {
+                                $this->Application->ApplicationStage->create();
+                                $s1['ApplicationStage']['status'] = 'Complete';
+                                $s1['ApplicationStage']['comment'] = 'Manager review comment';
+                                $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                                $this->Application->ApplicationStage->save($s1);
+                            }                                    
+                        }                                
+                    }
+
+                    if(!Hash::check($stages, '{n}.ApplicationStage[stage=ScreeningSubmission].id')) {
+                        $this->Application->ApplicationStage->create();
+                        $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager review comment','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                ))
+                        );
+                    } else {
+                        $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ScreeningSubmission]');
+                        if (!empty($var)) {
+                            $s2['ApplicationStage'] = min($var);
+                            if(empty($s2['ApplicationStage']['end_date'])) {
+                                $this->Application->ApplicationStage->create();
+                                $s2['ApplicationStage']['status'] = 'Complete';
+                                $s2['ApplicationStage']['comment'] = 'Manager review comment';
+                                $s2['ApplicationStage']['end_date'] = date('Y-m-d');
+                                $this->Application->ApplicationStage->save($s2);
+                            }                                    
+                        }                                
+                    }
+
+                    if(!Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
+                        $this->Application->ApplicationStage->create();
+                        $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager review comment','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                ))
+                        );
+                    } else {
+                        $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Assign]');
+                        if (!empty($var)) {
+                            $s3['ApplicationStage'] = min($var);
+                            if(empty($s3['ApplicationStage']['end_date'])) {
+                                $this->Application->ApplicationStage->create();
+                                $s3['ApplicationStage']['status'] = 'Complete';
+                                $s3['ApplicationStage']['comment'] = 'Manager review comment';
+                                $s3['ApplicationStage']['end_date'] = date('Y-m-d');
+                                $this->Application->ApplicationStage->save($s3);
+                            }                                    
+                        }                                
+                    }
+
+                    if(!Hash::check($stages, '{n}.ApplicationStage[stage=Review].id')) {
+                        $this->Application->ApplicationStage->create();
+                        $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager review comment','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                ))
+                        );
+                    } else {
+                        $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Review]');
+                        if (!empty($var)) {
+                            $s4['ApplicationStage'] = min($var);
+                            if(empty($s4['ApplicationStage']['end_date'])) {
+                                $this->Application->ApplicationStage->create();
+                                $s4['ApplicationStage']['status'] = 'Complete';
+                                $s4['ApplicationStage']['comment'] = 'Manager review comment';
+                                $s4['ApplicationStage']['end_date'] = date('Y-m-d');
+                                $this->Application->ApplicationStage->save($s4);
+                            }                                    
+                        }                                
+                    }
+
+                    if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
+                        $this->Application->ApplicationStage->create();
+                        $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Start', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d')
+                                ))
+                        );
+                    }
+                    //end stages
+
+
                     $data = array(
                         'application_id' => $this->request->data['Review']['application_id'],
                         'manager' => $this->Auth->User('id'));
                     CakeResque::enqueue('default', 'NotificationShell', array('managerCommentNotifyApplicant', $data));
-                    $this->Session->setFlash(__('Thank you. Your comments have been saved. They are now visible to the investigator'),
+                    $this->Session->setFlash(__('Thank you. Your comments have been saved. They are now visible to the applicant and reviewers'),
                         'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
                 } else {
@@ -183,10 +280,65 @@ class ReviewsController extends AppController {
 
                       if ($this->Review->saveMany($this->request->data)) {
 
-                             CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data));
+                            //Create new Screening,ScreeningSubmission,Assign stages if not exists
+                            $stages = $this->Application->ApplicationStage->find('all', array(
+                                      'contain' => array(),
+                                      'conditions' => array('ApplicationStage.application_id' => $id)
+                            ));
 
-                              $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
-                              $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+                            if(!Hash::check($stages, '{n}.ApplicationStage[stage=Screening].id')) {
+                                $this->Application->ApplicationStage->create();
+                                $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                   'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'))
+                                    )
+                                );
+                            } else {
+                                $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Screening]');
+                                if (!empty($var)) {
+                                    $s1['ApplicationStage'] = min($var);
+                                    if(empty($s1['ApplicationStage']['end_date'])) {
+                                        $this->Application->ApplicationStage->create();
+                                        $s1['ApplicationStage']['status'] = 'Complete';
+                                        $s1['ApplicationStage']['comment'] = 'Manager assign reviewer';
+                                        $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                                        $this->Application->ApplicationStage->save($s1);
+                                    }                                    
+                                }                                
+                            }
+
+                            if(!Hash::check($stages, '{n}.ApplicationStage[stage=ScreeningSubmission].id')) {
+                                $this->Application->ApplicationStage->create();
+                                $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                        'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'From Manager assign','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                        ))
+                                );
+                            } else {
+                                $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ScreeningSubmission]');
+                                if (!empty($var)) {
+                                    $s2['ApplicationStage'] = min($var);
+                                    if(empty($s2['ApplicationStage']['end_date'])) {
+                                        $this->Application->ApplicationStage->create();
+                                        $s2['ApplicationStage']['status'] = 'Complete';
+                                        $s2['ApplicationStage']['comment'] = 'Manager assign reviewer';
+                                        $s2['ApplicationStage']['end_date'] = date('Y-m-d');
+                                        $this->Application->ApplicationStage->save($s2);
+                                    }                                    
+                                }                                
+                            }
+
+                            if(!Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
+                                $this->Application->ApplicationStage->create();
+                                $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                        'application_id' => $id, 'stage' => 'Assign', 'status' => 'Start', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d')
+                                        ))
+                                );
+                            }
+                            //end stages
+
+                            CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data));
+
+                            $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
+                            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
                       } else {
                               $this->Session->setFlash(__('The reviewers could not be notified. Please, try again.'));
                               $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
@@ -317,20 +469,40 @@ class ReviewsController extends AppController {
                 $review['Review']['recommendation'] = $this->request->data['Review']['recommendation'];
                 if($this->Auth->password($this->request->data['Review']['password']) === $this->Auth->User('confirm_password')) {
                    if ($this->Review->save($review)) {
-                       /*$client = new GearmanClient();
-                       // Add Gearman server
-                       $client->addServer("127.0.0.1", 4730);
-                       // Process job through worker
-                       $data = array(
-                        'function' => 'ppRequestReviewerResponse',
-                        'Reviewer' => $review
-                       );
-                       $client->doBackground('sendnotification', serialize($data));*/
+                       
+                        //Complete assign phase if end date is null and create new Review stage if not exists
+                        $stages = $this->Application->ApplicationStage->find('all', array(
+                                  'contain' => array(),
+                                  'conditions' => array('ApplicationStage.application_id' => $this->request->data['Review']['application_id'])
+                        ));
+
+                        if(Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Assign]');
+                            if (!empty($var)) {
+                                $s3['ApplicationStage'] = min($var);
+                                if(empty($s3['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s3['ApplicationStage']['status'] = 'Complete';
+                                    $s3['ApplicationStage']['comment'] = 'Reviewer accept';
+                                    $s3['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s3);
+                                }                                    
+                            }                                
+                        }
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=Review].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                               'application_id' => $this->request->data['Review']['application_id'], 'stage' => 'Review', 'status' => 'Start', 'comment' => 'From Reviewer accept', 'start_date' => date('Y-m-d'))
+                                )
+                            );
+                        } 
+                        //end stages
+
                        CakeResque::enqueue('default', 'NotificationShell', array('ppbRequestReviewerResponse', $review));
 
                        if($review['Review']['accepted'] == 'accepted') {
-                        $this->Session->setFlash(__('Thank you. Your response has been sent to PPB. You may proceed to
-                            review the application'),  'alerts/flash_success');
+                        $this->Session->setFlash(__('Thank you. Your response has been sent to PPB. You may proceed to review the application'),  'alerts/flash_success');
                             $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
                     } elseif($review['Review']['accepted'] == 'declined') {
                         $this->Session->setFlash(__('Thank you for your prompt response.'),  'alerts/flash_info');

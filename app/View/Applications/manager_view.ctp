@@ -313,15 +313,36 @@
              <div class="row-fluid">
                 <div class="span12">
                    <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
-                   <h3 class="text-info" style="text-decoration: underline;">PPB Manager's Comments Form</h3>
                 </div>
              </div>
               <hr class="soften" style="margin: 10px 0px;">
         </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <h4 class="text-success">My Previous Comments  <small>(<?php echo $my_reviews; ?>)</small></h4>
+            <?php
+              $counter = 0;
+              // pr($this->Session->read('Auth.User.id'));
+                foreach ($application['Review'] as $review) {
+                  // PPB Manager should be able to see all manager's comments
+                  if ($review['type'] == 'ppb_comment') {
+                     $counter++;
+                     echo "<hr><span class=\"badge badge-success\">".$counter."</span> <small class='muted'>
+                                created on: ".date('d-m-Y H:i:s', strtotime($review['created']))."</small>";
+                     echo "<div style='padding-left: 29px;' class='morecontent'>".$review['text']."</div>";
+                     echo "<div style='padding-left: 29px;' class='morecontent'>".$review['recommendation']."</div>";
+                  }
+                }
+            ?>
+          </div>
+        </div>
+
+        <h4 class="text-info" style="text-decoration: underline;">PPB Manager's Comments Form</h4>
         <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no'];?></p>
         <p><strong>2. Protocol title: </strong><?php echo $application['Application']['study_title'];?></p>
+        
         <div class="row-fluid">
-          <div class="span8">
+          <div class="span12">
           <?php
              echo $this->Form->create('Review', array('url' => array('controller' => 'reviews',
               'action' => 'comment', $application['Application']['id'])));
@@ -340,24 +361,36 @@
                   ));
             ?>
           </div>
-          <div class="span4">
-            <h4 class="text-success">My Previous Comments  <small>(<?php echo $my_reviews; ?>)</small></h4>
-            <?php
-              $counter = 0;
-              // pr($this->Session->read('Auth.User.id'));
-                foreach ($application['Review'] as $review) {
-                  // PPB Manager should be able to see all manager's comments
-                  if ($review['type'] == 'ppb_comment') {
-                     $counter++;
-                     echo "<hr><span class=\"badge badge-success\">".$counter."</span> <small class='muted'>
-                                created on: ".date('d-m-Y H:i:s', strtotime($review['created']))."</small>";
-                     echo "<div style='padding-left: 29px;' class='morecontent'>".$review['text']."</div>";
-                     echo "<div style='padding-left: 29px;' class='morecontent'>".$review['recommendation']."</div>";
-                  }
-                }
-            ?>
-          </div>
        </div>
+
+        <div class="row-fluid">
+          <div class="span12">
+            <br>
+              <div class="amend-form">
+                <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php 
+                      //Reviews limited to ppb_comment already
+                      $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
+                      $rid = null;
+                      if(!empty($var)) $rid = min($var);
+                      // debug($rid);
+                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
+                    ?> 
+                  </div>
+                  <div class="span4 lefty">
+                  <?php  
+                      if(!empty($rid))  echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
+                                               'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response']]) 
+                  ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="tab-pane" id="tab5">

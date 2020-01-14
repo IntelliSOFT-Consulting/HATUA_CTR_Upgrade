@@ -651,13 +651,21 @@ class ApplicationsController extends AppController {
                         $approval_no = 'PPB/'.$application['Application']['protocol_no']."/$year"."($cnt)";
                         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
                         $expiry_date_s = date('Y-m-d', strtotime($application['Application']['approval_date'] . " +1 year"));
+
+                        $qualification = $names = $professional_address = $telephone = null;
+                        if(isset($application['InvestigatorContact'][0])) {
+                            $qualification = $application['InvestigatorContact'][0]['qualification'];
+                            $names = $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name'];
+                            $professional_address = $application['InvestigatorContact'][0]['professional_address'];
+                            $telephone = $application['InvestigatorContact'][0]['telephone'];
+                        }
                         $variables = array(
                             'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'], 
                             'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
-                            'qualification' => $application['InvestigatorContact'][0]['qualification'],
-                            'names' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name'],
-                            'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
-                            'telephone' => $application['InvestigatorContact'][0]['telephone'],
+                            'qualification' => $qualification,
+                            'names' => $names,
+                            'professional_address' => $professional_address,
+                            'telephone' => $telephone,
                             'study_title' => $application['Application']['short_title'],
                             'checklist' => $checkstring,
                             'expiry_date' => $expiry_date
@@ -678,7 +686,138 @@ class ApplicationsController extends AppController {
                              $this->log('Annual approval letter was not saved!!', 'annual_letter_error');
                              $this->log($save_data, 'annual_letter_error');
                         }
-                        // end        
+                        // end 
+
+
+                        //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final stages if not exists
+                        $stages = $this->Application->ApplicationStage->find('all', array(
+                                  'contain' => array(),
+                                  'conditions' => array('ApplicationStage.application_id' => $id)
+                        ));
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=Screening].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                               'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'))
+                                )
+                            );
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Screening]');
+                            if (!empty($var)) {
+                                $s1['ApplicationStage'] = min($var);
+                                if(empty($s1['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s1['ApplicationStage']['status'] = 'Complete';
+                                    $s1['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s1);
+                                }                                    
+                            }                                
+                        }
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=ScreeningSubmission].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                    'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    ))
+                            );
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ScreeningSubmission]');
+                            if (!empty($var)) {
+                                $s2['ApplicationStage'] = min($var);
+                                if(empty($s2['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s2['ApplicationStage']['status'] = 'Complete';
+                                    $s2['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s2['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s2);
+                                }                                    
+                            }                                
+                        }
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                    'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    ))
+                            );
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Assign]');
+                            if (!empty($var)) {
+                                $s3['ApplicationStage'] = min($var);
+                                if(empty($s3['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s3['ApplicationStage']['status'] = 'Complete';
+                                    $s3['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s3['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s3);
+                                }                                    
+                            }                                
+                        }
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=Review].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                    'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    ))
+                            );
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Review]');
+                            if (!empty($var)) {
+                                $s4['ApplicationStage'] = min($var);
+                                if(empty($s4['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s4['ApplicationStage']['status'] = 'Complete';
+                                    $s4['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s4['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s4);
+                                }                                    
+                            }                                
+                        }
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                    'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    ))
+                            );
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
+                            if (!empty($var)) {
+                                $s5['ApplicationStage'] = min($var);
+                                if(empty($s5['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s5['ApplicationStage']['status'] = 'Complete';
+                                    $s5['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s5['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s5);
+                                }                                    
+                            }                                
+                        }
+
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=FinalDecision].id')) {
+                            $this->Application->ApplicationStage->create();
+                            $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                    'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    ))
+                            );
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=FinalDecision]');
+                            if (!empty($var)) {
+                                $s6['ApplicationStage'] = min($var);
+                                if(empty($s6['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s6['ApplicationStage']['status'] = 'Complete';
+                                    $s6['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s6['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s6);
+                                }                                    
+                            }                                
+                        }
+
+                        //end stages
+                        //**********************        end
 
                         //******************       Send Email and Notifications Managers    *****************************
                         $this->loadModel('Message');

@@ -10,7 +10,7 @@
           <img alt="" src="/img/authenticated/preferences_composer.png">
           <div class="caption">
             <h4>My Applications</h4>
-            <p>A list of protocols that I have accepted to review</p>
+            <p>A list of assigned/accepted</p>
             <ol><?php
                  foreach($applications as $application) {
                     if(!empty($application['Application']['study_drug'])) {

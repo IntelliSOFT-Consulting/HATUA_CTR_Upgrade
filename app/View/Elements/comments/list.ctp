@@ -3,7 +3,7 @@
       <?php 
         foreach ($comments as $key => $comment) {
       ?>
-      <a class="btn btn-link" role="button" data-toggle="collapse" href="#comment<?php echo $comment['id'] ?>" aria-expanded="false" 
+      <a class="btn btn-link btn-comment" role="button" data-toggle="collapse" href="#comment<?php echo $comment['id'] ?>" aria-expanded="false" 
             aria-controls="comment<?php echo $comment['id'] ?>">
         <?php echo ($key+1).'.  '.$comment['sender'].' <small><em>'.$comment['created'].'</em></small> <br><small class="muted">'.$comment['category'].'</small>' ?>
       </a>

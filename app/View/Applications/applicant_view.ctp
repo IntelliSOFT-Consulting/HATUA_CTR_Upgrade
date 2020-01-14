@@ -182,7 +182,10 @@ $this->end();
                   <div class="span8">    
                     <?php 
                       // debug(min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]')));
-                      $eid = min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]'));
+                      // $eid = min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]'));
+                      $var = Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]');
+                      $eid = null;
+                      if(!empty($var)) $eid = min($var);
                       // debug($eid);
                       if(!empty($eid)) echo $this->element('comments/list', ['comments' => $eid['Comment']]);
                     ?> 
@@ -233,6 +236,35 @@ $this->end();
             ?>
           </div>
        </div>
+
+        <div class="row-fluid">
+          <div class="span12">
+            <br>
+              <div class="amend-form">
+                <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php 
+                      //Reviews limited to ppb_comment already
+                      $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
+                      $rid = null;
+                      if(!empty($var)) $rid = min($var);
+                      // debug($rid);
+                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
+                    ?> 
+                  </div>
+                  <div class="span4 lefty">
+                  <?php  
+                      if(!empty($rid))  echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
+                                               'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response']]) 
+                  ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="tab-pane" id="tab6">   
