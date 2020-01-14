@@ -413,6 +413,40 @@ class CommentsController extends AppController {
                       'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
                   ));
 
+                  //Check if request is coming from manager/applicant
+                  //Applicant can't respond during screening phase until manager makes comment
+                  //When manager responds, the screening phase is complete. Check if manager response is first
+                  $this->loadModel('ApplicationStage');
+                  $stage = $this->ApplicationStage->read(null, $this->request->data['Comment']['foreign_key']);
+                  
+                  //Complete screening phase 
+                  if($stage['ApplicationStage']['status'] == 'Submitted') {
+                    $this->ApplicationStage->set(array(
+                        'status' => 'Query',
+                        'comment' => 'Manager first comment',
+                        'end_date' => date('Y-m-d')
+                    ));
+                    $this->ApplicationStage->save();
+                  }
+
+                  // $var = Hash::extract($stage, 'Comment.{n}[stage=ScreeningSubmission].id');
+                  $var = $this->ApplicationStage->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('ApplicationStage.application_id' => $stage['ApplicationStage']['application_id'], 'ApplicationStage.stage' => 'ScreeningSubmission')
+                  ));
+                  if(empty($var)) {                       
+                      //Create new sponsor submission stage.
+                      $this->ApplicationStage->create();
+                      $this->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $stage['ApplicationStage']['application_id'],
+                          'stage' => 'ScreeningSubmission',
+                          'status' => 'Create',
+                          'start_date' => date('Y-m-d')
+                          ))
+                      );
+                  }                
+
+
                   $users = $this->Comment->User->find('all', array(
                       'contain' => array(),
                       'conditions' => array('OR' => array('User.id' => $app['Application']['user_id'], 'User.group_id' => 2))
@@ -429,7 +463,7 @@ class CommentsController extends AppController {
                       );
                       $datum = array(
                         'email' => $user['User']['email'],
-                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'screening_feedback', 'model' => 'Application',
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'screening_feedback', 'model' => 'ApplicationStage',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                       );

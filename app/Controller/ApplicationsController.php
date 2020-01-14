@@ -471,6 +471,12 @@ class ApplicationsController extends AppController {
             $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
         }
 
+
+        // $this->loadModel('ApplicationStage');
+        //           $stage = $this->ApplicationStage->read(null, 4);
+        //           debug($stage);
+                  
+
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
 
@@ -1040,7 +1046,7 @@ class ApplicationsController extends AppController {
                             Your assigned protocol number is '.$data['Application']['protocol_no'].'. PPB will review
                             this application and notify you on the progress. You can view the progress of the application by clicking on
                             &lsquo;my applications&rsquo; on the dashboard menu. Thank you.'), 'alerts/flash_success');
-                        $this->redirect(array('action' => 'index'));
+                        $this->redirect(array('action' => 'view', $this->Application->id));
                     } else {
                         $message = 'The change to the application has been saved. You may continue editing the report. Remember to submit the report when you are done.';
                         if($this->RequestHandler->isAjax()) {

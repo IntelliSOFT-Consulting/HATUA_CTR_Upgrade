@@ -85,11 +85,57 @@ class ApplicationStagesController extends AppController {
         }
         $this->ApplicationStage->id = $id;
         if (!$this->ApplicationStage->exists()) {
-            throw new NotFoundException(__('Invalid protocol deviation'), 'alerts/flash_error');
+            throw new NotFoundException(__('Invalid Application Stage'), 'alerts/flash_error');
         }
+
         $stage = $this->ApplicationStage->read(null, $id);
-        if ($this->ApplicationStage->saveField('status', 'Complete')) {
-        	$this->ApplicationStage->saveField('end_date', date('Y-m-d'));
+        // $this->ApplicationStage->set(array(
+        //                   'status' => 'Complete',
+        //                   'comment' => 'Manager close screening',
+        //                   'end_date' => date('Y-m-d')
+        // ));
+        $this->ApplicationStage->set('status', 'Complete');
+        $this->ApplicationStage->set('comment', 'Manager close screening');
+        if(empty($stage['ApplicationStage']['end_date'])) $this->ApplicationStage->set('end_date', date('Y-m-d'));
+
+        
+        if ($this->ApplicationStage->save()) {
+        	// $this->ApplicationStage->saveField('end_date', date('Y-m-d'));
+
+        	//Create ScreeningSubmission stage if not exists first or complete if existed
+        	$ssu = $this->ApplicationStage->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('ApplicationStage.application_id' => $stage['ApplicationStage']['application_id'], 'ApplicationStage.stage' => 'ScreeningSubmission')
+                  ));
+        	if(empty($ssu)) {
+        		$this->ApplicationStage->create();
+				$this->ApplicationStage->save(array('ApplicationStage' => array(
+						'application_id' => $stage['ApplicationStage']['application_id'],
+						'stage' => 'ScreeningSubmission',
+						'status' => 'Done',
+						'comment' => 'Direct confirmation',
+						'start_date' => date('Y-m-d'),
+						'end_date' => date('Y-m-d'),
+						))
+				);
+        	} else {
+        		$this->ApplicationStage->create();
+        		$ssu['ApplicationStage']['status'] = 'Complete';
+        		$ssu['ApplicationStage']['status'] = 'Manager direct complete';
+        		$ssu['ApplicationStage']['end_date'] = date('Y-m-d');
+				$this->ApplicationStage->save($ssu);
+        	}
+
+        	//Create new review stage.
+        	$this->ApplicationStage->create();
+			$this->ApplicationStage->save(array('ApplicationStage' => array(
+					'application_id' => $stage['ApplicationStage']['application_id'],
+					'stage' => 'Review',
+					'status' => 'Start',
+					'start_date' => date('Y-m-d')
+					))
+			);
+
             $this->Session->setFlash(__('Screening completed'), 'alerts/flash_success');
 
             //******************       Send Email and Notifications to Applicant and Managers          *****************************

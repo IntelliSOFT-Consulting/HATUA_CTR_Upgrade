@@ -9,6 +9,11 @@
       $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
       $this->Html->script('jquery.blockUI.js', array('inline' => false));
     ?>
+
+    <?php
+        echo $this->Session->flash();
+    ?>
+
     <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
@@ -168,11 +173,14 @@
                 <div class="span12">
                    <h3 class="text-info">Screening for completeness</h3>
                    <?php                   
-                      // echo $this->Html->link(
-                      //   '<label class="label label-info">Complete screening</label>', 
-                      //     array('controller' => 'application_stages', 'action' => 'complete', $application['ApplicationStage'][0]['id']), array('escape' => false));
-                   echo $this->Form->postLink(__('<label class="label label-success">Complete screening</label>'), array('controller' => 'application_stages', 'action' => 'complete_screening', $application['ApplicationStage'][0]['id']), 
-                    array('escape' => false), __('Are you sure you want to complete screening ?'));
+                      $eid = null;
+                      $var = Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]');
+                      if(!empty($var)) $eid = min($var);
+
+                      if(!empty($eid) && empty($eid['end_date'])) echo $this->Form->postLink(__('<button class="btn btn-primary active" type="button">Complete screening</button>'), 
+                            array('controller' => 'application_stages', 'action' => 'complete_screening', $eid['id']), 
+                            array('escape' => false), __('Are you sure you want to complete screening ?'));
+                      else echo '<button class="btn btn-success  disabled" type="button">Screening completed!!</button>';
                    ?>
                 </div>
              </div>
@@ -185,12 +193,12 @@
                 <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
                 <div class="row-fluid">
                   <div class="span8">    
-                    <?php echo $this->element('comments/list', ['comments' => $application['ApplicationStage'][0]['Comment']]) ?> 
+                    <?php if(!empty($eid)) echo $this->element('comments/list', ['comments' => $eid['Comment']]) ?> 
                   </div>
                   <div class="span4 lefty">
                   <?php  
-                        echo $this->element('comments/add', [
-                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $application['ApplicationStage'][0]['id'],   
+                      if(!empty($eid))   echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $eid['id'],   
                                                'model' => 'ApplicationStage', 'category' => 'external', 'url' => 'add_screening_query']]) 
                   ?>
                   </div>

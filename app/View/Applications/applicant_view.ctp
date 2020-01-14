@@ -27,6 +27,11 @@
 
      $this->assign('is-applicant', 'true');
     ?>
+
+    <?php
+        echo $this->Session->flash();
+    ?>
+
     <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
@@ -158,6 +163,43 @@ $this->end();
 
 <?php $this->start('endjs'); ?>
  </div> <!-- End or bootstrab tab1 -->
+
+    <div class="tab-pane" id="tab17">
+        <div class="marketing">
+             <div class="row-fluid">
+                <div class="span12">
+                   <h3 class="text-info">Screening for completeness</h3>
+                </div>
+             </div>
+              <hr class="soften" style="margin: 10px 0px;">
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <br>
+              <div class="amend-form">
+                <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
+                <div class="row-fluid">
+                  <div class="span8">    
+                    <?php 
+                      // debug(min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]')));
+                      $eid = min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]'));
+                      // debug($eid);
+                      if(!empty($eid)) echo $this->element('comments/list', ['comments' => $eid['Comment']]);
+                    ?> 
+                  </div>
+                  <div class="span4 lefty">
+                  <?php  
+                      if(!empty($eid) && !empty($eid['Comment']))  echo $this->element('comments/add', [
+                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $eid['id'],   
+                                               'model' => 'ApplicationStage', 'category' => 'external', 'url' => 'add_screening_query']]) 
+                  ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+
     <div class="tab-pane" id="tab2">
         <div class="marketing">
              <div class="row-fluid">
@@ -191,37 +233,6 @@ $this->end();
             ?>
           </div>
        </div>
-    </div>
-
-    <div class="tab-pane" id="tab17">
-        <div class="marketing">
-             <div class="row-fluid">
-                <div class="span12">
-                   <h3 class="text-info">Screening for completeness</h3>
-                </div>
-             </div>
-              <hr class="soften" style="margin: 10px 0px;">
-        </div>
-        <div class="row-fluid">
-          <div class="span12">
-            <br>
-              <div class="amend-form">
-                <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
-                <div class="row-fluid">
-                  <div class="span8">    
-                    <?php echo $this->element('comments/list', ['comments' => $application['ApplicationStage'][0]['Comment']]) ?> 
-                  </div>
-                  <div class="span4 lefty">
-                  <?php  
-                        echo $this->element('comments/add', [
-                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $application['ApplicationStage'][0]['id'],   
-                                               'model' => 'ApplicationStage', 'category' => 'external', 'url' => 'add_screening_query']]) 
-                  ?>
-                  </div>
-                </div>
-              </div>
-            </div>
-        </div>
     </div>
 
     <div class="tab-pane" id="tab6">   
