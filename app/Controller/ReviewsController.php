@@ -201,7 +201,19 @@ class ReviewsController extends AppController {
                                 'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Start', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d')
                                 ))
                         );
+                    } else {
+                        // Re-open stage
+                        $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
+                        if (!empty($var)) {
+                            $s5['ApplicationStage'] = min($var);
+                            $this->Application->ApplicationStage->create();
+                            $s5['ApplicationStage']['status'] = 'Comment';
+                            $s5['ApplicationStage']['comment'] = 'Manager new comment';
+                            $s5['ApplicationStage']['end_date'] = null;  //re-open stage
+                            $this->Application->ApplicationStage->save($s5);
+                        } 
                     }
+
                     //end stages
 
 

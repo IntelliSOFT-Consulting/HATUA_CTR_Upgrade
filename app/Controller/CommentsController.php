@@ -544,12 +544,65 @@ class CommentsController extends AppController {
         $this->set(compact('users'));
     }
     public function manager_add_review_response() {
+        //If manager commenting or sending feedback, review submission is opened again
+          $this->loadModel('ApplicationStage');
+          $stages = $this->ApplicationStage->find('all', array(
+              'contain' => array(),
+              'conditions' => array('ApplicationStage.application_id' => $this->request->data['Comment']['model_id'])
+          ));
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
+              $this->ApplicationStage->create();
+              $this->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Start', 'comment' => 'Manager review response', 'start_date' => date('Y-m-d')
+                      ))
+              );
+          } else {
+              // Re-open stage
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
+              if (!empty($var)) {
+                  $s5['ApplicationStage'] = min($var);
+                  if(empty($s5['ApplicationStage']['end_date'])) {
+                      $this->ApplicationStage->create();
+                      $s5['ApplicationStage']['status'] = 'Feedback';
+                      $s5['ApplicationStage']['comment'] = 'Manager review response';
+                      $s5['ApplicationStage']['end_date'] = null;  //re-open stage
+                      $this->ApplicationStage->save($s5);
+                  }                                    
+              } 
+          }
+        //end
         $this->add_review_response();
     }
     public function reviewer_add_review_response() {
         $this->add_review_response();
     }
     public function applicant_add_review_response() {
+        //If applicant commenting, close and create FinalDecision stage
+          $this->loadModel('ApplicationStage');
+          $stages = $this->ApplicationStage->find('all', array(
+              'contain' => array(),
+              'conditions' => array('ApplicationStage.application_id' => $this->request->data['Comment']['model_id'])
+          ));
+          if(Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
+              if (!empty($var)) {
+                  $s5['ApplicationStage'] = min($var);
+                  $this->ApplicationStage->create();
+                  $s5['ApplicationStage']['status'] = 'Complete';
+                  $s5['ApplicationStage']['comment'] = 'Applicant review response';
+                  $s5['ApplicationStage']['end_date'] = date('Y-m-d'); 
+                  $this->ApplicationStage->save($s5);
+              } 
+          }
+          if (!Hash::check($stages, '{n}.ApplicationStage[stage=FinalDecision].id')) {
+              // New final decision
+              $this->ApplicationStage->create();
+              $this->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $this->request->data['Comment']['model_id'], 'stage' => 'FinalDecision', 'status' => 'Start', 'comment' => 'Applicant review response', 'start_date' => date('Y-m-d')
+                      ))
+              );
+          }
+        //end
         $this->add_review_response();
     }
 

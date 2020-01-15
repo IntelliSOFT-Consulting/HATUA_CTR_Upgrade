@@ -30,7 +30,7 @@ class ApplicationsController extends AppController {
         $stages = [];
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
-            'contain' => array('Review')
+            'contain' => array('ApplicationStage', 'Review')
         ));
         if ($application) {
             if ($application['Application']['protocol_no']) {
@@ -46,54 +46,80 @@ class ApplicationsController extends AppController {
             $ccolor = 'success';
             $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Start', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
 
-            //Applicant submit
-            $stages['Submit'] = ['label' => 'Submit', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-            if ($application['Application']['submitted']) {
-                $ced = ($application['Application']['date_submitted']) ? new DateTime($application['Application']['date_submitted']) : new DateTime();
-                $cdays = $ced->diff($csd)->format('%a');
-                $stages['Creation']['end_date'] = $ced->format('d-M-Y');
-                $stages['Creation']['days'] = $cdays;
-
-                $stages['Submit']['start_date'] = $ced->format('d-M-Y');         
-                $stages['Submit']['color'] = 'success';         
+            //Screening for Completeness
+            $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=Screening].id')) {
+                $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Screening]'));
+                $scr_s = new DateTime($scr['start_date']);
+                $scr_e = new DateTime($scr['end_date']);
+                $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
+                $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                
+                $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');         
+                $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');  
+                $stages['Screening']['color'] = 'success';  
             }
 
-            //Review
-            // debug(Hash::extract($application, 'Review.{n}[id=2].id'));
-            $stages['Review'] = ['label' => 'Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-            if (in_array('request', Hash::extract($application, 'Review.{n}.type'))) {
-                $rsd = new DateTime(min(Hash::extract($application, 'Review.{n}.created')));
-                $stages['Submit']['end_date'] = $rsd->format('d-M-Y');
-                $stages['Submit']['days'] = $rsd->diff($ced)->format('%a');
-
-                $stages['Review']['start_date'] = $rsd->format('d-M-Y');
-                $stages['Review']['color'] = 'success';
+            //Submission by sponsor
+            $stages['ScreeningSubmission'] = ['label' => 'Sponsor <br>Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=ScreeningSubmission].id')) {
+                $ssb = min(Hash::extract($application['ApplicationStage'], '{n}[stage=ScreeningSubmission]'));
+                $ssb_s = new DateTime($ssb['start_date']);
+                $ssb_e = new DateTime($ssb['end_date']);
+                
+                $stages['ScreeningSubmission']['start_date'] = $ssb_s->format('d-M-Y');
+                $stages['ScreeningSubmission']['days'] = $ssb_s->diff($ssb_e)->format('%a');  
+                $stages['ScreeningSubmission']['color'] = 'success';  
             }
-
-            //Feedback
-            $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-            if (in_array('ppb_comment', Hash::extract($application, 'Review.{n}.type'))) {
-                // debug(Hash::extract($application, 'Review.{n}[type=ppb_comment].id'));
-                $fsd = new DateTime(min(Hash::extract($application, 'Review.{n}[type=ppb_comment].created')));
-                $stages['Review']['end_date'] = $fsd->format('d-M-Y');
-                $stages['Review']['days'] = $fsd->diff($rsd)->format('%a');
-
-                $stages['Feedback']['start_date'] = $fsd->format('d-M-Y');
-                $stages['Feedback']['color'] = 'success';
-            } 
-
-            //Approval
-            $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-            if ($application['Application']['approved']) {
-                $asd = new DateTime($application['Application']['approval_date']);
-                $stages['Feedback']['end_date'] = $asd->format('d-M-Y');
-                if(!isset($fsd)) $fsd = new DateTime($application['Application']['approval_date']);
-                $stages['Feedback']['days'] = $asd->diff($fsd)->format('%a');
-
-                $stages['Approval']['start_date'] = $asd->format('d-M-Y');
-                $stages['Approval']['color'] = ($application['Application']['approved'] == '2') ? 'success' : 'warning';
-            } 
-
+            
+            //Assign reviewers
+            $stages['Assign'] = ['label' => 'Assign <br>Reviewers', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=Assign].id')) {
+                $asn = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Assign]'));
+                $asn_s = new DateTime($asn['start_date']);
+                $asn_e = new DateTime($asn['end_date']);
+                
+                $stages['Assign']['start_date'] = $asn_s->format('d-M-Y');
+                $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a');  
+                $stages['Assign']['color'] = 'success';  
+            }
+            
+            //PPB Review
+            $stages['Review'] = ['label' => 'PPB Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=Review].id')) {
+                $rev = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Review]'));
+                $rev_s = new DateTime($rev['start_date']);
+                $rev_e = new DateTime($rev['end_date']);
+                
+                $stages['Review']['start_date'] = $rev_s->format('d-M-Y');
+                $stages['Review']['days'] = $rev_s->diff($rev_e)->format('%a');  
+                $stages['Review']['color'] = 'success';  
+            }
+            
+            //Review submission
+            $stages['ReviewSubmission'] = ['label' => 'Sponsor <br>Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=ReviewSubmission].id')) {
+                $rsb = min(Hash::extract($application['ApplicationStage'], '{n}[stage=ReviewSubmission]'));
+                $rsb_s = new DateTime($rsb['start_date']);
+                $rsb_e = new DateTime($rsb['end_date']);
+                
+                $stages['ReviewSubmission']['start_date'] = $rsb_s->format('d-M-Y');
+                $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a');  
+                $stages['ReviewSubmission']['color'] = 'success';  
+            }
+            
+            //Submission by sponsor
+            $stages['FinalDecision'] = ['label' => 'Final <br>Decision', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=FinalDecision].id')) {
+                $fin = min(Hash::extract($application['ApplicationStage'], '{n}[stage=FinalDecision]'));
+                $fin_s = new DateTime($fin['start_date']);
+                $fin_e = new DateTime($fin['end_date']);
+                
+                $stages['FinalDecision']['start_date'] = $fin_s->format('d-M-Y');
+                $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
+                $stages['FinalDecision']['color'] = 'success';  
+            }
+            
             //Completion
 
 
@@ -110,25 +136,9 @@ class ApplicationsController extends AppController {
         if ($this->request->is('requested')) {
             return $stages;
         }        
-    }    
-    /*public function admin_stages($id = null) {
-        $this->stages($id);
-    }
-    public function manager_stages($id = null) {
-        $this->stages($id);
-    }
-    public function inspector_stages($id = null) {
-        $this->stages($id);
-    }
-    public function reviewer_stages($id = null) {
-        $this->stages($id);
-    }
-    public function partner_stages($id = null) {
-        $this->stages($id);
-    }
-    public function applicant_stages($id = null) {
-        $this->stages($id);
-    }*/
+    } 
+
+    
 /**
  * index method
  *
@@ -809,7 +819,7 @@ class ApplicationsController extends AppController {
                                 if(empty($s6['ApplicationStage']['end_date'])) {
                                     $this->Application->ApplicationStage->create();
                                     $s6['ApplicationStage']['status'] = 'Complete';
-                                    $s6['ApplicationStage']['comment'] = 'Manager final decision';
+                                    $s6['ApplicationStage']['comment'] = $this->request->data['Application']['approved'];
                                     $s6['ApplicationStage']['end_date'] = date('Y-m-d');
                                     $this->Application->ApplicationStage->save($s6);
                                 }                                    
