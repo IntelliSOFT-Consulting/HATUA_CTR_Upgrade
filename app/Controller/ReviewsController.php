@@ -198,7 +198,7 @@ class ReviewsController extends AppController {
                     if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Start', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d')
+                                'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Current', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d')
                                 ))
                         );
                     } else {
@@ -207,7 +207,7 @@ class ReviewsController extends AppController {
                         if (!empty($var)) {
                             $s5['ApplicationStage'] = min($var);
                             $this->Application->ApplicationStage->create();
-                            $s5['ApplicationStage']['status'] = 'Comment';
+                            $s5['ApplicationStage']['status'] = 'Current';
                             $s5['ApplicationStage']['comment'] = 'Manager new comment';
                             $s5['ApplicationStage']['end_date'] = null;  //re-open stage
                             $this->Application->ApplicationStage->save($s5);
@@ -341,7 +341,7 @@ class ReviewsController extends AppController {
                             if(!Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
                                 $this->Application->ApplicationStage->create();
                                 $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
-                                        'application_id' => $id, 'stage' => 'Assign', 'status' => 'Start', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d')
+                                        'application_id' => $id, 'stage' => 'Assign', 'status' => 'Current', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d')
                                         ))
                                 );
                             }
@@ -505,7 +505,7 @@ class ReviewsController extends AppController {
                         if(!Hash::check($stages, '{n}.ApplicationStage[stage=Review].id')) {
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
-                               'application_id' => $this->request->data['Review']['application_id'], 'stage' => 'Review', 'status' => 'Start', 'comment' => 'From Reviewer accept', 'start_date' => date('Y-m-d'))
+                               'application_id' => $this->request->data['Review']['application_id'], 'stage' => 'Review', 'status' => 'Current', 'comment' => 'From Reviewer accept', 'start_date' => date('Y-m-d'))
                                 )
                             );
                         } 

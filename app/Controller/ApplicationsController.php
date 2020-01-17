@@ -56,8 +56,15 @@ class ApplicationsController extends AppController {
                 $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
                 
                 $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');         
-                $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');  
-                $stages['Screening']['color'] = 'success';  
+                $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a'); 
+                
+                if ($scr['status'] == 'Current' && $stages['Screening']['days'] > 0 && $stages['Screening']['days'] <= 5) {
+                    $stages['Screening']['color'] = 'warning';
+                } elseif ($scr['status'] == 'Current' && $stages['Screening']['days'] > 5) {
+                    $stages['Screening']['color'] = 'error';
+                } else {
+                    $stages['Screening']['color'] = 'success';
+                }
             }
 
             //Submission by sponsor
@@ -69,7 +76,14 @@ class ApplicationsController extends AppController {
                 
                 $stages['ScreeningSubmission']['start_date'] = $ssb_s->format('d-M-Y');
                 $stages['ScreeningSubmission']['days'] = $ssb_s->diff($ssb_e)->format('%a');  
-                $stages['ScreeningSubmission']['color'] = 'success';  
+                
+                if ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 0 && $stages['ScreeningSubmission']['days'] <= 10) {
+                    $stages['ScreeningSubmission']['color'] = 'warning';
+                } elseif ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 10) {
+                    $stages['ScreeningSubmission']['color'] = 'error';
+                } else {
+                    $stages['ScreeningSubmission']['color'] = 'success';  
+                }
             }
             
             //Assign reviewers
@@ -80,8 +94,15 @@ class ApplicationsController extends AppController {
                 $asn_e = new DateTime($asn['end_date']);
                 
                 $stages['Assign']['start_date'] = $asn_s->format('d-M-Y');
-                $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a');  
-                $stages['Assign']['color'] = 'success';  
+                $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a'); 
+
+                if ($asn['status'] == 'Current' && $stages['Assign']['days'] > 0 && $stages['Assign']['days'] <= 5) {
+                    $stages['Assign']['color'] = 'warning';
+                } elseif ($asn['status'] == 'Current' && $stages['Assign']['days'] > 5) {
+                    $stages['Assign']['color'] = 'error';
+                } else {
+                    $stages['Assign']['color'] = 'success';  
+                }
             }
             
             //PPB Review
@@ -93,7 +114,14 @@ class ApplicationsController extends AppController {
                 
                 $stages['Review']['start_date'] = $rev_s->format('d-M-Y');
                 $stages['Review']['days'] = $rev_s->diff($rev_e)->format('%a');  
-                $stages['Review']['color'] = 'success';  
+
+                if ($rev['status'] == 'Current' && $stages['Review']['days'] > 0 && $stages['Review']['days'] <= 30) {
+                    $stages['Review']['color'] = 'warning';
+                } elseif ($rev['status'] == 'Current' && $stages['Review']['days'] > 30) {
+                    $stages['Review']['color'] = 'error';
+                } else {
+                    $stages['Review']['color'] = 'success';  
+                }
             }
             
             //Review submission
@@ -104,11 +132,18 @@ class ApplicationsController extends AppController {
                 $rsb_e = new DateTime($rsb['end_date']);
                 
                 $stages['ReviewSubmission']['start_date'] = $rsb_s->format('d-M-Y');
-                $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a');  
-                $stages['ReviewSubmission']['color'] = 'success';  
+                $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a'); 
+
+                if ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 0 && $stages['ReviewSubmission']['days'] <= 90) {
+                    $stages['ReviewSubmission']['color'] = 'warning';
+                } elseif ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 90) {
+                    $stages['ReviewSubmission']['color'] = 'error';
+                } else {
+                    $stages['ReviewSubmission']['color'] = 'success';  
+                }
             }
             
-            //Submission by sponsor
+            //Final Decision
             $stages['FinalDecision'] = ['label' => 'Final <br>Decision', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if(Hash::check($application['ApplicationStage'], '{n}[stage=FinalDecision].id')) {
                 $fin = min(Hash::extract($application['ApplicationStage'], '{n}[stage=FinalDecision]'));
@@ -117,7 +152,34 @@ class ApplicationsController extends AppController {
                 
                 $stages['FinalDecision']['start_date'] = $fin_s->format('d-M-Y');
                 $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
-                $stages['FinalDecision']['color'] = 'success';  
+
+                if ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 0 && $stages['FinalDecision']['days'] <= 15) {
+                    $stages['FinalDecision']['color'] = 'warning';
+                } elseif ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 15) {
+                    $stages['FinalDecision']['color'] = 'error';
+                } else {
+                    $stages['FinalDecision']['color'] = 'success';  
+                }
+            }
+            
+            
+            //Annual Approval
+            $stages['AnnualApproval'] = ['label' => 'Annual <br>Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            if(Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
+                $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
+                $ann_s = new DateTime();
+                $ann_e = new DateTime($ann['end_date']);
+                
+                $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
+                $stages['AnnualApproval']['days'] = $ann_s->diff($fin_e)->format('%a');  
+
+                if ($ann['status'] == 'Current') {
+                    $stages['AnnualApproval']['color'] = 'success';
+                } elseif ($ann['status'] == 'Pending') {
+                    $stages['AnnualApproval']['color'] = 'warning';
+                } elseif ($ann['status'] == 'Expired') {
+                    $stages['AnnualApproval']['color'] = 'error';
+                } 
             }
             
             //Completion
@@ -235,6 +297,42 @@ class ApplicationsController extends AppController {
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
+    }
+
+    //workflow
+    public function manager_workflow() {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        // debug($this->params['named']['stages']);
+        if (!empty($this->passedArgs['stages'])) $this->passedArgs['stages'] = $this->params['named']['stages'];
+        if (!empty($this->passedArgs['status'])) $this->passedArgs['status'] = $this->params['named']['status'];
+            else $this->passedArgs['status'] = 'Current';
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+            $criteria = $this->Application->parseCriteria($this->passedArgs);
+            if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+
+            $this->paginate['conditions'] = $criteria;
+            $this->paginate['order'] = array('Application.created' => 'desc');
+
+            $this->paginate['contain'] = array(
+                'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
+                'TrialStatus',
+                'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
+
+            //in case of csv export
+            if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+              $this->csv_export($this->Application->find('all', 
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+                  ));
+            }
+            //end csv export
+
+            $this->set('page_options', $page_options);
+            $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+
     }
 
     public function inspector_index() {
@@ -699,7 +797,7 @@ class ApplicationsController extends AppController {
                         // end 
 
 
-                        //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final stages if not exists
+                        //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final,AnnualApproval stages if not exists
                         $stages = $this->Application->ApplicationStage->find('all', array(
                                   'contain' => array(),
                                   'conditions' => array('ApplicationStage.application_id' => $id)
@@ -822,6 +920,29 @@ class ApplicationsController extends AppController {
                                     $s6['ApplicationStage']['comment'] = $this->request->data['Application']['approved'];
                                     $s6['ApplicationStage']['end_date'] = date('Y-m-d');
                                     $this->Application->ApplicationStage->save($s6);
+                                }                                    
+                            }                                
+                        }
+
+                        if(!Hash::check($stages, '{n}.ApplicationStage[stage=AnnualApproval].id')) {
+                            //create only if approved
+                            if($this->request->data['Application']['approved'] == 2) {                                
+                                $this->Application->ApplicationStage->create();
+                                $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                                        'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                                        ))
+                                );
+                            }
+                        } else {
+                            $var = Hash::extract($stages, '{n}.ApplicationStage[stage=AnnualApproval]');
+                            if (!empty($var)) {
+                                $s7['ApplicationStage'] = min($var);
+                                if(empty($s7['ApplicationStage']['end_date'])) {
+                                    $this->Application->ApplicationStage->create();
+                                    $s7['ApplicationStage']['status'] = 'Current';
+                                    $s7['ApplicationStage']['comment'] = 'Manager approve';
+                                    $s7['ApplicationStage']['end_date'] = date('Y-m-d');
+                                    $this->Application->ApplicationStage->save($s7);
                                 }                                    
                             }                                
                         }
@@ -1059,54 +1180,6 @@ class ApplicationsController extends AppController {
         }
     }
 
-    
-
-/**
- * add method
- *
- * @return void
-*/
-    /*public function applicant_add() {
-        if ($this->request->is('post')) {
-            $this->Application->create();
-            $reviews = array('user_id' => $this->Auth->user('id'), 'description' => 'Applicant create');
-            $this->request->data['Reviewer'][] = $reviews;
-            if ($this->Application->saveAssociated($this->request->data, array('validate' => false))) {
-                $this->Session->setFlash(__('The application has been created'), 'alerts/flash_success');
-                $this->redirect(array('action' => 'applicant_edit', $this->Application->id));
-            } else {
-                $this->Session->setFlash(__('The application could not be saved. Please, try again.'));
-            }
-        }
-    }*/
-    /*public function applicant_add() {
-        if ($this->request->is('post')) {
-            $this->Application->create();
-            $this->request->data['Application']['user_id'] = $this->Auth->User('id');
-            if ($this->Application->save($this->request->data, true, array('email_address'))) {
-                $this->Session->setFlash(__('The application has been created'), 'alerts/flash_success');
-                $this->redirect(array('action' => 'applicant_edit', $this->Application->id));
-            } else {
-                $this->Session->setFlash(__('The application could not be saved. Please, try again.'), 'alerts/flash_error');
-                $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
-            }
-        }
-    }*/
-
-    /*public function partner_add() {
-        if ($this->request->is('post')) {
-            $this->Application->create();
-            $this->request->data['Application']['user_id'] = $this->Auth->User('id');
-            //pr($this->request->data);
-            if ($this->Application->save($this->request->data, true, array('email_address'))) {
-                $this->Session->setFlash(__('The application has been created'), 'alerts/flash_success');
-                $this->redirect(array('action' => 'partner_edit', $this->Application->id));
-            } else {
-                $this->Session->setFlash(__('The application could not be saveder. Please, try again.'), 'alerts/flash_error');
-                $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
-            }
-        }
-    }*/
 
 /**
  * edit method
@@ -1143,7 +1216,7 @@ class ApplicationsController extends AppController {
                 //Start application stage
                 $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
                 $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
-                $this->request->data['ApplicationStage'][0]['status'] = 'Submitted';
+                $this->request->data['ApplicationStage'][0]['status'] = 'Current';
                 //
                 if (empty($response['Application']['protocol_no'])) {
                     $count = $this->Application->find('count',  array('conditions' => array(

@@ -26,6 +26,7 @@ class Application extends AppModel {
             'investigator' => array('type' => 'query', 'method' => 'findByInvestigators', 'encode' => true),
             'users' => array('type' => 'query', 'method' => 'findByReviewer', 'encode' => true),
             'sites' => array('type' => 'query', 'method' => 'orSites', 'encode' => true),
+            'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
         );
 
         public function findByInvestigators($data = array()) {
@@ -43,6 +44,15 @@ class Application extends AppModel {
         public function findByReviewer($data = array()) {
             $cond = array($this->alias.'.id' => $this->Review->find('list', array(
                 'conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted', 'Review.user_id' => $data['users']),
+                'fields' => array('application_id', 'application_id')
+                    )));
+            return $cond;
+        }
+
+        public function findByStage($data = array()) {
+            // debug($data);
+            $cond = array($this->alias.'.id' => $this->ApplicationStage->find('list', array(
+                'conditions' => array('ApplicationStage.status' => $data['status'], 'ApplicationStage.stage' => $data['stages']),
                 'fields' => array('application_id', 'application_id')
                     )));
             return $cond;

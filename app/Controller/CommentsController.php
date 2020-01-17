@@ -420,9 +420,9 @@ class CommentsController extends AppController {
                   $stage = $this->ApplicationStage->read(null, $this->request->data['Comment']['foreign_key']);
                   
                   //Complete screening phase 
-                  if($stage['ApplicationStage']['status'] == 'Submitted') {
+                  if($stage['ApplicationStage']['status'] == 'Current') {
                     $this->ApplicationStage->set(array(
-                        'status' => 'Query',
+                        'status' => 'Complete',
                         'comment' => 'Manager first comment',
                         'end_date' => date('Y-m-d')
                     ));
@@ -440,7 +440,7 @@ class CommentsController extends AppController {
                       $this->ApplicationStage->save(array('ApplicationStage' => array(
                           'application_id' => $stage['ApplicationStage']['application_id'],
                           'stage' => 'ScreeningSubmission',
-                          'status' => 'Create',
+                          'status' => 'Current',
                           'start_date' => date('Y-m-d')
                           ))
                       );
@@ -553,7 +553,7 @@ class CommentsController extends AppController {
           if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
               $this->ApplicationStage->create();
               $this->ApplicationStage->save(array('ApplicationStage' => array(
-                      'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Start', 'comment' => 'Manager review response', 'start_date' => date('Y-m-d')
+                      'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Current', 'comment' => 'Manager review response', 'start_date' => date('Y-m-d')
                       ))
               );
           } else {
@@ -563,7 +563,7 @@ class CommentsController extends AppController {
                   $s5['ApplicationStage'] = min($var);
                   if(empty($s5['ApplicationStage']['end_date'])) {
                       $this->ApplicationStage->create();
-                      $s5['ApplicationStage']['status'] = 'Feedback';
+                      $s5['ApplicationStage']['status'] = 'Current';
                       $s5['ApplicationStage']['comment'] = 'Manager review response';
                       $s5['ApplicationStage']['end_date'] = null;  //re-open stage
                       $this->ApplicationStage->save($s5);
@@ -598,7 +598,7 @@ class CommentsController extends AppController {
               // New final decision
               $this->ApplicationStage->create();
               $this->ApplicationStage->save(array('ApplicationStage' => array(
-                      'application_id' => $this->request->data['Comment']['model_id'], 'stage' => 'FinalDecision', 'status' => 'Start', 'comment' => 'Applicant review response', 'start_date' => date('Y-m-d')
+                      'application_id' => $this->request->data['Comment']['model_id'], 'stage' => 'FinalDecision', 'status' => 'Current', 'comment' => 'Applicant review response', 'start_date' => date('Y-m-d')
                       ))
               );
           }

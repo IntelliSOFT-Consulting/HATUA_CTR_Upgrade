@@ -555,6 +555,7 @@ class UsersController extends AppController {
         $group->id = 2;
         $this->Acl->deny($group, 'controllers');
         $this->Acl->allow($group, 'controllers/Applications/manager_index');
+        $this->Acl->allow($group, 'controllers/Applications/manager_workflow');
         $this->Acl->allow($group, 'controllers/Applications/manager_view');
         $this->Acl->allow($group, 'controllers/Applications/manager_view_notification');
         $this->Acl->allow($group, 'controllers/Applications/manager_approve');

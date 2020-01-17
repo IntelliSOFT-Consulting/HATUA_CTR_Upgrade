@@ -19,9 +19,15 @@
             array('controller' => 'applications', 'action'=>'index', 'manager' => true ), array('escape' => false ));
             ?>
        </li>
+       <li class="<?php echo $this->fetch('Workflows') ?>">
+        <?php
+          echo $this->Html->link('<i class="icon-code-fork"></i> Workflows',
+            array('controller' => 'applications', 'action'=>'workflow', 'manager' => true ), array('escape' => false ));
+            ?>
+       </li>
        <li class="dropdown <?php echo $this->fetch('SAE') ?> <?php echo $this->fetch('SI') ?> <?php echo $this->fetch('PF') ?> <?php echo $this->fetch('CIOM') ?>">
          <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop7" href="#">
-            <i class="icon-bar-chart"></i> Application data <b class="caret"></b></a>
+            <i class="icon-paper-clip"></i> Application data <b class="caret"></b></a>
           <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
              <li>
              <?php
