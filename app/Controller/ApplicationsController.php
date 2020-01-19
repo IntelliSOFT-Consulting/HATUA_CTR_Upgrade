@@ -61,7 +61,7 @@ class ApplicationsController extends AppController {
                 if ($scr['status'] == 'Current' && $stages['Screening']['days'] > 0 && $stages['Screening']['days'] <= 5) {
                     $stages['Screening']['color'] = 'warning';
                 } elseif ($scr['status'] == 'Current' && $stages['Screening']['days'] > 5) {
-                    $stages['Screening']['color'] = 'error';
+                    $stages['Screening']['color'] = 'danger';
                 } else {
                     $stages['Screening']['color'] = 'success';
                 }
@@ -80,7 +80,7 @@ class ApplicationsController extends AppController {
                 if ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 0 && $stages['ScreeningSubmission']['days'] <= 10) {
                     $stages['ScreeningSubmission']['color'] = 'warning';
                 } elseif ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 10) {
-                    $stages['ScreeningSubmission']['color'] = 'error';
+                    $stages['ScreeningSubmission']['color'] = 'danger';
                 } else {
                     $stages['ScreeningSubmission']['color'] = 'success';  
                 }
@@ -99,7 +99,7 @@ class ApplicationsController extends AppController {
                 if ($asn['status'] == 'Current' && $stages['Assign']['days'] > 0 && $stages['Assign']['days'] <= 5) {
                     $stages['Assign']['color'] = 'warning';
                 } elseif ($asn['status'] == 'Current' && $stages['Assign']['days'] > 5) {
-                    $stages['Assign']['color'] = 'error';
+                    $stages['Assign']['color'] = 'danger';
                 } else {
                     $stages['Assign']['color'] = 'success';  
                 }
@@ -118,7 +118,7 @@ class ApplicationsController extends AppController {
                 if ($rev['status'] == 'Current' && $stages['Review']['days'] > 0 && $stages['Review']['days'] <= 30) {
                     $stages['Review']['color'] = 'warning';
                 } elseif ($rev['status'] == 'Current' && $stages['Review']['days'] > 30) {
-                    $stages['Review']['color'] = 'error';
+                    $stages['Review']['color'] = 'danger';
                 } else {
                     $stages['Review']['color'] = 'success';  
                 }
@@ -137,7 +137,7 @@ class ApplicationsController extends AppController {
                 if ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 0 && $stages['ReviewSubmission']['days'] <= 90) {
                     $stages['ReviewSubmission']['color'] = 'warning';
                 } elseif ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 90) {
-                    $stages['ReviewSubmission']['color'] = 'error';
+                    $stages['ReviewSubmission']['color'] = 'danger';
                 } else {
                     $stages['ReviewSubmission']['color'] = 'success';  
                 }
@@ -156,14 +156,14 @@ class ApplicationsController extends AppController {
                 if ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 0 && $stages['FinalDecision']['days'] <= 15) {
                     $stages['FinalDecision']['color'] = 'warning';
                 } elseif ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 15) {
-                    $stages['FinalDecision']['color'] = 'error';
+                    $stages['FinalDecision']['color'] = 'danger';
                 } else {
                     $stages['FinalDecision']['color'] = 'success';  
                 }
             }
             
             
-            //Annual Approval
+            //Annual Approval. Shows remaining days
             $stages['AnnualApproval'] = ['label' => 'Annual <br>Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if(Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
                 $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
@@ -171,14 +171,14 @@ class ApplicationsController extends AppController {
                 $ann_e = new DateTime($ann['end_date']);
                 
                 $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
-                $stages['AnnualApproval']['days'] = $ann_s->diff($fin_e)->format('%a');  
+                $stages['AnnualApproval']['days'] = $ann_s->diff($ann_e)->format('%a');  
 
                 if ($ann['status'] == 'Current') {
                     $stages['AnnualApproval']['color'] = 'success';
                 } elseif ($ann['status'] == 'Pending') {
                     $stages['AnnualApproval']['color'] = 'warning';
                 } elseif ($ann['status'] == 'Expired') {
-                    $stages['AnnualApproval']['color'] = 'error';
+                    $stages['AnnualApproval']['color'] = 'danger';
                 } 
             }
             

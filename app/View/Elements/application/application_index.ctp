@@ -318,7 +318,8 @@
                   <?php
                     $stages = $this->requestAction('applications/stages/'.$application['Application']['id']);
                     foreach ($stages as $sk => $stage) {
-                      echo '<span class="label label-'.$stage['color'].'">'.$stage['label'].'<br><small style="color: #f9ef9c;">'.$stage['start_date'].'</small>'.'</span><i class="icon-long-arrow-right"></i><span class="badge">'.$stage['days'].'</span><i class="icon-long-arrow-right"></i>';
+                      $color = ($stage['color'] == 'danger') ? 'important' : $stage['color'];
+                      echo '<span class="label label-'.$color.'">'.$stage['label'].'<br><small style="color: #f9ef9c;">'.$stage['start_date'].'</small>'.'</span><span class="badge">'.$stage['days'].'<small>'.(($sk == 'AnnualApproval') ? ' (to expiry)' : '').'</small>'.'</span>';
                     }
                   ?>                  
                 </td>

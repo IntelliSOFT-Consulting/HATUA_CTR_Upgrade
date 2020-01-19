@@ -217,7 +217,7 @@
                       if(Hash::check($stages, '{s}[color!=success]')) {
                           $var = Hash::extract($stages, '{s}[color!=success].color');
                           if(in_array('warning', $var)) echo 'warning';
-                          if(in_array('error', $var)) echo 'error';
+                          if(in_array('danger', $var)) echo 'error';
                       }
                    ?>">
                 <td><p class="tablenums"><?php $counder++; echo $counder;?>.</p></td>
@@ -270,7 +270,7 @@
                         foreach ($stages as $sk => $stage) {
                           $cound++;
                           echo "<tr>";
-                            echo "<td>".$cound.'. '.strip_tags($stage['label']);
+                            echo "<td>".$cound.'. '.strip_tags($stage['label']).(($sk == 'AnnualApproval') ? ' (to expiry)' : '');
                             echo "</td>";
                             echo "<td>".$stage['start_date'];
                             echo "</td>";

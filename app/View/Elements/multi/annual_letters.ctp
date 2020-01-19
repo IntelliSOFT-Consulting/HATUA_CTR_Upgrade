@@ -58,7 +58,10 @@
   <?php
     if(isset($this->params['named']['anl'])) {
         foreach ($application['AnnualLetter'] as $akey => $annual_letter) {
-            if ($annual_letter['id'] == $this->params['named']['anl'] && $annual_letter['status'] == 'approved') {               
+            if (
+              ($annual_letter['id'] == $this->params['named']['anl'] && $annual_letter['status'] == 'approved') or 
+              ($annual_letter['id'] == $this->params['named']['anl'] && $redir != 'applicant')
+              ) {               
   ?>
     <div class="ctr-groups">
         <?php   echo $anl["content"]; ?> &nbsp;
