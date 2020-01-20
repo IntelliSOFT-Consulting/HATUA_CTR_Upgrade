@@ -10,100 +10,133 @@ class StagesShell extends AppShell {
         $this->out('Hello world.');
         $stages = [];
         $applications = $this->Application->find('all', array(
-            //'conditions' => array('Application.submitted' => 1),
-            'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no', 'Application.study_drug', 'Application.submitted', 'Application.short_title'),
+            'conditions' => array('Application.submitted' => 1),
             'contain' => array('Review', 'ApplicationStage')
         ));
 
         foreach ($applications as $application) {
-            # code...
             if ($application) {
             
-                //creation
+                //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final,AnnualApproval stages if not exists
+                $stages = $application['ApplicationStage'];
+                $scr = $ssb = $asn = $rev = $rsb = $fin = $ann = null;
 
-                if (!in_array('Creation', Hash::extract($application, 'ApplicationStage.{n}.stage'))) {
-                    $stages[20]['stage'] = 'Creation';
-                    $stages[20]['start_date'] = $application['Application']['created'];
-                } else {
-                    for ($i=0; $i < count($application['ApplicationStage']); $i++) { 
-                        if($application['ApplicationStage'][$i]['stage'] == 'Creation' && empty($application['ApplicationStage'][$i]['end_date'])) {
-                            $application['ApplicationStage'][$i]['end_date'] = $application['Application']['date_submitted'];
+                //Screening
+                if(!Hash::check($stages, '{n}[stage=Screening].id')) {
+                    $scr = array('ApplicationStage' => array(
+                       'application_id' => $application['Application']['id'], 
+                       'stage' => 'Screening', 
+                       'status' => 'Current', 
+                       'comment' => 'Derived', 
+                       'start_date' => date('Y-m-d', strtotime($application['Application']['date_submitted'])), 
+                    ));
+                }
+
+                //ScreeningSubmission and Assign
+                if(Hash::check($application['Review'], '{n}.id')) {
+                    //close screening
+                    $scr['ApplicationStage']['status'] = 'Complete';
+                    $scr['ApplicationStage']['comment'] = 'Derived close';
+                    $scr['ApplicationStage']['end_date'] = min(Hash::extract($application['Review'], '{n}.created'));
+
+                    //create ScreeningSubmission
+                    $ssb = array('ApplicationStage' => array(
+                       'application_id' => $application['Application']['id'], 
+                       'stage' => 'ScreeningSubmission', 
+                       'status' => 'Complete', 
+                       'comment' => 'Derived', 
+                       'start_date' => min(Hash::extract($application['Review'], '{n}.created')), 
+                       'end_date' => min(Hash::extract($application['Review'], '{n}.created')), 
+                    ));
+
+                    //Assign
+                    $asn = array('ApplicationStage' => array(
+                       'application_id' => $application['Application']['id'], 
+                       'stage' => 'Assign', 
+                       'status' => 'Current', 
+                       'comment' => 'Derived', 
+                       'start_date' => min(Hash::extract($application['Review'], '{n}.created')), 
+                    ));
+
+                    //if exists ppb_comment or reviewer_comment create review stage and end Assign stage
+                    if(Hash::check($application['Review'], '{n}[type=ppb_comment].id') or Hash::check($application['Review'], '{n}[type=reviewer_comment].id')) {
+                        $var = Hash::extract($application['Review'], '{n}[type=ppb_comment].created');
+                        if (!empty($var)) {
+                            //end Assign
+                            $asn['ApplicationStage']['status'] = 'Complete';
+                            $asn['ApplicationStage']['comment'] = 'Derived close';
+                            $asn['ApplicationStage']['end_date'] = min($var);
+
+                            //create Review
+                            $rev = array('ApplicationStage' => array(
+                               'application_id' => $application['Application']['id'], 
+                               'stage' => 'Review', 
+                               'status' => 'Current', 
+                               'comment' => 'Derived', 
+                               'start_date' => min($var), 
+                            ));
+                        } 
+
+                        $var2 = Hash::extract($application['Review'], '{n}[type=reviewer_comment].created');
+                        if(!empty($var2)) {
+                            //end Review stage
+                            if(!empty($rev)) {
+                                $rev['ApplicationStage']['status'] = 'Complete';
+                                $rev['ApplicationStage']['comment'] = 'Derived close';
+                                $rev['ApplicationStage']['end_date'] = max($var2);
+                            }
+
+                            //create and close ReviewSubmission
+                            $rsb = array('ApplicationStage' => array(
+                               'application_id' => $application['Application']['id'], 
+                               'stage' => 'ReviewSubmission', 
+                               'status' => 'Complete', 
+                               'comment' => 'Derived', 
+                               'start_date' => max($var2), 
+                               'end_date' => max($var2), 
+                            ));
+                        }
+
+                        //Create final decision
+                        $fin = array('ApplicationStage' => array(
+                           'application_id' => $application['Application']['id'], 
+                           'stage' => 'FinalDecision', 
+                           'status' => 'Current', 
+                           'comment' => 'Derived', 
+                           'start_date' => ((!empty($var2)) ? max($var2) : min($var)), 
+                        ));
+                        
+                    }
+
+                    //if approved > 0, create final
+                    if ($application['Application']['approved'] > 0) {
+                        if (!empty($fin)) {
+                            $fin['ApplicationStage']['status'] = 'Complete';
+                            $fin['ApplicationStage']['comment'] = 'Derived complete';
+                            $fin['ApplicationStage']['end_date'] = date('Y-m-d', strtotime($application['Application']['approval_date']));
+
+                            //Create AnnualApproval stage if approved
+                            if ($application['Application']['approved'] == 2) {
+                                $ann = array('ApplicationStage' => array(
+                                   'application_id' => $application['Application']['id'], 
+                                   'stage' => 'AnnualApproval', 
+                                   'status' => 'Complete', 
+                                   'comment' => 'Derived', 
+                                   'start_date' => date('Y-m-d', strtotime($application['Application']['approval_date'])), 
+                                   'end_date' => date('Y-m-d', strtotime($application['Application']['approval_date'])), 
+                                ));
+                            }
+                            
                         }
                     }
                 }
-
-                //Applicant submit
-                if (!in_array('Submit', Hash::extract($application, 'ApplicationStage.{n}.stage'))) {
-                    $stages[30]['stage'] = 'Submit';
-                    $stages[30]['start_date'] = $application['Application']['date_submitted'];
-                    #creation end date
-                    $stages[20]['end_date'] = $stages[30]['start_date'];
-                } else {
-                    for ($i=0; $i < count($application['ApplicationStage']); $i++) { 
-                        if($application['ApplicationStage'][$i]['stage'] == 'Review' && empty($application['ApplicationStage'][$i]['end_date'])) {
-                            $application['ApplicationStage'][$i]['end_date'] = min(Hash::extract($application, 'Review.{n}.created'));
-                        }
-                    }
-                }
-
-                //Review
-                // debug(Hash::extract($application, 'Review.{n}[id=2].id'));
-                if (!in_array('Review', Hash::extract($application, 'ApplicationStage.{n}.stage'))) {
-                    $stages[40]['stage'] = 'Review';
-                    $rsd = ;
-                    $stages[40]['start_date'] = min(Hash::extract($application, 'Review.{n}.created'));
-                    #crstageeation end date
-                    $stages[30]['end_date'] = $stages[40]['start_date'];
-                } else {
-
-                }
-
-                //Feedback
-                if (!in_array('Feedback', Hash::extract($application, 'ApplicationStage.{n}.stage'))) {
-                    $stages[40]['stage'] = 'Feedback';
-                    $rsd = ;
-                    $stages[40]['start_date'] = min(Hash::extract($application, 'Review.{n}[type=ppb_comment].created'));
-                    #crstageeation end date
-                    $stages[30]['end_date'] = $stages[40]['start_date'];
-                } else {
-                    
-                }
-
-                $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-                if (in_array('ppb_comment', Hash::extract($application, 'Review.{n}.type'))) {
-                    // debug(Hash::extract($application, 'Review.{n}[type=ppb_comment].id'));
-                    $fsd = new DateTime(min(Hash::extract($application, 'Review.{n}[type=ppb_comment].created')));
-                    $stages['Review']['end_date'] = $fsd->format('d-M-Y');
-                    $stages['Review']['days'] = $fsd->diff($rsd)->format('%a');
-
-                    $stages['Feedback']['start_date'] = $fsd->format('d-M-Y');
-                    $stages['Feedback']['color'] = 'success';
-                } 
-
-                //Approval
-                $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-                if ($application['Application']['approved']) {
-                    $asd = new DateTime($application['Application']['approval_date']);
-                    $stages['Feedback']['end_date'] = $asd->format('d-M-Y');
-                    if(!isset($fsd)) $fsd = new DateTime($application['Application']['approval_date']);
-                    $stages['Feedback']['days'] = $asd->diff($fsd)->format('%a');
-
-                    $stages['Approval']['start_date'] = $asd->format('d-M-Y');
-                    $stages['Approval']['color'] = ($application['Application']['approved'] == '2') ? 'success' : 'warning';
-                } 
                 //Completion
-            } else {            
-                $stages['Creation'] = ['application_name' => '<< protocol no. >>', 'label' => 'Start', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-                $stages['Submit'] = ['label' => 'Submit', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-                $stages['Review'] = ['label' => 'Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-                $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-                $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
-            }
+
+                $sarray = array($scr , $ssb , $asn , $rev , $rsb , $fin , $ann);
+                $this->ApplicationStage->saveMany(array_filter($sarray));        
+                $this->out('Created stages for .'.$application['Application']['id']);
+            } 
         }
-        $this->set('stages', $stages);
-        $this->set('_serialize', 'stages');
-        if ($this->request->is('requested')) {
-            return $stages;
-        }        
+        
     }
 }

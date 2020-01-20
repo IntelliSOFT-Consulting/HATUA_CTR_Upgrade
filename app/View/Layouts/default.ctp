@@ -61,7 +61,7 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
         echo $this->fetch('css');
         echo $this->fetch('script');
 
-             echo $this->element('google-analytics');
+        echo $this->element('google-analytics');
     ?>
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>

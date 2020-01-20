@@ -24,7 +24,7 @@
             $reviewers_comments++;
           }
      }
-
+     // debug(Hash::check($application['Review'], '{n}[type=ppb_comment].id'));
      $this->assign('is-applicant', 'true');
     ?>
 
