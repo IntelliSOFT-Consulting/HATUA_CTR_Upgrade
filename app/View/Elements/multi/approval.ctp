@@ -12,7 +12,8 @@
           'label' => array('class' => 'control-label required', 'text' => 'Current status of the trial <span class="sterix">*</span>'),
         ));
       } else {
-        echo '<p class="lead"><strong>Current status of the trial</strong>: '.$trial_statuses[$application['Application']['trial_status_id']].'</p>';
+        $ts = (!empty($application['Application']['trial_status_id'])) ? $trial_statuses[$application['Application']['trial_status_id']] : '';
+        echo '<p class="lead"><strong>Current status of the trial</strong>: '.$ts.'</p>';
       }
       ?>
     </div>
