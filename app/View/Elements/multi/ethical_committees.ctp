@@ -7,12 +7,12 @@
         echo $this->Form->input('EthicalCommittee.0.id');
         $ercs = $this->requestAction('/ercs/checklist');
         echo $this->Form->input('EthicalCommittee.0.ethical_committee', array(
-          'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Ethics Review Committee (ERC)'),
+          'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Name of Ethics Review Committee (ERC)'),
           'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs, 'empty' => true,
         ));
         echo $this->Form->input('EthicalCommittee.0.submission_date', array(
           'type' => 'text',
-          'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission'),
+          'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission to ERC'),
           'placeholder' => ' ' , 'class' => 'datepickers',
         ));
         echo $this->Form->input('EthicalCommittee.0.erc_number', array(
@@ -21,7 +21,7 @@
         ));
         echo $this->Form->input('EthicalCommittee.0.initial_approval', array(
                 'div' => array('class' => 'control-group', 'id' => 'EthicalCommittee0'),    'type' => 'text', 'class' => 'datepickers',
-                'label' => array('class' => 'control-label', 'text' => 'Initial approval date'),
+                'label' => array('class' => 'control-label', 'text' => 'Initial approval date by ERC'),
                 'after'=>'<span class="help-inline"> format (dd-mm-yyyy)
                             </span>
                         </div>',
@@ -38,12 +38,12 @@
                   <?php
                     echo $this->Form->input('EthicalCommittee.'.$i.'.id');
                     echo $this->Form->input('EthicalCommittee.'.$i.'.ethical_committee', array(
-                      'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Ethics Review Committee (ERC)'),
+                      'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Name of Ethics Review Committee (ERC)'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs, 'empty' => true,
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.submission_date', array(
                       'type' => 'text',
-                      'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission'),
+                      'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission to ERC'),
                       'placeholder' => ' ' , 'class' => 'datepickers',
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.erc_number', array(
@@ -52,7 +52,7 @@
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.initial_approval', array(
                         'div' => array('class' => 'control-group'), 'type' => 'text', 'class' => 'datepickers',
-                        'label' => array('class' => 'control-label required', 'text' => 'Initial approval date'),
+                        'label' => array('class' => 'control-label required', 'text' => 'Initial approval date by ERC'),
                         'after'=>'
                                 </div>',
                   ));

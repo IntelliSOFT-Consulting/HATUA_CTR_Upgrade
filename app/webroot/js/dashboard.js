@@ -51,7 +51,7 @@ $(function() {
                         // console.log(key + " -> " + data[key]);
                         // console.log($('#'+key+' > small:first').text());
                         // console.log(data[key].start_date);
-                        $('#'+key+' > small:first').text(data[key].start_date);
+                        $('#'+key+' > small:first').html(data[key].start_date+" <br>Days: "+data[key].days);
                         $('#'+key).addClass('btn-'+data[key].color);
                     }
                 }

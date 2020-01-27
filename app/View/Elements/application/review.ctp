@@ -2,7 +2,7 @@
   <div class="marketing">
     <div class="row-fluid">
       <div class="span12">
-         <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
+         <h3 class="text-info">The Expert Committee on Clinical Trials</h3>
          <!-- <h3 class="text-info" style="text-decoration: underline;">Reviewer's Comments Form</h3> -->
       </div>
     </div>
@@ -49,6 +49,7 @@
           <th>Recommendation</th>
           <th>Status</th>
           <th>Type</th>
+          <th>User</th>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
         </tr>
@@ -70,6 +71,7 @@
             </td>
             <td><?php echo $rreview['status'] ?></td>
             <td><?php echo $rreview['type'] ?></td>
+            <td><?php echo $rreview['User']['name']; ?></td>
             <td><?php echo $rreview['created'] ?></td> 
             <td>
               <?php

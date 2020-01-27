@@ -258,11 +258,11 @@
             <table class="table  table-condensed">
               <tbody>
               <tr>
-                <td class="table-label"><p>Ethics Review Committee (ERC)</p></td>
+                <td class="table-label"><p>Name of Ethics Review Committee (ERC)</p></td>
                 <td><?php    echo "<p>". $date['ethical_committee']."</p>";  ?></td>
               </tr>
               <tr>
-                <td class="table-label"><p>Date of initial complete submission</p></td>
+                <td class="table-label"><p>Date of initial complete submission to ERC</p></td>
                 <td><?php    echo "<p>". $date['submission_date']."</p>";  ?></td>
               </tr>
               <tr>
@@ -270,7 +270,7 @@
                 <td><?php    echo "<p>". $date['erc_number']."</p>";  ?></td>
               </tr>
               <tr>
-                <td class="table-label"><p>Initial approval date</p></td>
+                <td class="table-label"><p>Initial approval date by ERC</p></td>
                 <td><?php    echo "<p>". $date['initial_approval']."</p>";  ?></td>
               </tr>
               </tbody>

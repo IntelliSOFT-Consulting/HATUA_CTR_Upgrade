@@ -250,7 +250,7 @@ $this->end();
                       $rid = null;
                       if(!empty($var)) $rid = min($var);
                       // debug($rid);
-                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
+                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment']]);
                     ?> 
                   </div>
                   <div class="span4 lefty">

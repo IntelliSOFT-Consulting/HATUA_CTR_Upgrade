@@ -26,6 +26,23 @@ class ApplicationsController extends AppController {
  *
  * @return array
  */
+    private function diff_wdays($start, $end){
+        $weekdays = array('1','2','3','4','5'); //this i think monday-saturday
+        $end2 = clone $end; //add one day so as to include the end date of our range
+        $end2 = ($start != $end) ? $end2->modify( '+1 day' ) : $end2; //add one day so as to include the end date of our range
+        $interval = new DateInterval('P1D'); // 1 Day
+        $dateRange = new DatePeriod($start, $interval, $end2);
+
+        $total_days = 0;
+        //this will calculate total days from monday to saturday in above date range
+        foreach ($dateRange as $date) {
+         if (in_array($date->format("N"),$weekdays)) {
+                $total_days++; 
+          }
+        }
+        return $total_days;
+    }
+
     public function stages($id = null) {
         $stages = [];
         $application = $this->Application->find('first', array(
@@ -42,9 +59,9 @@ class ApplicationsController extends AppController {
             }
         
             //creation
-            $csd = new DateTime($application['Application']['created']);            
+            $csd = new DateTime($application['Application']['created']); 
             $ccolor = 'success';
-            $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Start', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
+            $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Application <br>Creation', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
 
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
@@ -53,10 +70,12 @@ class ApplicationsController extends AppController {
                 $scr_s = new DateTime($scr['start_date']);
                 $scr_e = new DateTime($scr['end_date']);
                 $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
-                $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
                 
                 $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');         
-                $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a'); 
+                // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
+                $stages['Screening']['days'] = $this->diff_wdays($scr_s, $scr_e); 
                 
                 if ($scr['status'] == 'Current' && $stages['Screening']['days'] > 0 && $stages['Screening']['days'] <= 5) {
                     $stages['Screening']['color'] = 'warning';
@@ -68,14 +87,15 @@ class ApplicationsController extends AppController {
             }
 
             //Submission by sponsor
-            $stages['ScreeningSubmission'] = ['label' => 'Sponsor <br>Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            $stages['ScreeningSubmission'] = ['label' => 'Response to <br>Queries', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if(Hash::check($application['ApplicationStage'], '{n}[stage=ScreeningSubmission].id')) {
                 $ssb = min(Hash::extract($application['ApplicationStage'], '{n}[stage=ScreeningSubmission]'));
                 $ssb_s = new DateTime($ssb['start_date']);
                 $ssb_e = new DateTime($ssb['end_date']);
                 
                 $stages['ScreeningSubmission']['start_date'] = $ssb_s->format('d-M-Y');
-                $stages['ScreeningSubmission']['days'] = $ssb_s->diff($ssb_e)->format('%a');  
+                // $stages['ScreeningSubmission']['days'] = $ssb_s->diff($ssb_e)->format('%a');  
+                $stages['ScreeningSubmission']['days'] = $this->diff_wdays($ssb_s, $ssb_e);
                 
                 if ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 0 && $stages['ScreeningSubmission']['days'] <= 10) {
                     $stages['ScreeningSubmission']['color'] = 'warning';
@@ -87,14 +107,15 @@ class ApplicationsController extends AppController {
             }
             
             //Assign reviewers
-            $stages['Assign'] = ['label' => 'Assign <br>Reviewers', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            $stages['Assign'] = ['label' => 'Assigned to <br>Reviewers', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if(Hash::check($application['ApplicationStage'], '{n}[stage=Assign].id')) {
                 $asn = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Assign]'));
                 $asn_s = new DateTime($asn['start_date']);
                 $asn_e = new DateTime($asn['end_date']);
                 
                 $stages['Assign']['start_date'] = $asn_s->format('d-M-Y');
-                $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a'); 
+                // $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a'); 
+                $stages['Assign']['days'] = $this->diff_wdays($asn_s, $asn_e);
 
                 if ($asn['status'] == 'Current' && $stages['Assign']['days'] > 0 && $stages['Assign']['days'] <= 5) {
                     $stages['Assign']['color'] = 'warning';
@@ -106,14 +127,15 @@ class ApplicationsController extends AppController {
             }
             
             //PPB Review
-            $stages['Review'] = ['label' => 'PPB Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            $stages['Review'] = ['label' => 'Review <br>Comments', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if(Hash::check($application['ApplicationStage'], '{n}[stage=Review].id')) {
                 $rev = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Review]'));
                 $rev_s = new DateTime($rev['start_date']);
                 $rev_e = new DateTime($rev['end_date']);
                 
                 $stages['Review']['start_date'] = $rev_s->format('d-M-Y');
-                $stages['Review']['days'] = $rev_s->diff($rev_e)->format('%a');  
+                // $stages['Review']['days'] = $rev_s->diff($rev_e)->format('%a');  
+                $stages['Review']['days'] = $this->diff_wdays($rev_s, $rev_e);
 
                 if ($rev['status'] == 'Current' && $stages['Review']['days'] > 0 && $stages['Review']['days'] <= 30) {
                     $stages['Review']['color'] = 'warning';
@@ -132,7 +154,8 @@ class ApplicationsController extends AppController {
                 $rsb_e = new DateTime($rsb['end_date']);
                 
                 $stages['ReviewSubmission']['start_date'] = $rsb_s->format('d-M-Y');
-                $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a'); 
+                // $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a'); 
+                $stages['ReviewSubmission']['days'] = $this->diff_wdays($rsb_s, $rsb_e);
 
                 if ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 0 && $stages['ReviewSubmission']['days'] <= 90) {
                     $stages['ReviewSubmission']['color'] = 'warning';
@@ -151,7 +174,8 @@ class ApplicationsController extends AppController {
                 $fin_e = new DateTime($fin['end_date']);
                 
                 $stages['FinalDecision']['start_date'] = $fin_s->format('d-M-Y');
-                $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
+                // $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
+                $stages['FinalDecision']['days'] = $this->diff_wdays($fin_s, $fin_e);
 
                 if ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 0 && $stages['FinalDecision']['days'] <= 15) {
                     $stages['FinalDecision']['color'] = 'warning';
@@ -623,6 +647,7 @@ class ApplicationsController extends AppController {
             if ($my_applications[$id] == 'accepted') {
                 $contains = $this->a_contain;
                 $contains['Review']['conditions'] = array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment');
+                $contains['ManagerReview'] = array('conditions' => array('ManagerReview.type' => 'ppb_comment'), 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User');
                 $application = $this->Application->find('first', array(
                     'conditions' => array('Application.id' => $id),
                     'contain' => $contains));

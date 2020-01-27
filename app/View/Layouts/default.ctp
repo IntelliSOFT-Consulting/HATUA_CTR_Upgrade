@@ -76,7 +76,7 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
       <div class="navbar-inner">
         <div class="container">
           <!-- logo -->
-          <span><img style="float:left; width: 90px;" alt="Pharmacy and Poisons Board" src="/img/logo1.png" border="0"></span> 
+          <span><img style="float:left; width: 80px;" alt="Pharmacy and Poisons Board" src="/img/logo1.png" border="0"></span> 
           <span><a class="brand logo" style="color: #404b50; " href="/">Pharmacy and Poisons Board </a></span>
           
           <!-- end logo -->

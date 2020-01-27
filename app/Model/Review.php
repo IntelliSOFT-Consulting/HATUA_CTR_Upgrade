@@ -42,7 +42,13 @@ class Review extends AppModel {
             'className' => 'Comment',
             'foreignKey' => 'foreign_key',
             'dependent' => true,
-            'conditions' => array('InternalComment.model' => 'Review', 'InternalComment.category' => 'external' ),
+            'conditions' => array('InternalComment.model' => 'Review', 'InternalComment.category' => 'internal' ),
+        ),
+        'ExternalComment' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('ExternalComment.model' => 'Review', 'ExternalComment.category' => 'external' ),
         ),
     );
 }

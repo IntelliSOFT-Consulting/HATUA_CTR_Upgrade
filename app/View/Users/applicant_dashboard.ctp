@@ -41,9 +41,11 @@
             <div class="process-step">
                 <button id="<?php echo $stage_name; ?>" type="button" class="btn btn-<?php echo $stage['color'];?> btn-circle" disabled="disabled">
                   <h5 style="text-decoration: underline;"><?php echo $stage['label']; ?></h5> 
-                  <small><?php echo (isset($stage['start_date'])) ? $stage['start_date']: ''; ?></small>                  
+                  <small><?php echo (isset($stage['start_date'])) ? $stage['start_date']: ''; ?> <br>
+                  <?php echo (isset($stage['days'])) ? 'Days: '.$stage['days'].'' : ''; ?> 
+                  </small>      
                 </button>
-                &nbsp; <?php echo (isset($stage['days'])) ? '<span class="badge">'.$stage['days'].'</span>' : ''; ?>
+                <!-- &nbsp;  -->
             </div>
           <?php } ?>
         </div>

@@ -14,7 +14,7 @@
         //     'class' => false,
         // ));
       echo $this->Form->create('Comment', array(
-            'url' => array('controller' => 'comments','action' => $model['url']),
+            'url' => array('controller' => 'comments','action' => $model['url'], (isset($model['param'])) ? $model['param'] : ''),
             'type' => 'file',
             'class' => false,
             'inputDefaults' => array(

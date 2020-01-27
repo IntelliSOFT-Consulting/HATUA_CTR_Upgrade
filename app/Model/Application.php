@@ -134,6 +134,11 @@ class Application extends AppModel {
                                        'foreignKey' => 'application_id',
                                        'dependent' => false,
                           ),
+        'ManagerReview' => array(
+                                       'className' => 'Review',
+                                       'foreignKey' => 'application_id',
+                                       'dependent' => false,
+                          ),
                          // 'Request' => array(
                          //            'className' => 'Review',
                          //            'foreignKey' => 'application_id',

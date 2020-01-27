@@ -12,6 +12,7 @@
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
           <li><a href="#tab2" data-toggle="tab">My Reviews <small>(<?php echo count($application['Review']);?>)</small></a></li>
+          <li><a href="#tab3" data-toggle="tab">Manager Reviews <small>(<?php echo count($application['ManagerReview']);?>)</small></a></li>
       </ul>
       <div class="tab-content my-tab-content">
         <div class="tab-pane active" id="tab1">
@@ -112,6 +113,111 @@
         </div>
       </div>
     </div>
+
+
+    <div class="tab-pane" id="tab3">
+        <div class="marketing">
+             <div class="row-fluid">
+                <div class="span12">
+                   <h3 class="text-info">The Expert Committee on Clinical Trials</h3>
+                   <h3 class="text-info" style="text-decoration: underline;">Reviewer's Comments</h3>
+                </div>
+             </div>
+              <hr class="soften" style="margin: 10px 0px;">
+        </div>
+        <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no'];?></p>
+        <p><strong>2. Protocol title: </strong><?php echo $application['Application']['study_title'];?></p>
+        <div class="row-fluid">
+          <div class="span12">
+            <h4 class="text-success">Reviewer's Comments
+              <?php
+                echo $this->Html->link(__('<i class="icon-download-alt"></i> Download Comments <small>(PDF)</small>'),
+                  array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
+                  array('escape' => false, 'class' => 'btn pull-right', 'style'=>'margin-right: 10px;'));
+                ?>
+              </h4>
+            <?php
+                $counter = 0;
+                foreach ($application['ManagerReview'] as $review) {
+                   $counter++;
+                   echo "<hr><span class=\"badge badge-success\">".$counter."</span> <small class='muted'>created on: ".date('d-m-Y H:i:s', strtotime($review['created']))."</small>";
+                   echo "<div style='padding-left: 29px;' class='morecontent'>".$review['text']."</div>";
+                   // echo "<br>";
+                   echo "<div style='padding-left: 29px;' class='morecontent'>".$review['recommendation']."</div>";
+                }
+            ?>
+          </div>
+       </div>
+
+
+       <?php
+          //Reviews limited to ppb_comment already
+            $var = Hash::extract($application, 'ManagerReview.{n}[type=ppb_comment]');
+            $rid = null;
+            if(!empty($var)) $rid = min($var);
+       ?>
+        <ul id="reviewer_tab" class="nav nav-tabs">
+          <li class="active"><a href="#external_rev_comments">PI Comments (<?php echo count($rid['ExternalComment']); ?>)</a></li>
+          <?php if($redir !== 'applicant') { ?><li><a href="#internal_rev_comments">Internal Comments (<?php echo count($rid['InternalComment']); ?>)</a></li> <?php } ?>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="external_rev_comments">
+              <div class="row-fluid">
+                <div class="span12">
+                  <br>
+                    <div class="amend-form">
+                      <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                      <div class="row-fluid">
+                        <div class="span8">    
+                          <?php                       
+                            // debug($rid);
+                            if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment']]);
+                          ?> 
+                        </div>
+                        <div class="span4 lefty">
+                        <?php  
+                            //----------Manager can't respond directly to Applicant---------------------------------
+                            // if(!empty($rid))  echo $this->element('comments/add', [
+                            //              'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
+                            //                          'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response']]) 
+                        ?>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="tab-pane" id="internal_rev_comments">
+              <div class="row-fluid">
+                <div class="span12">
+                  <br>
+                    <div class="amend-form">
+                      <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                      <div class="row-fluid">
+                        <div class="span8">    
+                          <?php                       
+                            // debug($rid);
+                            if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
+                          ?> 
+                        </div>
+                        <div class="span4 lefty">
+                        <?php  
+                            if(!empty($rid))  echo $this->element('comments/add', [
+                                         'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
+                                                     'model' => 'Review', 'category' => 'internal', 'url' => 'add_internal_review_response']]) 
+                        ?>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>         
+        </div>
+
+    </div>
+
 </div>
 </div>
 
@@ -123,6 +229,29 @@ $(function() {
         expires: 1
       }
   });
+
+  //https://stackoverflow.com/questions/18999501/bootstrap-3-keep-selected-tab-on-page-refresh
+  //from mcaz
+  $('#reviewer_tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+  });
+
+  $('#reviewer_tab a').on("shown", function (e) {
+      var id = $(e.target).attr("href");
+      localStorage.setItem('assessmentTab', id)
+  });
+
+  var assessmentTab = localStorage.getItem('assessmentTab');
+  if (assessmentTab != null) {
+      // console.log("select tab");
+      // console.log($('#reviewer_tab a[href="' + assessmentTab + '"]'));
+      $('#reviewer_tab a[href="' + assessmentTab + '"]').tab('show');
+  }
+
+  var hashaTab = $('#reviewer_tab a[href="' + location.hash + '"]');
+  hashaTab && hashaTab.tab('show');
+
   $(".morecontent").expander();
   $('#ReviewText').ckeditor();
   $('#ReviewRecommendation').ckeditor();

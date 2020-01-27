@@ -312,7 +312,7 @@
         <div class="marketing">
              <div class="row-fluid">
                 <div class="span12">
-                   <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
+                   <h3 class="text-info">The Expert Committee on Clinical Trials</h3>
                 </div>
              </div>
               <hr class="soften" style="margin: 10px 0px;">
@@ -363,32 +363,71 @@
           </div>
        </div>
 
-        <div class="row-fluid">
-          <div class="span12">
-            <br>
-              <div class="amend-form">
-                <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
-                <div class="row-fluid">
-                  <div class="span8">    
-                    <?php 
-                      //Reviews limited to ppb_comment already
-                      $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
-                      $rid = null;
-                      if(!empty($var)) $rid = min($var);
-                      // debug($rid);
-                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
-                    ?> 
+       <?php
+          //Reviews limited to ppb_comment already
+            $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
+            $rid = null;
+            if(!empty($var)) $rid = min($var);
+       ?>
+        <ul id="reviewer_tab" class="nav nav-tabs">
+          <li class="active"><a href="#external_rev_comments">PI Comments (<?php echo count($rid['ExternalComment']); ?>)</a></li>
+          <?php if($redir !== 'applicant') { ?><li><a href="#internal_rev_comments">Internal Comments (<?php echo count($rid['InternalComment']); ?>)</a></li> <?php } ?>
+        </ul>
+
+        <div class="tab-content">
+
+          <div class="tab-pane active" id="external_rev_comments">
+              <div class="row-fluid">
+                <div class="span12">
+                  <br>
+                    <div class="amend-form">
+                      <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                      <div class="row-fluid">
+                        <div class="span8">    
+                          <?php                       
+                            // debug($rid);
+                            if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment']]);
+                          ?> 
+                        </div>
+                        <div class="span4 lefty">
+                        <?php  
+                            if(!empty($rid))  echo $this->element('comments/add', [
+                                         'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
+                                                     'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response']]) 
+                        ?>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="span4 lefty">
-                  <?php  
-                      if(!empty($rid))  echo $this->element('comments/add', [
-                                   'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
-                                               'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response']]) 
-                  ?>
-                  </div>
-                </div>
               </div>
-            </div>
+          </div>
+
+          <div class="tab-pane" id="internal_rev_comments">
+              <div class="row-fluid">
+                <div class="span12">
+                  <br>
+                    <div class="amend-form">
+                      <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                      <div class="row-fluid">
+                        <div class="span8">    
+                          <?php                       
+                            // debug($rid);
+                            if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
+                          ?> 
+                        </div>
+                        <div class="span4 lefty">
+                        <?php  
+                            if(!empty($rid))  echo $this->element('comments/add', [
+                                         'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
+                                                     'model' => 'Review', 'category' => 'internal', 'url' => 'add_internal_review_response']]) 
+                        ?>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+         
         </div>
 
     </div>
@@ -535,6 +574,27 @@ $(function() {
       }
   });
     
+  //https://stackoverflow.com/questions/18999501/bootstrap-3-keep-selected-tab-on-page-refresh
+    //from mcaz
+  $('#reviewer_tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+  });
+
+  $('#reviewer_tab a').on("shown", function (e) {
+      var id = $(e.target).attr("href");
+      localStorage.setItem('assessmentTab', id)
+  });
+
+  var assessmentTab = localStorage.getItem('assessmentTab');
+  if (assessmentTab != null) {
+      // console.log("select tab");
+      // console.log($('#reviewer_tab a[href="' + assessmentTab + '"]'));
+      $('#reviewer_tab a[href="' + assessmentTab + '"]').tab('show');
+  }
+
+  var hashaTab = $('#reviewer_tab a[href="' + location.hash + '"]');
+  hashaTab && hashaTab.tab('show');
 
   $(".morecontent").expander();
   $('#ReviewText').ckeditor();

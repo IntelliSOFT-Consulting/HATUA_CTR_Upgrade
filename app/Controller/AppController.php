@@ -36,7 +36,7 @@ class AppController extends Controller {
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval', 'ParticipantFlow', 'Budget', 'Document', 
-                'Review'  => array('InternalComment' => array('Attachment'), 'ReviewAnswer', 'User'), 
+                'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'), 
                 'Sae', 'AnnualLetter', 'StudyRoute', 'Manufacturer', 'Ciom',
                 'Deviation' => array('ExternalComment' => array('Attachment')),
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User'),

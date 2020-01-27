@@ -21,7 +21,7 @@
 <!-- Ethical Committees -->
   <div class="row-fluid">
    <div class="span12">
-    <h4 style="background-color: #4182c4; color: #fff; text-align: center;">Ethics Review Committees (ERC)</h4>
+    <h4 style="background-color: #496060f2; color: #fff; text-align: center;">Ethics Review Committees (ERC)</h4>
       
       <?php        
         echo $this->Form->create('EthicalCommittee', array(
@@ -38,7 +38,7 @@
            ),
         )); 
       ?>
-      <table class="table table-bordered table-condensed">
+      <table class="table table-condensed">
         <thead>
           <tr>
             <th>Ethics Review Committee (ERC)</th>
@@ -62,7 +62,7 @@
         <?php 
           if ($redir == 'applicant') { 
         ?>
-          <tr style="background-color: #4182c4;">
+          <tr style="background-color: #638282;">
             <td>
               <?php
                 echo $this->Form->input('application_id', array('type' => 'hidden' ,'value' => $application['Application']['id']));
