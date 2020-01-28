@@ -90,6 +90,7 @@
       <?php
 
         echo $this->Form->create('Budget', array(
+            'url' => array('controller' => 'budgets', 'action' => 'add'),
             'class' => 'form-inline',
        'inputDefaults' => array(
         'div' => array('class' => 'control-group'),

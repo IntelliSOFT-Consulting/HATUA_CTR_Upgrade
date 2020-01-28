@@ -58,33 +58,27 @@ class StagesShell extends AppShell {
                        'start_date' => min(Hash::extract($application['Review'], '{n}.created')), 
                     ));
 
+                    //if protocol assigned to reviewers who accepted then end assignment phase
+                    if (Hash::check($application['Review'], '{n}[accepted=accepted].id')) {
+                      //end Assign
+                      $asn['ApplicationStage']['status'] = 'Complete';
+                      $asn['ApplicationStage']['comment'] = 'Derived close';
+                      $asn['ApplicationStage']['end_date'] = min(Hash::extract($application['Review'], '{n}[accepted=accepted].created'));
+                    }
+
                     //if exists ppb_comment or reviewer_comment create review stage and end Assign stage
                     if(Hash::check($application['Review'], '{n}[type=ppb_comment].id') or Hash::check($application['Review'], '{n}[type=reviewer_comment].id')) {
-                        $var = Hash::extract($application['Review'], '{n}[type=ppb_comment].created');
+                        $var = Hash::extract($application['Review'], '{n}[type=reviewer_comment].created');
                         if (!empty($var)) {
-                            //end Assign
-                            $asn['ApplicationStage']['status'] = 'Complete';
-                            $asn['ApplicationStage']['comment'] = 'Derived close';
-                            $asn['ApplicationStage']['end_date'] = min($var);
-
                             //create Review
                             $rev = array('ApplicationStage' => array(
                                'application_id' => $application['Application']['id'], 
                                'stage' => 'Review', 
-                               'status' => 'Current', 
+                               'status' => 'Complete', 
                                'comment' => 'Derived', 
                                'start_date' => min($var), 
+                               'start_date' => max($var), 
                             ));
-                        } 
-
-                        $var2 = Hash::extract($application['Review'], '{n}[type=reviewer_comment].created');
-                        if(!empty($var2)) {
-                            //end Review stage
-                            if(!empty($rev)) {
-                                $rev['ApplicationStage']['status'] = 'Complete';
-                                $rev['ApplicationStage']['comment'] = 'Derived close';
-                                $rev['ApplicationStage']['end_date'] = max($var2);
-                            }
 
                             //create and close ReviewSubmission
                             $rsb = array('ApplicationStage' => array(
@@ -92,41 +86,36 @@ class StagesShell extends AppShell {
                                'stage' => 'ReviewSubmission', 
                                'status' => 'Complete', 
                                'comment' => 'Derived', 
-                               'start_date' => max($var2), 
-                               'end_date' => max($var2), 
+                               'start_date' => max($var), 
+                               'end_date' => max($var), 
                             ));
-                        }
-
-                        //Create final decision
-                        $fin = array('ApplicationStage' => array(
-                           'application_id' => $application['Application']['id'], 
-                           'stage' => 'FinalDecision', 
-                           'status' => 'Current', 
-                           'comment' => 'Derived', 
-                           'start_date' => ((!empty($var2)) ? max($var2) : min($var)), 
-                        ));
-                        
+                        }                        
                     }
 
                     //if approved > 0, create final
                     if ($application['Application']['approved'] > 0) {
-                        if (!empty($fin)) {
-                            $fin['ApplicationStage']['status'] = 'Complete';
-                            $fin['ApplicationStage']['comment'] = 'Derived complete';
-                            $fin['ApplicationStage']['end_date'] = date('Y-m-d', strtotime($application['Application']['approval_date']));
+                        //Create final decision
+                        $fr = (!empty($var)) ? max($var) : date('Y-m-d', strtotime($application['Application']['approval_date']));
+                        $fin = array('ApplicationStage' => array(
+                           'application_id' => $application['Application']['id'], 
+                           'stage' => 'FinalDecision', 
+                           'status' => 'Complete', 
+                           'comment' => 'Derived', 
+                           'start_date' => $fr, 
+                        ));
 
-                            //Create AnnualApproval stage if approved
-                            if ($application['Application']['approved'] == 2) {
-                                $ann = array('ApplicationStage' => array(
-                                   'application_id' => $application['Application']['id'], 
-                                   'stage' => 'AnnualApproval', 
-                                   'status' => 'Complete', 
-                                   'comment' => 'Derived', 
-                                   'start_date' => date('Y-m-d', strtotime($application['Application']['approval_date'])), 
-                                   'end_date' => date('Y-m-d', strtotime($application['Application']['approval_date'])), 
-                                ));
-                            }
-                            
+                        $fin['ApplicationStage']['end_date'] = date('Y-m-d', strtotime($application['Application']['approval_date']));
+
+                        //Create AnnualApproval stage if approved
+                        if ($application['Application']['approved'] == 2) {
+                            $ann = array('ApplicationStage' => array(
+                               'application_id' => $application['Application']['id'], 
+                               'stage' => 'AnnualApproval', 
+                               'status' => 'Complete', 
+                               'comment' => 'Derived', 
+                               'start_date' => date('Y-m-d', strtotime($application['Application']['approval_date'])), 
+                               'end_date' => date('Y-m-d', strtotime($application['Application']['approval_date']. " +1 year")), 
+                            ));
                         }
                     }
                 }
