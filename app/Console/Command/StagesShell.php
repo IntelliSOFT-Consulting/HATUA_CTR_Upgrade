@@ -66,8 +66,8 @@ class StagesShell extends AppShell {
                       $asn['ApplicationStage']['end_date'] = min(Hash::extract($application['Review'], '{n}[accepted=accepted].created'));
                     }
 
-                    //if exists ppb_comment or reviewer_comment create review stage and end Assign stage
-                    if(Hash::check($application['Review'], '{n}[type=ppb_comment].id') or Hash::check($application['Review'], '{n}[type=reviewer_comment].id')) {
+                    //if exists accepted or reviewer_comment create review stage and end Assign stage
+                    if(Hash::check($application['Review'], '{n}[type=accepted].id') or Hash::check($application['Review'], '{n}[type=reviewer_comment].id')) {
                         $var = Hash::extract($application['Review'], '{n}[type=reviewer_comment].created');
                         if (!empty($var)) {
                             //create Review
@@ -94,8 +94,37 @@ class StagesShell extends AppShell {
 
                     //if approved > 0, create final
                     if ($application['Application']['approved'] > 0) {
-                        //Create final decision
                         $fr = (!empty($var)) ? max($var) : date('Y-m-d', strtotime($application['Application']['approval_date']));
+
+                        // Close Assign, Review and ReviewSubmission
+                        if ($asn['ApplicationStage']['status'] != 'Complete') {
+                          $asn['ApplicationStage']['status'] = 'Complete';
+                          $asn['ApplicationStage']['comment'] = 'Derived close';
+                          $asn['ApplicationStage']['end_date'] = $fr;
+                        }
+                        if (empty($rev)) {
+                            //create Review
+                            $rev = array('ApplicationStage' => array(
+                               'application_id' => $application['Application']['id'], 
+                               'stage' => 'Review', 
+                               'status' => 'Complete', 
+                               'comment' => 'Derived', 
+                               'start_date' => $fr, 
+                               'start_date' => $fr, 
+                            ));
+
+                            //create and close ReviewSubmission
+                            $rsb = array('ApplicationStage' => array(
+                               'application_id' => $application['Application']['id'], 
+                               'stage' => 'ReviewSubmission', 
+                               'status' => 'Complete', 
+                               'comment' => 'Derived', 
+                               'start_date' => $fr, 
+                               'end_date' => $fr, 
+                            ));
+                        }
+
+                        //Create final decision
                         $fin = array('ApplicationStage' => array(
                            'application_id' => $application['Application']['id'], 
                            'stage' => 'FinalDecision', 
@@ -111,7 +140,7 @@ class StagesShell extends AppShell {
                             $ann = array('ApplicationStage' => array(
                                'application_id' => $application['Application']['id'], 
                                'stage' => 'AnnualApproval', 
-                               'status' => 'Complete', 
+                               'status' => 'Current', 
                                'comment' => 'Derived', 
                                'start_date' => date('Y-m-d', strtotime($application['Application']['approval_date'])), 
                                'end_date' => date('Y-m-d', strtotime($application['Application']['approval_date']. " +1 year")), 

@@ -1609,6 +1609,35 @@
         expires: 1
       }
     });
+
+    $('#ApplicationApplicantEditForm').submit(function(){
+        //check if there is an empty file input
+        rr = 0;
+        $("#ApplicationApplicantEditForm").find("input[type=file]").each(function(index, field){
+          console.log($(field).val());
+           if($(field).val() == '') {
+              $(field).addClass('error');
+              // alert('You have an empty file input in Checklist or Notifications sections. Please add a file before saving.');              
+              rr = rr + 1;
+           }
+        });
+        if (rr > 0 ) {
+          $('<div></div>').appendTo('body')
+              .html('<div> <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>You have an empty file input in Checklist or Notifications sections. \
+               Please add a file before saving. </p></div>')
+              .dialog({
+                  modal: true, title: 'message', zIndex: 10000, autoOpen: true,
+                  width: 'auto', resizable: false,
+                  close: function (event, ui) {
+                      $(this).remove();
+                  }
+              });
+          return false;
+        } else {
+          return true;
+        }
+        
+    });
     // $( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         // $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
