@@ -13,6 +13,7 @@ if ($redir === 'reviewer') {
             echo "<p>".$notification['Notification']['system_message']."</p>";
             echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
         }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
         echo "</div>";
     }
 } elseif ($redir === 'partner') {
@@ -36,6 +37,7 @@ if ($redir === 'reviewer') {
         echo "<p>".$notification['Notification']['system_message']."</p>";
         echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
       }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
       echo '</div>';
   }
 } elseif ($redir === 'manager') {
@@ -59,6 +61,7 @@ if ($redir === 'reviewer') {
         echo "<p>".$notification['Notification']['system_message']."</p>";
         echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
       }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
       echo '</div>';
   }
 } elseif ($redir === 'applicant') {
@@ -81,6 +84,7 @@ if ($redir === 'reviewer') {
             echo "<br/><small>".$notification['Notification']['system_message']."</small>";
             echo "<p> ".$notification['Notification']['user_message']."</p>";
         }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
         echo '</div>';
     }
 } elseif ($redir === 'admin') {
@@ -104,6 +108,7 @@ if ($redir === 'reviewer') {
         echo "<p>".$notification['Notification']['system_message']."</p>";
         echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
       }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
       echo '</div>';
     }
 } elseif ($redir === 'inspector') {
@@ -127,6 +132,7 @@ if ($redir === 'reviewer') {
         echo "<p>".$notification['Notification']['system_message']."</p>";
         echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
       }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
       echo '</div>';
     }
 } else {
@@ -150,6 +156,7 @@ if ($redir === 'reviewer') {
         echo "<p>".$notification['Notification']['system_message']."</p>";
         echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
       }
+        echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
       echo '</div>';
     }
 }
