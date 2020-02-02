@@ -226,7 +226,7 @@
       <?php
             echo $this->Form->input('study_information', array(
               'type' => 'textarea',
-              'label' => array('class' => 'control-label', 'text' => 'Study Center Informaiton'),       
+              'label' => array('class' => 'control-label', 'text' => 'Study Center Information'),       
                 'after'=>'<p class="help-block">  </p></div>',
             ));
       ?>

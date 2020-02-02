@@ -7,7 +7,7 @@ App::uses('AuthComponent', 'Controller/Component');
  * @property Group $Group
  */
 class User extends AppModel {
-	public $actsAs = array('Containable', 'Search.Searchable', 'Acl' => array('type' => 'requester'));
+    public $actsAs = array('Containable', 'Search.Searchable', 'Acl' => array('type' => 'requester'));
       public $filterArgs = array(
                 'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
             );
@@ -28,36 +28,36 @@ class User extends AppModel {
  *
  * @var array
  */
-	public $belongsTo = array(
-		'Group' => array(
-			'className' => 'Group',
-			'foreignKey' => 'group_id',
-			'conditions' => '',
-			'fields' => '',
-			'order' => ''
-		),
-		'County' => array(
-			'className' => 'County',
-			'foreignKey' => 'county_id',
-			'conditions' => '',
-			'fields' => '',
-			'order' => 'County.county_name DESC'
-		),
-		'Country' => array(
-			'className' => 'Country',
-			'foreignKey' => 'country_id',
-			'conditions' => '',
-			'fields' => '',
-		),
-	);
+    public $belongsTo = array(
+        'Group' => array(
+            'className' => 'Group',
+            'foreignKey' => 'group_id',
+            'conditions' => '',
+            'fields' => '',
+            'order' => ''
+        ),
+        'County' => array(
+            'className' => 'County',
+            'foreignKey' => 'county_id',
+            'conditions' => '',
+            'fields' => '',
+            'order' => 'County.county_name DESC'
+        ),
+        'Country' => array(
+            'className' => 'Country',
+            'foreignKey' => 'country_id',
+            'conditions' => '',
+            'fields' => '',
+        ),
+    );
 
 
-	public $hasMany = array(
-            	   'Application' => array(
-            	       'className' => 'Application',
-            	       'foreignKey' => 'application_id',
-            	       'dependent' => false,
-            	   ),
+    public $hasMany = array(
+                  //  'Application' => array(
+                  //      'className' => 'Application',
+                  //      'foreignKey' => 'application_id',
+                  //      'dependent' => false,
+                  // ),
                  'Review' => array(
                     'className' => 'Review',
                     'foreignKey' => 'user_id',
@@ -73,7 +73,7 @@ class User extends AppModel {
                     'foreignKey' => 'user_id',
                     'dependent' => false,
                  ),
-	);
+    );
 
 
 /**
@@ -164,26 +164,26 @@ class User extends AppModel {
       ),
     ),
   );
-	public function comparePasswords($field = null){
+    public function comparePasswords($field = null){
         return ($field['confirm_password'] === $this->data['User']['password']);
     }
-	public function compareOldPasswords($field = null){
-		if (isset($field['old_password'])) {
-			$a = $this->find('first', array('conditions' => array('User.id' => $this->data['User']['id']), 'recursive' => -1, 'fields' => 'User.password'));
-			return (AuthComponent::password($field['old_password']) === $a['User']['password']);
-		}
-		return true;
+    public function compareOldPasswords($field = null){
+        if (isset($field['old_password'])) {
+            $a = $this->find('first', array('conditions' => array('User.id' => $this->data['User']['id']), 'recursive' => -1, 'fields' => 'User.password'));
+            return (AuthComponent::password($field['old_password']) === $a['User']['password']);
+        }
+        return true;
     }
 
-	public function beforeSave($options = array()) {
-		if (isset($this->data[$this->alias]['password'])) {
-			$this->data[$this->alias]['password'] = AuthComponent::password($this->data[$this->alias]['password']);
-		}
-		if (isset($this->data[$this->alias]['confirm_password'])) {
-			$this->data[$this->alias]['confirm_password'] = AuthComponent::password($this->data[$this->alias]['confirm_password']);
-		}
-		return true;
-	}
+    public function beforeSave($options = array()) {
+        if (isset($this->data[$this->alias]['password'])) {
+            $this->data[$this->alias]['password'] = AuthComponent::password($this->data[$this->alias]['password']);
+        }
+        if (isset($this->data[$this->alias]['confirm_password'])) {
+            $this->data[$this->alias]['confirm_password'] = AuthComponent::password($this->data[$this->alias]['confirm_password']);
+        }
+        return true;
+    }
 
     public function parentNode() {
         if (!$this->id && empty($this->data)) {

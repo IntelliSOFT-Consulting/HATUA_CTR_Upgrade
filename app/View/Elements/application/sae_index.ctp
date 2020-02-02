@@ -5,6 +5,22 @@
 <div class="row-fluid">
   <div class="span12">
     
+  <?php
+    echo $this->Session->flash();
+    if ($redir == 'applicant') {
+  ?>
+  <div class="row-fluid">
+    <div class="span12">
+    <?php
+      echo $this->Html->link('<i class="icon-file"></i> New SAE/SUSAR',
+               array('controller' => 'applications', 'action' => 'index'),
+               array('escape' => false, 'class' => 'btn btn-success',  'style'=>'margin-right: 10px;'));
+    ?>
+    </div>
+  </div>
+    <hr>
+    <?php } ?>
+
     <div class="marketing">
       <div class="row-fluid">
             <div class="span12">

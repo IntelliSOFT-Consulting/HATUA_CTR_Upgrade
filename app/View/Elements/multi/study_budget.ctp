@@ -105,7 +105,7 @@
       <?php
             echo $this->Form->input('Budget.0.study_information', array(
               'type' => 'textarea',
-              'label' => array('class' => 'control-label', 'text' => 'Study Center Informaiton'),       
+              'label' => array('class' => 'control-label', 'text' => 'Study Center Information'),       
                 'after'=>'<p class="help-block">  </p></div>',
             ));
       ?>

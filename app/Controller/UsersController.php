@@ -74,7 +74,7 @@ class UsersController extends AppController {
     }
 
     public function applicant_dashboard() {
-        $applications = $this->User->Application->find('all', array(
+        $applications = $this->Application->find('all', array(
             'limit' => 20,
             'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no',
                 'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'),
@@ -87,13 +87,20 @@ class UsersController extends AppController {
         $this->set(compact('trial_statuses'));
 
         if ($this->request->is('post')) {
-            $this->Application->create();
-            $this->request->data['Application']['user_id'] = $this->Auth->User('id');
-            if ($this->Application->save($this->request->data, true, array('user_id', 'email_address'))) {
-                $this->Session->setFlash(__('The application has been created'), 'alerts/flash_success');
-                $this->redirect(array('controller' => 'applications', 'action' => 'applicant_edit', $this->Application->id));
+            //Ensure the applicant has set a sponsor's email first
+            $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->User('id'))));
+            if (!empty($user['User']['sponsor_email'])) {
+                $this->Application->create();
+                $this->request->data['Application']['user_id'] = $this->Auth->User('id');
+                if ($this->Application->save($this->request->data, true, array('user_id', 'email_address'))) {
+                    $this->Session->setFlash(__('The application has been created'), 'alerts/flash_success');
+                    $this->redirect(array('controller' => 'applications', 'action' => 'applicant_edit', $this->Application->id));
+                } else {
+                    $this->Session->setFlash(__('The application could not be saved. Please, try again.'), 'alerts/flash_error');
+                }
             } else {
-                $this->Session->setFlash(__('The application could not be saved. Please, try again.'), 'alerts/flash_error');
+                $this->Session->setFlash(__('Please update the sponsor\'s email before creating an application.'), 'alerts/flash_warning');
+                $this->redirect(array('controller' => 'users' , 'action' => 'edit', 'admin' => false));
             }
         }
 
@@ -112,7 +119,7 @@ class UsersController extends AppController {
     }
 
     public function manager_dashboard() {
-        $applications = $this->User->Application->find('all', array(
+        $applications = $this->Application->find('all', array(
             'limit' => 5,
             'fields' => array('Application.id','Application.created', 'Application.study_drug', 'Application.submitted', 'Application.protocol_no'),
             'order' => array('Application.created' => 'desc'),
@@ -136,7 +143,7 @@ class UsersController extends AppController {
     }
 
     public function inspector_dashboard() {
-        $applications = $this->User->Application->find('all', array(
+        $applications = $this->Application->find('all', array(
             'limit' => 5,
             'fields' => array('Application.id','Application.created', 'Application.study_drug', 'Application.submitted'),
             'order' => array('Application.created' => 'desc'),
@@ -156,13 +163,13 @@ class UsersController extends AppController {
     }
 
     public function reviewer_dashboard() {
-        // $this->User->Application->recursive = -1;
+        // $this->Application->recursive = -1;
         $my_applications = $this->User->Review->find('list', array(
             'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request', 'ifnull(Review.accepted,-1)' => array('accepted', '-1')),
             'fields' => array('Review.application_id'),
             'contain' => array()));
         // pr($my_applications);
-        $this->set('applications', $this->User->Application->find('all', array(
+        $this->set('applications', $this->Application->find('all', array(
             'limit' => 5, 'fields' => array('id','study_drug', 'created'),
             'order' => array('Application.created' => 'desc'),
             'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
