@@ -57,8 +57,70 @@ class AnnualLettersController extends AppController {
  *
  * @return void
  */
-    public function manager_generate($application_id = null) {
+    public function manager_initial($application_id = null) {
+        //Create  annual approval letter
+
+        $html = new HtmlHelper(new ThemeView());
+        $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'initial_approval_letter')));
+
+        $application = $this->Application->find('first', array('conditions' => array('Application.id' => $application_id)));
+        $checklist = array();
+        foreach ($application['Checklist'] as $formdata) {            
+          $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
+          (isset($checklist[$formdata['pocket_name']])) ? 
+            $checklist[$formdata['pocket_name']] .= $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>' : 
+            $checklist[$formdata['pocket_name']] = $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>';
+        }
+        $deeds = $this->Pocket->find('list', array(
+          'fields' => array('Pocket.name', 'Pocket.content'),
+          'conditions' => array('Pocket.type' => 'protocol'),
+          'recursive' => 0
+        ));
+        // debug($deeds);
+        $checkstring='';
+        $cnt = 0;
+        foreach ($checklist as $kech => $check) {
+          $cnt++;
+          $checkstring .= $cnt.'. '.$deeds[$kech].'<br>'.$check;
+        }
+
+        $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $application_id)));
+        $cnt++;
+        $year = date('Y', strtotime($application['Application']['approval_date']));
+        $approval_no = 'APL/'.$cnt.'/'.$year.'-'.$application['Application']['protocol_no'];
+        $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
+        $variables = array(
+            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'], 
+            'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
+            'qualification' => $application['InvestigatorContact'][0]['qualification'],
+            'names' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name'],
+            'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
+            'telephone' => $application['InvestigatorContact'][0]['telephone'],
+            'study_title' => $application['Application']['short_title'],
+            'checklist' => $checkstring,
+            'expiry_date' => $expiry_date
+        );
         
+        $save_data = array('AnnualLetter' => array(
+                'application_id' => $application['Application']['id'],
+                'approval_no' => $approval_no,
+                'approver' => $this->Session->read('Auth.User.name'),
+                'approval_date' => date('d-m-Y'),
+                'expiry_date' => date('d-m-Y', strtotime('+1 year')),
+                'status' => 'submitted',
+                'content' => String::insert($approval_letter['Pocket']['content'], $variables)
+              ),
+            );
+        
+        $this->AnnualLetter->Create();
+        if (!$this->AnnualLetter->save($save_data)) {
+             $this->Session->setFlash(__('The approval letter could not be saved.'), 'alerts/flash_error');
+        }
+        $this->Session->setFlash(__('The approval letter has been saved.'), 'alerts/flash_success');
+        $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'ane' => $this->AnnualLetter->id));
+    }
+
+    public function manager_generate($application_id = null) {        
         // Notify managers approval generated awaiting approval
         $html = new HtmlHelper(new ThemeView());
         $type = 'manager_approve_letter';
@@ -105,7 +167,7 @@ class AnnualLettersController extends AppController {
 
               $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $application['Application']['id'])));
               $cnt++;
-              $year = date('Y', strtotime($this->Application->field('approval_date')));
+              $year = date('Y', strtotime($application['Application']['approval_date']));
               $approval_no = 'APL/'.$cnt.'/'.$year.'-'.$application['Application']['protocol_no'];
               // $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
               $expiry_date = date('jS F Y', strtotime('+1 year'));
@@ -165,6 +227,7 @@ class AnnualLettersController extends AppController {
                  $this->Session->setFlash(__('The annual approval letter could not be saved.'), 'alerts/flash_error');
             }
             // $this->redirect($this->referer());
+            $this->Session->setFlash(__('The approval letter has been saved.'), 'alerts/flash_success');
             $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'ane' => $this->AnnualLetter->id));
     }
 

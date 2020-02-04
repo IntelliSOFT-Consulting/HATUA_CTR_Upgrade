@@ -2,10 +2,19 @@
   echo $this->Session->flash();
 ?>
 <h3>Annual Approval Letters</h3>
-
+  <?php if($redir == 'manager') { ?>
   <br>
   <div class="row-fluid">
-    <div class="span12">      
+    <div class="span6">      
+        <?php 
+          if($redir == 'manager') {
+              echo $this->Html->link(__('<i class="icon-file"></i> Generate initial approval letter'),
+                        array('controller' => 'annual_letters', 'action' => 'initial', $application['Application']['id']),
+                        array('escape' => false, 'class' => 'btn btn-primary'));
+          }
+        ?>
+    </div>
+    <div class="span6">      
         <?php 
           if($redir == 'manager') {
               echo $this->Html->link(__('<i class="icon-file-alt"></i> Generate annual approval letter'),
@@ -16,6 +25,7 @@
     </div>
   </div>
   <br>
+  <?php } ?>
 
 <table  class="table  table-bordered table-striped">
      <thead>
