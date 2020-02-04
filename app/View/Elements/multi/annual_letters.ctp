@@ -7,9 +7,9 @@
   <div class="row-fluid">
     <div class="span12">      
         <?php 
-          if($redir == 'applicant') {
-              echo $this->Html->link(__('<i class="icon-file-alt"></i> Generate approval letter'),
-                        array('controller' => 'annual_letters', 'action' => 'add', $application['Application']['id']),
+          if($redir == 'manager') {
+              echo $this->Html->link(__('<i class="icon-file-alt"></i> Generate annual approval letter'),
+                        array('controller' => 'annual_letters', 'action' => 'generate', $application['Application']['id']),
                         array('escape' => false, 'class' => 'btn btn-info'));
           }
         ?>
@@ -30,6 +30,12 @@
       <tbody>
     <?php
     foreach ($application['AnnualLetter'] as $anl): ?>
+    <?php
+        $show = false;
+        if($redir == 'manager') $show = true;
+        if($redir == 'applicant' && $anl['status'] == 'submitted') $show = true;
+        if($show) {
+    ?>
     <tr class="">
         <td><?php echo h($anl['id']); ?>&nbsp;</td>
         <td><?php echo h($anl['approval_no']); ?>&nbsp;</td>
@@ -37,16 +43,22 @@
         <td><?php echo h($anl['created']); ?>&nbsp;</td>
         <td class="actions">
           <?php 
-              echo $this->Html->link('<span class="label label-info"> View </span>', array('action' => 'view', $application['Application']['id'], 'anl' => $anl['id']), array('escape'=>false));
+              if ($anl['status'] == 'submitted') {                
+                  echo $this->Html->link('<span class="label label-success"> Edit </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape'=>false));
+              } else {
+                  echo $this->Html->link('<span class="label label-info"> View </span>', array('action' => 'view', $application['Application']['id'], 'anl' => $anl['id']), array('escape'=>false));
+              }
+
               echo "&nbsp;";
               if($anl['status'] == 'submitted') 
-                echo $this->Html->link('<span class="label label-success"> Approve </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape'=>false));
+                echo $this->Html->link('<span class="label label-warning"> Approve </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape'=>false));
               echo "&nbsp;";
               // if($anl['status'] == 'submitted') 
                 echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'annual_letters', 'action' => 'view', $anl['id'], 'ext' => 'pdf',), array('escape'=>false));
           ?>
         </td>
     </tr>
+    <?php } ?>
     <?php endforeach; ?>
     </tbody>
 </table>
@@ -96,6 +108,16 @@
         <?php
             echo $this->Form->input('id', array('type' => 'hidden', 'value' => $annual_letter['id']));
             echo $this->Form->input('status', array('type' => 'hidden', 'value' => 'approved'));
+            echo $this->Form->input('approval_date', array(
+              'div' => array('class' => 'control-group'), 'type' => 'text', 'value' => $annual_letter['approval_date'], 'class' => 'datepickers',
+              'label' => array('class' => 'control-label required', 'text' => 'Approval date <span class="sterix">*</span>'),
+              'after'=>'<span class="help-inline">  Date format (dd-mm-yyyy) </span></div>',
+            ));
+            echo $this->Form->input('expiry_date', array(
+              'div' => array('class' => 'control-group'), 'type' => 'text', 'value' => $annual_letter['expiry_date'], 'class' => 'datepickers',
+              'label' => array('class' => 'control-label required', 'text' => 'Expiry date <span class="sterix">*</span>'),
+              'after'=>'<span class="help-inline">  Date format (dd-mm-yyyy) </span></div>',
+            ));
             echo $this->Form->input('content', array(
                   'label' => false, 'value' => $annual_letter['content'],
                   'between'=>'<div class="controle">',  'class' => 'input-large',
@@ -112,7 +134,16 @@
             ));
             ?>
       <script type="text/javascript">
+          (function( $ ) {
+
+              $( ".datepickers" ).datepicker({
+                  minDate:"-5Y", maxDate:"+999D", dateFormat:'dd-mm-yy', showButtonPanel:true, changeMonth:true, changeYear:true,
+                  //yearRange: "-100Y:+0",
+                  buttonImageOnly:true, showAnim:'show', showOn:'both', buttonImage:'/img/calendar.gif'
+              });
+            })( jQuery );
+
           CKEDITOR.replace( 'data[AnnualLetter][content]');
-      </script>
+    </script>
     </div>
   <?php } } } ?>

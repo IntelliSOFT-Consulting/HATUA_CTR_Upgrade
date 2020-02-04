@@ -24,4 +24,29 @@ class AnnualLetter extends AppModel {
 			'order' => ''
 		)
 	);
+
+	public function beforeSave() {
+		if (!empty($this->data['AnnualLetter']['approval_date'])) {
+			$this->data['AnnualLetter']['approval_date'] = $this->dateFormatBeforeSave($this->data['AnnualLetter']['approval_date']);
+		}
+		if (!empty($this->data['AnnualLetter']['expiry_date'])) {
+			$this->data['AnnualLetter']['expiry_date'] = $this->dateFormatBeforeSave($this->data['AnnualLetter']['expiry_date']);
+		}
+		return true;
+	}
+
+
+	function afterFind($results) {
+		foreach ($results as $key => $val) {
+			if (isset($val['AnnualLetter']['approval_date'])) {
+				$results[$key]['AnnualLetter']['approval_date'] = $this->dateFormatAfterFind($val['AnnualLetter']['approval_date']);
+			}
+		}
+		foreach ($results as $key => $val) {
+			if (isset($val['AnnualLetter']['expiry_date'])) {
+				$results[$key]['AnnualLetter']['expiry_date'] = $this->dateFormatAfterFind($val['AnnualLetter']['expiry_date']);
+			}
+		}
+		return $results;
+	}
 }
