@@ -18,7 +18,7 @@ class ApplicationsController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'view', 'view.pdf', 'apl', 'apn', 'study_title', 'myindex');
+        $this->Auth->allow('index', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
 
 /**
@@ -1109,12 +1109,12 @@ class ApplicationsController extends AppController {
         // $this->set('save_data', $save_data);
     }
 
-    public function apn() {
+    public function apn($id) {
           //Create  annual approval letter
           $this->loadModel('Pocket');
           $this->loadModel('AnnualLetter');
           $html = new HtmlHelper(new ThemeView());
-          $this->Application->read(null, 46);
+          $this->Application->read(null, $id);
           $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'annual_approval_letter'), 'contain' => array()));
 
           $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));

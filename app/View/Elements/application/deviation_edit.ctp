@@ -38,7 +38,7 @@
         <td>
           <?php 
             // echo $this->Form->input('Deviation.'.$akey.'.deviation_type', array('label' => false, 'value' => $deviation['deviation_type'])); 
-            echo $this->Form->input('id', array('label' => false, 'value' => $deviation['id'])); 
+            // echo $this->Form->input('id', array('label' => false, 'value' => $deviation['id'])); 
             echo $this->Form->input('Deviation.'.$akey.'.deviation_type', array(
               'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
               'class' => 'deviation_type',
