@@ -114,7 +114,7 @@
             // echo h($ciom['Ciom']['basename']); 
             echo $this->Html->link(
                 $ciom['Ciom']['basename'],
-                str_replace('/var/www/ctr/app/webroot', '', $ciom['Ciom']['file']),
+                str_replace('/var/www/html/ctr/app/webroot', '', $ciom['Ciom']['file']),
                 array('class' => 'button', 'target' => '_blank')
             );
           ?>
