@@ -618,6 +618,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Saes');
         $this->Acl->allow($group, 'controllers/Cioms/inspector_view');
         $this->Acl->allow($group, 'controllers/Cioms/inspector_index');
+        $this->Acl->allow($group, 'controllers/Cioms/download');
         $this->Acl->allow($group, 'controllers/Reports');
         $this->Acl->allow($group, 'controllers/MeetingDates');
 
@@ -697,6 +698,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Cioms/applicant_add');
         $this->Acl->allow($group, 'controllers/Cioms/applicant_view');
         $this->Acl->allow($group, 'controllers/Cioms/applicant_index');
+        $this->Acl->allow($group, 'controllers/Cioms/download');
         $this->Acl->allow($group, 'controllers/ParticipantFlows/applicant_add');
         $this->Acl->allow($group, 'controllers/Budgets/applicant_add');
         $this->Acl->allow($group, 'controllers/EthicalCommittees/applicant_add');

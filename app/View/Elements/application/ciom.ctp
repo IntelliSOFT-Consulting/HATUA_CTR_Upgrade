@@ -33,11 +33,12 @@
             <td>
               <?php 
                 // echo h($ciom['Ciom']['basename']); 
-                echo $this->Html->link(
-                    $ciom['basename'],
-                    str_replace('/var/www/ctr/app/webroot', '', $ciom['file']),
-                    array('class' => 'button', 'target' => '_blank')
-                );
+                // echo $this->Html->link(
+                //     $ciom['basename'],
+                //     str_replace('/var/www/ctr/app/webroot', '', $ciom['file']),
+                //     array('class' => 'button', 'target' => '_blank')
+                // );
+              echo $this->Html->link(__($ciom['basename']), array('controller' => 'cioms', 'action' => 'download', $ciom['id'], 'admin' => false), array('escape' => false));
               ?>
             </td>
             <td><?php echo $ciom['created'] ?></td> 

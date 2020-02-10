@@ -77,6 +77,39 @@ class CiomsController extends AppController {
  * @param string $id
  * @return void
  */
+	public function download($id = null) {
+        $this->viewClass = 'Media';
+        $this->Ciom->id = $id;
+        if (!$this->Ciom->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } 
+        // else if ($this->Session->read('Auth.User.group_id') == '5' && !$this->Ciom->isOwnedBy($id, $this->Auth->user('id'))) {
+        //     $this->Session->setFlash(__('You do not have permission to access this resource
+        //                                     id = '.$id.' and user = '.$this->Auth->user('id')), 'alerts/flash_error');
+        //     $this->redirect($this->referer());
+        // } 
+        // else if($this->Session->read('Auth.User.group_id') == '5' && $this->Ciom->isOwnedBy($id, $this->Auth->user('id'))) {
+        else {
+            $attachment = $this->Ciom->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Ciom']['basename'],
+                'download'  => true,
+                'path'      => 'media'. DS .'transfer'. DS .$attachment['Ciom']['dirname'] . DS
+            );
+            $this->set($params);
+        } 
+        // else if($this->Session->read('Auth.User.group_id') == 1 || $this->Session->read('Auth.User.group_id') == 2 || $this->Session->read('Auth.User.group_id') == 3) {
+        //     $attachment = $this->Ciom->read(null, $id);
+        //     $params = array(
+        //         'id'        => $attachment['Ciom']['basename'],
+        //         'download'  => true,
+        //         'path'      => 'media'. DS .'transfer'. DS .$attachment['Ciom']['dirname'] . DS
+        //     );
+        //     $this->set($params);
+        // }        
+    }
+
 	public function applicant_view($id = null) {
 		$this->Ciom->id = $id;
 		if (!$this->Ciom->exists()) {

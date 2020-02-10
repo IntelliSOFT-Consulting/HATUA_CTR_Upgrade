@@ -112,11 +112,15 @@
         <td>
           <?php 
             // echo h($ciom['Ciom']['basename']); 
-            echo $this->Html->link(
-                $ciom['Ciom']['basename'],
-                str_replace('/var/www/html/ctr/app/webroot', '', $ciom['Ciom']['file']),
-                array('class' => 'button', 'target' => '_blank')
-            );
+            // echo $this->Html->link(
+            //     $ciom['Ciom']['basename'],
+            //     str_replace('/var/www/html/ctr/app/webroot', '', $ciom['Ciom']['file']),
+            //     array('class' => 'button', 'target' => '_blank')
+            // );
+          echo $this->Html->link(__($ciom['Ciom']['basename']), array('controller' => 'cioms', 'action' => 'download', $ciom['Ciom']['id'], 'admin' => false), array('escape' => false));
+            // echo $this->Html->link($ciom['Ciom']['basename'],
+            //         array('controller' => 'cioms', 'action' => 'download', $ciom['Ciom']['id'], 'admin' => false),
+            //         );
           ?>
           &nbsp;
         </td>
