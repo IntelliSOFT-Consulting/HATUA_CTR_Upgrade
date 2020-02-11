@@ -65,6 +65,7 @@
                 if ($rreview['type'] == 'request') {
                   echo 'Assigned: '.$rreview['accepted'].'<br/>';
                 }
+                echo $rreview['summary'].'<br/>'; 
                 echo $rreview['recommendation']; 
 
               ?>              

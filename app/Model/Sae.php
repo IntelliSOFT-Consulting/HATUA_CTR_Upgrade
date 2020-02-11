@@ -146,6 +146,13 @@ class Sae extends AppModel {
                 'message'  => 'Please select the gender!'
             ),
         ),
+        'causality' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please select the causality!'
+            ),
+        ),
         'reaction_description' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',

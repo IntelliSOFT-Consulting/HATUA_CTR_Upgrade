@@ -323,7 +323,7 @@ class MeetingDatesController extends AppController {
                     }
                     //**********************************    END   *********************************
 
-                    $this->Session->setFlash(__('The meeting date has been submitted to mcaz'), 'alerts/flash_success');
+                    $this->Session->setFlash(__('The meeting date has been submitted to PPB'), 'alerts/flash_success');
                     $this->redirect(array('action' => 'view', $this->MeetingDate->id));      
                 }
                 // debug($this->request->data);

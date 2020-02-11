@@ -285,6 +285,16 @@ class UsersController extends AppController {
         $this->set('users', $this->paginate());
     }*/
 
+    public function applicant_index() {
+        $this->paginate['conditions'] = array('sponsor' => $this->Auth->User('id'));
+
+        $this->paginate['order'] = array('User.created' => 'desc');
+        // $this->User->recursive = -1;
+        $this->paginate['contain'] = array('Group', 'County', 'Country');
+
+            $this->set('users', $this->paginate());
+
+    }
     public function admin_index() {
         $this->Prg->commonProcess();
         $page_options = array('10' => '10', '20' => '20');
@@ -335,6 +345,25 @@ class UsersController extends AppController {
  *
  * @return void
  */
+    public function applicant_add() {
+        if ($this->request->is('post')) {
+            $this->User->create();
+            $this->request->data['User']['group_id'] = 7;
+            $this->request->data['User']['is_active'] = 1;
+            $this->request->data['User']['sponsor'] = $this->Auth->User('id');
+            if ($this->User->save($this->request->data)) {
+                $this->Session->setFlash(__('The study monitor has been saved'), 'alerts/flash_success');
+                $this->redirect(array('action' => 'index'));
+            } else {
+                $this->Session->setFlash(__('The study monitor could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        }
+        $counties = $this->User->County->find('list', array('order' => 'County.county_name ASC'));
+        $this->set(compact('counties'));
+        $countries = $this->User->Country->find('list', array('order' => 'Country.name ASC'));
+        $this->set(compact('countries'));
+    }
+
     public function admin_add() {
         if ($this->request->is('post')) {
             $this->User->create();
@@ -464,13 +493,45 @@ class UsersController extends AppController {
         $this->set(compact('countries'));
     }
 
+    public function applicant_edit($id = null) {
+        $this->User->id = $id;
+        if (!$this->User->exists()) {
+            $this->Session->setFlash(__('User does not exist!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+        $user = $this->User->read(null, $id);
+        if ($user['User']['sponsor'] != $this->Auth->user('id')) {
+            $this->Session->setFlash(__('Your are not allowed to edit this user!!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+        $fieldlist = array('name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address', 'sponsor_email',
+                'institution_contact', 'county_id', 'country_id', 'group_id', 'is_active');
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->User->save($this->request->data)) {
+                $this->Session->setFlash(__('Your registration details have been updated.'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+                $this->Session->setFlash(__('The user could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        } else {
+            // $this->request->data = $this->User->read(null, $id);
+            $fieldlist[] = 'id'; $fieldlist[] = 'group_id'; $fieldlist[] = 'username';
+            $this->request->data = $this->User->find('first', array('conditions' => array('User.id' => $id), 'fields' => $fieldlist,
+                'contain' => array('County', 'Country')));
+        }
+        $counties = $this->User->County->find('list', array('order' => 'County.county_name ASC'));
+        $this->set(compact('counties'));
+        $countries = $this->User->Country->find('list', array('order' => 'Country.name ASC'));
+        $this->set(compact('countries'));
+    }
+
     public function admin_edit($id = null) {
         $this->User->id = $id;
         if (!$this->User->exists()) {
             $this->Session->setFlash(__('User does not exist!'), 'alerts/flash_error');
             $this->redirect($this->referer());
         }
-        $fieldlist = array('name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address',
+        $fieldlist = array('name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address', 
                 'institution_contact', 'county_id', 'country_id', 'group_id', 'is_active');
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->User->save($this->request->data)) {
@@ -500,6 +561,27 @@ class UsersController extends AppController {
  * @param string $id
  * @return void
  */
+    public function applicant_delete($id = null, $activate = true) {
+        $this->User->id = $id;
+        if (!$this->User->exists()) {
+            $this->Session->setFlash(__('User does not exist!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+
+        $user = $this->User->read(null, $id);
+        if ($user['User']['sponsor'] != $this->Auth->user('id')) {
+            $this->Session->setFlash(__('Your are not allowed to edit this user!!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+
+        if ($this->User->saveField('deactivated', $activate)) {
+            if($activate) $this->Session->setFlash(__('The User has been successfully Deactivated.'), 'alerts/flash_success');
+            if(!$activate) $this->Session->setFlash(__('The User has been successfully Activated.'), 'alerts/flash_success');
+        }
+
+        $this->redirect($this->referer());
+    }
+
     public function admin_delete($id = null, $activate = true) {
         $this->User->id = $id;
         if (!$this->User->exists()) {
@@ -684,6 +766,10 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/applicant_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
+        $this->Acl->allow($group, 'controllers/Users/applicant_add');
+        $this->Acl->allow($group, 'controllers/Users/applicant_edit');
+        $this->Acl->allow($group, 'controllers/Users/applicant_index');
+        $this->Acl->allow($group, 'controllers/Users/applicant_delete');
         $this->Acl->allow($group, 'controllers/SiteInspections/applicant_download_summary');
         $this->Acl->allow($group, 'controllers/SiteInspections/applicant_index');
         $this->Acl->allow($group, 'controllers/Comments/applicant_add_si_external');

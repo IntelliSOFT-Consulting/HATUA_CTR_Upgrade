@@ -71,6 +71,10 @@
     <table class="table  table-condensed">
       <tbody>
         <tr>
+          <td class="table-label required" width="25%"><p>Causality of the reaction <span class="sterix">*</span></p></td>
+          <td><?php  echo $sae['Sae']['causality']; ?></td>
+        </tr>
+        <tr>
           <td class="table-label required" width="25%"><p>Describe Reaction(s) <small class="muted">(including relevant test, lab data)</small> <span class="sterix">*</span></p></td>
           <td><?php  echo $sae['Sae']['reaction_description']; ?></td>
         </tr>

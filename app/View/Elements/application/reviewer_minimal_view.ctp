@@ -16,11 +16,11 @@
       <table style="width: 100%;">
         <tr>
           <td style="width: 25%;">Abstract of Study:</td>
-          <td style="width: 75%;"><strong><?php echo __($application['Application']['abstract_of_study'], true) ?></strong></td>
+          <td style="width: 75%;"><strong><?php echo $application['Application']['abstract_of_study'] ?></strong></td>
         </tr>
         <tr>
           <td style="width: 25%;">Study Title:</td>
-          <td style="width: 75%;"><strong><?php echo __($application['Application']['study_title'], true) ?></strong></td>
+          <td style="width: 75%;"><strong><?php echo $application['Application']['study_title'] ?></strong></td>
         </tr>
       </table>
       <hr>

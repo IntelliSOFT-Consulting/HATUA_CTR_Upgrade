@@ -1,5 +1,5 @@
 <?php
-    $this->Html->script('multi/checklist', array('inline' => false));
+    $this->Html->script('multi/checklist?v=2', array('inline' => false));
   $add_checklist = '<p><button class="btn btn-mini tiptip add-checklist" data-original-title="Add a file"
                                 style="margin-left:10px;" type="button">&nbsp;<i class="icon-plus-sign"></i>&nbsp; </button>';
     $num = 0;

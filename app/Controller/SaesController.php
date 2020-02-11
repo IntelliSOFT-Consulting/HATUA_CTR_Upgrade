@@ -310,7 +310,7 @@ class SaesController extends AppController {
                     }
                     //**********************************    END   *********************************
 
-                    $this->Session->setFlash(__('The sae has been submitted to mcaz'), 'alerts/flash_success');
+                    $this->Session->setFlash(__('The sae has been submitted to PPB'), 'alerts/flash_success');
                     $this->redirect(array('action' => 'view', $this->Sae->id));      
                 }
                 // debug($this->request->data);

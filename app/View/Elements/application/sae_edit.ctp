@@ -88,7 +88,155 @@
     </div><!--/row-->
     <div class="row-fluid">
         <div class="span12">
-            <?php                
+
+            <div class="accordion" id="accordion2" style="margin-left: 20px;margin-right: 20px; margin-bottom: 5px;">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" style="color: #0088cc;">
+                    WHO-UMC Causality Assessment Scale
+                  </a>
+                </div>
+                <div id="collapseOne" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                   
+                    <table class="table table-bordered  table-condensed">
+                        <thead>
+                          <tr>
+                            <th>Causality Term</th>
+                            <th>Assessment</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                         <tr>
+                           <td><strong>Certain</strong></td>
+                           <td>
+                            <ul>
+                                <li>Event of laboratory test abnormality, with plausible time relationship to drug intake</li>
+                                <li>Cannot be explained by disease or other drugs </li>
+                                <li>Response to withdrawal plausible (pharmacologically, pathologically)</li>
+                                <li>Event definitive pharmacologically or phenomenologically <em>(i.e an objective and specific medical disorder or a recognized pharmacological phenomenon)</em> </li>
+                                <li>Rechallenge satisfactory , if necessary.</li>
+                            </ul>
+                           </td>
+                         </tr>
+                         <tr>
+                           <td><strong>Probable / Likely</strong></td>
+                           <td>
+                            <ul>
+                                <li>Event or laboratory test abnormality, with reasonble time relationship to drug intake.</li>
+                                <li>Unlikely to be attributed to disease or other drugs</li>
+                                <li>Response to withdrawal clinically reasonable</li>
+                                <li>Rechallenge not required </li>
+                            </ul>
+                           </td>
+                         </tr>
+                         <tr>
+                           <td><strong>Possible</strong></td>
+                           <td>
+                            <ul>
+                                <li>Event or laboratory test abnormality, with reasonable time relationship to drug intake</li>
+                                <li>Could also be explained by disease or other drugs</li>
+                                <li>Information on drugs withdrawal lacking or unclear</li>
+                            </ul>
+                           </td>
+                         </tr>
+
+                         <tr>
+                           <td><strong>Unlikely</strong></td>
+                           <td>
+                            <ul>
+                                <li>Event or laboratory tests abnormality, with a time to drug intake that makes a relationship improbable (but not impossible)</li>
+                                <li>Disease or other drugs provide plausible explanations</li>
+                            </ul>
+                           </td>
+                         </tr>
+
+                         <tr>
+                           <td><strong>Conditional / Unclassified</strong></td>
+                           <td>
+                            <ul>
+                                <li>Event or laboratory test abnormality </li>
+                                <li>More data for proper, assessment needed or </li>
+                                <li>Additional data under examination </li>
+                            </ul>
+                           </td>
+                         </tr>
+
+                         <tr>
+                           <td><strong>Unassessable / unclassifiable</strong></td>
+                           <td>
+                            <ul>
+                                <li>Report suggesting an adverse reaction </li>
+                                <li>Cannot be judged because of insufficient or contradictory information </li>
+                                <li>Data cannot be supplemented or verified </li>
+                            </ul>
+                           </td>
+                         </tr>
+
+                        </tbody>
+                      </table>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <?php 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<div class="control-group ">   <label class="control-label required">
+                    Causality of the reaction <span class="sterix">*</span></label>  <div class="controls">
+                    <input type="hidden" value="" id="SaeGender_" name="data[Sae][causality]"> <label class="radio inline">',
+                  'after' => '</label>',
+                  'options' => array('Certain' => 'Certain'),
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<label class="radio inline">', 'after' => '</label>',
+                  'options' => array('Probable/Likely' => 'Probable/Likely')
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<label class="radio inline">', 'after' => '</label>',
+                  'options' => array('Possible' => 'Possible')
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<label class="radio inline">', 'after' => '</label>',
+                  'options' => array('Unlikely' => 'Unlikely')
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<label class="radio inline">', 'after' => '</label>',
+                  'options' => array('Conditional/Unclassified' => 'Conditional/Unclassified')
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<label class="radio inline">', 'after' => '</label>',
+                  'options' => array('Probable/Likely' => 'Probable/Likely')
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'causality',
+                  'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                  'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+                  'before' => '<label class="radio inline">',
+                  'after' => '</label>
+                        <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                        onclick="$(\'.causality\').removeAttr(\'checked disabled\')">
+                        <em class="accordion-toggle">clear!</em></a> </span>
+
+                        </div> </div>',
+                  'options' => array('Unassessable/Unclassifiable' => 'Unassessable/Unclassifiable'),
+                ));
+            ?>
+
+            <?php
                 echo $this->Form->input('reaction_description',
                     array('class' => 'span9',
                         'label' => array('class' => 'control-label required', 'text' => 'Describe Reaction(s) <small class="muted">(including relevant test, lab data)</small> <span class="sterix">*</span>'),));
@@ -310,8 +458,15 @@
 
     $(function() {
         $( "#SaeCountryId" ).combobox();
-        // $( "#toggle" ).click(function() {
-        //  $( "#combobox" ).toggle();
-        // });
+        $('.causality').click(function(){            
+            if ($(this).val() == 'Certain' || $(this).val() == 'Probable/Likely' || $(this).val() == 'Possible') {
+                if($("#suspected-drugs .suspected-group").length == 0) {
+                    $('#addSuspectedDrug').click();
+                }
+            } 
+        });
+        // function causality_click() {
+        //    console.log($(this).val());
+        // }
     });
     </script>

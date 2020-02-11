@@ -90,7 +90,7 @@ $(function() {
   </div>\
 </div>'.replace(/{i}/g, intId));
             // console.log(se.replace(/\d/, '1441441'));
-            $(new_suspectdrug).find('[name*="route_id"]').append($("#SuspectedDrug0RouteId > option").clone()).val('');
+            $(new_suspectdrug).find('[name*="route_id"]').append($("#SaeLiboso > option").clone()).val('');
             $("#suspected-drugs").append(new_suspectdrug);
         } else {
             alert("Sorry, cant add more than "+$("#suspected-drugs .suspected-group").length+" Suspected Drugs!");

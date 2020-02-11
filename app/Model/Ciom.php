@@ -31,6 +31,33 @@ class Ciom extends AppModel {
  * @var array
  */
 	public $validate = array(
+		'file' => array(
+			// 'resource'   => array('rule' => 'checkResource'),
+			'resource'   => array(
+				'rule' => 'checkResource',
+				'allowEmpty' => false,
+				'message' => 'Please attach an E2B compliant file!'
+			),
+			'access'     => array('rule' => 'checkAccess'),
+			// 'location'   => array('rule' => array('checkLocation', array(
+				// MEDIA_TRANSFER, '/tmp/'
+			// ))),
+			'permission' => array('rule' => array('checkPermission', '*')),
+			'size'       => array('rule' => array('checkSize', '5M')),
+			// 'pixels'     => array('rule' => array('checkPixels', '1600x1600')),  // removed image restriction
+			'extension'  => array(
+				'rule' => array('checkExtension', false, array('xml', 'tmp', 'Xml')),
+				'message' => 'Please attach a valid E2B file'),
+			// 'mimeType'   => array('rule' => array('checkMimeType', false, array(
+			// 	'image/jpeg', 'image/png', 'image/tiff', 'image/gif', 'application/pdf'	)))
+		),
+		'reporter_email' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please enter a valid email address'
+            ),
+        ),
 		'basename' => array(
 			'notempty' => array(
 				'rule' => array('notempty'),

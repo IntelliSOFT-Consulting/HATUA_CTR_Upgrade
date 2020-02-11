@@ -74,7 +74,7 @@ class MediaValidation extends Validation {
 		if ($deny === true || (is_array($deny) && Validation::extension($check, $deny))) {
 			return false;
 		}
-		if ($allow !== true && (is_array($allow) && !Validation::extension($check, $allow))) {
+		if ($allow !== true && (is_array($allow) && !Validation::inList($check, $allow))) {  //Eddie: changed to allow valid check
 			return false;
 		}
 		return true;

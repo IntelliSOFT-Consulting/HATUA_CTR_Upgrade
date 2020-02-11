@@ -14,6 +14,16 @@
 				<hr>
 				<p>Thank you for being a registered user.</p>
 				<p>You may update your registration details within your profile or change your passord.</p>
+				<?php 
+					if($redir == 'applicant'){
+				?>
+				<h4 class="text-success" style="text-decoration: underline;">Study Monitors</h4>
+				<p>You can add study monitors who will have minimal access to add SAE/SUSARS, Deviations and notifications</p>
+				<?php echo $this->Html->link('Add Monitor', array('controller' => 'users', 'action' => 'add', 'applicant' => true), array('class' => 'btn btn-inverse', 'escape' => false)); ?>
+
+				<?php
+					}
+				?>
 		</div> <!-- /span5 -->
 
 		<div class="span5 columns">

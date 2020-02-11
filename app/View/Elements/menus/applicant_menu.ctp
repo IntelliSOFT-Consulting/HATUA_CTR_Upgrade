@@ -53,11 +53,31 @@
                         array('controller' => 'feedbacks', 'action'=>'add', 'applicant' => false ), array('escape' => false ));
                     ?>
              </li>
-             <li class="<?php echo $this->fetch('Profile') ?>">
-                <?php
-                    echo $this->Html->link('<i class="icon-user"></i> My Profile',
+             <li class="dropdown <?php echo $this->fetch('Profile') ?>">
+                 <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop7" href="#">
+                    <i class="icon-group"></i> My Profile &amp; Monitors <b class="caret"></b></a>
+                  <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
+                     <li>
+                     <?php
+                      echo $this->Html->link('<i class="icon-user"></i> My Profile',
                         array('controller' => 'users', 'action'=>'profile', 'admin' => false ), array('escape' => false ));
-                    ?>
+                      ?>
+                    </li>
+                  <li class="divider"></li>
+                     <li>
+                      <?php
+                      echo $this->Html->link('<i class="icon-user-md"></i> Add Monitor',
+                        array('controller' => 'users', 'action'=>'add', 'applicant' => true ), array('escape' => false ));
+                      ?>
+                    </li>
+                  <li class="divider"></li>
+                     <li>
+                      <?php
+                      echo $this->Html->link('<i class="icon-list-alt"></i> List Study Monitors',
+                        array('controller' => 'users', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
+                      ?>
+                    </li>
+                </ul>
              </li>
         </ul>
         
