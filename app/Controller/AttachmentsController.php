@@ -90,6 +90,27 @@ class AttachmentsController extends AppController {
         }
     }
 
+    public function monitor_download($id = null) {
+        $this->viewClass = 'Media';
+        $this->Attachment->id = $id;
+        if (!$this->Attachment->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else if (!$this->Attachment->isOwnedBy($id, $this->Auth->user('sponsor'))) {
+            $this->Session->setFlash(__('You do not have permission to access this resource
+                                            id = '.$id.' and user = '.$this->Auth->user('sponsor')), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else {
+            $attachment = $this->Attachment->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Attachment']['basename'],
+                'download'  => true,
+                'path'      => 'media'. DS .'transfer'. DS .$attachment['Attachment']['dirname'] . DS
+            );
+            $this->set($params);
+        }
+    }
+
     public function reviewer_download($id = null) {
         $this->viewClass = 'Media';
         $this->Attachment->id = $id;

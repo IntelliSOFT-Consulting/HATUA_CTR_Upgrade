@@ -289,6 +289,36 @@ class ApplicationsController extends AppController {
         $this->set(compact('trial_statuses'));
     }
 
+
+    public function monitor_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+            $criteria = $this->Application->parseCriteria($this->passedArgs);
+            $criteria['Application.user_id'] = $this->Auth->User('sponsor');
+            $criteria['Application.submitted'] = 1;
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Application.created' => 'desc');
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'Review' => array('User'));
+            
+            //in case of csv export
+            if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+              $this->csv_export($this->Application->find('all', 
+                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+                  ));
+            }
+            //end pdf export
+
+            $this->set('page_options', $page_options);
+            $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
+    }
+
     public function manager_index() {
         $this->Prg->commonProcess();
         $page_options = array('5' => '5', '10' => '10');
@@ -579,6 +609,39 @@ class ApplicationsController extends AppController {
             $this->redirect(array('action' => 'edit', $response['Application']['id']));
         }
         
+    }
+
+    public function monitor_view($id = null) {        
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
+        }
+
+        // $response = $this->_isOwnedBy($id);
+        $contains = $this->a_contain;
+        $response = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id, 'Application.submitted' => 1),
+            'contain' => $contains,
+            )
+        );
+        if($response['Application']['user_id'] != $this->Auth->user('sponsor')) {
+            $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('sponsor'),'debug');
+            $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $this->set('application', $response);
+        $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
+        }
+        
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => $this->a_contain));
+        $this->request->data = $application;        
     }
 
     public function applicant_final_report($id = null) {

@@ -73,6 +73,7 @@ class AppController extends Controller {
       if($this->Auth->User('group_id') == '4')  $redir = 'partner';
       if($this->Auth->User('group_id') == '5')  $redir = 'applicant';
       if($this->Auth->User('group_id') == '6')  $redir = 'inspector';
+      if($this->Auth->User('group_id') == '7')  $redir = 'monitor';
 
           $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login', 'admin' => false);
           $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login', 'admin' => false);

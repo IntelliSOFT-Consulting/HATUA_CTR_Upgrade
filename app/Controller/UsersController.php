@@ -118,6 +118,27 @@ class UsersController extends AppController {
             )));
     }
 
+    public function monitor_dashboard() {
+        $applications = $this->Application->find('all', array(
+            'limit' => 20,
+            'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no',
+                'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'),
+            'order' => array('Application.created' => 'desc'),
+            'contain' => array('Review'),
+            'conditions' => array('Application.user_id' => $this->Auth->User('sponsor'), 'Application.submitted' => 1),
+        ));
+        $this->set('applications', $applications);
+
+        $this->set('notifications', $this->User->Notification->find('all', array(
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
+            )));
+        $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
+        $this->set('saes', $this->Sae->find('all', array(
+            'limit' => 5,
+            'conditions' => array('Sae.user_id' => $this->Auth->User('sponsor')), 'order' => 'Sae.created DESC'
+            )));
+    }
+
     public function manager_dashboard() {
         $applications = $this->Application->find('all', array(
             'limit' => 5,
@@ -802,6 +823,33 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/MeetingDates/applicant_edit');
         $this->Acl->allow($group, 'controllers/MeetingDates/applicant_delete');
 
+        //Allow monitors
+        $group->id = 7;
+        $this->Acl->deny($group, 'controllers');
+        $this->Acl->allow($group, 'controllers/Applications/monitor_index');  //
+        $this->Acl->allow($group, 'controllers/Applications/monitor_view');  //
+        $this->Acl->allow($group, 'controllers/Applications/stages');  //
+        $this->Acl->allow($group, 'controllers/Attachments/monitor_download'); //
+        $this->Acl->allow($group, 'controllers/Attachments/download');  //
+        $this->Acl->allow($group, 'controllers/Notifications'); //
+        $this->Acl->allow($group, 'controllers/Users/monitor_dashboard');   //
+        $this->Acl->allow($group, 'controllers/Users/profile'); //
+        $this->Acl->allow($group, 'controllers/Users/edit');  //
+        $this->Acl->allow($group, 'controllers/Saes/monitor_add');  //
+        $this->Acl->allow($group, 'controllers/Saes/monitor_edit');  //
+        $this->Acl->allow($group, 'controllers/Saes/monitor_index');  //
+        $this->Acl->allow($group, 'controllers/Saes/monitor_view');  //
+        $this->Acl->allow($group, 'controllers/Saes/monitor_delete');   //
+        $this->Acl->allow($group, 'controllers/Saes/monitor_followup');  //
+        $this->Acl->allow($group, 'controllers/Cioms/monitor_add');  //
+        $this->Acl->allow($group, 'controllers/Cioms/monitor_view');  //
+        $this->Acl->allow($group, 'controllers/Cioms/monitor_index');  //
+        $this->Acl->allow($group, 'controllers/Cioms/download');  //
+        $this->Acl->allow($group, 'controllers/Deviations/monitor_add'); //
+        $this->Acl->allow($group, 'controllers/Deviations/monitor_download_deviation'); //
+        $this->Acl->allow($group, 'controllers/Deviations/monitor_index'); //
+        $this->Acl->allow($group, 'controllers/Deviations/monitor_edit'); //
+        $this->Acl->allow($group, 'controllers/Comments'); //
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";
         exit;
