@@ -44,7 +44,7 @@
 	Router::connect('/admin', array('controller' => 'users', 'action' => 'dashboard', 'admin' => true));	
 	//INSPECTOR ROUTING: DASHBOARD PAGE
 	Router::connect('/inspector', array('controller' => 'users', 'action' => 'dashboard', 'inspector' => true));	
-	//INSPECTOR ROUTING: DASHBOARD PAGE
+	//MONITOR ROUTING: DASHBOARD PAGE
 	Router::connect('/monitor', array('controller' => 'users', 'action' => 'dashboard', 'monitor' => true));	
 /**
  * Load all plugin routes.  See the CakePlugin documentation on 

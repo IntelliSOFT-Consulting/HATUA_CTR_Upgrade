@@ -278,6 +278,7 @@ class UsersController extends AppController {
                 if($this->Auth->User('group_id') == '4') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'partner' => true));
                 if($this->Auth->User('group_id') == '5') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'applicant' => 'applicant'));
                 if($this->Auth->User('group_id') == '6') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'inspector' => true));
+                if($this->Auth->User('group_id') == '7') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'monitor' => 'monitor'));
             } else {
                 $this->Session->setFlash('Your username or password was incorrect.', 'alerts/flash_error');
             }
