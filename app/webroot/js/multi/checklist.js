@@ -14,6 +14,8 @@ $(function() {
         <input type="hidden" id="{n}{i}Description" value="{description}" name="data[{n}][{i}][description]" style="display: inline;">\
         <input type="hidden" id="{n}{i}Dirname" name="data[{n}][{i}][dirname]" style="display: inline;">\
         <input type="hidden" id="{n}{i}Basename" name="data[{n}][{i}][basename]" style="display: inline;">\
+        <button id="{n}{i}btn" class="btn btn-mini btn-primary up_btn" type="button">&nbsp;<i class="icon-upload-alt"></i>&nbsp;Upload</button>\
+                        <button class="btn btn-mini btn-danger remove_file" type="button">&nbsp;<i class="icon-remove"></i>&nbsp;Delete</button>\
         <input type="hidden" id="{n}{i}Checksum" name="data[{n}][{i}][checksum]" style="display: inline;">';
     //if an input is checked and no input file in its control group, trigger add checklist file
     $('#tabs-12 :input:checkbox').each(function() {
@@ -112,12 +114,16 @@ $(function() {
                 fileInput: $(this),
                 add: function (e, data) {
                   data.context = $(this).closest('div');
-                  if(!data.context.find('.progress').length) {
-                    data.context.append('\
+                  /*console.log(data.context);
+                  upld_btn = '\
                         <button id="{n}{i}btn" class="btn btn-mini btn-primary up_btn" type="button">&nbsp;<i class="icon-upload-alt"></i>&nbsp;Upload</button>\
-                        <button class="btn btn-mini btn-danger remove_file" type="button">&nbsp;<i class="icon-remove"></i>&nbsp;Delete</button>'
+                        <button class="btn btn-mini btn-danger remove_file" type="button">&nbsp;<i class="icon-remove"></i>&nbsp;Delete</button>';
+                  if(!data.context.find('.progress').length) {                    
+                    name = data.context.parent().find('div.checkcontrols').next().attr('id');
+                    intId = data.context.parent().find('div.checkcontrols').next().children().length;
+                    data.context.append(upld_btn.replace(/{n}/g, name).replace(/{i}/g, intId)
                     );
-                  }
+                  }*/
                     if(!data.context.find('.progress').length) {
                       data.context.append('\
                           <div class="progress progress-striped active" style="width: 45%; margin-right: 45px; margin-top: 10px; margin-bottom: 5px;"> \
@@ -132,6 +138,7 @@ $(function() {
                   // console.log(data.files[0].name);
                   // $(this).css("backgroundColor", "#99C0DD");
                   $(this).hide();
+                  console.log(data.context);
                   data.context.find('button.up_btn').off('click').on('click', function () {
                     if(!data.context.find('[name*="version_no"]').val() && !data.context.find('[name*="file_date"]').val()) {
                       alert('Please enter the document version and date.');

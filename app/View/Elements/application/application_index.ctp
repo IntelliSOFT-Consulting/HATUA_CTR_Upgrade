@@ -282,7 +282,7 @@
                           array('escape'=>false, 'class' => 'btn btn-block',  'style'=>'padding:7px; margin-top: 10px;'));
                         echo "<br><br>";
 
-                        if ($redir == 'applicant' && $application['Application']['submitted']) {
+                        if (($redir == 'applicant' or $redir == 'monitor') && $application['Application']['submitted']) {
                           echo $this->Html->link('<span class="label label-success"> New SAE </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
                                 array('escape' => false)); 
                           echo "<br><br>";

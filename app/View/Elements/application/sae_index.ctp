@@ -149,7 +149,7 @@
             <?php if($sae['Sae']['approved'] > 0) echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $sae['Sae']['id']), array('escape' => false)); ?>
             <?php if($redir === 'applicant' && $sae['Sae']['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('action' => 'edit', $sae['Sae']['id']), array('escape' => false)); ?>
             <?php
-              if($sae['Sae']['approved'] < 1) {
+              if($sae['Sae']['approved'] < 1 && $redir === 'applicant') {
                 echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $sae['Sae']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['Sae']['id']));
               } 
               if($redir === 'applicant' && $sae['Sae']['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $sae['Sae']['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['Sae']['reference_no']));

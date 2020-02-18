@@ -43,7 +43,7 @@
     <?php
         $show = false;
         if($redir == 'manager') $show = true;
-        if($redir == 'applicant' && $anl['status'] == 'submitted') $show = true;
+        if($redir == 'applicant' && $anl['status'] == 'approved') $show = true;
         if($show) {
     ?>
     <tr class="">
