@@ -160,6 +160,24 @@ class Sae extends AppModel {
                 'message'  => 'Please describe the reaction(s)!'
             ),
         ),
+        'source_study' => array(
+            'sourceSelected' => array(
+                'rule' => 'sourceSelected',
+                'message' => 'Select at least one report source!!'
+            )
+        ),
+        'source_literature' => array(
+            'sourceSelected' => array(
+                'rule' => 'sourceSelected',
+                'message' => 'Select at least one report source!!'
+            )
+        ),
+        'source_health_professional' => array(
+            'sourceSelected' => array(
+                'rule' => 'sourceSelected',
+                'message' => 'Select at least one report source!!'
+            )
+        ),
       );
 
     public function beforeSave() {
@@ -195,6 +213,13 @@ class Sae extends AppModel {
             foreach ($this->data['SuspectedDrug'] as $val) {
                 if(strtotime($field['reaction_onset']) < strtotime($val['date_from']))    return false;
             }
+        }
+        return true;
+    }
+
+    public function sourceSelected($field = null) {
+        if (empty($this->data['Sae']['source_study']) and empty($this->data['Sae']['source_literature']) and empty($this->data['Sae']['source_health_professional'])) {
+            return false;
         }
         return true;
     }

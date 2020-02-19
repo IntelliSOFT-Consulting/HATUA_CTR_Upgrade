@@ -260,7 +260,7 @@
             ?>
         </div>
         <div class="span6">
-            <h5>Report Source </h5>
+            <h5>Report Source <span class="sterix">*</span></h5><br>
             <?php
                 echo $this->Form->input('source_study', array('label' => array('class' => 'control-label', 'text' => 'Study')));
                 echo $this->Form->input('source_literature', array('label' => array('class' => 'control-label', 'text' => 'Literature')));

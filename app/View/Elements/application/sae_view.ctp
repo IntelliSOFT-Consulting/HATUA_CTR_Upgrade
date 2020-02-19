@@ -103,7 +103,7 @@
         </tr>
         <tr>
           <td class="table-label required"><p>Administration Route <span class="sterix">*</span></p></td>
-          <td><?php  echo $sae['SuspectedDrug'][$i]['Route']['name']; ?></td>
+          <td><?php  echo isset($sae['SuspectedDrug'][$i]['Route']['name']) ? $sae['SuspectedDrug'][$i]['Route']['name'] : ''; ?></td>
           <td class="table-label required"><p>Therapy duration</p></td>
           <td><?php  echo $sae['SuspectedDrug'][$i]['therapy_duration']; ?></td>
         </tr>
