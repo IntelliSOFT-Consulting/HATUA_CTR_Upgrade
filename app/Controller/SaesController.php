@@ -273,7 +273,7 @@ class SaesController extends AppController {
             $data_save['report_type'] = 'Followup';
             $data_save['approved'] = 0;
 
-            if ($this->Sae->saveAssociated($data_save, array('deep' => true))) {
+            if ($this->Sae->saveAssociated($data_save, array('deep' => true, 'validate' => false))) {
                     $this->Session->setFlash(__('Follow up '.$data_save['reference_no'].' has been created'), 'alerts/flash_info');
                     $this->redirect(array('action' => 'edit', $this->Sae->id));               
             } else {
