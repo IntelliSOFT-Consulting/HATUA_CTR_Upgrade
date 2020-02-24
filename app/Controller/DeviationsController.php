@@ -1,5 +1,6 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('Sanitize', 'Utility');
 /**
  * Deviations Controller
  *
@@ -10,14 +11,37 @@ class DeviationsController extends AppController {
     public $paginate = array();
     public $presetVars = true; // using the model configuration
     public $uses = array('Deviation', 'Application');
+    public $components = array('Search.Prg');
 /**
  * index method
  *
  * @return void
  */
     public function index() {
-        $this->Deviation->recursive = 0;
-        $this->set('deviations', $this->paginate());
+        // $this->Deviation->recursive = 0;
+        // $this->set('deviations', $this->paginate());
+
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Deviation->parseCriteria($this->passedArgs);
+        $criteria['Deviation.status'] = 'Submitted';
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Deviation.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Deviation->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('deviations', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
 
     public function applicant_index() {
@@ -37,11 +61,34 @@ class DeviationsController extends AppController {
  * @return void
  */
     public function view($id = null) {
+        // $this->Deviation->id = $id;
+        // if (!$this->Deviation->exists()) {
+        //     throw new NotFoundException(__('Invalid deviation'));
+        // }
+        // $this->set('deviation', $this->Deviation->read(null, $id));
         $this->Deviation->id = $id;
         if (!$this->Deviation->exists()) {
             throw new NotFoundException(__('Invalid deviation'));
         }
-        $this->set('deviation', $this->Deviation->read(null, $id));
+        $deviation = $this->Deviation->read(null, $id);
+        if ($deviation['Deviation']['status'] !== 'Submitted') {
+            $this->Session->setFlash(__('The deviation has not been submitted'), 'alerts/flash_info');
+        }
+
+        $this->set('deviation', $this->Deviation->find('first', array(
+            'contain' => array('Application', 'ExternalComment' => array('Attachment')),
+            'conditions' => array('Deviation.id' => $id)
+            )
+        ));
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'DEV_' . $id,  'orientation' => 'portrait');
+        }
+    }
+    public function manager_view($id = null) {
+      $this->view($id);
+    }
+    public function inspector_view($id = null) {
+      $this->view($id);
     }
 
     /**

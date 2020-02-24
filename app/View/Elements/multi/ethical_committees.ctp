@@ -7,16 +7,16 @@
         echo $this->Form->input('EthicalCommittee.0.id');
         $ercs = $this->requestAction('/ercs/checklist');
         echo $this->Form->input('EthicalCommittee.0.ethical_committee', array(
-          'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Name of Ethics Review Committee (ERC)'),
+          'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Name of Ethics Review Committee (ERC)  <span class="sterix">*</span>'),
           'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs, 'empty' => true,
         ));
         echo $this->Form->input('EthicalCommittee.0.submission_date', array(
           'type' => 'text',
-          'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission to ERC'),
+          'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission to ERC  <span class="sterix">*</span>'),
           'placeholder' => ' ' , 'class' => 'datepickers',
         ));
         echo $this->Form->input('EthicalCommittee.0.erc_number', array(
-          'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number'),
+          'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number  <span class="sterix">*</span>'),
           'placeholder' => ' ' , 'class' => 'input-xxlarge',
         ));
         echo $this->Form->input('EthicalCommittee.0.initial_approval', array(
@@ -38,16 +38,16 @@
                   <?php
                     echo $this->Form->input('EthicalCommittee.'.$i.'.id');
                     echo $this->Form->input('EthicalCommittee.'.$i.'.ethical_committee', array(
-                      'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Name of Ethics Review Committee (ERC)'),
+                      'type' => 'select', 'label' => array('class' => 'control-label required', 'text' => 'Name of Ethics Review Committee (ERC)  <span class="sterix">*</span>'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge', 'options' => $ercs, 'empty' => true,
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.submission_date', array(
                       'type' => 'text',
-                      'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission to ERC'),
+                      'label' => array('class' => 'control-label required', 'text' => 'Date of initial complete submission to ERC  <span class="sterix">*</span>'),
                       'placeholder' => ' ' , 'class' => 'datepickers',
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.erc_number', array(
-                      'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number'),
+                      'label' => array('class' => 'control-label required', 'text' => 'ERC Reference Number  <span class="sterix">*</span>'),
                       'placeholder' => ' ' , 'class' => 'input-xxlarge',
                     ));
                     echo $this->Form->input('EthicalCommittee.'.$i.'.initial_approval', array(

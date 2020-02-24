@@ -2,6 +2,7 @@
 /app/Config/core.php
 /app/Config/appwide.php
 /app/Config/bootstrap.php
+/app/Config/email.php
 /app/webroot/media/
 /app/tmp
 /lib/Cake/Console/Templates/skel/tmp/

@@ -25,6 +25,30 @@ class EthicalCommittee extends AppModel {
 		)
 	);
 
+	public $validate = array(
+        'ethical_committee' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Abstract: Please enter the Kenya Ethics Review Committee Name!'
+            ),
+        ),
+        'submission_date' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Abstract: Please enter the date of initial complete sumission to ERC!'
+            ),
+        ),
+        'erc_number' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Abstract: Please enter the ERC Reference Number!'
+            ),
+        ),
+      );
+
 	public function beforeSave() {
 		if (!empty($this->data['EthicalCommittee']['submission_date'])) {
 			$this->data['EthicalCommittee']['submission_date'] = $this->dateFormatBeforeSave($this->data['EthicalCommittee']['submission_date']);

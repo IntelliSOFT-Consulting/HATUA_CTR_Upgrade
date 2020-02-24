@@ -847,6 +847,13 @@ class Application extends AppModel {
                 'message'  => 'Organizations : Please state if the sponsor has transferred trial related duties to another organization.'
             ),
         ),
+        'study_objectives' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Criteria : Please enter the study objectives.'
+            ),
+        ),
         'principal_inclusion_criteria' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',

@@ -40,6 +40,13 @@ class Sponsor extends AppModel {
                 // 'message'  => 'Please enter the sponsor contact person'
             // ),
         // ),
+        'sponsor_type' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Sponsor : Please enter the sponsor type'
+            ),
+        ),
 		'address' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
