@@ -307,11 +307,15 @@
                               echo $this->Html->link('<span class="label label-important"> Delete </span>',
                                   array('action' => 'delete', $application['Application']['id'], 'admin' => true),   array('escape'=>false));
                           }
-                          echo "<br><br>";
+                          
                           if($application['Application']['submitted']) {
+                             echo "<br><br>";
                              echo $this->Form->postLink(__('<span class="label label-warning">Unsubmit</span>'), array('action' => 'unsubmit',
                               $application['Application']['id']), array('escape' => false), __('Are you sure you want to Unsubmit Application No. %s? The user will be able to edit it!', $application['Application']['id']));
                           }
+                          echo "<br><br>";
+                          echo $this->Html->link('<span class="badge badge-inverse"> Reassign </span>',
+                                  array('controller' => 'users', 'action' => 'reassign', $application['Application']['id'], 'admin' => true),   array('escape'=>false));
                       }
                   ?>
                 </td>

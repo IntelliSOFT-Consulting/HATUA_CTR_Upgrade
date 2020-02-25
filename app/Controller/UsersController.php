@@ -346,6 +346,54 @@ class UsersController extends AppController {
             $this->set('users', $this->paginate());
 
     }
+
+    public function userdesc($id = null) {
+        $userdetails = $this->User->find('first', array(
+            'contain' => array(),
+            'fields' => array('id', 'name', 'email', 'username'),
+            'conditions' => array('id' => $id),
+            'recursive' => 0
+        ));
+        if ($this->request->is('requested')) {
+            return $userdetails;
+        }
+    }
+    public function admin_reassign($application_id = null, $user_id = null) {
+        if (empty($application_id)) {
+            $this->Session->setFlash(__('Application does not exist!'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'applications', 'action' => 'index'));
+        }
+
+        $this->Prg->commonProcess();
+        $criteria = $this->Application->User->parseCriteria($this->passedArgs);
+        $criteria['User.deactivated'] = 0;
+        $criteria['User.group_id'] = 5;
+        $criteria['User.is_active'] = 1;
+        $this->paginate['conditions'] = $criteria;
+
+        $this->paginate['order'] = array('User.created' => 'desc');
+        // $this->User->recursive = -1;
+        $this->paginate['contain'] = array('Group', 'County', 'Country');
+
+        $this->set('users', $this->paginate());
+        $application = $this->Application->find('first', array(
+            'contain' => array('User', 'Reassignment'),
+            'conditions' => array('Application.id' => $application_id)
+            )
+        );
+        $this->set('application', $application);
+
+        if ($this->request->is('post')) {
+            //save reassignment
+            $this->Application->Reassignment->save(array('application_id' => $application_id, 'orig_user' => $application['Application']['user_id'], 'new_user' => $user_id, 'assigning_user' => $this->Auth->User('id')));
+            //save application
+            $this->Application->save(array('id' => $application_id, 'user_id' => $user_id), array('validate' => false, 'fieldList' => array('user_id')));
+
+            $this->Session->setFlash(__('The application has been successfully re-assigned to the new user'), 'alerts/flash_success');
+            // $this->redirect(array('controller' => 'reassignments','action' => 'index'));
+            $this->redirect($this->referer());
+        }
+    }
 /**
  * view method
  *

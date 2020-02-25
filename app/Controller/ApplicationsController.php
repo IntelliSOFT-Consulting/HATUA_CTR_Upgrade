@@ -824,7 +824,7 @@ class ApplicationsController extends AppController {
                         $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));
                         $checklist = array();
                         foreach ($application['Checklist'] as $formdata) {            
-                          $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
+                          $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false, 'full_base' => true));
                           (isset($checklist[$formdata['pocket_name']])) ? 
                             $checklist[$formdata['pocket_name']] .= $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>' : 
                             $checklist[$formdata['pocket_name']] = $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>';
@@ -1183,7 +1183,7 @@ class ApplicationsController extends AppController {
           $application = $this->Application->find('first', array('conditions' => array('Application.id' => $this->Application->id)));
           $checklist = array();
           foreach ($application['AnnualApproval'] as $formdata) {            
-            $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
+            $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false, 'full_base' => true));
             (isset($checklist[$formdata['pocket_name']])) ? 
               $checklist[$formdata['pocket_name']] .= $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>' : 
               $checklist[$formdata['pocket_name']] = $file_link.' dated '.date('jS F Y', strtotime($formdata['file_date'])).' Version '.$formdata['version_no'].'<br>';
@@ -1547,6 +1547,7 @@ class ApplicationsController extends AppController {
             $this->redirect($this->referer());
         }
     }
+
 
 /**
 * Utility Methods

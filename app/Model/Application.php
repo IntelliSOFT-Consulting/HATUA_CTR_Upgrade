@@ -226,6 +226,11 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'Reassignment' => array(
+            'className' => 'Reassignment',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
                           'Attachment' => array(
                                     'className' => 'Attachment',
                                     'foreignKey' => 'foreign_key',

@@ -38,7 +38,7 @@
           <li class="divider"></li>
              <li>
               <?php
-              echo $this->Html->link('<i class="icon-skype"></i> Deviations/Violations',
+              echo $this->Html->link('<i class="icon-random"></i> Deviations/Violations',
                   array('controller' => 'deviations', 'action'=>'index', 'manager' => true ), array('escape' => false ));
               ?>
             </li>
