@@ -60,10 +60,10 @@
           <td><?php  echo ($sae['Sae']['life_threatening']) ? $checked : $nChecked; ?></td>
         </tr>
         <tr>
+          <td class="table-label required">Reaction end date</td>
+          <td><?php  echo $sae['Sae']['reaction_end_date']; ?></td>
           <td class="table-label required"><p>Gender <span class="sterix">*</span></p></td>
           <td><?php  echo $sae['Sae']['gender']; ?></td>
-          <td class="table-label required"></td>
-          <td></td>
         </tr>
       </tbody>
     </table>

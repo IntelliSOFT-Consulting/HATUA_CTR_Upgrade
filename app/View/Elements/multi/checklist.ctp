@@ -26,7 +26,7 @@ foreach ($medals as $lad => $medal) {
     <?php
      if(isset($this->request->data['Checklist'])){
        foreach ($this->request->data['Checklist'] as $bKey => $protocol) {
-          if ($protocol['group'] == $lad) {
+          if ($protocol['group'] === $lad) {
             echo '<div style="margin-top: 5px; margin-bottom: 5px;">';
             echo $this->Form->input('Checklist.'.$bKey.'.id');
             echo $this->Form->input('Checklist.'.$bKey.'.basename', array('type'=>'hidden'));

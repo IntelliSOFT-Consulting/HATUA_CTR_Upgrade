@@ -139,6 +139,12 @@ class Sae extends AppModel {
                 'message' => 'The reaction onset date must be after the date of drug administration'
             )
         ),
+        'reaction_end_date' => array(
+            'dateAfterOnsetDate' => array(
+                'rule' => 'dateAfterOnsetDate',
+                'message' => 'The reaction end date must be after the reaction onset date'
+            )
+        ),
         'gender' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
@@ -178,6 +184,18 @@ class Sae extends AppModel {
                 'message' => 'Select at least one report source!!'
             )
         ),
+        'patient_died' => array(
+            'reactionSelected' => array(
+                'rule' => 'reactionSelected',
+                'message' => 'Select at least one adverse reaction!!'
+            )
+        ),
+        'life_threatening' => array(
+            'reactionSelected' => array(
+                'rule' => 'reactionSelected',
+                'message' => 'Select at least one adverse reaction!!'
+            )
+        ),
       );
 
     public function beforeSave() {
@@ -186,6 +204,9 @@ class Sae extends AppModel {
         }
         if (!empty($this->data['Sae']['reaction_onset'])) {
             $this->data['Sae']['reaction_onset'] = $this->dateFormatBeforeSave($this->data['Sae']['reaction_onset']);
+        }
+        if (!empty($this->data['Sae']['reaction_end_date'])) {
+            $this->data['Sae']['reaction_end_date'] = $this->dateFormatBeforeSave($this->data['Sae']['reaction_end_date']);
         }
         if (!empty($this->data['Sae']['manufacturer_date'])) {
             $this->data['Sae']['manufacturer_date'] = $this->dateFormatBeforeSave($this->data['Sae']['manufacturer_date']);
@@ -200,6 +221,9 @@ class Sae extends AppModel {
             }
             if (isset($val['Sae']['reaction_onset'])) {
                 $results[$key]['Sae']['reaction_onset'] = $this->dateFormatAfterFind($val['Sae']['reaction_onset']);
+            }
+            if (isset($val['Sae']['reaction_end_date'])) {
+                $results[$key]['Sae']['reaction_end_date'] = $this->dateFormatAfterFind($val['Sae']['reaction_end_date']);
             }
             if (isset($val['Sae']['manufacturer_date'])) {
                 $results[$key]['Sae']['manufacturer_date'] = $this->dateFormatAfterFind($val['Sae']['manufacturer_date']);
@@ -217,8 +241,22 @@ class Sae extends AppModel {
         return true;
     }
 
+    public function dateAfterOnsetDate($field = null) {
+        if (!empty($field['reaction_end_date'])) {
+            if(strtotime($field['reaction_end_date']) < strtotime($this->data['Sae']['reaction_onset']))    return false;
+        }
+        return true;
+    }
+
     public function sourceSelected($field = null) {
         if (empty($this->data['Sae']['source_study']) and empty($this->data['Sae']['source_literature']) and empty($this->data['Sae']['source_health_professional'])) {
+            return false;
+        }
+        return true;
+    }
+
+    public function reactionSelected($field = null) {
+        if (empty($this->data['Sae']['patient_died']) and empty($this->data['Sae']['prolonged_hospitalization']) and empty($this->data['Sae']['incapacity']) and empty($this->data['Sae']['life_threatening'])) {
             return false;
         }
         return true;

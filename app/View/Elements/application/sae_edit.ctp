@@ -52,6 +52,9 @@
                 echo $this->Form->input('reaction_onset', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Reaction Onset <span class="sterix">*</span>')
                 ));
+                echo $this->Form->input('reaction_end_date', array('type' => 'text', 'class' => 'datepickers',
+                    'label' => array('class' => 'control-label required', 'text' => 'Reaction end date')
+                ));
                 echo $this->Form->input('gender', array(
                   'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
                   'class' => 'gender',
@@ -77,7 +80,7 @@
                 ?>
         </div><!--/span-->
         <div class="span6">
-            <h5>Check All Appropriate to Adverse Reaction</h5>
+            <h5>Check All Appropriate to Adverse Reaction <span class="sterix">*</span></h5>
             <?php                
                 echo $this->Form->input('patient_died', array('label' => array('class' => 'control-label', 'text' => 'Patient Died')));
                 echo $this->Form->input('prolonged_hospitalization', array('label' => array('class' => 'control-label', 'text' => 'Involved or Prolonged Inpatient Hospitalization')));
