@@ -30,7 +30,8 @@ class CommentsController extends AppController {
           $this->redirect($this->referer());
       } 
 
-      $attachment = $this->Comment->Attachment->read(null, $id);
+      // $attachment = $this->Comment->Attachment->read(null, $id);
+      $attachment = $this->Comment->Attachment->find('first', array('conditions' => array('Attachment.id' => $id, 'model' => 'Comments')));
       $params = array(
           'id'        => $attachment['Attachment']['basename'],
           'download'  => true,
