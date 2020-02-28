@@ -177,8 +177,13 @@ class CiomsController extends AppController {
 			throw new NotFoundException(__('Invalid ciom'), 'alerts/flash_error');
 		}
 		$ciom = $this->Ciom->read(null, $id);
-		$e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
-		$this->set(compact('ciom', 'e2b'));
+        if( strpos($ciom['Ciom']['basename'], 'xml') !== false ) {
+            $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
+            $this->set(compact('ciom', 'e2b'));
+        } else {
+            $this->redirect($this->referer());
+        }
+		
     }
     public function manager_view($id = null) {
       $this->aview($id);

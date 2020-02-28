@@ -31,35 +31,35 @@ class Manufacturer extends AppModel {
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
                 'required' => true,
-                'message'  => 'Please enter the name of the manufacturer!'
+                'message'  => 'Abstract: Please enter the name of the manufacturer!'
             ),
         ),
         'address' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
                 'required' => true,
-                'message'  => 'Please enter the manufacturing site address!'
+                'message'  => 'Abstract: Please enter the manufacturing site address!'
             ),
         ),
         'manufacturer_email' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
                 'required' => true,
-                'message'  => 'Please enter the email of the manufacturer!'
+                'message'  => 'Abstract: Please enter the email of the manufacturer!'
             ),
         ),
         'manufacturing_activities' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
                 'required' => true,
-                'message'  => 'Please enter the manufacturing activities at the site!'
+                'message'  => 'Abstract: Please enter the manufacturing activities at the site!'
             ),
         ),
         'manufacturer_country' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
                 'required' => true,
-                'message'  => 'Please enter the country of the manufacturer!'
+                'message'  => 'Abstract: Please enter the country of the manufacturer!'
             ),
         ),
       );
