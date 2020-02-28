@@ -12,7 +12,7 @@
   <div class="tab-pane active" id="deviation_form">
     <?php 
       echo $this->Html->link(__('<i class="icon-download-alt"></i> Download PDF'),
-                    array('controller' => 'deviations', 'ext' => 'pdf', 'action' => 'view', $deviation['Deviation']['id']),
+                    array('controller' => 'deviations', 'ext' => 'pdf', 'action' => 'download_deviation', $deviation['Deviation']['id']),
                     array('escape' => false, 'class' => 'btn btn-primary'));
       echo $this->element('application/deviation_view', array('deviation' => $deviation['Deviation'])); 
     ?>

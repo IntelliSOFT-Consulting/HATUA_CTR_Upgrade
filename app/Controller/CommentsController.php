@@ -21,6 +21,25 @@ class CommentsController extends AppController {
         $this->set('comments', $this->paginate());
     }
 
+
+  public function comment_file_download($id = null) {
+      $this->viewClass = 'Media';
+      $this->Comment->Attachment->id = $id;
+      if (!$this->Comment->Attachment->exists()) {
+          $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+          $this->redirect($this->referer());
+      } 
+
+      $attachment = $this->Comment->Attachment->read(null, $id);
+      $params = array(
+          'id'        => $attachment['Attachment']['basename'],
+          'download'  => true,
+          'path'      => 'media'. DS .'transfer'. DS .$attachment['Attachment']['dirname'] . DS
+      );
+      $this->set($params);
+          
+  }
+
 /**
  * manager_view method
  *

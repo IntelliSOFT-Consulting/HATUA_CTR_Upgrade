@@ -33,11 +33,11 @@
                     if(isset($comment['Attachment'])) {
                       foreach ($comment['Attachment'] as $key => $value) {
                         echo '<p>';
-                         // echo $this->Html->link(__($value['basename']),
-                         //   array('controller' => 'attachments',  'action' => 'download', $value['id'],
-                         //     'full_base' => true),
-                         //   array('class' => 'btn btn-link'));
-                        echo $this->Html->link($value['basename'], substr($value['file'], 24), ['fullBase' => true]);
+                         echo $this->Html->link(__($value['basename']),
+                           array('controller' => 'comments',  'action' => 'comment_file_download', $value['id'],
+                             'admin' => false),
+                           array('class' => 'btn btn-link'));
+                        // echo $this->Html->link($value['basename'], substr($value['file'], 24), ['fullBase' => true]);
                          echo '</p>';
                         }
                     }
