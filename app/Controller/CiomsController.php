@@ -93,6 +93,12 @@ class CiomsController extends AppController {
         $this->index();
     }
 
+    private function csv_export($cioms = '') {
+        $this->response->download('CIOMS_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->set(compact('cioms'));
+        $this->layout = false;
+        $this->render('csv_export');
+    }
 /**
  * view method
  *
@@ -178,6 +184,7 @@ class CiomsController extends AppController {
 		}
 		$ciom = $this->Ciom->read(null, $id);
         if( strpos($ciom['Ciom']['basename'], 'xml') !== false ) {
+            $this->Session->setFlash(__('Invalid E2B file. Unable to parse content!!'), 'alerts/flash_error');
             $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
             $this->set(compact('ciom', 'e2b'));
         } else {
