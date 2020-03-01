@@ -31,7 +31,7 @@ foreach ($medals as $lad => $medal) {
             echo $this->Form->input('Checklist.'.$bKey.'.id');
             echo $this->Form->input('Checklist.'.$bKey.'.basename', array('type'=>'hidden'));
                 echo $this->Form->input('Checklist.'.$bKey.'.model', array('type'=>'hidden'));
-                echo $this->Form->input('Checklist.'.$bKey.'.group', array('type'=>'hidden'));
+                // echo $this->Form->input('Checklist.'.$bKey.'.group', array('type'=>'hidden'));
                 echo $this->Form->input('Checklist.'.$bKey.'.file_date', array('type'=>'hidden'));
                 echo $this->Form->input('Checklist.'.$bKey.'.version_no', array('type'=>'hidden'));
             if (!empty($protocol['id']) && !empty($protocol['basename'])) {

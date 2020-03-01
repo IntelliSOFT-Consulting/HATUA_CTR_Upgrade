@@ -115,9 +115,165 @@ class AnnualLettersController extends AppController {
         $this->AnnualLetter->Create();
         if (!$this->AnnualLetter->save($save_data)) {
              $this->Session->setFlash(__('The approval letter could not be saved.'), 'alerts/flash_error');
+        } else {
+          
+          //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final,AnnualApproval stages if not exists
+          $id = $application_id;
+          $stages = $this->Application->ApplicationStage->find('all', array(
+                    'contain' => array(),
+                    'conditions' => array('ApplicationStage.application_id' => $id)
+          ));
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=Screening].id')) {
+              $this->Application->ApplicationStage->create();
+              $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                 'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'))
+                  )
+              );
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Screening]');
+              if (!empty($var)) {
+                  $s1['ApplicationStage'] = min($var);
+                  if(empty($s1['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s1['ApplicationStage']['status'] = 'Complete';
+                      $s1['ApplicationStage']['comment'] = 'Manager final decision';
+                      $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s1);
+                  }                                    
+              }                                
+          }
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=ScreeningSubmission].id')) {
+              $this->Application->ApplicationStage->create();
+              $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                      ))
+              );
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ScreeningSubmission]');
+              if (!empty($var)) {
+                  $s2['ApplicationStage'] = min($var);
+                  if(empty($s2['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s2['ApplicationStage']['status'] = 'Complete';
+                      $s2['ApplicationStage']['comment'] = 'Manager final decision';
+                      $s2['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s2);
+                  }                                    
+              }                                
+          }
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
+              $this->Application->ApplicationStage->create();
+              $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                      ))
+              );
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Assign]');
+              if (!empty($var)) {
+                  $s3['ApplicationStage'] = min($var);
+                  if(empty($s3['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s3['ApplicationStage']['status'] = 'Complete';
+                      $s3['ApplicationStage']['comment'] = 'Manager final decision';
+                      $s3['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s3);
+                  }                                    
+              }                                
+          }
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=Review].id')) {
+              $this->Application->ApplicationStage->create();
+              $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                      ))
+              );
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Review]');
+              if (!empty($var)) {
+                  $s4['ApplicationStage'] = min($var);
+                  if(empty($s4['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s4['ApplicationStage']['status'] = 'Complete';
+                      $s4['ApplicationStage']['comment'] = 'Manager final decision';
+                      $s4['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s4);
+                  }                                    
+              }                                
+          }
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
+              $this->Application->ApplicationStage->create();
+              $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                      ))
+              );
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
+              if (!empty($var)) {
+                  $s5['ApplicationStage'] = min($var);
+                  if(empty($s5['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s5['ApplicationStage']['status'] = 'Complete';
+                      $s5['ApplicationStage']['comment'] = 'Manager final decision';
+                      $s5['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s5);
+                  }                                    
+              }                                
+          }
+
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=FinalDecision].id')) {
+              $this->Application->ApplicationStage->create();
+              $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                      'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                      ))
+              );
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=FinalDecision]');
+              if (!empty($var)) {
+                  $s6['ApplicationStage'] = min($var);
+                  if(empty($s6['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s6['ApplicationStage']['status'] = 'Complete';
+                      $s6['ApplicationStage']['comment'] = $application['Application']['approved'];
+                      $s6['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s6);
+                  }                                    
+              }                                
+          }
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=AnnualApproval].id')) {
+              //create only if approved
+              if($application['Application']['approved'] == 2) {                                
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                          ))
+                  );
+              }
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=AnnualApproval]');
+              if (!empty($var)) {
+                  $s7['ApplicationStage'] = min($var);
+                  if(empty($s7['ApplicationStage']['end_date'])) {
+                      $this->Application->ApplicationStage->create();
+                      $s7['ApplicationStage']['status'] = 'Current';
+                      $s7['ApplicationStage']['comment'] = 'Manager approve';
+                      $s7['ApplicationStage']['end_date'] = date('Y-m-d');
+                      $this->Application->ApplicationStage->save($s7);
+                  }                                    
+              }                                
+          }
+
+          //end stages
+          //**********************        end
+
+          $this->Session->setFlash(__('The approval letter has been saved.'), 'alerts/flash_success');
+          $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'ane' => $this->AnnualLetter->id));
         }
-        $this->Session->setFlash(__('The approval letter has been saved.'), 'alerts/flash_success');
-        $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'ane' => $this->AnnualLetter->id));
     }
 
     public function manager_generate($application_id = null) {        
@@ -225,10 +381,165 @@ class AnnualLettersController extends AppController {
             $this->AnnualLetter->Create();
             if (!$this->AnnualLetter->save($save_data)) {
                  $this->Session->setFlash(__('The annual approval letter could not be saved.'), 'alerts/flash_error');
+            } else {
+              
+              //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final,AnnualApproval stages if not exists
+              $id = $application_id;
+              $stages = $this->Application->ApplicationStage->find('all', array(
+                        'contain' => array(),
+                        'conditions' => array('ApplicationStage.application_id' => $id)
+              ));
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=Screening].id')) {
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                     'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'))
+                      )
+                  );
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Screening]');
+                  if (!empty($var)) {
+                      $s1['ApplicationStage'] = min($var);
+                      if(empty($s1['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s1['ApplicationStage']['status'] = 'Complete';
+                          $s1['ApplicationStage']['comment'] = 'Manager final decision';
+                          $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s1);
+                      }                                    
+                  }                                
+              }
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=ScreeningSubmission].id')) {
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                          ))
+                  );
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ScreeningSubmission]');
+                  if (!empty($var)) {
+                      $s2['ApplicationStage'] = min($var);
+                      if(empty($s2['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s2['ApplicationStage']['status'] = 'Complete';
+                          $s2['ApplicationStage']['comment'] = 'Manager final decision';
+                          $s2['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s2);
+                      }                                    
+                  }                                
+              }
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=Assign].id')) {
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                          ))
+                  );
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Assign]');
+                  if (!empty($var)) {
+                      $s3['ApplicationStage'] = min($var);
+                      if(empty($s3['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s3['ApplicationStage']['status'] = 'Complete';
+                          $s3['ApplicationStage']['comment'] = 'Manager final decision';
+                          $s3['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s3);
+                      }                                    
+                  }                                
+              }
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=Review].id')) {
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                          ))
+                  );
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Review]');
+                  if (!empty($var)) {
+                      $s4['ApplicationStage'] = min($var);
+                      if(empty($s4['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s4['ApplicationStage']['status'] = 'Complete';
+                          $s4['ApplicationStage']['comment'] = 'Manager final decision';
+                          $s4['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s4);
+                      }                                    
+                  }                                
+              }
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                          ))
+                  );
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
+                  if (!empty($var)) {
+                      $s5['ApplicationStage'] = min($var);
+                      if(empty($s5['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s5['ApplicationStage']['status'] = 'Complete';
+                          $s5['ApplicationStage']['comment'] = 'Manager final decision';
+                          $s5['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s5);
+                      }                                    
+                  }                                
+              }
+
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=FinalDecision].id')) {
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                          ))
+                  );
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=FinalDecision]');
+                  if (!empty($var)) {
+                      $s6['ApplicationStage'] = min($var);
+                      if(empty($s6['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s6['ApplicationStage']['status'] = 'Complete';
+                          $s6['ApplicationStage']['comment'] = $application['Application']['approved'];
+                          $s6['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s6);
+                      }                                    
+                  }                                
+              }
+
+              if(!Hash::check($stages, '{n}.ApplicationStage[stage=AnnualApproval].id')) {
+                  //create only if approved
+                  if($application['Application']['approved'] == 2) {                                
+                      $this->Application->ApplicationStage->create();
+                      $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                              'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                              ))
+                      );
+                  }
+              } else {
+                  $var = Hash::extract($stages, '{n}.ApplicationStage[stage=AnnualApproval]');
+                  if (!empty($var)) {
+                      $s7['ApplicationStage'] = min($var);
+                      if(empty($s7['ApplicationStage']['end_date'])) {
+                          $this->Application->ApplicationStage->create();
+                          $s7['ApplicationStage']['status'] = 'Current';
+                          $s7['ApplicationStage']['comment'] = 'Manager approve';
+                          $s7['ApplicationStage']['end_date'] = date('Y-m-d');
+                          $this->Application->ApplicationStage->save($s7);
+                      }                                    
+                  }                                
+              }
+
+              //end stages
+              //**********************        end
+
+              $this->Session->setFlash(__('The approval letter has been saved.'), 'alerts/flash_success');
+              $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'ane' => $this->AnnualLetter->id));
             }
-            // $this->redirect($this->referer());
-            $this->Session->setFlash(__('The approval letter has been saved.'), 'alerts/flash_success');
-            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'ane' => $this->AnnualLetter->id));
     }
 
 	public function manager_add($application_id = null, $type = null) {
@@ -336,33 +647,62 @@ class AnnualLettersController extends AppController {
 			if ($this->AnnualLetter->save($this->request->data)) {
 
 				//******************       Send Email and Notifications to Applicant and Managers    *****************************
-                $this->loadModel('Message');
-                $html = new HtmlHelper(new ThemeView());
-                $message = $this->Message->find('first', array('conditions' => array('name' => 'annual_approval_letter')));
-                $anl = $this->AnnualLetter->find('first', array('contain' => array('Application'), 'conditions' => array('AnnualLetter.id' => $this->AnnualLetter->id)));
-                
-                $users = $this->AnnualLetter->Application->User->find('all', array(
-                    'contain' => array('Group'),
-                    'conditions' => array('OR' => array('User.id' => $this->AnnualLetter->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
-                ));
-                foreach ($users as $user) {
-                  $variables = array(
-                    'name' => $user['User']['name'], 'approval_no' => $anl['AnnualLetter']['approval_no'], 'protocol_no' => $anl['Application']['protocol_no'],
-                    'protocol_link' => $html->link($anl['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], $user['Group']['redir'] => true, 
-                        'full_base' => true), array('escape' => false)),
-                    'expiry_date' => $anl['AnnualLetter']['expiry_date'],
-                    'approval_date' => $anl['AnnualLetter']['approval_date']
+          $this->loadModel('Message');
+          $html = new HtmlHelper(new ThemeView());
+          $message = $this->Message->find('first', array('conditions' => array('name' => 'annual_approval_letter')));
+          $anl = $this->AnnualLetter->find('first', array('contain' => array('Application'), 'conditions' => array('AnnualLetter.id' => $this->AnnualLetter->id)));
+          
+          $users = $this->AnnualLetter->Application->User->find('all', array(
+              'contain' => array('Group'),
+              'conditions' => array('OR' => array('User.id' => $this->AnnualLetter->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+          ));
+          foreach ($users as $user) {
+            $variables = array(
+              'name' => $user['User']['name'], 'approval_no' => $anl['AnnualLetter']['approval_no'], 'protocol_no' => $anl['Application']['protocol_no'],
+              'protocol_link' => $html->link($anl['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], $user['Group']['redir'] => true, 
+                  'full_base' => true), array('escape' => false)),
+              'expiry_date' => $anl['AnnualLetter']['expiry_date'],
+              'approval_date' => $anl['AnnualLetter']['approval_date']
+            );
+            $datum = array(
+              'email' => $user['User']['email'],
+              'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'annual_approval_letter', 'model' => 'AnnaulLetter',
+              'subject' => String::insert($message['Message']['subject'], $variables),
+              'message' => String::insert($message['Message']['content'], $variables)
+            );
+            CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+            CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+          }
+          //**********************************    END   *********************************
+
+        //**********************  Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission,Final,AnnualApproval stages if not exists
+          $stages = $this->Application->ApplicationStage->find('all', array(
+                    'contain' => array(),
+                    'conditions' => array('ApplicationStage.application_id' => $anl['Application']['id'])
+          ));          
+
+          if(!Hash::check($stages, '{n}.ApplicationStage[stage=AnnualApproval].id')) {
+              //create only if approved
+              if($anl['Application']['approved'] == 2) {                                
+                  $this->Application->ApplicationStage->create();
+                  $this->Application->ApplicationStage->save(array('ApplicationStage' => array(
+                          'application_id' => $anl['Application']['id'], 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve','start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                          ))
                   );
-                  $datum = array(
-                    'email' => $user['User']['email'],
-                    'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'annual_approval_letter', 'model' => 'AnnaulLetter',
-                    'subject' => String::insert($message['Message']['subject'], $variables),
-                    'message' => String::insert($message['Message']['content'], $variables)
-                  );
-                  CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
-                  CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
-                }
-                //**********************************    END   *********************************
+              }
+          } else {
+              $var = Hash::extract($stages, '{n}.ApplicationStage[stage=AnnualApproval]');
+              if (!empty($var)) {
+                  $s7['ApplicationStage'] = min($var);
+                      $this->Application->ApplicationStage->create();
+                      $s7['ApplicationStage']['status'] = 'Current';
+                      $s7['ApplicationStage']['comment'] = 'Manager letter approve';
+                      $s7['ApplicationStage']['end_date'] = date('Y-m-d', strtotime($anl['AnnualLetter']['expiry_date']));
+                      $this->Application->ApplicationStage->save($s7);
+              }                                
+          }
+          //end stages
+          //**********************        end
 
 				$this->Session->setFlash(__('The annual approval letter has been saved'), 'alerts/flash_success');
 				$this->redirect(array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], 'anl' => $id, 'manager' => true));
