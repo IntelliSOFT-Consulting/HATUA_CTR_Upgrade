@@ -77,7 +77,7 @@ class DeviationsController extends AppController {
             else $this->paginate['limit'] = reset($page_options);
 
         $criteria = $this->Deviation->parseCriteria($this->passedArgs);
-        $criteria['Deviation.status'] = 'Submitted';
+        // $criteria['Deviation.status'] = 'Submitted';
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Deviation.created' => 'desc');
         $this->paginate['contain'] = array('Application');
@@ -302,7 +302,7 @@ class DeviationsController extends AppController {
         if (!$this->Deviation->exists()) {
             throw new NotFoundException(__('Invalid protocol deviation'), 'alerts/flash_error');
         }
-        $site_inspection = $this->Deviation->read(null, $id);
+        $deviation = $this->Deviation->read(null, $id);
         if ($this->Deviation->saveField('status', 'Unsubmitted')) {
             $this->Session->setFlash(__('Protocol deviation unsubmitted'), 'alerts/flash_success');
             //TODO: notify applicant the protocol deviation can be edited

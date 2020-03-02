@@ -116,10 +116,11 @@
             <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('reference_no'); ?></th>
-        <th><?php echo $this->Paginator->sort('deviation_type'); ?></th>
+        <th><?php echo $this->Paginator->sort('deviation_type', 'Type'); ?></th>
         <th><?php echo $this->Paginator->sort('application_id'); ?></th>
         <th><?php echo $this->Paginator->sort('pi_name'); ?></th>
-        <th><?php echo $this->Paginator->sort('deviation_date'); ?></th>
+        <th><?php echo $this->Paginator->sort('deviation_date', 'Date'); ?></th>
+        <th><?php echo $this->Paginator->sort('status'); ?></th>
         <th><?php echo $this->Paginator->sort('created'); ?></th>
         <th class="actions"><?php echo __('Actions'); ?></th>
           </tr>
@@ -143,11 +144,13 @@
         ?>&nbsp;</td>
         <td><?php echo h($deviation['Deviation']['pi_name']); ?>&nbsp;</td>
         <td><?php echo h($deviation['Deviation']['deviation_date']); ?>&nbsp;</td>
+        <td><?php echo h($deviation['Deviation']['status']); ?>&nbsp;</td>
         <td><?php echo h($deviation['Deviation']['created']); ?>&nbsp;</td>
         <td class="actions">     
             <?php echo $this->Html->link('<span class="label label-info"> View </span>',
                      array('controller' => 'applications', 'action' => 'view', $deviation['Application']['id'], 'deviation_view' => $deviation['Deviation']['id']), array('escape'=>false)); ?>  
-            <?php //echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $deviation['Deviation']['id']), array('escape' => false)); ?>     
+            <?php //echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $deviation['Deviation']['id']), array('escape' => false)); ?> 
+            <?php if($redir === 'manager' && $deviation['Deviation']['status'] == 'Submitted') echo $this->Form->postLink('<span class="badge badge-inverse">Unsubmit</span>', array('action' => 'unsubmit', $deviation['Deviation']['id']), array('escape' => false), __('Unsubmit %s?', $deviation['Deviation']['reference_no'])); ?>
         </td>
     </tr>
 <?php endforeach; ?>

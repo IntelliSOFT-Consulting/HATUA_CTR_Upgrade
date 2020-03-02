@@ -545,6 +545,18 @@ class SaesController extends AppController {
         $this->set(compact('sae', 'routes', 'countries', 'applications'));
     }
 
+    public function manager_unsubmit($id = null) {
+        $this->Sae->id = $id;
+        if (!$this->Sae->exists()) {
+            $this->Session->setFlash(__('SAE does not exist!'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        if($this->Sae->saveField('approved', 0)) {
+            $this->Session->setFlash(__('The SAE/SUSAR has been successfully Unsubmitted. The user is now able to edit the SAE.'), 'alerts/flash_success');
+            $this->redirect($this->referer());
+        }
+    }
 /**
  * delete method
  *
