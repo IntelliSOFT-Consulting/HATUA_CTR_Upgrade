@@ -35,6 +35,12 @@
                         array('controller' => 'saes', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
                     ?>
              </li>
+             <li class="<?php echo $this->fetch('DEV') ?>">
+                <?php
+                    echo $this->Html->link('<i class="icon-random"></i> Deviations',
+                        array('controller' => 'deviations', 'action'=>'index', 'applicant' => true ), array('escape' => false ));
+                    ?>
+             </li>
              <li class="<?php echo $this->fetch('SI') ?>">
                 <?php
                     echo $this->Html->link('<i class="icon-skype"></i> Site Inspections',

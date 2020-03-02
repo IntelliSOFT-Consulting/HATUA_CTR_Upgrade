@@ -132,7 +132,9 @@
         <td>
           <?php 
             // echo h($deviation['Deviation']['reference_no']); 
-            echo $this->Html->link($deviation['Deviation']['reference_no'], array('action' => 'view', $deviation['Deviation']['id']), array('escape'=>false));
+            //echo $this->Html->link($deviation['Deviation']['reference_no'], array('action' => 'view', $deviation['Deviation']['id']), array('escape'=>false));
+            echo $this->Html->link($deviation['Deviation']['reference_no'],
+               array('controller' => 'applications', 'action' => 'view', $deviation['Application']['id'], 'deviation_view' => $deviation['Deviation']['id']), array('escape'=>false));
         ?>&nbsp;</td>
         <td><?php echo h($deviation['Deviation']['deviation_type']); ?>&nbsp;</td>
         <td><?php 
@@ -142,8 +144,10 @@
         <td><?php echo h($deviation['Deviation']['pi_name']); ?>&nbsp;</td>
         <td><?php echo h($deviation['Deviation']['deviation_date']); ?>&nbsp;</td>
         <td><?php echo h($deviation['Deviation']['created']); ?>&nbsp;</td>
-        <td class="actions">
-            <?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $deviation['Deviation']['id']), array('escape' => false)); ?>      
+        <td class="actions">     
+            <?php echo $this->Html->link('<span class="label label-info"> View </span>',
+                     array('controller' => 'applications', 'action' => 'view', $deviation['Application']['id'], 'deviation_view' => $deviation['Deviation']['id']), array('escape'=>false)); ?>  
+            <?php //echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $deviation['Deviation']['id']), array('escape' => false)); ?>     
         </td>
     </tr>
 <?php endforeach; ?>

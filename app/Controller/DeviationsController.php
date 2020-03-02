@@ -17,6 +17,55 @@ class DeviationsController extends AppController {
  *
  * @return void
  */
+    
+
+    public function applicant_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Deviation->parseCriteria($this->passedArgs);
+        $criteria['Deviation.user_id'] = $this->Auth->User('id');
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Deviation.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Deviation->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('deviations', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
+    public function monitor_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Deviation->parseCriteria($this->passedArgs);
+        $criteria['Deviation.user_id'] = array($this->Auth->User('id'), $this->Auth->User('sponsor'));
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Deviation.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Deviation->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('deviations', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
+
     public function index() {
         // $this->Deviation->recursive = 0;
         // $this->set('deviations', $this->paginate());
@@ -44,13 +93,10 @@ class DeviationsController extends AppController {
         $this->set('deviations', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
 
-    public function applicant_index() {
-        $this->index();
-    }
-    public function monitor_index() {
-        $this->index();
-    }
     public function manager_index() {
+        $this->index();
+    }
+    public function inspector_index() {
         $this->index();
     }
 /**
@@ -145,12 +191,12 @@ class DeviationsController extends AppController {
                         'Deviation.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
         $count++; 
         $count = ($count < 10) ? "0$count" : $count;
-        $data = array('application_id' => $application_id,  'study_title' => $application['Application']['study_title'], 
+        $data = array('application_id' => $application_id,  'study_title' => $application['Application']['study_title'], 'user_id' => $this->Auth->User('id'),
                       'reference_no' => 'DEV/'.date('Y').'/'.$count,
                       'pi_name' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name']
                 );
         if ($this->Deviation->saveAssociated(array('Deviation' => $data))) {            
-            $this->Session->setFlash(__('The protocol deviation has been created'), 'alerts/flash_success');
+            $this->Session->setFlash(__('The protocol deviation has been created. Kindly update the details and submit!!'), 'alerts/flash_info');
             $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_edit' => $this->Deviation->id));
         } else {
             $this->Session->setFlash(__('The protocol deviation could not be created. Please notify the administrator.'), 'alerts/flash_error');
@@ -166,12 +212,12 @@ class DeviationsController extends AppController {
                         'Deviation.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
         $count++; 
         $count = ($count < 10) ? "0$count" : $count;
-        $data = array('application_id' => $application_id,  'study_title' => $application['Application']['study_title'], 
+        $data = array('application_id' => $application_id,  'study_title' => $application['Application']['study_title'], 'user_id' => $this->Auth->User('id'),
                       'reference_no' => 'DEV/'.date('Y').'/'.$count,
                       'pi_name' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name']
                 );
         if ($this->Deviation->saveAssociated(array('Deviation' => $data))) {            
-            $this->Session->setFlash(__('The protocol deviation has been created'), 'alerts/flash_success');
+            $this->Session->setFlash(__('The protocol deviation has been created. Kindly update the details and submit!!'), 'alerts/flash_info');
             $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_edit' => $this->Deviation->id));
         } else {
             $this->Session->setFlash(__('The protocol deviation could not be created. Please notify the administrator.'), 'alerts/flash_error');
@@ -196,10 +242,10 @@ class DeviationsController extends AppController {
                 // debug($this->request->data);
                 if (isset($this->request->data['submitReport'])) {
                   $this->Deviation->saveField('status', 'Submitted');                    
-                    $this->Session->setFlash(__('The protocol deviation has been submitted'), 'alerts/flash_success');
+                    $this->Session->setFlash(__('The protocol deviation has been submitted!!'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_view' => $id));
                 } else {
-                   $this->Session->setFlash(__('The protocol deviation has been saved'), 'alerts/flash_success');
+                   $this->Session->setFlash(__('The protocol deviation has been saved. Please submit when complete!!'), 'alerts/flash_info');
                     $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_edit' => $id));
                 }
             } else {

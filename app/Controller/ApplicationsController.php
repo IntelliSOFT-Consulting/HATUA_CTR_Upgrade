@@ -611,7 +611,7 @@ class ApplicationsController extends AppController {
         
     }
 
-    public function monitor_view($id = null) {        
+    public function monitor_view($id = null) {    
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
             $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
@@ -1575,6 +1575,7 @@ class ApplicationsController extends AppController {
         // $response = $this->Application->isOwnedBy($id, $this->Auth->user('id'));
         $contains = $this->a_contain;
         $contains['SiteInspection']['conditions'] = array('SiteInspection.summary_approved' => 2);
+        $contains['Deviation']['conditions'] = array('Deviation.user_id' => $this->Auth->user('id'));
         $contains['Review']['conditions'] = array('Review.type' => 'ppb_comment');
         // debug($contains);
         $response = $this->Application->find('first', array(

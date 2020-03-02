@@ -61,7 +61,7 @@ class SaesController extends AppController {
             else $this->paginate['limit'] = reset($page_options);
 
         $criteria = $this->Sae->parseCriteria($this->passedArgs);
-        $criteria['Sae.user_id'] = $this->Auth->User('sponsor');
+        $criteria['Sae.user_id'] = array($this->Auth->User('id'), $this->Auth->User('sponsor'));
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Sae.created' => 'desc');
         $this->paginate['contain'] = array('Application', 'Country', 'SuspectedDrug', 'ConcomittantDrug');
@@ -168,9 +168,10 @@ class SaesController extends AppController {
                 $this->Session->setFlash(__('The sae has not been submitted'), 'alerts/flash_info');
                 $this->redirect(array('action' => 'edit', $this->Sae->id));
         }
-        if ($sae['Sae']['user_id'] !== $this->Auth->User('sponsor')) {
+        // if ($sae['Sae']['user_id'] !== $this->Auth->User('id')) {
+        if (!in_array($sae['Sae']['user_id'], array($this->Auth->User('id'), $sae['Sae']['user_id']))) {
                 $this->Session->setFlash(__('You don\'t have permission to access!!'), 'alerts/flash_error');
-                $this->redirect('/');
+                $this->redirect(array('action' => 'index'));
         }
         $this->set('sae', $this->Sae->find('first', array(
             'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
@@ -240,7 +241,7 @@ class SaesController extends AppController {
             // $this->Sae->saveField('form_type', 'SUSAR');
             $this->Sae->create();
             $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
-                'form_type' => 'SAE'
+                'form_type' => 'SUSAR'
                 ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
         }
@@ -298,7 +299,7 @@ class SaesController extends AppController {
             // $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
             // $this->Sae->saveField('form_type', 'SAE');
             $this->Sae->create();
-            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('sponsor'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
+            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
                 'form_type' => 'SAE'
                 ]], false);
             $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
@@ -311,8 +312,8 @@ class SaesController extends AppController {
             // $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
             // $this->Sae->saveField('form_type', 'SUSAR');
             $this->Sae->create();
-            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('sponsor'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
-                'form_type' => 'SAE'
+            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
+                'form_type' => 'SUSAR'
                 ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
         }
@@ -461,6 +462,10 @@ class SaesController extends AppController {
                 $this->Session->setFlash(__('The sae has been submitted'), 'alerts/flash_info');
                 $this->redirect(array('action' => 'view', $this->Sae->id));
         }
+        if ($sae['Sae']['user_id'] !== $this->Session->read('Auth.User.id')) {
+                $this->Session->setFlash(__('You don\'t have permission to edit this SAE!!'), 'alerts/flash_warning');
+                $this->redirect(array('action' => 'index'));
+        }
         if ($this->request->is('post') || $this->request->is('put')) {
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
@@ -534,7 +539,7 @@ class SaesController extends AppController {
 
         $applications = $this->Sae->Application->find('list', array(
             'fields' => array('Application.id', 'Application.protocol_no'),
-            'conditions' => array('Application.user_id' => $this->Session->read('Auth.User.id') , 'Application.approved' => array(1, 2) )));
+            'conditions' => array('Application.user_id' => $this->Session->read('Auth.User.sponsor') , 'Application.approved' => array(1, 2) , 'Application.submitted' => array(1) )));
         $routes = $this->Sae->SuspectedDrug->Route->find('list');
         $countries = $this->Sae->Country->find('list');
         $this->set(compact('sae', 'routes', 'countries', 'applications'));

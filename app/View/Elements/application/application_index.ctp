@@ -286,10 +286,13 @@
                           echo $this->Html->link('<span class="label label-success"> New SAE </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
                                 array('escape' => false)); 
                           echo "<br><br>";
-                          echo $this->Html->link('<span class="label label-primary"> New SUSAR </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
+                          echo $this->Html->link('<span class="badge badge-inverse"> New SUSAR </span>', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
                                 array('escape' => false));   
                           echo "<br><br>";
-                          echo $this->Html->link('<span class="label label-primary"> New CIOMS E2B </span>', array('controller' => 'cioms', 'action' => 'add', $application['Application']['id'], 'susar'), 
+                          echo $this->Html->link('<span class="badge badge-inverse"> New CIOMS E2B </span>', array('controller' => 'cioms', 'action' => 'add', $application['Application']['id']), 
+                                array('escape' => false)); 
+                          echo "<br><br>";
+                          echo $this->Html->link('<span class="badge badge-inverse"> New Deviation </span>', array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']), 
                                 array('escape' => false));   
                           echo "<br>";
                         }

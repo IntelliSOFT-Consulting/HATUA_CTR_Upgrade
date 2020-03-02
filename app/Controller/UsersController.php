@@ -134,8 +134,8 @@ class UsersController extends AppController {
             )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('saes', $this->Sae->find('all', array(
-            'limit' => 5,
-            'conditions' => array('Sae.user_id' => $this->Auth->User('sponsor')), 'order' => 'Sae.created DESC'
+            'limit' => 20,
+            'conditions' => array('Sae.user_id' => array($this->Auth->User('sponsor'), $this->Auth->User('id'))), 'order' => 'Sae.created DESC'
             )));
     }
 
@@ -769,6 +769,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/ParticipantFlows');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/Saes');
+        $this->Acl->allow($group, 'controllers/Deviations/inspector_index');
+        $this->Acl->allow($group, 'controllers/Deviations/inspector_view');
         $this->Acl->allow($group, 'controllers/Cioms/inspector_view');
         $this->Acl->allow($group, 'controllers/Cioms/inspector_index');
         $this->Acl->allow($group, 'controllers/Cioms/download');

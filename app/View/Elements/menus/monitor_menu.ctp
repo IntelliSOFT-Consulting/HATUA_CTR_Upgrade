@@ -20,6 +20,12 @@
                         array('controller' => 'saes', 'action'=>'index', 'monitor' => true ), array('escape' => false ));
                     ?>
              </li>
+             <li class="<?php echo $this->fetch('DEV') ?>">
+                <?php
+                    echo $this->Html->link('<i class="icon-random"></i> Deviations',
+                        array('controller' => 'deviations', 'action'=>'index', 'monitor' => true ), array('escape' => false ));
+                    ?>
+             </li>
              <li class="<?php echo $this->fetch('CIOM') ?>">
                 <?php
                     echo $this->Html->link('<i class="icon-upload-alt"></i> CIOMS E2B',

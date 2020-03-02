@@ -160,12 +160,12 @@ $this->end();
                 <td class="actions">
                     <?php if($sae['approved'] > 0) echo $this->Html->link(__('<label class="label label-info">View</label>'), array('controller' => 'saes', 'action' => 'view', $sae['id']), 
                         array('target' => '_blank', 'escape' => false)); ?>
-                    <?php if($redir === 'monitor' && $sae['approved'] < 1 && $sae['user_id'] == $this->Session->read('Auth.User.sponsor')) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('target' => '_blank', 'escape' => false)); ?>
+                    <?php if($redir === 'monitor' && $sae['approved'] < 1 && $sae['user_id'] == $this->Session->read('Auth.User.id')) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('target' => '_blank', 'escape' => false)); ?>
                     <?php
-                      if($sae['approved'] < 1) {
+                      if($sae['approved'] < 1 && $sae['user_id'] == $this->Session->read('Auth.User.id')) {
                         echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
                       } 
-                      if($redir === 'monitor' && $sae['approved'] > 0 && $sae['user_id'] == $this->Session->read('Auth.User.sponsor')) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
+                      if($redir === 'monitor' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
                     ?>            
                 </td>
             </tr>

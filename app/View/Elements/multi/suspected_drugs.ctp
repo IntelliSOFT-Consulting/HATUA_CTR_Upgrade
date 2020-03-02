@@ -24,7 +24,7 @@
             <div class="row-fluid">
                 <div class="span6">
                 <?php
-                    echo $this->Form->input('SuspectedDrug.'.$i.'.id', ['templates' => 'table_form']);
+                    // echo $this->Form->input('SuspectedDrug.'.$i.'.id', ['templates' => 'table_form']);
                     echo $this->Form->input('SuspectedDrug.'.$i.'.id');
                     echo $this->Form->input('SuspectedDrug.'.$i.'.generic_name',
                                 array('label' => array('class' => 'control-label required', 'text' => 'Generic Name <span class="sterix">*</span>'),));

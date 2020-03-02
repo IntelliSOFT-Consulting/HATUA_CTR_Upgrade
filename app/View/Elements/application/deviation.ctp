@@ -6,7 +6,7 @@
   <div class="row-fluid">
     <div class="span12">      
         <?php 
-          if($redir == 'applicant') {
+          if($redir == 'applicant' or $redir == 'monitor') {
               echo $this->Html->link(__('<i class="icon-random"></i> Add Protocol Deviation'),
                         array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']),
                         array('escape' => false, 'class' => 'btn btn-info'));
@@ -39,11 +39,13 @@
             <td>
               <?php
                 if ($deviation['status'] === 'Unsubmitted') {
-                  echo $this->Html->link('<label class="label label-success">Edit</label>',
+                  if($redir === 'applicant' && $deviation['user_id'] == $this->Session->read('Auth.User.id')) echo $this->Html->link('<label class="label label-success">Edit</label>',
+                                   array('action' => 'view', $application['Application']['id'], 'deviation_edit' => $deviation['id']), array('escape'=>false));
+                  if($redir === 'monitor' && $deviation['user_id'] == $this->Session->read('Auth.User.id')) echo $this->Html->link('<label class="label label-success">Edit</label>',
                                    array('action' => 'view', $application['Application']['id'], 'deviation_edit' => $deviation['id']), array('escape'=>false));
                   echo "&nbsp;";
 
-                  if (($redir == 'applicant')) {                    
+                  if ($redir == 'applicant' && $deviation['user_id'] == $this->Session->read('Auth.User.id')) {                    
                       echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'deviations', 'action' => 'delete', $deviation['id']), array('escape' => false), __('Are you sure you want to delete deviation # %s?', $deviation['id']));
                   }
                   
