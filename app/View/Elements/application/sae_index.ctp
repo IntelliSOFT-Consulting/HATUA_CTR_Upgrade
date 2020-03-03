@@ -138,7 +138,7 @@
                   if($sae['Sae']['report_type'] == 'Followup') {
                     echo "<br> Initial: ";
                     echo $this->Html->link(
-                      '<label class="label label-info">'.substr($sae['Sae']['reference_no'], 0, strpos($sae['Sae']['reference_no'], '-')).'</label>', 
+                      '<label class="label label-info">'.substr($sae['Sae']['reference_no'], 0, strpos($sae['Sae']['reference_no'], '_')).'</label>', 
                       array('action' => 'view', $sae['Sae']['sae_id']), array('escape' => false));
                   }
               ?>&nbsp;</td>

@@ -6,7 +6,7 @@ App::uses('AppController', 'Controller');
  * @property PreviousDate $PreviousDate
  */
 class ReportsController extends AppController {
-    public $uses = array('SiteInspection', 'Application', 'Sae');
+    public $uses = array('SiteInspection', 'Application', 'Sae', 'Deviation');
 
 
     /**
@@ -68,6 +68,26 @@ class ReportsController extends AppController {
     }
     public function manager_sae_by_type(){
         $this->sae_by_type();
+    }
+
+    public function dev_by_study() {
+        $data = $this->Deviation->find('all', array(
+            'fields' => array('Deviation.deviation_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
+            'contain' => array('Application'),
+            'conditions' => array('Deviation.status' => 'Submitted'),
+            'group' => array('Deviation.deviation_type', 'Application.protocol_no'),
+            'having' => array('COUNT(*) >' => 0),
+          ));        
+
+        $this->set(compact('data'));
+        $this->set('_serialize', 'data');
+        $this->render('dev_by_study');
+    }
+    public function inspector_dev_by_study(){
+        $this->dev_by_study();
+    }
+    public function manager_dev_by_study(){
+        $this->dev_by_study();
     }
 
     public function protocols_by_status() {

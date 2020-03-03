@@ -315,6 +315,10 @@
                              echo "<br><br>";
                              echo $this->Form->postLink(__('<span class="label label-warning">Unsubmit</span>'), array('action' => 'unsubmit',
                               $application['Application']['id']), array('escape' => false), __('Are you sure you want to Unsubmit Application No. %s? The user will be able to edit it!', $application['Application']['id']));
+                             echo "<br><br>";
+                             echo $this->Html->link('<span class="badge badge-success"> <i class="icon-cloud-upload"></i> Annual Letters </span>',
+                                  array('controller' => 'annual_letters', 'action' => 'letter_upload', $application['Application']['id'], 'admin' => true),   array('escape'=>false));
+
                           }
                           echo "<br><br>";
                           echo $this->Html->link('<span class="badge badge-inverse"> Reassign </span>',
