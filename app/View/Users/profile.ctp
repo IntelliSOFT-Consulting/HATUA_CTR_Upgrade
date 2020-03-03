@@ -17,8 +17,8 @@
 				<?php 
 					if($redir == 'applicant'){
 				?>
-				<h4 class="text-success" style="text-decoration: underline;">Study Monitors</h4>
-				<p>You can add study monitors who will have minimal access to add SAE/SUSARS, Deviations and notifications</p>
+				<h6 class="text-success" style="text-decoration: underline;">Contract Research Organizations (CRO)/ Monitors</h6>
+				<p>Please add study CRO/Monitor to enable them submit reports e.g. SUSARs, directly to PPB</p>
 				<?php echo $this->Html->link('Add Monitor', array('controller' => 'users', 'action' => 'add', 'applicant' => true), array('class' => 'btn btn-inverse', 'escape' => false)); ?>
 
 				<?php
