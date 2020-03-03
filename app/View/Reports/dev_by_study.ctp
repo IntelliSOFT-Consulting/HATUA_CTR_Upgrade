@@ -19,8 +19,8 @@
     <thead>
         <tr>
             <th></th>
-            <th>SAE</th>
-            <th>SUSAR</th>
+            <th>Deviation</th>
+            <th>Violation</th>
         </tr>
     </thead>
     <tbody>
