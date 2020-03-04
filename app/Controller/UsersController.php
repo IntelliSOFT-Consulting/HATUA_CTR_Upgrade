@@ -367,7 +367,7 @@ class UsersController extends AppController {
         $this->Prg->commonProcess();
         $criteria = $this->Application->User->parseCriteria($this->passedArgs);
         $criteria['User.deactivated'] = 0;
-        $criteria['User.group_id'] = 5;
+        $criteria['User.group_id'] = array(5, 7);
         $criteria['User.is_active'] = 1;
         $this->paginate['conditions'] = $criteria;
 

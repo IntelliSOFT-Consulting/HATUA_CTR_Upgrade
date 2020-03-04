@@ -9,7 +9,45 @@
 ?>
 
 <?php //pr($data) ;?>
+<?php
+  echo $this->Form->create('Application', array(
+    'url' => array_merge(array('action' => 'index'), $this->params['pass']),
+    //'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
+  ));
+?>
+  <div class="row-fluid">
+    <div class="span12">
+      <table class="table table-condensed" style="margin-bottom: 2px;">
+        <thead>
+        <tr>
+          <th style="width: 75%;">
+          <?php
+                echo $this->Form->input('start_date',
+                  array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
+                      'label' => array('class' => 'required', 'text' => 'Application Create Dates'), 'placeHolder' => 'Start Date'));
+                echo $this->Form->input('end_date',
+                  array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
+                       'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
+                            <em class="accordion-toggle">clear!</em></a>',
+                      'label' => false, 'placeHolder' => 'End Date'));
+              ?>
+          </th>          
+          <th rowspan="2" style="width: 14%;">
+            <?php
+              echo $this->Form->button('<i class="icon-search icon-white"></i> Search', array(
+                  'class' => 'btn btn-inverse', 'div' => 'control-group', 'div' => false,
+                  'style' => array('margin-bottom: 5px')
+              ));
 
+             // echo $this->Html->link('<i class="icon-remove"></i> Clear', array('action' => 'index'), array('class' => 'btn', 'escape' => false, 'style' => array('margin-bottom: 5px')));
+            ?>
+          </th>
+        </tr>
+      </thead>
+     </table>
+    </div>
+  </div>
+<?php echo $this->Form->end(); ?>
 
 <div id="sae-by-type"></div>
 

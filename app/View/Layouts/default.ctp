@@ -88,7 +88,7 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
                     <?php echo $this->Html->link('<i class="icon-home"></i> Home', array('controller' => 'pages', 'action' => 'home', 'admin' => false) , array('escape' => false)); ?>
                 </li>
                 <li class="dropdown <?php echo $this->fetch('Applications') ?>">
-                    <?php echo $this->Html->link('<i class="icon-th-list"></i> Approved Trials', array('controller' => 'applications', 'action'=>'index', 'admin' => false,) , array('escape' => false)); ?>
+                    <?php echo $this->Html->link('<i class="icon-thumbs-up"></i> Approved Clinical Trials', array('controller' => 'applications', 'action'=>'index', 'admin' => false,) , array('escape' => false)); ?>
                 </li>
                 <li class="dropdown <?php echo $this->fetch('News') ?>">
                     <?php echo $this->Html->link('<i class="icon-bullhorn"></i> News', array('controller' => 'pages', 'action'=>'news', 'admin' => false,) , array('escape' => false)); ?>
