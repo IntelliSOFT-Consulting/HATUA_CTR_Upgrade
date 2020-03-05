@@ -867,6 +867,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Deviations/applicant_download_deviation');
         $this->Acl->allow($group, 'controllers/Deviations/applicant_index');
         $this->Acl->allow($group, 'controllers/Deviations/applicant_edit');
+        $this->Acl->allow($group, 'controllers/Deviations/applicant_delete');
         $this->Acl->allow($group, 'controllers/Reviews/manager_download_summary');
         $this->Acl->allow($group, 'controllers/Comments');
         $this->Acl->allow($group, 'controllers/MeetingDates/applicant_add');
@@ -901,6 +902,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Deviations/monitor_download_deviation'); //
         $this->Acl->allow($group, 'controllers/Deviations/monitor_index'); //
         $this->Acl->allow($group, 'controllers/Deviations/monitor_edit'); //
+        $this->Acl->allow($group, 'controllers/Deviations/monitor_delete'); //
         $this->Acl->allow($group, 'controllers/Comments'); //
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";

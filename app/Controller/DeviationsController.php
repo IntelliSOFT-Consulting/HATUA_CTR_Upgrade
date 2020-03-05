@@ -319,6 +319,40 @@ class DeviationsController extends AppController {
  * @param string $id
  * @return void
  */
+    public function applicant_delete($id = null) {
+        if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Deviation->id = $id;
+        $deviation = $this->Deviation->read(null, $id);
+        if ($deviation['Deviation']['user_id'] != $this->Auth->User('id') && !$this->Deviation->exists()) {
+            throw new NotFoundException(__('Invalid deviation'), 'alerts/flash_error');
+        }
+        if ($this->Deviation->delete()) {
+            $this->Session->setFlash(__('Deviation deleted'), 'alerts/flash_success');
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Deviation was not deleted'), 'alerts/flash_error');
+        $this->redirect($this->referer());
+    }
+
+    public function monitor_delete($id = null) {
+        if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Deviation->id = $id;
+        $deviation = $this->Deviation->read(null, $id);
+        if ($deviation['Deviation']['user_id'] != $this->Auth->User('id') && !$this->Deviation->exists()) {
+            throw new NotFoundException(__('Invalid deviation'), 'alerts/flash_error');
+        }
+        if ($this->Deviation->delete()) {
+            $this->Session->setFlash(__('Deviation deleted'), 'alerts/flash_success');
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Deviation was not deleted'), 'alerts/flash_error');
+        $this->redirect($this->referer());
+    }
+
     public function delete($id = null) {
         if (!$this->request->is('post')) {
             throw new MethodNotAllowedException();
