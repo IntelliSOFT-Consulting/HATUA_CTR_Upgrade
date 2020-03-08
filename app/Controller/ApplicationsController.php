@@ -645,9 +645,9 @@ class ApplicationsController extends AppController {
     }
 
     public function applicant_final_report($id = null) {
-        if (!$this->request->is('post')) {
-            throw new MethodNotAllowedException();
-        } else {
+        // if (!$this->request->is('post') || !$this->request->is('put')) {
+        //     throw new MethodNotAllowedException();
+        // } else {
           if ($this->Application->save($this->request->data, true, array('id', 'final_report', 'laymans_summary', 
                 'quantity_imported', 'quantity_dispensed', 'quantity_destroyed', 'quantity_exported', 'balance_site', 'final_date'))) {
               $this->Session->setFlash(__('Final report successfully submitted.'), 'alerts/flash_success');
@@ -656,7 +656,7 @@ class ApplicationsController extends AppController {
               $this->Session->setFlash(__('Error. Unable to submit final report.'), 'alerts/flash_error');
               $this->redirect(array('action' => 'view', $id));
           }
-        }
+        // }
     }
 
     private function aview($id = null) {

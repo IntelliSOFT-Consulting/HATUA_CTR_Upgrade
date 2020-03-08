@@ -8,7 +8,7 @@ App::uses('AppModel', 'Model');
  */
 class Sae extends AppModel {
 
-    public $actsAs = array('Containable', 'Search.Searchable', 'SoftDelete');
+    public $actsAs = array('Containable', 'Search.Searchable');
     public $filterArgs = array(
             'reference_no' => array('type' => 'like', 'encode' => true),
             'protocol_no' => array('type' => 'like', 'encode' => true),

@@ -574,10 +574,10 @@ class SaesController extends AppController {
             throw new NotFoundException(__('Invalid sae'));
         }
         if ($this->Sae->delete()) {
-            $this->Session->setFlash(__('Sae deleted'));
+            $this->Session->setFlash(__('Sae deleted'), 'alerts/flash_success');
             $this->redirect(array('action' => 'index'));
         }
-        $this->Session->setFlash(__('Sae was not deleted'));
+        $this->Session->setFlash(__('Sae was not deleted'), 'alerts/flash_error');
         $this->redirect(array('action' => 'index'));
     }
     public function monitor_delete($id = null) {
@@ -589,10 +589,10 @@ class SaesController extends AppController {
             throw new NotFoundException(__('Invalid sae'));
         }
         if ($this->Sae->delete()) {
-            $this->Session->setFlash(__('Sae deleted'));
+            $this->Session->setFlash(__('Sae deleted'), 'alerts/flash_success');
             $this->redirect(array('action' => 'index'));
         }
-        $this->Session->setFlash(__('Sae was not deleted'));
+        $this->Session->setFlash(__('Sae was not deleted'), 'alerts/flash_error');
         $this->redirect(array('action' => 'index'));
     }
 }
