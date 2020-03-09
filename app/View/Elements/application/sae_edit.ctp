@@ -43,12 +43,15 @@
                 // echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
                 echo $this->Form->input('patient_initials',
                     array('label' => array('class' => 'control-label required', 'text' => 'Patient Initials <small class="muted">(first, last)</small> <span class="sterix">*</span>'),));
-                echo $this->Form->input('country_id', array(
-                    'empty' => true,
-                    'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>') ));
-                echo $this->Form->input('date_of_birth', array('type' => 'text', 'class' => 'datepickers',
-                        'label' => array('class' => 'control-label required', 'text' => 'Date of Birth <span class="sterix">*</span>'), ));
-                echo $this->Form->input('age_years', array('label' => array('class' => 'control-label', 'text' => 'Years'),));
+                echo $this->Form->input('enrollment_date', array('type' => 'text', 'class' => 'datepickers',
+                    'label' => array('class' => 'control-label required', 'text' => 'Date of enrollment into the study')
+                ));
+                echo $this->Form->input('administration_date', array('type' => 'text', 'class' => 'datepickers',
+                    'label' => array('class' => 'control-label required', 'text' => 'Date of initial administration of investigational product')
+                ));
+                echo $this->Form->input('latest_date', array('type' => 'text', 'class' => 'datepickers',
+                    'label' => array('class' => 'control-label required', 'text' => 'Date of the latest administration of the investigational product')
+                ));
                 echo $this->Form->input('reaction_onset', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Reaction Onset <span class="sterix">*</span>')
                 ));
@@ -80,6 +83,15 @@
                 ?>
         </div><!--/span-->
         <div class="span6">
+            <?php
+                  echo $this->Form->input('country_id', array(
+                      'empty' => true,
+                      'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>') ));
+                  echo $this->Form->input('date_of_birth', array('type' => 'text', 'class' => 'datepickers',
+                          'label' => array('class' => 'control-label required', 'text' => 'Date of Birth <span class="sterix">*</span>'), ));
+                  echo $this->Form->input('age_years', array('label' => array('class' => 'control-label', 'text' => 'Years'),));
+                    
+            ?>
             <h5>Check All Appropriate to Adverse Reaction <span class="sterix">*</span></h5>
             <?php                
                 echo $this->Form->input('patient_died', array('label' => array('class' => 'control-label', 'text' => 'Patient Died')));

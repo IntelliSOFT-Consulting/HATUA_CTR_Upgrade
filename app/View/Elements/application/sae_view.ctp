@@ -54,13 +54,31 @@
           <td><?php  echo ($sae['Sae']['incapacity']) ? $checked : $nChecked; ?></td>
         </tr>
         <tr>
-          <td class="table-label required"><p>Reaction Onset <span class="sterix">*</span></p></td>
-          <td><?php  echo $sae['Sae']['reaction_onset']; ?></td>
+          <td class="table-label required"><p>Date of enrollment into the study</p></td>
+          <td><?php  echo $sae['Sae']['enrollment_date']; ?></td>
           <td class="table-label required"><p>Life Threatening</p></td>
           <td><?php  echo ($sae['Sae']['life_threatening']) ? $checked : $nChecked; ?></td>
         </tr>
         <tr>
-          <td class="table-label required">Reaction end date</td>
+          <td class="table-label required"><p>Date of initial administration of investigational product</p></td>
+          <td><?php  echo $sae['Sae']['administration_date']; ?></td>
+          <td class="table-label required"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="table-label required"><p>Date of the latest administration of the investigational product </p></td>
+          <td><?php  echo $sae['Sae']['latest_date']; ?></td>
+          <td class="table-label required"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="table-label required"><p>Reaction Onset <span class="sterix">*</span></p></td>
+          <td><?php  echo $sae['Sae']['reaction_onset']; ?></td>
+          <td class="table-label required"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="table-label required"><p>Reaction end date</p></td>
           <td><?php  echo $sae['Sae']['reaction_end_date']; ?></td>
           <td class="table-label required"><p>Gender <span class="sterix">*</span></p></td>
           <td><?php  echo $sae['Sae']['gender']; ?></td>
