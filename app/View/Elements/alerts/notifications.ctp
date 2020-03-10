@@ -1,4 +1,5 @@
 <?php
+$this->assign('NOT', 'active');
 if ($redir === 'reviewer') {
     foreach ($notifications as $notification) {
         echo '<div class="alert alert-'.$messages[$notification['Notification']['type']].'" id="'.$notification['Notification']['id'].'">';
@@ -160,4 +161,7 @@ if ($redir === 'reviewer') {
       echo '</div>';
     }
 }
+
+echo $this->Html->link('All notifications >>', array('controller' => 'notifications', 'action' => 'index'),
+              array('escape' => false, 'class' => 'btn btn-info'));
 ?>

@@ -108,7 +108,7 @@
         <td>
         	<?php echo $notification['User']['name']; ?>&nbsp;
         </td>
-        <td><?php echo "<p>".$notification['Notification']['system_message']."</p>";; ?>&nbsp;</td>
+        <td><?php echo $notification['Notification']['system_message']; ?>&nbsp;</td>
         <td><?php echo h($notification['Notification']['created']); ?>&nbsp;</td>
         <td class="actions">
             <?php echo $this->Form->postLink('<label class="label label-important">Delete</label>', array('action' => 'delete', $notification['Notification']['id']), array('escape'=>false),

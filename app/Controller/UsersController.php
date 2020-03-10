@@ -105,7 +105,7 @@ class UsersController extends AppController {
         }
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
             )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('saes', $this->Sae->find('all', array(
@@ -130,7 +130,7 @@ class UsersController extends AppController {
         $this->set('applications', $applications);
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
             )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('saes', $this->Sae->find('all', array(
@@ -150,7 +150,7 @@ class UsersController extends AppController {
         $this->set('applications', $applications);
         $this->User->Notification->recursive = -1;
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -174,7 +174,7 @@ class UsersController extends AppController {
         $this->set('applications', $applications);
         $this->User->Notification->recursive = -1;
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -198,7 +198,7 @@ class UsersController extends AppController {
         )));
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC'
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
             )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('meetingDates', $this->MeetingDate->find('all', array(
@@ -828,7 +828,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Attachments/delete');
         $this->Acl->allow($group, 'controllers/InvestigatorContacts/delete');
-        $this->Acl->allow($group, 'controllers/Notifications');
+        $this->Acl->allow($group, 'controllers/Notifications/applicant_index');
         $this->Acl->allow($group, 'controllers/Organizations/delete');
         $this->Acl->allow($group, 'controllers/PreviousDates/delete');
         $this->Acl->allow($group, 'controllers/StudyRoutes/delete');

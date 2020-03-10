@@ -49,7 +49,8 @@
 		<div class="thumbnail">
 		  <img alt="" src="/img/authenticated/preferences_desktop_notification.png">
 		  <div class="caption">
-			<h4>Notifications <small>Actions that require your attention</small> </h4>
+            <h4><?php echo $this->Html->link('Notifications', array('controller' => 'notifications', 'action' => 'index'),
+          array('escape' => false, 'class' => 'text-success'));?> <small>Actions that require your attention.</small></h4>
 			<dl>
 	  <?php
 		echo $this->element('alerts/notifications', ['notifications' => $notifications]);
