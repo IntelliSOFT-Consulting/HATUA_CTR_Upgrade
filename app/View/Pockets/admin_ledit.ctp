@@ -23,6 +23,7 @@
     <?php
         echo $this->Form->input('id');
         echo $this->Form->input('required');
+        echo $this->Form->input('item_number');
         echo $this->Form->input('content', array(
               'label' => array('class' => 'control-label required', 'text' => 'Content <span class="sterix">*</span>'),
               'between'=>'<div class="controls">', 'placeholder' => 'study title' , 'class' => 'input-large',

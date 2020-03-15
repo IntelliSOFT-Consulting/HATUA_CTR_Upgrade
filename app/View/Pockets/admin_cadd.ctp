@@ -23,6 +23,7 @@
     <?php
         echo $this->Form->input('id');
         echo $this->Form->input('name');
+        echo $this->Form->input('required');
         echo $this->Form->input('item_number');
         echo $this->Form->input('type', array('type' => 'hidden', 'value' => 'annual'));
         echo $this->Form->input('content', array(

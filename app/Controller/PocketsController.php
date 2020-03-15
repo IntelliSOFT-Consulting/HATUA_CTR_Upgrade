@@ -29,13 +29,14 @@ class PocketsController extends AppController {
     }
     public function admin_lindex() {
         $this->Pocket->recursive = 0;
-        $this->paginate = array('conditions' => array('Pocket.type' => 'protocol'));
+        $this->paginate = array('conditions' => array('Pocket.type' => 'protocol'), 'order' => array('Pocket.item_number' => 'ASC'));
         $this->set('pockets', $this->paginate());
     }
     public function checklist($type = null) {
         $formdata = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.content'),
             'conditions' => array('Pocket.type' => $type),
+            'order' => array('Pocket.item_number' => 'ASC'),
             'recursive' => 0
         ));
         if ($this->request->is('requested')) {
