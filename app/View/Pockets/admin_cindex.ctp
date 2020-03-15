@@ -8,7 +8,8 @@
     <tr>
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('name'); ?></th>
-        <th><?php echo $this->Paginator->sort('name'); ?></th>
+        <th><?php echo $this->Paginator->sort('required'); ?></th>
+        <th><?php echo $this->Paginator->sort('item_number'); ?></th>
            <th><?php echo $this->Paginator->sort('content'); ?></th>
          <th class="actions"><?php echo __('Actions'); ?></th>
     </tr>
@@ -16,8 +17,9 @@
     foreach ($pockets as $pocket): ?>
     <tr>
         <td><?php echo h($pocket['Pocket']['id']); ?>&nbsp;</td>
-        <td><?php echo h($pocket['Pocket']['name']); ?>&nbsp;</td>        
+        <td><?php echo h($pocket['Pocket']['name']); ?>&nbsp;</td>  
         <td><?php echo ($pocket['Pocket']['required']) ? '<i class="icon-check-sign"></i>' : '<i class="icon-check-minus"></i>'; ?>&nbsp;</td>
+        <td><?php echo h($pocket['Pocket']['item_number']); ?>&nbsp;</td>  
               <td><?php echo $pocket['Pocket']['content']; ?>&nbsp;</td>
         <td class="actions">
             <?php echo $this->Html->link(__('Edit'), array('controller' => 'pockets', 'action' => 'cedit', $pocket['Pocket']['id'], 'admin' => true), array('class' => 'btn btn-success')); ?>

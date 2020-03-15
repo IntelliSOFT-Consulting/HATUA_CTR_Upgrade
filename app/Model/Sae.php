@@ -196,6 +196,51 @@ class Sae extends AppModel {
                 'message' => 'Select at least one adverse reaction!!'
             )
         ),
+        'enrollment_date' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please enter the date of enrollment into the study!'
+            ),
+            'dateBeforeAdministration' => array(
+                'rule' => 'dateBeforeAdministration',
+                'message' => 'The enrollment date must be before the date of administration of investigational product!'
+            ),
+            'dateAfterBirthDate' => array(
+                'rule' => 'dateAfterBirthDate',
+                'message' => 'The enrollment date must be after the date of birth!'
+            )
+        ),
+        'administration_date' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please enter the date of initial administration of the investigational product!'
+            ),
+            'dateBeforeAdministration' => array(
+                'rule' => 'dateBeforeAdministration',
+                'message' => 'The date of initial administration of the investigational product must be after the date of enrollment into the study!'
+            ),
+            'dateAfterBirthDate' => array(
+                'rule' => 'dateAfterBirthDate',
+                'message' => 'The date of initial administration of the investigational product must be after the date of birth!'
+            )
+        ),
+        'latest_date' => array(
+            'notEmpty' => array(
+                'rule'     => 'notEmpty',
+                'required' => true,
+                'message'  => 'Please enter the date of latest administration of the investigational product!'
+            ),
+            'dateBeforeAdministration' => array(
+                'rule' => 'dateBeforeAdministration',
+                'message' => 'The date of the latest administration of the investigational product must be after the date of enrollment into the study and date of initial administration!'
+            ),
+            'dateAfterBirthDate' => array(
+                'rule' => 'dateAfterBirthDate',
+                'message' => 'The date of the latest administration of the investigational product must be after the date of birth!'
+            )
+        ),
       );
 
     public function beforeSave() {
@@ -255,6 +300,32 @@ class Sae extends AppModel {
             foreach ($this->data['SuspectedDrug'] as $val) {
                 if(strtotime($field['reaction_onset']) < strtotime($val['date_from']))    return false;
             }
+        }
+        return true;
+    }
+
+    public function dateBeforeAdministration($field = null) {
+        if (!empty($field['administration_date'])) {
+            if(strtotime($field['administration_date']) < strtotime($this->data['Sae']['enrollment_date']))    return false;
+        }
+        if (!empty($field['latest_date'])) {
+            if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['enrollment_date']))    return false;
+        }
+        if (!empty($field['latest_date'])) {
+            if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['administration_date']))    return false;
+        }
+        return true;
+    }
+
+    public function dateAfterBirthDate($field = null) {
+        if (!empty($field['enrollment_date'])) {
+            if(strtotime($field['enrollment_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
+        }
+        if (!empty($field['administration_date'])) {
+            if(strtotime($field['administration_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
+        }
+        if (!empty($field['latest_date'])) {
+            if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
         }
         return true;
     }

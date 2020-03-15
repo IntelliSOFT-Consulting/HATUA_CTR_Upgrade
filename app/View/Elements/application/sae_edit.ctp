@@ -44,13 +44,13 @@
                 echo $this->Form->input('patient_initials',
                     array('label' => array('class' => 'control-label required', 'text' => 'Patient Initials <small class="muted">(first, last)</small> <span class="sterix">*</span>'),));
                 echo $this->Form->input('enrollment_date', array('type' => 'text', 'class' => 'datepickers',
-                    'label' => array('class' => 'control-label required', 'text' => 'Date of enrollment into the study')
+                    'label' => array('class' => 'control-label required', 'text' => 'Date of enrollment into the study </small> <span class="sterix">*</span>')
                 ));
                 echo $this->Form->input('administration_date', array('type' => 'text', 'class' => 'datepickers',
-                    'label' => array('class' => 'control-label required', 'text' => 'Date of initial administration of investigational product')
+                    'label' => array('class' => 'control-label required', 'text' => 'Date of initial administration of investigational product </small> <span class="sterix">*</span>')
                 ));
                 echo $this->Form->input('latest_date', array('type' => 'text', 'class' => 'datepickers',
-                    'label' => array('class' => 'control-label required', 'text' => 'Date of the latest administration of the investigational product')
+                    'label' => array('class' => 'control-label required', 'text' => 'Date of the latest administration of the investigational product </small> <span class="sterix">*</span>')
                 ));
                 echo $this->Form->input('reaction_onset', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Reaction Onset <span class="sterix">*</span>')
