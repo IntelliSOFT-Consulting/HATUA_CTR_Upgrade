@@ -122,10 +122,20 @@ class Sae extends AppModel {
             ),
         ),
         'date_of_birth' => array(
-            'notEmpty' => array(
-                'rule'     => 'notEmpty',
-                'required' => true,
-                'message'  => 'Please select a valid date of birth!'
+            // 'notEmpty' => array(
+            //     'rule'     => 'notEmpty',
+            //     'required' => true,
+            //     'message'  => 'Please select a valid date of birth!'
+            // ),
+            'dateOrYears' => array(
+                'rule'     => 'dateOrYears',
+                'message'  => 'Please select a valid date of birth or enter the age in years!'
+            ),
+        ),
+        'age_years' => array(
+            'dateOrYears' => array(
+                'rule'     => 'dateOrYears',
+                'message'  => 'Please select a valid date of birth or enter the age in years!'
             ),
         ),
         'reaction_onset' => array(
@@ -295,6 +305,12 @@ class Sae extends AppModel {
         return $results;
     }
 
+    public function dateOrYears($field = null) {
+        if(empty($this->data['Sae']['date_of_birth']) && empty($this->data['Sae']['age_years']))    return false;
+        
+        return true;
+    }
+
     public function dateAfterStartDates($field = null) {
         if (!empty($this->data['SuspectedDrug'])) {
             foreach ($this->data['SuspectedDrug'] as $val) {
@@ -318,13 +334,13 @@ class Sae extends AppModel {
     }
 
     public function dateAfterBirthDate($field = null) {
-        if (!empty($field['enrollment_date'])) {
+        if (!empty($field['enrollment_date']) && !empty($field['date_of_birth'])) {
             if(strtotime($field['enrollment_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
         }
-        if (!empty($field['administration_date'])) {
+        if (!empty($field['administration_date']) && !empty($field['date_of_birth'])) {
             if(strtotime($field['administration_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
         }
-        if (!empty($field['latest_date'])) {
+        if (!empty($field['latest_date']) && !empty($field['date_of_birth'])) {
             if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
         }
         return true;

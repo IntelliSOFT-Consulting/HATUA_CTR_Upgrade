@@ -1,6 +1,6 @@
 <?php
-    $checked = '<i class="icon-check" aria-hidden="true"></i>';
-    $nChecked = '<i class="icon-check-empty" aria-hidden="true"></i>';
+    $checked = '&#9745;';
+    $nChecked = '&#x25a2;';
 ?>
 
 <div class="sae-form">    

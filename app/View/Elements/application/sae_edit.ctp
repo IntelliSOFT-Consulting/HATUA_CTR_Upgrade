@@ -88,7 +88,7 @@
                       'empty' => true,
                       'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>') ));
                   echo $this->Form->input('date_of_birth', array('type' => 'text', 'class' => 'datepickers',
-                          'label' => array('class' => 'control-label required', 'text' => 'Date of Birth <span class="sterix">*</span>'), ));
+                          'label' => array('class' => 'control-label required', 'text' => 'Date of Birth'), ));
                   echo $this->Form->input('age_years', array('label' => array('class' => 'control-label', 'text' => 'Years'),));
                     
             ?>
@@ -235,6 +235,12 @@
                   'class' => 'causality',
                   'before' => '<label class="radio inline">', 'after' => '</label>',
                   'options' => array('Probable/Likely' => 'Probable/Likely')
+                )); 
+                echo $this->Form->input('causality', array(
+                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                  'class' => 'causality',
+                  'before' => '<label class="radio inline">', 'after' => '</label>',
+                  'options' => array('Not related' => 'Not related')
                 )); 
                 echo $this->Form->input('causality', array(
                   'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'causality',

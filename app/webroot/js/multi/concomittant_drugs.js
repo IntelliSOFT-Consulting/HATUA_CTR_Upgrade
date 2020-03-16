@@ -66,7 +66,8 @@ $(function() {
   </div>\
 </div>'.replace(/{i}/g, intId));
             // console.log(se.replace(/\d/, '1441441'));
-            $(new_concomittantdrug).find('[name*="route_id"]').append($("#SuspectedDrug0RouteId > option").clone()).val('');
+            // $(new_concomittantdrug).find('[name*="route_id"]').append($("#SuspectedDrug0RouteId > option").clone()).val('');
+            $(new_concomittantdrug).find('[name*="route_id"]').append($("#SaeLiboso > option").clone()).val('');
             $("#concomittant-drugs").append(new_concomittantdrug);
         } else {
             alert("Sorry, cant add more than "+$("#concomittant-drugs .concomittant-group").length+" Suspected Drugs!");
