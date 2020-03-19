@@ -206,6 +206,12 @@ class Sae extends AppModel {
                 'message' => 'Select at least one adverse reaction!!'
             )
         ),
+        'reaction_other' => array(
+            'reactionSelected' => array(
+                'rule' => 'reactionSelected',
+                'message' => 'Select at least one adverse reaction!!'
+            )
+        ),
         'enrollment_date' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
@@ -361,7 +367,7 @@ class Sae extends AppModel {
     }
 
     public function reactionSelected($field = null) {
-        if (empty($this->data['Sae']['patient_died']) and empty($this->data['Sae']['prolonged_hospitalization']) and empty($this->data['Sae']['incapacity']) and empty($this->data['Sae']['life_threatening'])) {
+        if (empty($this->data['Sae']['patient_died']) and empty($this->data['Sae']['prolonged_hospitalization']) and empty($this->data['Sae']['incapacity']) and empty($this->data['Sae']['life_threatening']) and empty($this->data['Sae']['reaction_other'])) {
             return false;
         }
         return true;

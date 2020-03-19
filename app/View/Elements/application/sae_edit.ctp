@@ -98,6 +98,7 @@
                 echo $this->Form->input('prolonged_hospitalization', array('label' => array('class' => 'control-label', 'text' => 'Involved or Prolonged Inpatient Hospitalization')));
                 echo $this->Form->input('incapacity', array('label' => array('class' => 'control-label', 'text' => 'Involved Persistence or Significant Disability or Incapacity')));
                 echo $this->Form->input('life_threatening', array('label' => array('class' => 'control-label', 'text' => 'Life Threatening')));
+                echo $this->Form->input('reaction_other', array('label' => array('class' => 'control-label', 'text' => 'Other')));
             ?>
         </div><!--/span-->
     </div><!--/row-->
