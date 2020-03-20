@@ -64,6 +64,12 @@ class AnnualLettersController extends AppController {
         $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'initial_approval_letter')));
 
         $application = $this->Application->find('first', array('conditions' => array('Application.id' => $application_id)));
+        //check if application is approved
+        if($application['Application']['approved'] != 2) {
+            $this->Session->setFlash(__('Only for approved protocols!!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+        //
         $checklist = array();
         foreach ($application['Checklist'] as $formdata) {            
           $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
@@ -282,6 +288,12 @@ class AnnualLettersController extends AppController {
         $type = 'manager_approve_letter';
         $message = $this->Message->find('first', array('conditions' => array('name' => $type)));
         $application = $this->Application->find('first', array('conditions' => array('Application.id' => $application_id)));
+        //check if application is approved
+        if($application['Application']['approved'] != 2) {
+            $this->Session->setFlash(__('Only for approved protocols!!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+        //
             //Create  annual approval letter
             $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'annual_approval_letter')));
 

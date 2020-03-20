@@ -25,6 +25,7 @@ class Application extends AppModel {
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Application.created BETWEEN ? AND ?'),
             'investigator' => array('type' => 'query', 'method' => 'findByInvestigators', 'encode' => true),
             'users' => array('type' => 'query', 'method' => 'findByReviewer', 'encode' => true),
+            'ercs' => array('type' => 'query', 'method' => 'findByErc', 'encode' => true),
             'sites' => array('type' => 'query', 'method' => 'orSites', 'encode' => true),
             'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
         );
@@ -44,6 +45,15 @@ class Application extends AppModel {
         public function findByReviewer($data = array()) {
             $cond = array($this->alias.'.id' => $this->Review->find('list', array(
                 'conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted', 'Review.user_id' => $data['users']),
+                'fields' => array('application_id', 'application_id')
+                    )));
+            return $cond;
+        }
+
+        public function findByErc($data = array()) {
+            // debug($data['ercs']);
+            $cond = array($this->alias.'.id' => $this->EthicalCommittee->find('list', array(
+                'conditions' => array('EthicalCommittee.ethical_committee' => $data['ercs']),
                 'fields' => array('application_id', 'application_id')
                     )));
             return $cond;

@@ -173,7 +173,17 @@
                 ?>
               </td>
               <td colspan="3">
-                <!-- Remaining space for detailed search-->
+                <?php
+                  //pr($this->request->params); //REMEMBER to limit this for administrators, managers and inspector only
+                  if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                      echo $this->Form->input('ercs', array(
+                        'type' => 'select', 'div' => false, 'class' => 'span12',
+                        'empty' => true,
+                        'options' => $ercs,
+                        'label' => array('class' => 'required', 'text' => 'ERCs'),
+                      ));
+                  }
+                ?>
               </td>
             </tr>
           </tbody>

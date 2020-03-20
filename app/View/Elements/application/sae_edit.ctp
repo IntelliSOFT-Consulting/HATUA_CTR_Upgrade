@@ -235,12 +235,6 @@
                   'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
                   'class' => 'causality',
                   'before' => '<label class="radio inline">', 'after' => '</label>',
-                  'options' => array('Probable/Likely' => 'Probable/Likely')
-                )); 
-                echo $this->Form->input('causality', array(
-                  'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
-                  'class' => 'causality',
-                  'before' => '<label class="radio inline">', 'after' => '</label>',
                   'options' => array('Not related' => 'Not related')
                 )); 
                 echo $this->Form->input('causality', array(
