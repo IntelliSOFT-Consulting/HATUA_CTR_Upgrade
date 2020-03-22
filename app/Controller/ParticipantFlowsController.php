@@ -48,8 +48,8 @@ class ParticipantFlowsController extends AppController {
         $this->index();
     }
 
-    private function csv_export($participantFlows = ''){
-        $_serialize = 'participantFlows';
+    private function csv_export($participants = ''){
+        $_serialize = 'participants';
         $_header = array('#','Protocol No', 'Year', 'Original Subjects', 'Consented', 'Screened', 'Enrolled', 'Lost', 'Withdrawn', 'Self withdrawal', 'Active subjects', 'Completed number',
             'Created', 'Reasons for lost', 'Withdrawn reasons', 'Self Withdrawal reasons');
         $_extract = array('ParticipantFlow.id', 'Application.protocol_no', 'ParticipantFlow.year', 'ParticipantFlow.original_subjects', 'ParticipantFlow.consented', 'ParticipantFlow.screened', 'ParticipantFlow.enrolled', 'ParticipantFlow.lost', 'ParticipantFlow.withdrawn', 'ParticipantFlow.self_withdrawal', 'ParticipantFlow.active_subjects', 'ParticipantFlow.completed_number', 
@@ -57,7 +57,7 @@ class ParticipantFlowsController extends AppController {
 
         $this->response->download('Participant_Flow_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';
-        $this->set(compact('participantFlows', '_serialize', '_header', '_extract'));
+        $this->set(compact('participants', '_serialize', '_header', '_extract'));
     }
 /**
  * view method

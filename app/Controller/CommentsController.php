@@ -312,7 +312,7 @@ class CommentsController extends AppController {
                   $this->loadModel('Application');
                   $app = $this->Application->find('first', array(
                       'contain' => array(),
-                      'conditions' => array('Application.id' => $this->request->data['Comment']['foreign_key'])
+                      'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
                   ));
 
                   $users = $this->Comment->User->find('all', array(
@@ -322,10 +322,10 @@ class CommentsController extends AppController {
                   foreach ($users as $user) {
                       $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'reviewer';
                       $variables = array(
-                        'name' => $user['User']['name'], 'protocol_no' => $app['Application']['protocol_no'], 
+                        'name' => $user['User']['name'], 'sender' => $user['User']['name'], 'reference_link' => $app['Application']['protocol_no'], 
                         'comment_subject' => $this->request->data['Comment']['subject'],
                         'comment_content' => $this->request->data['Comment']['content'],
-                        'reference_link' => $html->link($app['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $app['Application']['id'],
+                        'protocol_no' => $html->link($app['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $app['Application']['id'],
                              $actioner => true, 'full_base' => true), 
                           array('escape' => false)),
                       );

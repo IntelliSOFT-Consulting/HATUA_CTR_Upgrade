@@ -99,6 +99,20 @@ class DeviationsController extends AppController {
     public function inspector_index() {
         $this->index();
     }
+
+    private function csv_export($pdeviations = ''){
+        $_serialize = 'pdeviations';
+        $_header = array('#','Protocol No', 'Reference No', 'Deviation Type', 'PI Name', 'Date of deviation', 
+            'Study participant number', 'Treating physician', 'Description of deviation', 'Explanation', 'Measures taken', 
+            'Measure to preclude', 'Sponsor notified', 'Impact on study', 'Created date');
+        $_extract = array('Deviation.id', 'Application.protocol_no', 'Deviation.reference_no', 'Deviation.deviation_type', 'Deviation.pi_name', 'Deviation.deviation_date', 
+            'Deviation.participant_number', 'Deviation.treating_physician', 'Deviation.deviation_description', 'Deviation.deviation_explanation', 'Deviation.deviation_measures', 
+            'Deviation.deviation_preclude', 'Deviation.sponsor_notified', 'Deviation.study_impact', 'Deviation.created');
+
+        $this->response->download('Deviations_'.date('Ymd_Hi').'.csv'); // <= setting the file name
+        $this->viewClass = 'CsvView.Csv';
+        $this->set(compact('pdeviations', '_serialize', '_header', '_extract'));
+    }
 /**
  * view method
  *

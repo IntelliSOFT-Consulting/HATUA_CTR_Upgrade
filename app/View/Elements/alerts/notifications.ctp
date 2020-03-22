@@ -13,6 +13,11 @@ if ($redir === 'reviewer') {
             echo "<p>".$notification['Notification']['title']."</p>";
             echo "<p>".$notification['Notification']['system_message']."</p>";
             echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
+        } else {
+          // pr($notification);
+          echo "<p>".$notification['Notification']['title']."</p>";
+          echo "<p>".$notification['Notification']['system_message']."</p>";
+          echo "<p><i class='icon-comment-alt'></i> ".$notification['Notification']['user_message']."</p>";
         }
         echo '<div style="text-align: right;"><small class="muted">'.$notification['Notification']['created'].'</small></div>';
         echo "</div>";

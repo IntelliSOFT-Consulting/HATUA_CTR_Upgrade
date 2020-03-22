@@ -63,6 +63,13 @@
                         array('controller' => 'cioms', 'action'=>'index', 'manager' => true ), array('escape' => false ));
                     ?>
             </li>
+          <li class="divider"></li>
+            <li>
+              <?php
+                    echo $this->Html->link('<i class="icon-money"></i> Study Budgets',
+                        array('controller' => 'budgets', 'action'=>'index', 'manager' => true ), array('escape' => false ));
+                    ?>
+            </li>
         </ul>
        </li>
 

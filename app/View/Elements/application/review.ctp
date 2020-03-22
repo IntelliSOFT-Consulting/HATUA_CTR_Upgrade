@@ -159,7 +159,7 @@
                   <?php  
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $rreview['id'], 'foreign_key' => $rreview['id'], 
-                                'model' => ['model_id' => '1', 'foreign_key' => $rreview['id'],
+                                'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rreview['id'],
                                             'model' => 'Review', 'category' => 'external', 'url' => 'add_review_internal']]) 
                   ?>
                 </div>

@@ -146,7 +146,7 @@
                 <div class="span4 lefty">
                   <?php  
                        echo $this->element('comments/add', [
-                                'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
+                                'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $site_inspection['id'], 
                                             'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add_si_internal']]) 
                   ?>
                 </div>
@@ -172,7 +172,7 @@
                   <?php  
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
-                                'model' => ['model_id' => '1', 'foreign_key' => '1', 
+                                'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $site_inspection['id'], 
                                             'model' => 'SiteInspection', 'category' => 'external', 'url' => 'add_si_external']]) 
                   ?>
                 </div>

@@ -7,6 +7,21 @@ App::uses('AppModel', 'Model');
  */
 class Budget extends AppModel {
 
+	public $actsAs = array('Containable', 'Search.Searchable');
+    public $filterArgs = array(
+            'grand_total_kshs' => array('type' => 'like', 'encode' => true),
+            'protocol_no' => array('type' => 'like', 'encode' => true),
+            'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Sae.created BETWEEN ? AND ?'),
+        );
+    public function makeRangeCondition($data = array()) {
+            if(!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
+            else $start_date = date('Y-m-d', strtotime('2012-05-01'));
+
+            if(!empty($data['end_date'])) $end_date = date('Y-m-d', strtotime($data['end_date']));
+            else $end_date = date('Y-m-d');
+
+            return array($start_date, $end_date);
+        }
 /**
  * Validation rules
  *

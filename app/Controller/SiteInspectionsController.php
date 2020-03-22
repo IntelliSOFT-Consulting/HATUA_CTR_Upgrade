@@ -28,7 +28,7 @@ class SiteInspectionsController extends AppController {
    */
     public function applicant_index() {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('25' => '25', '20' => '20');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
             else $this->paginate['limit'] = reset($page_options);
@@ -52,7 +52,7 @@ class SiteInspectionsController extends AppController {
     }
     public function index() {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('25' => '25', '20' => '20');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
             else $this->paginate['limit'] = reset($page_options);
@@ -80,9 +80,9 @@ class SiteInspectionsController extends AppController {
         $this->index();
     }
 
-    private function csv_export($siteInspections = ''){
-        //todo: check if data exists in $siteInspections
-        $_serialize = 'siteInspections';
+    private function csv_export($csiteInspections = ''){
+        //todo: check if data exists in $csiteInspections
+        $_serialize = 'csiteInspections';
         $_header = array('#', 'Reference No.', 'Protocol No', 'PACTR No.', 
             'Study Title', 'Short Title', 'Study Site', 'Co-ordinating Investigator Name', 'Co-ordinating Investigator Qualification', 'Co-ordinating Investigator Telephone', 'Co-ordinating Investigator Email', 
             'Principal Investigator Name', 'Principal Investigator Qualification', 'Principal Investigator Telephone', 'Principal Investigator Email', 'Sponsor Name', 'Sponsor Phone', 'Sponsor Email',
@@ -97,7 +97,7 @@ class SiteInspectionsController extends AppController {
 
         $this->response->download('Site_Inspection_'.date('Ymd_Hi').'.csv'); // <= setting the file name
         $this->viewClass = 'CsvView.Csv';
-        $this->set(compact('siteInspections', '_serialize', '_header', '_extract'));
+        $this->set(compact('csiteInspections', '_serialize', '_header', '_extract'));
     }
 /**
  * view method

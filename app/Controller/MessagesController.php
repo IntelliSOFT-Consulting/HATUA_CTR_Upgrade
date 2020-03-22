@@ -1,25 +1,52 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('Sanitize', 'Utility');
 /**
  * Messages Controller
  *
  * @property Message $Message
  */
 class MessagesController extends AppController {
+
 	public $paginate = array();
+    public $presetVars = true; // using the model configuration
+    public $components = array('Search.Prg');
 /**
  * index method
  *
  * @return void
  */
 	public function admin_index() {
-		$this->Message->recursive = 0;
-		$this->paginate['order'] = array('Message.created' => 'desc');
-		$this->set('messages', $this->paginate());
-		// pr($this->Message->find('list', array(
-  //                                             'conditions' => array('Message.name' => array('reviewer_new_application')),
-  //                                             'fields' => array('Message.name', 'Message.content'))));
-	}
+
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Message->parseCriteria($this->passedArgs);
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Message.created' => 'desc');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Message->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('messages', $this->paginate(), array('encode' => false));
+    }
+
+	// public function admin_index() {
+	// 	$this->Message->recursive = 0;
+	// 	$this->paginate['order'] = array('Message.created' => 'desc');
+	// 	$this->set('messages', $this->paginate());
+	// 	// pr($this->Message->find('list', array(
+ //  //                                             'conditions' => array('Message.name' => array('reviewer_new_application')),
+ //  //                                             'fields' => array('Message.name', 'Message.content'))));
+	// }
 
 /**
  * view method
