@@ -6,8 +6,24 @@ App::uses('AppModel', 'Model');
  * @property User $User
  */
 class Feedback extends AppModel {
+	public $actsAs = array('Containable', 'Search.Searchable');
+    public $filterArgs = array(
+            'name' => array('type' => 'query', 'method' => 'findByName', 'field' => 'Feedback.user_id'),
+            'subject' => array('type' => 'like', 'encode' => true),
+            'feedback' => array('type' => 'like', 'encode' => true),
+        );
 
-
+    public function findByName($data = array()) {
+       		$cond = array($this->alias.'.user_id' => $this->User->find('list', array(
+                'conditions' => array(
+                    'OR' => array(
+                        'User.name LIKE' => '%' . $data['name'] . '%',
+                        'User.email LIKE' => '%' . $data['name'] . '%',
+                        'User.email LIKE' => '%' . $data['name'] . '%', )),
+                'fields' => array('id', 'id')
+                    )));
+            return $cond;
+    }
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
@@ -25,6 +41,18 @@ class Feedback extends AppModel {
 			'order' => ''
 		)
 	);
+
+	public $hasMany = array(
+    	'Reply' => array(
+            'className' => 'Feedback',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            // 'conditions' => array('Attachment.model' => 'Application', 'Attachment.group' => 'attachment'),
+                                   // 'className' => 'Feedback',
+                                   // 'foreignKey' => 'application_id',
+                                   // 'dependent' => false,
+                      )
+        );
 
 	public $validate = array(
 	'email' => array(

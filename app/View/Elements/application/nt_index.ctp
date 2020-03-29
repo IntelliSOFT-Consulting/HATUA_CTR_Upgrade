@@ -1,5 +1,5 @@
 <?php
-    $this->assign('PF', 'active');
+    $this->assign('NT', 'active');
 ?>
 
 <div class="row-fluid">

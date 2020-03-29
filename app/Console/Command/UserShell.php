@@ -38,7 +38,7 @@ class UserShell extends Shell {
        $email->emailFormat('html');
        $email->to($this->args[0]['User']['email']);
        $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org', $this->args[0]['User']['sponsor_email']));
-       $email->bcc(array('edward.okemwa@intellisoftkenya.com'));
+       // $email->bcc(array('edward.okemwa@intellisoftkenya.com'));
        // $email->subject(Configure::read('Emails.registration.subject'));
        $email->subject($messages['forgot_email_subject']);
        $email->viewVars(array('message' => $message));

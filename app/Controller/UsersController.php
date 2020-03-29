@@ -753,6 +753,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Budgets/manager_view');
         $this->Acl->allow($group, 'controllers/ApplicationStages/manager_complete_screening');
         $this->Acl->allow($group, 'controllers/MeetingDates');
+        $this->Acl->allow($group, 'controllers/Feedbacks');
 
         //Allow Inpectors
         $group->id = 6;

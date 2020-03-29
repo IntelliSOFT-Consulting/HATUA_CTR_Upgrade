@@ -17,7 +17,28 @@ class MessagesController extends AppController {
  * @return void
  */
 	public function admin_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
 
+        $criteria = $this->Message->parseCriteria($this->passedArgs);
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Message.created' => 'desc');
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Message->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'])
+              ));
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('messages', $this->paginate(), array('encode' => false));
+    }
+
+	public function manager_index() {
         $this->Prg->commonProcess();
         $page_options = array('25' => '25', '20' => '20');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;

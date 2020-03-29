@@ -1,5 +1,6 @@
 <?php
 App::uses('AppController', 'Controller');
+App::uses('String', 'Utility');
 /**
  * Feedbacks Controller
  *
@@ -9,6 +10,8 @@ class FeedbacksController extends AppController {
 
 	public $paginate = array('order' => array('Feedback.created' => 'desc'));
 	// var $components = array('Captcha.Captcha'=>array('Model'=>'Feedback', 'field'=>'captcha'));//'Captcha.Captcha'
+    public $presetVars = true; // using the model configuration
+    public $components = array('Search.Prg');
 
 
     public $helpers = array('Tools.Captcha' => array('type' => 'active'));
@@ -27,6 +30,22 @@ class FeedbacksController extends AppController {
 		$this->Feedback->recursive = 0;
 		$this->set('feedbacks', $this->paginate());
 	}
+
+
+	public function manager_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Feedback->parseCriteria($this->passedArgs);
+        $criteria[] = array('NOT' => array('Feedback.user_id' => null), 'Feedback.foreign_key' => null);
+        $this->paginate['conditions'] = $criteria;
+
+        $this->set('page_options', $page_options);
+        $this->set('feedbacks', $this->paginate(), array('encode' => false));
+    }
 
 /**
  * view method
@@ -65,8 +84,92 @@ class FeedbacksController extends AppController {
 			// if($this->Auth->User('id')) $this->request->data['Feedback']['user_id'] = $this->Auth->User('id');
 			$this->Feedback->Behaviors->attach('Tools.Captcha');
 			if (empty($this->data['Feedback']['bot_stop']) && $this->Feedback->save($this->request->data)) {
+
+				//******************       Send Email to Applicant and Managers and Notifications   applicant      *****************************
+                  $this->loadModel('Message');
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'contact_feedback')));
+
+                  $users = $this->Feedback->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $this->Auth->User('id'), 'User.group_id' => array(2)))
+                  ));
+                  foreach ($users as $user) {
+                      if($user['User']['group_id'] == 2) $actioner =  'manager';
+                      if($user['User']['group_id'] == 5) $actioner =  'applicant';
+
+                      $variables = array(
+                        'name' => $user['User']['name'],  
+                        'subject' => $this->request->data['Feedback']['subject'],
+                        'feedback' => $this->request->data['Feedback']['feedback'],
+                      );
+                      $datum = array(
+                        'email' => $user['User']['email'], 
+                        'id' => $this->Auth->User('id'), 'user_id' => $user['User']['id'], 'type' => 'contact_feedback', 'model' => 'SiteInspection',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      if($actioner == 'applicant') CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }
+                //**********************************    END   *********************************
+                  
 				$this->Session->setFlash(__('The feedback has been saved'), 'alerts/flash_success');
 				$this->redirect(array('action' => 'add'));
+			} else {
+				$this->Session->setFlash(__('Your feedback could not be saved. Please, try again.'), 'alerts/flash_error');
+			}
+		}
+		$this->set('previous_messages', $previous_messages);
+	}
+
+	public function manager_reply($id = null) {
+		$previous_messages = array();
+		if($this->Auth->User('id')) {
+			// $this->helpers[] = 'Text';
+			$this->request->data['Feedback']['user_id'] = $this->Auth->User('id');
+			// $this->Feedback->recursive = -1;
+			// $this->paginate['conditions'] = array('user_id' => $this->Auth->User('id'));
+			// $this->paginate['limit'] = 5;
+			$previous_messages = $this->Feedback->find('all', array('conditions' => array('Feedback.id' => $id)));
+			// $previous_messages = $this->paginate();
+
+		}
+		if ($this->request->is('post')) {
+			$this->Feedback->create();
+			// if($this->Auth->User('id')) $this->request->data['Feedback']['user_id'] = $this->Auth->User('id');
+			$this->Feedback->Behaviors->attach('Tools.Captcha');
+			if (empty($this->data['Feedback']['bot_stop']) && $this->Feedback->save($this->request->data)) {
+
+				//******************       Send Email to Applicant and Managers and Notifications   applicant      *****************************
+                  $this->loadModel('Message');
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'contact_feedback')));
+
+                  $users = $this->Feedback->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $previous_messages[0]['Feedback']['user_id'], 'User.group_id' => array(2)))
+                  ));
+                  foreach ($users as $user) {
+                      if($user['User']['group_id'] == 2) $actioner =  'manager';
+                      if($user['User']['group_id'] == 5) $actioner =  'applicant';
+
+                      $variables = array(
+                        'name' => $user['User']['name'],  
+                        'subject' => $this->request->data['Feedback']['subject'],
+                        'feedback' => $this->request->data['Feedback']['feedback'],
+                      );
+                      $datum = array(
+                        'email' => $user['User']['email'], 
+                        'id' => $previous_messages[0]['Feedback']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'contact_feedback', 'model' => 'SiteInspection',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      if($actioner == 'applicant') CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }
+                //**********************************    END   *********************************
+
+				$this->Session->setFlash(__('The feedback has been saved'), 'alerts/flash_success');
+				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('Your feedback could not be saved. Please, try again.'), 'alerts/flash_error');
 			}

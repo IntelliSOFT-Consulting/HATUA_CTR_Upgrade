@@ -52,7 +52,7 @@
           <li class="divider"></li>
             <li>
               <?php
-              echo $this->Html->link('<i class="icon-sitemap"></i> Participants',
+              echo $this->Html->link('<i class="icon-sitemap"></i> Participant flows',
                   array('controller' => 'participant_flows', 'action'=>'index', 'manager' => true ), array('escape' => false ));
               ?>
             </li>
@@ -109,11 +109,23 @@
             </li>
         </ul>
        </li>
-       <li class="<?php echo $this->fetch('Notifications') ?>">
-        <?php
-          echo $this->Html->link('<i class="icon-exclamation-sign"></i> Notifications',
-            array('controller' => 'notifications', 'action'=>'index', 'manager' => true ), array('escape' => false ));
-            ?>
+
+       <li class="dropdown <?php echo $this->fetch('NT') ?>">
+         <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop5" href="#">
+            <i class="icon-envelope"></i> Messages &amp; Notifications <b class="caret"></b></a>
+          <ul aria-labelledby="drop5" role="menu" class="dropdown-menu">
+             <li><?php
+                   echo $this->Html->link('<i class="icon-exclamation-sign"></i> Notifications',
+                      array('controller' => 'notifications', 'action'=>'index', 'manager' => true ), array('escape' => false ));
+                 ?>
+            </li>
+          <li class="divider"></li>
+             <li><?php                      
+                    echo $this->Html->link('<i class="icon-envelope"></i> Messages',
+                      array('controller' => 'feedbacks', 'action'=>'index', 'manager' => true ), array('escape' => false ));
+                ?>
+            </li>            
+        </ul>
        </li>
        <li class="<?php echo $this->fetch('Profile') ?>">
         <?php
