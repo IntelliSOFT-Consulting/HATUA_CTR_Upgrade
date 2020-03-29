@@ -27,7 +27,7 @@ class ManagerShell extends Shell {
               'protocol_link' => Router::url(array('controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
                                              'manager' => true), true),
               'protocol_no' => $this->args[0]['Application']['protocol_no'],
-              'name' => $this->args[0]['Application']['name']
+              'name' => $this->args[0]['Application']['protocol_no']
             );
             foreach ($managers as $manager) {
                   $save_data[] = array('Notification' => array(
@@ -77,7 +77,7 @@ class ManagerShell extends Shell {
               'protocol_link' => Router::url(array('controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
                                              'manager' => true), true),
               'protocol_no' => $this->args[0]['Application']['protocol_no'],
-              'name' => $this->args[0]['Application']['name']
+              'name' => $this->args[0]['Application']['protocol_no']
             );
             foreach ($managers as $manager) {
                   $save_data[] = array('Notification' => array(
