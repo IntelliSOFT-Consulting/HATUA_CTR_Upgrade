@@ -71,6 +71,7 @@
 <?php $this->end(); ?>
 
 <div class="row-fluid">
+  <?php echo $this->Session->flash(); ?>
   <div class="span9">
 
     <div class="page-header">
@@ -111,7 +112,7 @@
       </h3>
       <hr>
       <?php
-        echo $this->Session->flash();
+        
         if(!$this->Session->read('Auth.User')) {
         echo $this->Form->create('User', array(
               'action' => 'login',
