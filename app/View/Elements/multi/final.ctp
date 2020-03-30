@@ -27,12 +27,17 @@
                   echo $this->Form->input('id', array('type' => 'hidden' ,'value' => $application['Application']['id']));
                   echo $this->Form->input('final_date', array('value' => date('d-m-Y'), 'type' => 'hidden'));
                   echo $this->Form->input('final_report', array(
-                      'label' => array('class' => 'control-nolabel required', 'text' => 'Executive summary'),
+                      'label' => array('class' => 'control-nolabel required', 'text' => 'Executive summary <span class="sterix">*</span>'),
                       'between'=>'<div class="nocontrols">', 'placeholder' => 'final report' , 'class' => 'input-large',
                       'value' => $application['Application']['final_report']
                     ));
+                  echo $this->Form->input('implication_results', array(
+                      'label' => array('class' => 'control-nolabel required', 'text' => 'Implication of the results on current practice  <span class="sterix">*</span>'),
+                      'between'=>'<div class="nocontrols">', 'placeholder' => 'Implication of the Results on current practice' , 'class' => 'input-large',
+                      'value' => $application['Application']['implication_results']
+                    ));
                   echo $this->Form->input('laymans_summary', array(
-                      'label' => array('class' => 'control-nolabel required', 'text' => 'Laymans summary'),
+                      'label' => array('class' => 'control-nolabel required', 'text' => 'Laymans summary <span class="sterix">*</span>'),
                       'between'=>'<div class="nocontrols">', 'placeholder' => 'final report' , 'class' => 'input-large',
                       'value' => $application['Application']['laymans_summary']
                     ));

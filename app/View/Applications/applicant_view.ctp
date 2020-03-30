@@ -17,6 +17,7 @@
       //Only meant for applicant
       $this->Html->script('multi/approval', array('inline' => false));
       $this->Html->script('multi/documents', array('inline' => false));
+      // $this->Html->script('multi/attachments', array('inline' => false));
 
       $reviewers_comments = 0;
      foreach ($application['Review'] as $review) {
@@ -422,6 +423,7 @@ $this->end();
     // var editor = $('#ApplicationFinalReport').ckeditor();
     if ($('#ApplicationFinalReport').length) {
       var editor = CKEDITOR.editor.replace('ApplicationFinalReport');
+      var editor = CKEDITOR.editor.replace('ApplicationImplicationResults');
       var editor = CKEDITOR.editor.replace('ApplicationLaymansSummary');
     }
     $(document).on('click', '#ApplicationViewSaveReport', function() {
