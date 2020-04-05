@@ -584,13 +584,21 @@ class ApplicationsController extends AppController {
                                     array('conditions' =>array('Attachment.id' => $this->Application->AnnualApproval->id),
                                            'contain' => array()))));
                             // CakeResque::enqueue('default', 'ManagerShell', array('newAnnualApproval', $response));
-                        if (isset($this->request->data['Document'])) 
+                        if (isset($this->request->data['Document'])) {
                             $this->set('response', array(
                                 'message' => 'Success',
                                 'content' => $this->Application->Attachment->find('first',
                                     array('conditions' =>array('Attachment.id' => $this->Application->Document->id),
                                            'contain' => array()))));                        
                             CakeResque::enqueue('default', 'ManagerShell', array('newFinalReport', $response));
+                        }
+                        if (isset($this->request->data['Attachment'])) {
+                            $this->set('response', array(
+                                'message' => 'Success',
+                                'content' => $this->Application->Attachment->find('first',
+                                    array('conditions' =>array('Attachment.id' => $this->Application->Attachment->id),
+                                           'contain' => array()))));                        
+                        }
                     }               
                     
                 } else {

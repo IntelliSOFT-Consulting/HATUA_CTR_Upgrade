@@ -75,7 +75,7 @@ class AmendmentsController extends AppController {
 		  	'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Attachment', 'AnnualApproval',
 		  	'Review' => array('conditions' => array('Review.type' => 'ppb_comment')))
 		));*/
-		$contains = $this->a_contains;
+		$contains = $this->a_contain;
 		$contains['Amendment'] =  array('Attachment', 'CoverLetter');
 		$contains['Review'] = array('conditions' => array('Review.type' => 'ppb_comment'));
 		$application = $this->Amendment->Application->find('first', array(
