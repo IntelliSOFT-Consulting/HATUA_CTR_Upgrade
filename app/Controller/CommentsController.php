@@ -319,10 +319,11 @@ class CommentsController extends AppController {
                       'contain' => array(),
                       'conditions' => array('OR' => array('User.id' => $app['Application']['user_id'], 'User.group_id' => 2))
                   ));
+                  $sender = $this->Comment->User->find('first', array('contain' => array(), 'conditions' => array('User.id' => $this->request->data['Comment']['user_id'])));
                   foreach ($users as $user) {
                       $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'reviewer';
                       $variables = array(
-                        'name' => $user['User']['name'], 'sender' => $user['User']['name'], 'reference_link' => $app['Application']['protocol_no'], 
+                        'name' => $user['User']['name'], 'sender' => $sender['User']['name'], 'reference_link' => $app['Application']['protocol_no'], 
                         'comment_subject' => $this->request->data['Comment']['subject'],
                         'comment_content' => $this->request->data['Comment']['content'],
                         'protocol_no' => $html->link($app['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $app['Application']['id'],

@@ -47,8 +47,8 @@
         <tr>
           <th>ID</th>
           <th>Recommendation</th>
-          <th>Status</th>
-          <th>Type</th>
+          <th>Comments</th>
+          <th>Status &amp; Type</th>
           <th>User</th>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
@@ -70,8 +70,12 @@
 
               ?>              
             </td>
-            <td><?php echo $rreview['status'] ?></td>
-            <td><?php echo $rreview['type'] ?></td>
+            <td><?php 
+                foreach ($rreview['InternalComment'] as $iComment) {
+                  echo $iComment['subject']."<br>".$iComment['content'];
+                }
+             ?></td>
+            <td><?php echo $rreview['status']."<br>".$rreview['type'] ?></td>
             <td><?php echo $rreview['User']['name']; ?></td>
             <td><?php echo $rreview['created'] ?></td> 
             <td>
@@ -160,7 +164,7 @@
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $rreview['id'], 'foreign_key' => $rreview['id'], 
                                 'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rreview['id'],
-                                            'model' => 'Review', 'category' => 'external', 'url' => 'add_review_internal']]) 
+                                            'model' => 'Review', 'category' => 'internal', 'url' => 'add_review_internal']]) 
                   ?>
                 </div>
               </div>
