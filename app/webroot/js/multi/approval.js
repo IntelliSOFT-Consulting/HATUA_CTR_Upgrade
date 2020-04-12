@@ -23,7 +23,7 @@ $(function() {
               $(this).after('<label class="btn pull-left" style="background-color: #99C0DD" for="'+$(this).attr('id')+'">'+data.files[0].name+'</label>&nbsp;');
               $(this).hide();    
               data.context.find('button.add-approval').off('click').on('click', function () {
-                if(!data.context.find('[name*="version_no"]').val() && !data.context.find('[name*="file_date"]').val()) {
+                if(!data.context.find('[name*="version_no"]').val() || !data.context.find('[name*="file_date"]').val()) {
                   alert('Please enter the document version and date.');
                 } else {
                   data.submit();
