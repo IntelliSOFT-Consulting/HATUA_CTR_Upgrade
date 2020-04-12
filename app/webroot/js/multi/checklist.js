@@ -140,7 +140,7 @@ $(function() {
                   $(this).hide();
                   console.log(data.context);
                   data.context.find('button.up_btn').off('click').on('click', function () {
-                    if(!data.context.find('[name*="version_no"]').val() && !data.context.find('[name*="file_date"]').val()) {
+                    if(!data.context.find('[name*="version_no"]').val() || !data.context.find('[name*="file_date"]').val()) {
                       alert('Please enter the document version and date.');
                     } else {
                       data.submit();
