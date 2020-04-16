@@ -29,7 +29,7 @@ class ApplicationsController extends AppController {
     private function diff_wdays($start, $end){
         $weekdays = array('1','2','3','4','5'); //this i think monday-saturday
         $end2 = clone $end; //add one day so as to include the end date of our range
-        $end2 = ($start != $end) ? $end2->modify( '+1 day' ) : $end2; //add one day so as to include the end date of our range
+        $end2 = ($start->diff($end)->format('%a') != '0') ? $end2->modify( '+1 day' ) : $end2; //add one day so as to include the end date of our range
         $interval = new DateInterval('P1D'); // 1 Day
         $dateRange = new DatePeriod($start, $interval, $end2);
 
