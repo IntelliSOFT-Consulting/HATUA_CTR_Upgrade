@@ -381,12 +381,19 @@ class ReviewsController extends AppController {
                     $this->Review->saveField('status', 'Submitted');
                     // $results = Hash::extract($this->request->data['Review'], '{n}.ReviewAnswer.{n}.comment');
                     $results = '';
-                    foreach ($this->request->data['Review'] as $ansa) {
-                        foreach ($ansa as $key => $value) {
-                            $results .= $value['question']."\n";
-                            $results .= $value['comment']."\n\n";
+                    $nyabola = $this->Review->ReviewAnswer->find('list', array('conditions' => array('review_id' => $this->Review->id), 'fields' => array('question', 'comment')));
+                    foreach ($nyabola as $lenny => $timko) {
+                        if (!empty($timko)) {
+                            $results .= $lenny."\n";
+                            $results .= $timko."\n\n";
                         }
                     }
+                    // foreach ($this->request->data['Review'] as $ansa) {
+                    //     foreach ($ansa as $key => $value) {
+                    //         $results .= $value['question']."\n";
+                    //         $results .= $value['comment']."\n\n";
+                    //     }
+                    // }
                     // $this->Review->saveField('summary', implode("\n\n",$results));
                     $this->Review->saveField('summary', $results);
                 		$this->Session->setFlash(__('The review has been submitted'), 'alerts/flash_success');
