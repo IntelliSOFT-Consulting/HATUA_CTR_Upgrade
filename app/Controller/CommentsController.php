@@ -317,7 +317,7 @@ class CommentsController extends AppController {
 
                   $users = $this->Comment->User->find('all', array(
                       'contain' => array(),
-                      'conditions' => array('OR' => array('User.id' => $app['Application']['user_id'], 'User.group_id' => 2))
+                      'conditions' => array('User.group_id' => 2)
                   ));
                   $sender = $this->Comment->User->find('first', array('contain' => array(), 'conditions' => array('User.id' => $this->request->data['Comment']['user_id'])));
                   foreach ($users as $user) {
