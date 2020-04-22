@@ -200,6 +200,17 @@
                           <?php                       
                             // debug($rid);
                             if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment']]);
+
+                            //NEW*** Bring in all the assessment comments
+                            $rcas = Hash::extract($application, 'Review.{n}[type=reviewer_comment]');
+                            if(!empty($rcas)) {
+                              echo "<hr>";
+                              echo "<h4 class='text-success' style='text-align: center; text-decoration: underline'>Assessment comments</h4>";
+                              foreach ($rcas as $rca) {
+                                echo $this->element('comments/list', ['comments' => $rca['InternalComment']]);
+                              }
+                            }
+                            //end
                           ?> 
                         </div>
                         <div class="span4 lefty">
