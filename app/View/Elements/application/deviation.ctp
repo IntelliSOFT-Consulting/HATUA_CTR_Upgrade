@@ -21,6 +21,7 @@
           <th>ID</th>
           <th>Reference No</th>
           <th>Deviation Date</th>
+          <th>Deviation Type</th>
           <th>Status</th>
           <th>Created</th>
           <th><?php echo __('Actions'); ?></th>
@@ -34,6 +35,7 @@
             <td><?php echo $deviation['id'] ?></td>
             <td><?php echo $deviation['reference_no'] ?></td>
             <td><?php echo $deviation['deviation_date'] ?></td>
+            <td><?php echo $deviation['deviation_type'] ?></td>
             <td><?php echo $deviation['status'] ?></td>
             <td><?php echo $deviation['created'] ?></td> 
             <td>

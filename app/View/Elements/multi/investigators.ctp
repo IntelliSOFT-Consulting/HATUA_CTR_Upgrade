@@ -1,5 +1,5 @@
 <?php
- 	//$this->Html->script('multi/investigators', array('inline' => false));
+ 	$this->Html->script('multi/investigators', array('inline' => false));
 ?>
 <h5>2.1 PRINCIPAL INVESTIGATOR (<small>for multicentre trial; where necessary, Click button to add more -
 <button type="button" class="btn-mini" id="addPIContact">Add Contact</button></small>) </h5>

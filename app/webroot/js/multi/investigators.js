@@ -5,6 +5,7 @@ $(function() {
 
 	// Multi Contacts Handling
 	function addPIContacts() {
+		// console.log('marakwe?');
 		var se = $("#investigator_contacts .contact-group").last().find('button').attr('id');
 		if ( typeof se !== 'undefined' && se !== false && se !== "") {
 			intId = parseFloat(se.replace('InvestigatorContactButton', '')) + 1;
