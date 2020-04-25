@@ -104,7 +104,7 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
                 <li class="dropdown <?php echo $this->fetch('Login') ?>">
                     <?php
                         if($this->Session->read('Auth.User')) {
-                            echo $this->Html->link('<i class="icon-user"></i> '.$this->Session->read('Auth.User.username'),
+                            echo $this->Html->link('<i class="icon-user"></i> '.$this->Text->truncate($this->Session->read('Auth.User.username'), 12, array('ellipsis' => '..', 'html' => true)),
                                 array('controller' => 'users', 'action' => 'profile', 'admin' => false,) , array('escape' => false));
                         } else {
                             echo $this->Html->link('<i class="icon-signin"></i> Login',

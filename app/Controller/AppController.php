@@ -60,7 +60,7 @@ class AppController extends Controller {
         'Session',
         'DebugKit.Toolbar' => array('panels' => array('DebugKit.history'))
     );
-    public $helpers = array('Html', 'Form', 'Session');
+    public $helpers = array('Html', 'Form', 'Session', 'Text');
 
     public function beforeFilter() {
       $this->Auth->allow('display');
