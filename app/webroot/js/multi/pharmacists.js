@@ -13,6 +13,8 @@ $(function() {
         }
         if ($("#pharmacist_contacts .pharmacist-group").length < 9) {
             var new_picontact = $('<div class="pharmacist-group"> \
+                <p  class="topper" id="PharmacyLabel{i}">{i} additional pharmacists</p> \
+                <span class="badge badge-success">{i}</span> \
                        <div class="control-group"><label for="Pharmacist{i}RegNo" class="control-label required">Registration Number <span class="sterix">*</span></label>\
                         <div class="controls"><input name="data[Pharmacist][{i}][reg_no]" class="input-xxlarge" maxlength="100" type="text" id="Pharmacist{i}RegNo"></div></div>\
                        <div class="control-group"><label for="Pharmacist{i}GivenName" class="control-label required">Name <span class="sterix">*</span></label>\
