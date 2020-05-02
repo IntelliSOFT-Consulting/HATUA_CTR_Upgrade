@@ -17,6 +17,7 @@ class User extends AppModel {
                 'OR' => array(
                     $this->alias . '.email LIKE' => '%' . $filter . '%',
                     $this->alias . '.name LIKE' => '%' . $filter . '%',
+                    $this->alias . '.username LIKE' => '%' . $filter . '%',
                 ));
             return $cond;
         }
@@ -70,6 +71,11 @@ class User extends AppModel {
                  ),
                  'Feedback' => array(
                     'className' => 'Feedback',
+                    'foreignKey' => 'user_id',
+                    'dependent' => false,
+                 ),
+                 'StudyMonitor' => array(
+                    'className' => 'StudyMonitor',
                     'foreignKey' => 'user_id',
                     'dependent' => false,
                  ),

@@ -44,8 +44,8 @@
 				));
 				echo $this->Form->input('phone_no',
 					array('label' => array('class' => 'control-label required', 'text' => 'Phone Number <span class="sterix">*</span>'),));
-				echo $this->Form->input('group_id');
-				echo $this->Form->input('is_active');
+				echo $this->Form->input('group_id', array('label' => array('class' => 'control-label required', 'text' => 'User Role <span class="sterix">*</span>'), 'empty' => true));
+				echo $this->Form->input('is_active', array('checked' => true));
 				?>
 		</div><!--/span-->
 		<div class="span6">

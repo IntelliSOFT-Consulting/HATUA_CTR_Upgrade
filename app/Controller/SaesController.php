@@ -61,7 +61,9 @@ class SaesController extends AppController {
             else $this->paginate['limit'] = reset($page_options);
 
         $criteria = $this->Sae->parseCriteria($this->passedArgs);
-        $criteria['Sae.user_id'] = array($this->Auth->User('id'), $this->Auth->User('sponsor'));
+        $sars = $this->Application->StudyMonitor->find('list', array('fields' => array('owner_id', 'owner_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
+        $sars[$this->Auth->User('id')] = $this->Auth->User('id');
+        $criteria['Sae.user_id'] = $sars;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Sae.created' => 'desc');
         $this->paginate['contain'] = array('Application', 'Country', 'SuspectedDrug', 'ConcomittantDrug');
@@ -263,7 +265,7 @@ class SaesController extends AppController {
             $sae = Hash::remove($sae, 'ConcomittantDrug.{n}.id');
             $data_save = $sae['Sae'];
             $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
-            $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
+            if(isset($sae['ConcomittantDrug'])) $data_save['ConcomittantDrug'] = $sae['ConcomittantDrug'];
             $data_save['sae_id'] = $id;
 
             $count = $this->Sae->find('count',  array('conditions' => array(
@@ -335,7 +337,7 @@ class SaesController extends AppController {
             $sae = Hash::remove($sae, 'ConcomittantDrug.{n}.id');
             $data_save = $sae['Sae'];
             $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
-            $data_save['SuspectedDrug'] = $sae['SuspectedDrug'];
+            if(isset($sae['ConcomittantDrug'])) $data_save['ConcomittantDrug'] = $sae['ConcomittantDrug'];
             $data_save['sae_id'] = $id;
 
             $count = $this->Sae->find('count',  array('conditions' => array(

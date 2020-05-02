@@ -101,6 +101,9 @@ class NotificationsController extends AppController {
     public function inspector_index() {
         $this->index();
     }
+    public function monitor_index() {
+        $this->index();
+    }
 
 /**
  * view method

@@ -2,9 +2,15 @@
 	<?php
 	$this->assign('Users', 'active');
 ?>
-	<h2><?php echo __('Users'); ?></h2>
+  <?php 
+    // echo $this->Html->link(__('<label class="label label-success">Add Study Monitor</label>'), array('controller' => 'users', 'action' => 'add'), array('escape' => false)); 
+  echo $this->Html->link(__('<i class="icon-plus"></i> Add Study Monitor'),
+                  array('controller' => 'users', 'action' => 'add'),
+                  array('escape' => false, 'class' => 'btn btn-primary btn-small', 'style'=>'margin-right: 10px;'));
+  ?>
+	<h2><?php echo __('Study Monitors'); ?></h2>
     <?php
-        echo $this->Form->create('User', array(
+        echo $this->Form->create('StudyMonitor', array(
           'url' => array_merge(array('action' => 'index'), $this->params['pass']),
           'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
         ));
@@ -80,9 +86,8 @@
 		<th><?php echo $this->Paginator->sort('id'); ?></th>
 		<th><?php echo $this->Paginator->sort('username'); ?></th>
 		<th><?php echo $this->Paginator->sort('name'); ?></th>
-		<th><?php echo $this->Paginator->sort('phone_no'); ?></th>
 		<th><?php echo $this->Paginator->sort('email'); ?></th>
-		<th><?php echo $this->Paginator->sort('group_id', 'Role'); ?></th>
+		<th>Studies</th>
 		<th><?php echo $this->Paginator->sort('created'); ?></th>
 		<th class="actions"><?php echo __('Actions'); ?></th>
 	      </tr>
@@ -94,25 +99,19 @@
 		<td><?php echo h($user['User']['id']); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['username']); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['name']); ?>&nbsp;</td>
-		<td><?php echo h($user['User']['phone_no']); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['email']); ?>&nbsp;</td>
 		<td>
-			<?php echo $this->Html->link($user['Group']['name'], array('controller' => 'groups', 'action' => 'view', $user['Group']['id'])); ?>
+			<?php 
+        foreach ($user['StudyMonitor'] as $study_monitor) {
+          echo $study_monitor['Application']['protocol_no']."<br>"; 
+        }        
+      ?>
 		</td>
 		<td><?php echo h($user['User']['created']); ?>&nbsp;</td>
 		<td class="actions">
-			<?php echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $user['User']['id']), array('escape' => false)); ?>
-			<?php echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('action' => 'edit', $user['User']['id']), array('escape' => false)); ?>
-			<?php
-			   if(!$user['User']['deactivated']) {
-				echo $this->Form->postLink(__('<label class="label label-inverse">Deactivate</label>'), array('action' => 'delete', $user['User']['id'], 1), array('escape' => false), __('Are you sure you want to deactivate # %s?', $user['User']['id']));
-			   } else {
-			   	echo $this->Form->postLink(__('<label class="label">Activate</label>'), array('action' => 'delete', $user['User']['id'], 0), array('escape' => false), __('Are you sure you want to Reactivate # %s?', $user['User']['id']));
-			   }
-                      if(!$user['User']['is_active'] && !empty($user['User']['activation_key'])) {
-                          echo $this->Form->postLink(__('<label class="label label-warning">Approve</label>'), array('action' => 'approve', $user['User']['id']), array('escape' => false), __('Are you sure you want to approve # %s?', $user['User']['id']));
-                      }
-			?>
+			<?php echo $this->Html->link(__('<label class="label label-info">Assign Study</label>'), array('action' => 'view', $user['User']['id']), array('escape' => false)); ?>
+			<?php echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'users', 'action' => 'edit', $user['User']['id']), array('escape' => false)); ?>
+			
 		</td>
 	</tr>
 <?php endforeach; ?>

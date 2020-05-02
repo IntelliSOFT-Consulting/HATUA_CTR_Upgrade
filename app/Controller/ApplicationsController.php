@@ -298,7 +298,13 @@ class ApplicationsController extends AppController {
             else $this->paginate['limit'] = reset($page_options);
 
             $criteria = $this->Application->parseCriteria($this->passedArgs);
-            $criteria['Application.user_id'] = $this->Auth->User('sponsor');
+            // $user = $this->Application->User->find('first', array(
+            //     'contain' => array('StudyMonitor'=> array('Application')),
+            //     'conditions' => array('User.id' => $this->Auth->User('id'))
+            //     )
+            // );
+            // $criteria['Application.id'] = Hash::extract($user['StudyMonitor'], '{n}.application_id');
+            $criteria['Application.id'] = $this->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
             $criteria['Application.submitted'] = 1;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
@@ -488,6 +494,8 @@ class ApplicationsController extends AppController {
             $this->set('page_options', $page_options);
             $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
             $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+            $this->loadModel('Erc');
+            $this->set('ercs', $this->Erc->find('list', array('fields' => array('Erc.name', 'Erc.name'),)));
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));

@@ -382,6 +382,11 @@ class Application extends AppModel {
             'dependent' => true,
             'conditions' => array('Checklist.model' => 'Checklist'),
         ),
+        'StudyMonitor' => array(
+            'className' => 'StudyMonitor',
+            'foreignKey' => 'user_id',
+            'dependent' => false,
+        ),
     );
 
     public $validate = array(

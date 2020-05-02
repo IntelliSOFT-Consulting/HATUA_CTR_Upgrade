@@ -63,8 +63,13 @@
               array('escape' => false)); ?>
         </li>
         <li>
-        <?php echo $this->Html->link('<i class="icon-plus-sign"></i> Create User',
+        <?php echo $this->Html->link('<i class="icon-plus-sign"></i> Add User',
               array('controller' => 'users', 'action' => 'add', 'admin' => true),
+              array('escape' => false)); ?>
+        </li>
+        <li>
+        <?php echo $this->Html->link('<i class="icon-user-md"></i> Study Monitors',
+              array('controller' => 'study_monitors', 'action' => 'index', 'admin' => true),
               array('escape' => false)); ?>
         </li>
         <li>

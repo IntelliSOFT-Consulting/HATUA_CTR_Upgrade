@@ -11,11 +11,7 @@ class UsersController extends AppController {
     public $paginate = array();
     public $uses = array('User', 'Application', 'Sae', 'Message', 'MeetingDate');
     public $components = array('Search.Prg');
-    public $presetVars = array(
-            'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
-            'start_date' => array('type' => 'value'),
-            'end_date' => array('type' => 'value'),
-        );
+    public $presetVars = true;
 
     public $helpers = array('Tools.Captcha' => array('type' => 'active'));
     
@@ -119,13 +115,18 @@ class UsersController extends AppController {
     }
 
     public function monitor_dashboard() {
+        $user = $this->User->find('first', array(
+            'contain' => array('StudyMonitor'=> array('Application')),
+            'conditions' => array('User.id' => $this->Auth->User('id'))
+            )
+        );
         $applications = $this->Application->find('all', array(
             'limit' => 20,
             'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no',
                 'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'),
             'order' => array('Application.created' => 'desc'),
             'contain' => array('Review'),
-            'conditions' => array('Application.user_id' => $this->Auth->User('sponsor'), 'Application.submitted' => 1),
+            'conditions' => array('Application.id' => Hash::extract($user['StudyMonitor'], '{n}.application_id'), 'Application.submitted' => 1),
         ));
         $this->set('applications', $applications);
 
@@ -307,7 +308,7 @@ class UsersController extends AppController {
         $this->set('users', $this->paginate());
     }*/
 
-    public function applicant_index() {
+    /*public function applicant_index() {
         $this->paginate['conditions'] = array('sponsor' => $this->Auth->User('id'));
 
         $this->paginate['order'] = array('User.created' => 'desc');
@@ -316,7 +317,7 @@ class UsersController extends AppController {
 
             $this->set('users', $this->paginate());
 
-    }
+    }*/
     public function admin_index() {
         $this->Prg->commonProcess();
         $page_options = array('10' => '10', '20' => '20');
@@ -415,7 +416,7 @@ class UsersController extends AppController {
  *
  * @return void
  */
-    public function applicant_add() {
+    /*public function applicant_add() {
         if ($this->request->is('post')) {
             $this->User->create();
             $this->request->data['User']['group_id'] = 7;
@@ -432,19 +433,24 @@ class UsersController extends AppController {
         $this->set(compact('counties'));
         $countries = $this->User->Country->find('list', array('order' => 'Country.name ASC'));
         $this->set(compact('countries'));
-    }
+    }*/
 
     public function admin_add() {
         if ($this->request->is('post')) {
             $this->User->create();
             if ($this->User->save($this->request->data)) {
-                $this->Session->setFlash(__('The user has been saved'), 'alerts/flash_success');
-                $this->redirect(array('action' => 'index'));
+                if ($this->request->data['User']['group_id'] == 7) {
+                    $this->Session->setFlash(__('The study monitor has been saved. Please assign studies to the user.'), 'alerts/flash_success');
+                    $this->redirect(array('controller' => 'study_monitors', 'action' => 'view', $this->User->id));   
+                } else {
+                    $this->Session->setFlash(__('The user has been saved'), 'alerts/flash_success');
+                    $this->redirect(array('action' => 'index'));   
+                }
             } else {
                 $this->Session->setFlash(__('The user could not be saved. Please, try again.'), 'alerts/flash_error');
             }
         }
-        $groups = $this->User->Group->find('list');
+        $groups = $this->User->Group->find('list', array('order' => array('id' => 'desc')));
         $this->set(compact('groups'));        
         $counties = $this->User->County->find('list', array('order' => 'County.county_name ASC'));
         $this->set(compact('counties'));
@@ -842,9 +848,9 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Users/applicant_dashboard');
         $this->Acl->allow($group, 'controllers/Users/profile');
         $this->Acl->allow($group, 'controllers/Users/edit');
-        $this->Acl->allow($group, 'controllers/Users/applicant_add');
+        // $this->Acl->allow($group, 'controllers/Users/applicant_add');
         $this->Acl->allow($group, 'controllers/Users/applicant_edit');
-        $this->Acl->allow($group, 'controllers/Users/applicant_index');
+        // $this->Acl->allow($group, 'controllers/Users/applicant_index');
         $this->Acl->allow($group, 'controllers/Users/applicant_delete');
         $this->Acl->allow($group, 'controllers/SiteInspections/applicant_download_summary');
         $this->Acl->allow($group, 'controllers/SiteInspections/applicant_index');
