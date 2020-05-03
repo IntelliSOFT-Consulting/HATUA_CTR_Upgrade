@@ -146,7 +146,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr id="searchmore" style="display: none;">
+            <tr class="searchmore" style="display: none;">
               <td colspan="2">
               <?php
                 echo $this->Form->input('start_date',
@@ -185,6 +185,48 @@
                   }
                 ?>
               </td>
+            </tr>
+            <tr class="searchmore" style="display: none;">
+              <td colspan="2">
+              <?php
+                if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                  echo $this->Form->input('disease_condition',
+                      array('div' => false, 'class' => 'span12 unauthorized_index', 'label' => array('class' => 'required', 'text' => 'Disease Condition')));
+                }
+              ?>
+              </td>
+              <td>
+                <?php
+                if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                    echo $this->Form->input('product_type_biologicals', array('label' => 'Biologicals', 'hiddenField' => false));
+                    echo $this->Form->input('product_type_proteins', array('label' => 'Proteins', 'hiddenField' => false));
+                }
+                ?>
+              </td>
+              <td>
+                <?php
+                if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                    echo $this->Form->input('product_type_immunologicals', array('label' => 'Immunologicals', 'hiddenField' => false));
+                    echo $this->Form->input('product_type_vaccines', array('label' => 'Vaccines', 'hiddenField' => false));
+                }
+                ?>
+              </td>
+              <td>
+                <?php
+                if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                    echo $this->Form->input('product_type_hormones', array('label' => 'Hormones', 'hiddenField' => false));
+                    echo $this->Form->input('product_type_toxoid', array('label' => 'Toxoid', 'hiddenField' => false));
+                }
+                ?>
+              </td>
+              <td>
+                <?php
+                if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                    echo $this->Form->input('product_type_chemical', array('label' => 'Chemical', 'hiddenField' => false));
+                    echo $this->Form->input('product_type_medical_device', array('label' => 'Medical Device', 'hiddenField' => false));
+                }
+                ?>
+              </td>              
             </tr>
           </tbody>
          </table>
@@ -392,11 +434,11 @@ $(function() {
   });
 
   $('#moresearch').on("click", function() {
-    if($('#searchmore').is(':hidden')) {
-      $('#searchmore').show();
+    if($('.searchmore').is(':hidden')) {
+      $('.searchmore').show();
       $(this).html('<small><i class="icon-caret-up"></i> Extended search...</small>');
     } else {
-      $('#searchmore').hide();
+      $('.searchmore').hide();
       $(this).html('<small><i class="icon-caret-right"></i> Extended search...</small>');
     }
   });

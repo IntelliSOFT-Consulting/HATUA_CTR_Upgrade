@@ -299,6 +299,9 @@ class CommentsController extends AppController {
     public function applicant_add_dev_external() {
         $this->add_dev_external();
     }
+    public function monitor_add_dev_external() {
+        $this->add_dev_external();
+    }
 
     private function add_review_internal() {
         if ($this->request->is('post')) {

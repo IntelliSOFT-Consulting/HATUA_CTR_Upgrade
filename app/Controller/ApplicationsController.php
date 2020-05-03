@@ -643,8 +643,10 @@ class ApplicationsController extends AppController {
             'contain' => $contains,
             )
         );
-        if($response['Application']['user_id'] != $this->Auth->user('sponsor')) {
-            $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('sponsor'),'debug');
+        $aids = $this->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
+        // if($response['Application']['id'] != $this->Auth->user('sponsor')) {
+        if(!in_array($response['Application']['id'], $aids)) {
+            // $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('sponsor'),'debug');
             $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');
             $this->redirect(array('action' => 'index'));
         }

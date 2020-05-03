@@ -76,11 +76,14 @@
                     }
                     if ($application['Application']['submitted']) {
                       echo "<br>";
-                      echo $this->Html->link('<i class="icon-list-alt"></i> Create SAE', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
+                      echo $this->Html->link('<i class="icon-list-alt"></i> Add SAE', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'), 
                             array('escape' => false, 'class' => 'btn btn-success btn-mini')); 
                       echo "&nbsp;";
-                      echo $this->Html->link('<i class="icon-credit-card"></i> Create SUSAR', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
-                            array('escape' => false, 'class' => 'btn btn-primary btn-mini'));   
+                      echo $this->Html->link('<i class="icon-credit-card"></i> Add SUSAR', array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'), 
+                            array('escape' => false, 'class' => 'btn btn-primary btn-mini'));  
+                      echo "&nbsp;";
+                      echo $this->Html->link('<i class="icon-random"></i> Add Deviation', array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']), 
+                            array('escape' => false, 'class' => 'btn btn-warning btn-mini'));   
                       echo "&nbsp;";
                       echo $this->Html->link('<i class="icon-upload-alt"></i> Upload E2B CIOMS', array('controller' => 'cioms', 'action' => 'add', $application['Application']['id']), 
                             array('escape' => false, 'class' => 'btn btn-inverse btn-mini'));   

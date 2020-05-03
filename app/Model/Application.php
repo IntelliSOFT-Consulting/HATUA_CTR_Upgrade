@@ -10,6 +10,15 @@ class Application extends AppModel {
         public $actsAs = array('Containable', 'Search.Searchable', 'SoftDelete');
         public $filterArgs = array(
             'protocol_no' => array('type' => 'like', 'encode' => true),
+            'disease_condition' => array('type' => 'like', 'encode' => true),
+            'product_type_biologicals' => array('type' => 'value'),
+            'product_type_proteins' => array('type' => 'value'),
+            'product_type_immunologicals' => array('type' => 'value'),
+            'product_type_vaccines' => array('type' => 'value'),
+            'product_type_hormones' => array('type' => 'value'),
+            'product_type_toxoid' => array('type' => 'value'),
+            'product_type_chemical' => array('type' => 'value'),
+            'product_type_medical_device' => array('type' => 'value'),
             'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
             // 'start_date' => array('type' => 'value'),
             // 'end_date' => array('type' => 'value'),

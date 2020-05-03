@@ -73,7 +73,7 @@ class StudyMonitorsController extends AppController {
 
         $this->Prg->commonProcess();
         $criteria = $this->Application->parseCriteria($this->passedArgs);
-        $criteria['Application.submitted'] = 1;
+        // $criteria['Application.submitted'] = 1;
         $criteria['NOT'] = array('Application.id' => Hash::extract($user['StudyMonitor'], '{n}.application_id'));
         $this->paginate['Application']['conditions'] = $criteria;
 

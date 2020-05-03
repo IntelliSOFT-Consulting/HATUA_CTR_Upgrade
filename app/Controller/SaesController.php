@@ -242,7 +242,7 @@ class SaesController extends AppController {
             // $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
             // $this->Sae->saveField('form_type', 'SUSAR');
             $this->Sae->create();
-            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
+            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SUSAR/'.date('Y').'/'.$count,
                 'form_type' => 'SUSAR'
                 ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
@@ -314,7 +314,7 @@ class SaesController extends AppController {
             // $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
             // $this->Sae->saveField('form_type', 'SUSAR');
             $this->Sae->create();
-            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SAE/'.date('Y').'/'.$count,
+            $this->Sae->save(['Sae' => ['application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SUSAR/'.date('Y').'/'.$count,
                 'form_type' => 'SUSAR'
                 ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
@@ -347,6 +347,7 @@ class SaesController extends AppController {
             $data_save['reference_no'] = $sae['Sae']['reference_no'].'_F'.$count;
             $data_save['report_type'] = 'Followup';
             $data_save['approved'] = 0;
+            $data_save['user_id'] = $this->Auth->User('id');
 
             if ($this->Sae->saveAssociated($data_save, array('deep' => true))) {
                     $this->Session->setFlash(__('Follow up '.$data_save['reference_no'].' has been created'), 'alerts/flash_info');
@@ -493,7 +494,7 @@ class SaesController extends AppController {
                       );
                     $datum = array(
                         'email' => $sae['Sae']['reporter_email'],
-                        'id' => $id, 'user_id' => $this->Auth->User('sponsor'), 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                        'id' => $id, 'user_id' => $this->Auth->User('id'), 'type' => 'applicant_sae_submit', 'model' => 'Sae',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                       );
@@ -501,7 +502,7 @@ class SaesController extends AppController {
                     CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
                     $users = $this->Sae->User->find('all', array(
                         'contain' => array(),
-                        'conditions' => array('OR' => array('User.id' => $this->Auth->User('sponsor'), 'User.group_id' => 2))
+                        'conditions' => array('OR' => array('User.id' => $this->Auth->User('id'), 'User.group_id' => 2))
                     ));
                     foreach ($users as $user) {
                       $variables = array(
@@ -538,10 +539,10 @@ class SaesController extends AppController {
         }
 
         //$sae = $this->request->data;
-
+        $aids = $this->Sae->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
         $applications = $this->Sae->Application->find('list', array(
             'fields' => array('Application.id', 'Application.protocol_no'),
-            'conditions' => array('Application.user_id' => $this->Session->read('Auth.User.sponsor') , 'Application.approved' => array(1, 2) , 'Application.submitted' => array(1) )));
+            'conditions' => array('Application.id' => $aids , 'Application.approved' => array(1, 2) , 'Application.submitted' => array(1) )));
         $routes = $this->Sae->SuspectedDrug->Route->find('list');
         $countries = $this->Sae->Country->find('list');
         $this->set(compact('sae', 'routes', 'countries', 'applications'));

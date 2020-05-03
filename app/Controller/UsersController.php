@@ -134,9 +134,10 @@ class UsersController extends AppController {
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
             )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
+        $aids = $this->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
         $this->set('saes', $this->Sae->find('all', array(
             'limit' => 20,
-            'conditions' => array('Sae.user_id' => array($this->Auth->User('sponsor'), $this->Auth->User('id'))), 'order' => 'Sae.created DESC'
+            'conditions' => array('Sae.application_id' => $aids), 'order' => 'Sae.created DESC'
             )));
     }
 
