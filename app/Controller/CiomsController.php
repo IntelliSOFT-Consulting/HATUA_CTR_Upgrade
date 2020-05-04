@@ -26,7 +26,8 @@ class CiomsController extends AppController {
             else $this->paginate['limit'] = reset($page_options);
 
         $criteria = $this->Ciom->parseCriteria($this->passedArgs);
-        $criteria['Ciom.user_id'] = $this->Auth->User('id');
+        $sars = $this->Ciom->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
+        $criteria['Ciom.application_id'] = $sars;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Ciom.created' => 'desc');
         $this->paginate['contain'] = array('Application');

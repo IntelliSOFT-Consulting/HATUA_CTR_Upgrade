@@ -51,9 +51,8 @@ class DeviationsController extends AppController {
 
         $criteria = $this->Deviation->parseCriteria($this->passedArgs);
         // $criteria['Deviation.user_id'] = array($this->Auth->User('id'), $this->Auth->User('sponsor'));
-        $sars = $this->Application->StudyMonitor->find('list', array('fields' => array('owner_id', 'owner_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
-        $sars[$this->Auth->User('id')] = $this->Auth->User('id');
-        $criteria['Deviation.user_id'] = $sars;
+        $sars = $this->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
+        $criteria['Deviation.application_id'] = $sars;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Deviation.created' => 'desc');
         $this->paginate['contain'] = array('Application');
