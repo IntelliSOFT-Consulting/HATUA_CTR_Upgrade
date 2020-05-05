@@ -92,6 +92,7 @@
         <th>Name</th>
   	    <th><?php echo $this->Paginator->sort('subject'); ?></th>
          <th><?php echo $this->Paginator->sort('feedback'); ?></th>
+         <th><?php echo $this->Paginator->sort('created'); ?></th>
   	     <th class="actions"><?php echo __('Actions'); ?></th>
   	</tr>
   	<?php
@@ -101,6 +102,7 @@
       <td><?php echo h($feedback['User']['name']); ?>&nbsp;</td>
   		<td><?php echo h($feedback['Feedback']['subject']); ?>&nbsp;</td>
                 <td><?php echo $feedback['Feedback']['feedback']; ?>&nbsp;</td>
+                <td><?php echo $feedback['Feedback']['created']; ?>&nbsp;</td>
   		<td class="actions">
   			<?php echo $this->Html->link(__('Reply'), array('controller' => 'feedbacks', 'action' => 'reply', $feedback['Feedback']['id'], 'manager' => true), array('class' => 'btn btn-success')); ?>
   		</td>
