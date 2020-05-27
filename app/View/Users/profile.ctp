@@ -15,7 +15,7 @@
 				<p>Thank you for being a registered user.</p>
 				<p>You may update your registration details within your profile or change your passord.</p>
 				<?php 
-					if($redir == 'applicant'){
+					if($redir == 'applicanter'){
 				?>
 				<h6 class="text-success" style="text-decoration: underline;">Contract Research Organizations (CRO)/ Monitors</h6>
 				<p>Please add study CRO/Monitor to enable them submit reports e.g. SUSARs, directly to PPB</p>

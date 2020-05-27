@@ -11,7 +11,7 @@ class Notification extends AppModel {
 
 	public $filterArgs = array(
             'reference_no' => array('type' => 'like', 'encode' => true),
-            'protocol_no' => array('type' => 'like', 'encode' => true),
+            'protocol_no' => array('type' => 'like', 'encode' => true, 'field' => 'Notification.system_message'),
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'SiteInspection.created BETWEEN ? AND ?'),
         );
     public function makeRangeCondition($data = array()) {
