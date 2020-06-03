@@ -26,62 +26,7 @@
     echo $this->Form->input('Review.'.$akey.'.id', array('value' => $rreview['id'], 'type' => 'hidden'));
 ?>
   <div class="row-fluid">
-
-    <div class="span2">
-      <!-- <div class="well controls"> -->
-        <?php
-          // echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
-          //     'name' => 'saveChanges',
-          //     'class' => 'btn btn-success mapop',
-          //     'id' => 'rreviewSaveChanges', 'title'=>'Save & continue editing',
-          //     'data-content' => 'Save changes to form without submitting it.
-          //                                 The form will still be available for further editing.',
-          //     'div' => false,
-          // ));
-        ?>
-        <?php
-          // echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
-          //     'name' => 'submitReport',
-          //     'onclick'=>"return confirm('Are you sure you wish to submit the protocol rreview report?');",
-          //     'class' => 'btn btn-primary mapop',
-          //     'id' => 'rreviewSubmitReport', 'title'=>'Save and Submit Report',
-          //     'data-content' => 'Submit report for peer review and approval.',
-          //     'div' => false,
-          //   ));
-
-        ?>
-          <!-- <div class="controls">         -->
-        <div data-spy="affix" class="my-sidebar">
-          <div class="well">
-            <?php
-              echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
-                  'name' => 'saveChanges',
-                  'class' => 'btn btn-success btn-block mapop',
-                  'id' => 'SiteInspectionSaveChanges', 'title'=>'Save & continue editing',
-                  'data-content' => 'Save changes to form without submitting it.
-                                              The form will still be available for further editing.',
-                  'div' => false,
-                ));
-            ?>
-            <br>
-            <hr>
-            <?php
-              echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
-                  'name' => 'submitReport',
-                  'onclick'=>"return confirm('Are you sure you wish to submit the protocol review report?');",
-                  'class' => 'btn btn-primary btn-block mapop',
-                  'id' => 'SiteInspectionSubmitReport', 'title'=>'Save and Submit Report',
-                  'data-content' => 'Submit report for peer review and approval.',
-                  'div' => false,
-                ));
-
-            ?>
-           </div>
-         </div>
-      <!-- </div> -->
-    </div>
-    
-    <div class="span10">
+    <div class="span12">
 
 
   <table class="table table-bordered table-condensed">
@@ -179,7 +124,67 @@
         ?>     
      </tbody>        
     </table>
+
+      <div class="well controls">
+        <?php
+          echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+              'name' => 'saveChanges',
+              'class' => 'btn btn-success mapop',
+              'id' => 'rreviewSaveChanges', 'title'=>'Save & continue editing',
+              'data-content' => 'Save changes to form without submitting it.
+                                          The form will still be available for further editing.',
+              'div' => false,
+          ));
+        ?>
+        <?php
+          echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
+              'name' => 'submitReport',
+              'onclick'=>"return confirm('Are you sure you wish to submit the protocol rreview report?');",
+              'class' => 'btn btn-primary mapop',
+              'id' => 'rreviewSubmitReport', 'title'=>'Save and Submit Report',
+              'data-content' => 'Submit report for peer review and approval.',
+              'div' => false,
+            ));
+
+        ?>
+        </div>
+          <!-- <div class="controls">         -->
+
     </div>
+    <?php /* ?>
+    <div class="span2">
+      
+        
+        <div class="my-sidebar"  >
+          <div data-spy="affix" class="well">
+            <?php
+              echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+                  'name' => 'saveChanges',
+                  'class' => 'btn btn-success btn-block mapop',
+                  'id' => 'SiteInspectionSaveChanges', 'title'=>'Save & continue editing',
+                  'data-content' => 'Save changes to form without submitting it.
+                                              The form will still be available for further editing.',
+                  'div' => false,
+                ));
+            ?>
+            <br>
+            <hr>
+            <?php
+              echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
+                  'name' => 'submitReport',
+                  'onclick'=>"return confirm('Are you sure you wish to submit the protocol review report?');",
+                  'class' => 'btn btn-primary btn-block mapop',
+                  'id' => 'SiteInspectionSubmitReport', 'title'=>'Save and Submit Report',
+                  'data-content' => 'Submit report for peer review and approval.',
+                  'div' => false,
+                ));
+
+            ?>
+           </div>
+         </div>
+      <!-- </div> -->
+      </div>
+        <?php */ ?>
     </div>
 
 <?php
