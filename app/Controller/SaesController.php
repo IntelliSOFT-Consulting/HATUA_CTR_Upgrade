@@ -375,6 +375,10 @@ class SaesController extends AppController {
                 $this->Session->setFlash(__('The sae has been submitted'), 'alerts/flash_info');
                 $this->redirect(array('action' => 'view', $this->Sae->id));
         }
+        if ($sae['Sae']['user_id'] !== $this->Session->read('Auth.User.id')) {
+                $this->Session->setFlash(__('You don\'t have permission to edit this SAE!!'), 'alerts/flash_warning');
+                $this->redirect(array('action' => 'index'));
+        }
         if ($this->request->is('post') || $this->request->is('put')) {
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
@@ -408,7 +412,7 @@ class SaesController extends AppController {
                     CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
                     $users = $this->Sae->User->find('all', array(
                         'contain' => array(),
-                        'conditions' => array('OR' => array('User.id' => $this->Auth->User('id'), 'User.group_id' => 2))
+                        'conditions' => array('User.group_id' => 2)
                     ));
                     foreach ($users as $user) {
                       $variables = array(

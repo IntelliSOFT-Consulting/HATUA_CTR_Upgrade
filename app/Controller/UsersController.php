@@ -285,10 +285,6 @@ class UsersController extends AppController {
                 $this->Session->setFlash('Your username or password was incorrect.', 'alerts/flash_error');
             }
         }
-        // App::uses('String', 'Utility');
-        // // CakeResque::enqueue('default', 'FriendShell', array('findNewFriend', 'wa gwan'));
-        // pr(String::insert('<strong>My name is :name and I am :age years old.</strong>', array('name' => 'Bob', 'age' => '65')));
-// generates: "My name is Bob and I am 65 years old."
 
     }
 

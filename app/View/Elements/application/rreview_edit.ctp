@@ -8,12 +8,8 @@
   
 <?php
   if ($this->Session->read('Auth.User.id') == $rreview['user_id'] and $rreview['status'] == 'Unsubmitted') {
-?>
-  <div class="row-fluid">
-    <div class="span10">
-<?php
-  // $this->request->data['Review'] = $rreview['Review'];
-  echo $this->Form->create('Review', array(
+
+    echo $this->Form->create('Review', array(
         'url' => array('controller' => 'reviews', 'action' => 'assess', $rreview['id'], $rreview['application_id']),
         'type' => 'file',
         'class' => 'form-inline',
@@ -26,9 +22,12 @@
           'format' => array('before', 'label', 'between', 'input', 'after','error'),
           'error' => array('attributes' => array( 'class' => 'controls help-block')),
          ),
-  ));
-  echo $this->Form->input('Review.'.$akey.'.id', array('value' => $rreview['id'], 'type' => 'hidden'));
+    ));
+    echo $this->Form->input('Review.'.$akey.'.id', array('value' => $rreview['id'], 'type' => 'hidden'));
 ?>
+  <div class="row-fluid">
+    <div class="span10">
+
 
   <table class="table table-bordered table-condensed">
     <tbody>
