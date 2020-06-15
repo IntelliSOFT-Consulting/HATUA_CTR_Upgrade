@@ -70,7 +70,7 @@
                     echo "<td>";
                     echo $this->Form->input('Review.'.$akey.'.ReviewAnswer.'.$i.'.answer', array(
                       'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
-                      'class' => 'answer'.$i.$rreview['ReviewAnswer'][$i]['question_number'],
+                      'class' => 'answer'.$i.str_replace('.', '_', $rreview['ReviewAnswer'][$i]['question_number']),
                       'before' => '
                         <input type="hidden" value="" id="Review'.$akey.$i.'ReviewAnswer_" name="data[Review]['.$akey.'][ReviewAnswer]['.$i.'][answer]"> <label class="radio inline">',
                       'after' => '</label>',
@@ -78,19 +78,19 @@
                     ));                                
                     echo $this->Form->input('Review.'.$akey.'.ReviewAnswer.'.$i.'.answer', array(
                       'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
-                      'class' => 'answer'.$i.$rreview['ReviewAnswer'][$i]['question_number'],
+                      'class' => 'answer'.$i.str_replace('.', '_', $rreview['ReviewAnswer'][$i]['question_number']),
                       'before' => '<label class="radio inline">', 'after' => '</label>',
                       'options' => array('No' => 'No')
                     ));     
                     echo $this->Form->input('Review.'.$akey.'.ReviewAnswer.'.$i.'.answer', array(
                       'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 
-                      'class' => 'answer'.$i.$rreview['ReviewAnswer'][$i]['question_number'],
+                      'class' => 'answer'.$i.str_replace('.', '_', $rreview['ReviewAnswer'][$i]['question_number']),
                       'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
                       'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
                       'before' => '<label class="radio inline">',
                       'after' => '</label>
                             <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
-                            onclick="$(\'.answer'.$i.$rreview['ReviewAnswer'][$i]['question_number'].'\').removeAttr(\'checked disabled\')">
+                            onclick="$(\'.answer'.$i.str_replace('.', '_', $rreview['ReviewAnswer'][$i]['question_number']).'\').removeAttr(\'checked disabled\')">
                             <em class="accordion-toggle"><i class="icon-remove-circle"></i> </em></a> </span>
                            ',
                       'options' => array('N/A' => 'N/A'),

@@ -104,7 +104,7 @@ class FeedbacksController extends AppController {
                       );
                       $datum = array(
                         'email' => $user['User']['email'], 
-                        'id' => $this->Auth->User('id'), 'user_id' => $user['User']['id'], 'type' => 'contact_feedback', 'model' => 'SiteInspection',
+                        'id' => $this->Auth->User('id'), 'user_id' => $user['User']['id'], 'type' => 'contact_feedback', 'model' => 'Feedback',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                       );
@@ -159,7 +159,7 @@ class FeedbacksController extends AppController {
                       );
                       $datum = array(
                         'email' => $user['User']['email'], 
-                        'id' => $previous_messages[0]['Feedback']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'contact_feedback', 'model' => 'SiteInspection',
+                        'id' => $previous_messages[0]['Feedback']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'contact_feedback', 'model' => 'Feedback',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                       );

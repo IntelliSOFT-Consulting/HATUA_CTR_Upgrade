@@ -106,7 +106,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -158,7 +158,7 @@ class CommentsController extends AppController {
               $this->Session->setFlash(__('The comment has been saved'), 'alerts/flash_success');
               $this->redirect($this->referer());
           } else {
-              $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+              $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
               $this->redirect($this->referer());
           }
       }
@@ -224,7 +224,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -286,7 +286,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -347,7 +347,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -404,7 +404,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -499,7 +499,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -560,7 +560,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
@@ -673,7 +673,7 @@ class CommentsController extends AppController {
                 $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
-                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_success');
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
         }
