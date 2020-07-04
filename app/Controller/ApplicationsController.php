@@ -14,7 +14,7 @@ class ApplicationsController extends AppController {
 
     public $paginate = array();
     public $components = array('Search.Prg');
-    public $presetVars = true; // using the model configuration
+    public $presetVars = true;
 
     public function beforeFilter() {
         parent::beforeFilter();

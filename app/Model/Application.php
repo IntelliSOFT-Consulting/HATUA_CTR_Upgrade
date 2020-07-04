@@ -20,8 +20,8 @@ class Application extends AppModel {
             'product_type_chemical' => array('type' => 'value'),
             'product_type_medical_device' => array('type' => 'value'),
             'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
-            // 'start_date' => array('type' => 'value'),
-            // 'end_date' => array('type' => 'value'),
+            'start_date' => array('type' => 'query', 'method' => 'dummy'),
+            'end_date' => array('type' => 'query', 'method' => 'dummy'),
             'submitted' => array('type' => 'value'),
             'approved' => array('type' => 'value'),
             'deactivated' => array('type' => 'value'),
@@ -38,6 +38,10 @@ class Application extends AppModel {
             'sites' => array('type' => 'query', 'method' => 'orSites', 'encode' => true),
             'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
         );
+
+        public function dummy($data = array()) {
+            return array( '1' => '1');
+        }
 
         public function findByInvestigators($data = array()) {
             $cond = array($this->alias.'.id' => $this->InvestigatorContact->find('list', array(

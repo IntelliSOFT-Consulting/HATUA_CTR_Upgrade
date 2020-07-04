@@ -18,7 +18,7 @@ class SaesController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        // $this->Auth->allow('index', 'view', 'view.pdf');
+        $this->Auth->allow('fetch');
     }
   /**
    * index method
@@ -128,6 +128,57 @@ class SaesController extends AppController {
         $this->set(compact('saes'));
         $this->layout = false;
         $this->render('csv_export');
+    }
+
+    /*public function fetch($id = null){
+        $this->layout = false;
+        //set default response
+        $response = array('status'=>'failed', 'message'=>'Failed to process request');
+        
+        //check if ID was passed
+        if(!empty($id)){
+            
+            //find data by ID
+            $result = $this->Sae->find('all', array('contain' => array('SuspectedDrug', 'ConcomittantDrug'), 'conditions' => array('Sae.id >' => $id, 'Sae.approved >' => 0)));
+            if(!empty($result)){
+                $response = array('status'=>'success','data'=>$result);  
+            } else {
+                $response['message'] = 'Found no matching data';
+            }  
+        } else {
+            $response['message'] = "Please provide ID";
+        }
+            
+        $this->response->type('application/json');
+        $this->response->body(json_encode($response));
+        $this->autoRender = false ;
+        return $this->response->send();
+    }*/
+    public function fetch($id = null){
+        // $this->layout = false;
+        //set default response
+        $response = array('status'=>'failed', 'message'=>'Failed to process request');
+        
+        //check if ID was passed
+        if(!empty($id)){
+            
+            //find data by ID
+            $result = $this->Sae->find('all', array('contain' => array('SuspectedDrug', 'ConcomittantDrug'), 'conditions' => array('Sae.id >' => $id, 'Sae.approved >' => 0)));
+            if(!empty($result)){
+                $response = array('status'=>'success', 'data'=>$result);  
+            } else {
+                $response['message'] = 'Found no matching data';
+            }  
+        } else {
+            $response['message'] = "Please provide ID";
+        }
+        
+        $this->set(compact('response'));
+        $this->set('_serialize', array('response'));
+        // $this->response->type('application/json');
+        // $this->response->body(json_encode($response));
+        // $this->autoRender = false ;
+        // return $this->response->send();
     }
 /**
  * view method
