@@ -12,7 +12,8 @@ class SiteInspection extends AppModel {
 
     public $filterArgs = array(
             'reference_no' => array('type' => 'like', 'encode' => true),
-            'protocol_no' => array('type' => 'like', 'encode' => true),
+            'protocol_no' => array('type' => 'query', 'method' => 'findByProtocolNo', 'encode' => true),
+            // 'protocol_no' => array('type' => 'like', 'encode' => true),
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'SiteInspection.created BETWEEN ? AND ?'),
         );
     public function makeRangeCondition($data = array()) {
@@ -23,7 +24,20 @@ class SiteInspection extends AppModel {
             else $end_date = date('Y-m-d');
 
             return array($start_date, $end_date);
-        }
+    }
+
+
+    public function findByProtocolNo($data = array()) {
+            $cond = array($this->alias.'.application_id' => $this->Application->find('list', array(
+                'conditions' => array(
+                    'OR' => array(
+                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%',
+                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%', )),
+                'fields' => array('id', 'id')
+                    )));
+            return $cond;
+    }
+
 /**
  * Display field
  *

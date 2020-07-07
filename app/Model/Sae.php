@@ -11,9 +11,10 @@ class Sae extends AppModel {
     public $actsAs = array('Containable', 'Search.Searchable');
     public $filterArgs = array(
             'reference_no' => array('type' => 'like', 'encode' => true),
-            'protocol_no' => array('type' => 'like', 'encode' => true),
+            'protocol_no' => array('type' => 'query', 'method' => 'findByProtocolNo', 'encode' => true),
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Sae.created BETWEEN ? AND ?'),
         );
+    
     public function makeRangeCondition($data = array()) {
             if(!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
             else $start_date = date('Y-m-d', strtotime('2012-05-01'));
@@ -22,7 +23,18 @@ class Sae extends AppModel {
             else $end_date = date('Y-m-d');
 
             return array($start_date, $end_date);
-        }
+    }
+
+    public function findByProtocolNo($data = array()) {
+            $cond = array($this->alias.'.application_id' => $this->Application->find('list', array(
+                'conditions' => array(
+                    'OR' => array(
+                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%',
+                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%', )),
+                'fields' => array('id', 'id')
+                    )));
+            return $cond;
+    }
     //The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
