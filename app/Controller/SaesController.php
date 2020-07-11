@@ -50,6 +50,8 @@ class SaesController extends AppController {
               ));
         }
         //end pdf export
+        $countries = $this->Sae->Country->find('list');
+        $this->set(compact('countries'));
         $this->set('page_options', $page_options);
         $this->set('saes', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
@@ -74,6 +76,8 @@ class SaesController extends AppController {
               ));
         }
         //end pdf export
+        $countries = $this->Sae->Country->find('list');
+        $this->set(compact('countries'));
         $this->set('page_options', $page_options);
         $this->set('saes', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
@@ -102,6 +106,8 @@ class SaesController extends AppController {
         }
         //end pdf export
 
+        $countries = $this->Sae->Country->find('list');
+        $this->set(compact('countries'));
         $this->set('page_options', $page_options);
         $this->set('saes', Sanitize::clean($this->paginate(), array('encode' => false)));
     }

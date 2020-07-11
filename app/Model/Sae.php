@@ -13,8 +13,32 @@ class Sae extends AppModel {
             'reference_no' => array('type' => 'like', 'encode' => true),
             'protocol_no' => array('type' => 'query', 'method' => 'findByProtocolNo', 'encode' => true),
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Sae.created BETWEEN ? AND ?'),
+            'start_date' => array('type' => 'query', 'method' => 'dummy'),
+            'end_date' => array('type' => 'query', 'method' => 'dummy'),
+            'drug_name' => array('type' => 'query', 'method' => 'findByDrugName', 'encode' => true),
+            'indication' => array('type' => 'query', 'method' => 'findByIndication', 'encode' => true),
+            'gender' => array('type' => 'value'),
+            'country_id' => array('type' => 'value'),
+            'report_type' => array('type' => 'value'),
+            'patient_died' => array('type' => 'value'),
+            'prolonged_hospitalization' => array('type' => 'value'),
+            'incapacity' => array('type' => 'value'),
+            'life_threatening' => array('type' => 'value'),
+            'reaction_other' => array('type' => 'value'),
+            'source_study' => array('type' => 'value'),
+            'source_literature' => array('type' => 'value'),
+            'source_health_professional' => array('type' => 'value'),
+            'patient_initials' => array('type' => 'like', 'encode' => true),
+            'reporter' => array('type' => 'query', 'method' => 'reporterFilter', 'encode' => true),
+            'age_start' => array('type' => 'query', 'method' => 'ageFilter', 'encode' => true),
+            'age_end' => array('type' => 'query', 'method' => 'ageFilter', 'encode' => true),
+            'causality' => array('type' => 'value', 'encode' => true),
         );
     
+    public function dummy($data = array()) {
+        return array( '1' => '1');
+    }
+
     public function makeRangeCondition($data = array()) {
             if(!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
             else $start_date = date('Y-m-d', strtotime('2012-05-01'));
@@ -28,13 +52,62 @@ class Sae extends AppModel {
     public function findByProtocolNo($data = array()) {
             $cond = array($this->alias.'.application_id' => $this->Application->find('list', array(
                 'conditions' => array(
-                    'OR' => array(
-                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%',
-                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%', )),
+                        'Application.protocol_no LIKE' => '%' . $data['protocol_no'] . '%',),
                 'fields' => array('id', 'id')
                     )));
             return $cond;
     }
+
+    public function findByDrugName($data = array()) {
+            $cond = array($this->alias.'.id' => $this->SuspectedDrug->find('list', array(
+                'conditions' => array(
+                        'SuspectedDrug.generic_name LIKE' => '%' . $data['drug_name'] . '%'),
+                'fields' => array('sae_id', 'sae_id')
+                    )));
+            return $cond;
+    }
+
+
+    public function findByIndication($data = array()) {
+            $cond = array($this->alias.'.id' => $this->SuspectedDrug->find('list', array(
+                'conditions' => array(
+                        'SuspectedDrug.indication LIKE' => '%' . $data['indication'] . '%'),
+                'fields' => array('sae_id', 'sae_id')
+                    )));
+            return $cond;
+    }
+
+    public function reporterFilter($data = array()) {
+            $filter = $data['reporter'];
+            $cond = array(
+                'OR' => array(
+                    $this->alias . '.reporter_name LIKE' => '%' . $filter . '%',
+                    $this->alias . '.reporter_email LIKE' => '%' . $filter . '%',
+                    $this->alias . '.reporter_phone LIKE' => '%' . $filter . '%',
+                ));
+            return $cond;
+    }
+
+    public function ageFilter($data = array()) {
+        $start = date('Y-m-d'); $end = date('Y-m-d', strtotime("-140 years"));
+        $start1 = 0; $end1 = 140;
+        if(!empty($data['age_start'])) {
+            $start = date('Y-m-d', strtotime("-".$data['age_start']." years"));
+            $start1 = $data['age_start'];
+        }
+        if(!empty($data['age_end'])) {
+            $end = date('Y-m-d', strtotime("-".$data['age_end']." years"));
+            $end1 = $data['age_end'];
+        }
+
+        $cond = array(
+            'OR' => array(
+                $this->alias . '.date_of_birth between ? AND ?' => array($end, $start),
+                $this->alias . '.age_years between ? AND ?' => array($start1, $end1),
+            ));
+        return $cond;
+    }
+
     //The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
