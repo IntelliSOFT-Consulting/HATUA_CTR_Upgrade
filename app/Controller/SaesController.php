@@ -129,9 +129,9 @@ class SaesController extends AppController {
         $this->viewClass = 'CsvView.Csv';
         $this->set(compact('saes', '_serialize', '_header', '_extract'));
     }*/
-    private function csv_export($saes = '') {
+    private function csv_export($csaes = '') {
         $this->response->download('SAEs_'.date('Ymd_Hi').'.csv'); // <= setting the file name
-        $this->set(compact('saes'));
+        $this->set(compact('csaes'));
         $this->layout = false;
         $this->render('csv_export');
     }

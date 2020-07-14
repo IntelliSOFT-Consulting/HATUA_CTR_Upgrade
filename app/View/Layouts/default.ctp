@@ -169,7 +169,7 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
   <footer class="footer">
     <div class="container">
       <div class="row">
-        <div class="span12">
+        <div class="span5">
           <div class="widget">
             <!-- logo -->
             <!-- <h5>Browse pages</h5>
@@ -186,7 +186,6 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
                         'admin' => false,), array('target' => '_blank', 'escape' => false)
                   );
               ?>
-                <p class="pull-right"><a href="#">Back to top</a></p>
                 <address>
                 <a href="http://www.pharmacyboardkenya.org" target="_blank">Pharmacy and Poisons Board Kenya</a>.
                 Kenya's Drug Regulatory Authority
@@ -197,6 +196,16 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
                 </ul>
                 </address>
           </div>
+        </div>
+        <div class="span7">  
+          <p class="pull-right"><a href="#">Back to top</a></p>          
+
+                <img src="/img/edctp.png" alt="EDCTP" width="12%">
+
+                <img src="/img/eu.png" alt="EU" style="padding-left: 30%;" width="17%">
+                <p>
+                  Clinical Trial Registry Information system upgrade project (HATUA) with the support from EDCTP and EU partners
+                </p>
         </div>
       </div>
     </div>

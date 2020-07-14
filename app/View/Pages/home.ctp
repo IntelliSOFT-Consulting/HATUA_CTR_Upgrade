@@ -25,17 +25,30 @@
                   <!-- Layer 1 -->
                   <li>
                     <div class="info animate-in">
-                      <h2>Pharmacy and Poisons Board</h2>
+                      <h2>EDCTP</h2>
                       <br>
-                      <h3>Kenya </h3>
+                      <h3>CTR Upgrade project (HATUA)</h3>
                       <p>
-                        Online clinical trials registry system
+                        HATUA KENYA project with the support from EDCTP were funded to update the Clinical Trial Record Information System and Pharmacovigilance Electronic Records System
+                      </p>
+                      <a class="btn btn-success" href="#">Learn more &raquo;</a>
+                    </div>
+                    <img class="slider_img" src="/img/homepage/sponsor3.png" alt="">
+                  </li>
+                  <!-- Layer 2 -->
+                  <li>
+                    <div class="info">
+                      <h2>Clinical Trials Registry</h2>
+                      <br>
+                      <h3>Pharmacy and Poisons Board, Kenya </h3>
+                      <p>
+                        Designed and developed in Kenya to enable electronic management of clinical trials
                       </p>
                       <a class="btn btn-success" href="#">Learn more &raquo;</a>
                     </div>
                     <img class="slider_img animate-in" src="/img/homepage/home-01.png" alt="">
                   </li>
-                  <!-- Layer 2 -->
+                  <!-- Layer 3 -->
                   <li>
                     <div class="info">
                       <h2>Annual Approvals</h2>
@@ -48,7 +61,7 @@
                     </div>
                     <img class="slider_img" src="/img/homepage/home3.jpeg" alt="">
                   </li>
-                  <!-- Layer 3 -->
+                  <!-- Layer 4 -->
                   <li>
                     <div class="info">
                       <h2>Pharmacovigilance reporting</h2>

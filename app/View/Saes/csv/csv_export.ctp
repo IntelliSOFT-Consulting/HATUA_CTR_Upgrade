@@ -7,7 +7,7 @@ $header = array('id' => '#', 'protocol_no' => 'Protocol No.', 'reference_no' => 
 
 echo implode(',', $header)."\n";
 // debug($data);
-foreach ($saes as $sae):
+foreach ($csaes as $sae):
 	$content = '';
 	$row = [];
 	foreach ($header as $key => $val) {
