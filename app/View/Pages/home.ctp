@@ -59,7 +59,7 @@
                       </p>
                       <a class="btn btn-success" href="#">Learn more &raquo;</a>
                     </div>
-                    <img class="slider_img" src="/img/homepage/home3.jpeg" alt="">
+                    <img class="slider_img" src="/img/homepage/home3.png" alt="">
                   </li>
                   <!-- Layer 4 -->
                   <li>
@@ -70,7 +70,7 @@
                       <p>check out the electronic pharmacovigilance reporting system at <a href="http://www.pv.pharmacyboardkenya.org" target="_blank">www.pv.pharmacyboardkenya.org</a></p>
                       <a class="btn btn-success" href="#">Learn more &raquo;</a>
                     </div>
-                    <img class="slider_img" src="/img/homepage/home10.jpeg" alt="">
+                    <img class="slider_img" src="/img/homepage/home10.png" alt="">
                   </li>
                 </ul>
               </div>
