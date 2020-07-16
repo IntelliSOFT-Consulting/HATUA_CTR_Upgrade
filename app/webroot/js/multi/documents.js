@@ -1,11 +1,11 @@
 $(function() {
-    $(document).on('click', '#tabs-16 .remove-row', remove_D_row);
-    $(document).on('click', '#tabs-16 .add-D-desc', add_D_desc);
+    $(document).on('click', '#tab9 .remove-row', remove_D_row);   //tabs-16
+    $(document).on('click', '#tab9 .add-D-desc', add_D_desc);
 
     if ($("#buildDocumentsForm tr").length == 1 ) { $("#documentsTableHeader").hide(); }
     setDocumentUpload();
     function setDocumentUpload() {
-      $('#tabs-16 :input:file').each(function() {
+      $('#tab9 :input:file').each(function() {
           $(this).fileupload({
             dataType: 'json',
             fileInput: $(this),

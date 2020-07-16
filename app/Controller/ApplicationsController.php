@@ -668,7 +668,7 @@ class ApplicationsController extends AppController {
         // if (!$this->request->is('post') || !$this->request->is('put')) {
         //     throw new MethodNotAllowedException();
         // } else {
-          if ($this->Application->save($this->request->data, true, array('id', 'final_report', 'laymans_summary', 
+          if ($this->Application->save($this->request->data, true, array('id', 'final_report', 'laymans_summary', 'implication_results',
                 'quantity_imported', 'quantity_dispensed', 'quantity_destroyed', 'quantity_exported', 'balance_site', 'final_date'))) {
               $this->Session->setFlash(__('Final report successfully submitted.'), 'alerts/flash_success');
               $this->redirect(array('action' => 'view', $id));
