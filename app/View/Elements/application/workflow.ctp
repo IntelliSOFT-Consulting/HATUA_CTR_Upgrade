@@ -113,6 +113,12 @@
 
                 echo $this->Form->input('protocol_no',
                     array('div' => false, 'class' => 'span12 unauthorized_index', 'label' => array('class' => 'required', 'text' => 'Protocol No.')));
+
+                echo $this->Form->input('disease_condition', array('type' => 'hidden'));
+                echo $this->Form->input('ercs', array('type' => 'hidden'));
+                echo $this->Form->input('investigator', array('type' => 'hidden'));
+                echo $this->Form->input('sites', array('type' => 'hidden'));
+                echo $this->Form->input('users', array('type' => 'hidden'));
               ?>
               </td>
               <td>
@@ -162,7 +168,7 @@
               </td>
               <td colspan="2" style="text-align: center;">
                 <?php
-                  if($redir) echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array('action' => 'workflow', 'ext' => 'csv'), array('class' => 'btn btn-success', 'escape' => false));
+                  if($redir) echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array_merge(array('action' => 'workflow', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                 ?>
               </td>
             </tr>

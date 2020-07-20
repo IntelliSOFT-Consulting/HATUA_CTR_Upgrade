@@ -373,28 +373,34 @@ class ApplicationsController extends AppController {
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
             else $this->paginate['limit'] = reset($page_options);
 
-            $criteria = $this->Application->parseCriteria($this->passedArgs);
-            if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+        $criteria = $this->Application->parseCriteria($this->passedArgs);
+        if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
 
-            $this->paginate['conditions'] = $criteria;
-            $this->paginate['order'] = array('Application.created' => 'desc');
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Application.created' => 'desc');
 
-            $this->paginate['contain'] = array(
-                'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-                'TrialStatus',
-                'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array(
+            'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
+            'TrialStatus', 'ApplicationStage',
+            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
-            //in case of csv export
-            if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-              $this->csv_export($this->Application->find('all', 
-                      array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
-                  ));
-            }
-            //end csv export
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+            $this->response->download('applications_'.date('Ymd_Hi').'.csv'); 
+            $this->set('applications', $this->Application->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+            ));
+            // $this->set(compact('applications'));
+            $this->layout = false;
+            $this->render('workflow');
+          // $this->csv_export($this->Application->find('all', 
+          //         array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+          //     ));
+        }
+        //end csv export
 
-            $this->set('page_options', $page_options);
-            $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
-
+        $this->set('page_options', $page_options);
+        $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
 
     public function inspector_index() {
