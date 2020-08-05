@@ -89,6 +89,10 @@
                     ?>
             </li>
             <li><?php  
+              echo $this->Html->link('<i class="icon-arrow-right"></i> Monthly Deviations',  
+                 array('controller' => 'reports', 'action'=>'dev_per_month', 'manager' => true ), array('escape' => false, 'tabindex' => '-1'));?>
+            </li>
+            <li><?php  
             echo $this->Html->link('<i class="icon-arrow-right"></i> SAE by Type by Study',  
                  array('controller' => 'reports', 'action'=>'sae_by_type', 'manager' => true ), array('escape' => false, 'tabindex' => '-1'));?>
             </li>

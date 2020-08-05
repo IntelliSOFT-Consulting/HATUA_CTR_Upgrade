@@ -50,6 +50,24 @@ class ReportsController extends AppController {
         $this->sae_per_month();
     }
 
+    public function dev_per_month() {
+        $data = $this->Deviation->find('all', array(
+            'fields' => array('date_format(Deviation.created,"%M") as name', 'COUNT(*) as y'),
+            'contain' => array(),
+            'group' => 'date_format(Deviation.created,"%M")'
+          ));
+        $data = Hash::extract($data, '{n}.{n}');
+        $this->set(compact('data'));
+        $this->set('_serialize', 'data');
+        $this->render('dev_per_month');
+    }
+    public function inspector_dev_per_month(){
+        $this->dev_per_month();
+    }
+    public function manager_dev_per_month(){
+        $this->dev_per_month();
+    }
+
     public function sae_by_type() {
         $data = $this->Sae->find('all', array(
             'fields' => array('Sae.form_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
