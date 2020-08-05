@@ -138,7 +138,7 @@ $(function() {
                   // console.log(data.files[0].name);
                   // $(this).css("backgroundColor", "#99C0DD");
                   $(this).hide();
-                  console.log(data.context);
+                  // console.log(data.context);
                   data.context.find('button.up_btn').off('click').on('click', function () {
                     if(!data.context.find('[name*="version_no"]').val() || !data.context.find('[name*="file_date"]').val()) {
                       alert('Please enter the document version and date.');
@@ -167,15 +167,15 @@ $(function() {
               data.context.find('.progress').show().find('.bar').css('width',  progress + '%');
                   },
                 done: function (e, data) {
-                            if (/msie/.test(navigator.userAgent.toLowerCase())) {
+                      if (/msie/.test(navigator.userAgent.toLowerCase())) {
                         location.reload();
-                }
-                     if(data.result.message == 'Success') {
+                      }
+                      if(data.result.message == 'Success') {
                         data.context.empty();
                         // console.log(data.context.closest('div.checkcontrols').attr('id'));
-                   name = data.context.closest('div.checkcontrols').attr('id');
-                   cound = data.context.closest('div.checkcontrols').children().length;
-                        data.context.prepend(' \
+                      name = data.context.closest('div.checkcontrols').attr('id');
+                      cound = data.context.closest('div.checkcontrols').children().length;
+                      data.context.prepend(' \
                           <a href="/applicant/attachments/download/'+data.result.content.Attachment.id+'" class="btn btn-info"> \
                           '+data.result.content.Attachment.basename+'</a> \
                           <input type="hidden" name="data['+name+']['+cound+'][id]" \
@@ -191,6 +191,9 @@ $(function() {
                           <p>'+data.result.errors+'</p> </div>');
                         data.context.find('.progress').fadeOut('slow');
                     }
+                },
+                error: function (e, data) {
+                    alert('Could not upload the file. Please refresh the page to submit.');
                 }
             })
       });
