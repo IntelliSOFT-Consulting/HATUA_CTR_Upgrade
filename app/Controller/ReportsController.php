@@ -90,10 +90,10 @@ class ReportsController extends AppController {
 
     public function dev_by_study() {
         $data = $this->Deviation->find('all', array(
-            'fields' => array('Application.protocol_no', 'COUNT(*) as cnt'),
+            'fields' => array('Deviation.deviation_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
             'contain' => array('Application'),
             'conditions' => array('Deviation.status' => 'Submitted'),
-            'group' => array('Application.protocol_no'),
+            'group' => array('Deviation.deviation_type', 'Application.protocol_no'),
             'having' => array('COUNT(*) >' => 0),
           ));        
 

@@ -20,6 +20,7 @@
         <tr>
             <th></th>
             <th>Deviations</th>
+            <th>Violations</th>
         </tr>
     </thead>
     <tbody>
@@ -27,8 +28,10 @@
           foreach ($data as $key => $value) {
               echo "<tr>";
                 echo "<th>".$value['Application']['protocol_no']."</th>";
-                echo "<td>".$value[0]['cnt']."</td>";
+                // echo "<td>".$value[0]['cnt']."</td>";
                 //echo "<td>".(($value['Deviation']['deviation_type'] == 'Violation') ? $value[0]['cnt'] : 0)."</td>";
+                echo "<td>".(($value['Deviation']['deviation_type'] == 'Deviation') ? $value[0]['cnt'] : 0)."</td>";
+                echo "<td>".(($value['Deviation']['deviation_type'] == 'Violation') ? $value[0]['cnt'] : 0)."</td>";
               echo "</tr>";
           }
       ?>        
