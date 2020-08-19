@@ -82,11 +82,11 @@
                <tr class="table-viewlabel"><td class="table-viewlabel"><?php echo $key+1; ?></td></tr>
                <tr class="table-viewlabel table-in">
                 <td class="table-noline">
-                <?php 
+                  <?php 
                   if(isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') { 
                     echo ($amendment['abstract_of_study']); 
                   } else {   ?>
-                  <iframe width="100%" height="250"> srcdoc='<?php  echo ($amendment['abstract_of_study']);  ?>'> </iframe>
+                  <iframe width="100%" height="250" srcdoc='<?php  echo ($amendment["abstract_of_study"]);  ?>'> </iframe>
                 <?php  } ?>
                 </td> 
               </tr>
