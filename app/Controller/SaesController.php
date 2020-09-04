@@ -169,7 +169,7 @@ class SaesController extends AppController {
         if(!empty($id)){
             
             //find data by ID
-            $result = $this->Sae->find('all', array('contain' => array('SuspectedDrug', 'ConcomittantDrug'), 'conditions' => array('Sae.id >' => $id, 'Sae.approved >' => 0)));
+            $result = $this->Sae->find('all', array('contain' => array('SuspectedDrug', 'ConcomittantDrug'), 'conditions' => array('Sae.id >' => $id, 'Sae.approved >' => 0, 'NOT' => array('Sae.causality' => array('Unlikely', 'Not related')) )));
             if(!empty($result)){
                 $response = array('status'=>'success', 'data'=>$result);  
             } else {
