@@ -537,7 +537,15 @@ class CommentsController extends AppController {
                       'conditions' => array('OR' => array('User.id' => $app['Application']['user_id'], 'User.group_id' => 2))
                   ));
                   foreach ($users as $user) {
-                      $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'applicant';
+                      // $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'applicant';
+                      if ($user['User']['group_id'] == 2) {
+                        $actioner =  'manager';
+                      } elseif ($user['User']['group_id'] == 3) {
+                        $actioner =  'reviewer';
+                      } else {
+                        $actioner =  'applicant';
+                      }
+
                       $variables = array(
                         'name' => $user['User']['name'], 'protocol_no' => $app['Application']['protocol_no'], 
                         'comment_subject' => $this->request->data['Comment']['subject'],
