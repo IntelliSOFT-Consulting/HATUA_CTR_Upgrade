@@ -79,7 +79,7 @@ class Attachment extends MediaAppModel {
 				// MEDIA_TRANSFER, '/tmp/'
 			// ))),
 			'permission' => array('rule' => array('checkPermission', '*')),
-			'size'       => array('rule' => array('checkSize', '5M')),
+			'size'       => array('rule' => array('checkSize', '25M')),
 			'pixels'     => array('rule' => array('checkPixels', '1600x1600')),
 			// 'extension'  => array('rule' => array('checkExtension', false, array(
 				// 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'gif', 'pdf', 'tmp'
