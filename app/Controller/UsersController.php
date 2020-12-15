@@ -834,6 +834,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Attachments/download');
         $this->Acl->allow($group, 'controllers/Attachments/delete');
         $this->Acl->allow($group, 'controllers/InvestigatorContacts/delete');
+        $this->Acl->allow($group, 'controllers/Pharmacists/delete');
         $this->Acl->allow($group, 'controllers/Notifications/applicant_index');
         $this->Acl->allow($group, 'controllers/Organizations/delete');
         $this->Acl->allow($group, 'controllers/PreviousDates/delete');

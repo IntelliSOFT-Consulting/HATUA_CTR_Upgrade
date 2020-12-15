@@ -101,7 +101,7 @@ class AmendmentsController extends AppController {
 			unset($filedata['Amendment']);
 			if(empty($this->request->data)) {
 				$this->Session->setFlash(__('The file(s) you provided could not be saved. Kindly ensure that the file(s) are less than
-					4.7MB in size. <small>If they are larger, compress (zip,tar...) them to the required size first</small>'), 'alerts/flash_error');
+					18 MB in size. <small>If they are larger, compress (zip,tar...) them to the required size first</small>'), 'alerts/flash_error');
 				$this->redirect(array('action' => 'edit', $id));
 			}
 			elseif (!$this->Amendment->saveAll($filedata, array(
@@ -110,7 +110,7 @@ class AmendmentsController extends AppController {
 			       	'Attachment' => 'file'
 			    	)))) {
 				$this->Session->setFlash(__('The file(s) is not valid. If the file(s) are more than
-					4.7MB in size please compress them to below 4.7MB first.'), 'alerts/flash_error');
+					18 MB in size please compress them to below 18 MB first.'), 'alerts/flash_error');
 			}
 			else {
 				if ($this->Amendment->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {

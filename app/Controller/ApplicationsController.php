@@ -567,14 +567,14 @@ class ApplicationsController extends AppController {
                 $this->redirect(array('controller' => 'users' , 'action' => 'dashboard'));
             } elseif (empty($this->request->data)) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file you provided could not be saved. Kindly ensure that the file is less than
-                    4.7MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>'));
+                    18 MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>'));
             } elseif (!$this->Application->saveAll($this->request->data, array(
                 'validate' => 'only',
                 'fieldList' => array(
                     'Attachment' => 'file'
                     )))) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file(s) is not valid. If the file(s) are more than
-                    4.7MB in size please compress them to below 4.7MB first.'));
+                    18 MB in size please compress them to below 18 7MB first.'));
             } else {
                 if ($this->Application->saveAssociated($this->request->data, array('validate' => false))) {
                     // $this->log($this->Application->Document->id,'debug');
@@ -1345,7 +1345,7 @@ class ApplicationsController extends AppController {
             unset($filedata['Application']);
             if(empty($this->request->data)) {
                 $message = 'The file you provided could not be saved. Kindly ensure that the file is less than
-                        4.7MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>';
+                        18 MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>';
                 if($this->RequestHandler->isAjax()) {
                     $this->set('response', array('message' => 'Failure', 'errors' => $message));
                 } else {
@@ -1359,7 +1359,7 @@ class ApplicationsController extends AppController {
                 'fieldList' => array(
                     'Attachment' => 'file'
                     )))) {
-                $message = 'The file is not valid. If the file is more than 4.7MB in size please compress it to below 4.7MB first.
+                $message = 'The file is not valid. If the file is more than 18 MB in size please compress it to below 18 MB first.
                 If the file is an image file, ensure the image resolution is within 1600X1600 pixels.';
                 if($this->RequestHandler->isAjax()) $this->set('response', array('message' => 'Failure', 'errors' => $message));
                 else $this->Session->setFlash(__($message), 'alerts/flash_error');

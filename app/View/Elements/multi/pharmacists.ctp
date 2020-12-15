@@ -90,7 +90,7 @@
 	              'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'Email address <span class="sterix">*</span>'),
 	              'placeholder' => ' ' , 'class' => 'input-xxlarge'
 	            ));
-				echo $this->Html->tag('div', '<button id="PharmacistButton'.$i.'" class="btn btn-mini btn-danger removePIContact" type="button">Remove Pharmacist</button>', array(
+				echo $this->Html->tag('div', '<button id="PharmacistButton'.$i.'" class="btn btn-mini btn-danger removePharmacist" type="button">Remove Pharmacist</button>', array(
 							'class' => 'controls', 'escape' => false));
 				echo $this->Html->tag('hr', '', array('id' => 'PharmacistHr'.$i));
 			?>

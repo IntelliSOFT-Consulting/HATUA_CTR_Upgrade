@@ -107,7 +107,7 @@ class PharmacistsController extends AppController {
  * @param string $id
  * @return void
  */
-	public function delete($id = null) {
+	/*public function delete($id = null) {
 		if (!$this->request->is('post')) {
 			throw new MethodNotAllowedException();
 		}
@@ -121,5 +121,26 @@ class PharmacistsController extends AppController {
 		}
 		$this->Session->setFlash(__('Pharmacist was not deleted'));
 		$this->redirect(array('action' => 'index'));
+	}*/
+	public function delete($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$this->Pharmacist->id = $id;
+		if (!$this->Pharmacist->exists()) {
+			throw new NotFoundException(__('Invalid investigator contact'));
+		}
+		if(!$this->Pharmacist->isOwnedBy($id, $this->Auth->user('id'))) {
+			$this->set('message', 'You do not have permission to access this resource');
+			$this->set('_serialize', 'message');
+		} else {
+			if ($this->Pharmacist->delete()) {
+				$this->set('message', 'Pharmacist deleted');
+				$this->set('_serialize', 'message');
+			} else {
+				$this->set('message', 'Pharmacist was not deleted');
+				$this->set('_serialize', 'message');
+			}
+		}
 	}
 }

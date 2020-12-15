@@ -70,4 +70,10 @@ class Pharmacist extends AppModel {
             ),
         ),
       );
+
+    // UTILITY METHODS
+    public function isOwnedBy($pharmacist, $user) {
+        $application = $this->field('application_id', array('id' => $pharmacist));
+        return $this->Application->field('id', array('id' => $application, 'user_id' => $user)) === $application;
+    }
 }
