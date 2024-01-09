@@ -109,7 +109,7 @@ class ManagerShell extends Shell {
            $email->to('pv@pharmacyboardkenya.org');
            // $email->to('eddieokemwa@gmail.com');  // make sure you change this oo!!!
            $email->cc(array('info@pharmacyboardkenya.org'));
-           $email->bcc(array('eddyokemwa@gmail.com'));
+           $email->bcc(array('kiprotich.japheth19@gmail.com'));
            $email->subject(Sanitize::html(String::insert($messages['manager_new_final_report_subject'], $variables), array('remove' => true)));
            $email->viewVars(array('message' => $message));
            if(!$email->send()) {

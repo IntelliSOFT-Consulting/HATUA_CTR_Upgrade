@@ -15,7 +15,8 @@
       $this->Html->script('bootstrap-editable', array('inline' => false));
       $this->Html->css('bootstrap-editable', null, array('inline' => false));
       //Only meant for applicant
-      $this->Html->script('multi/approval', array('inline' => false));
+      // $this->Html->script('multi/approval', array('inline' => false));
+      $this->Html->script('multi/approvalyear', array('inline' => false));
       $this->Html->script('multi/documents', array('inline' => false));
       $this->Html->script('multi/afro_attachments', array('inline' => false));
 
