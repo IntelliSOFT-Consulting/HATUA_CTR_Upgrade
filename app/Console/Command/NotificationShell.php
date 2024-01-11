@@ -212,7 +212,7 @@ class NotificationShell extends Shell
           'AuditTrail' => array(
             'foreign_key' => $review['Review']['application_id'],
             'model' => 'Application',
-            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review',
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review by ' . $this->Auth->User('username'),
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
           )
         );
@@ -363,6 +363,22 @@ class NotificationShell extends Shell
     $this->Notification->Create();
     if (!$this->Notification->save($save_data)) {
       $this->log('The Notifications were not sent at managerCommentNotifyApplicant.', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
+    }
+    // Create a Audit Trail
+    $audit = array(
+      'AuditTrail' => array(
+        'foreign_key' => $this->args[0]['application_id'],
+        'model' => 'Application',
+        'message' => 'Manager comments has been sent for report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $this->args[0]['application_id'])) . ' by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+        'ip' =>  $this->Application->field('protocol_no', array('id' => $this->args[0]['application_id']))
+      )
+    );
+    $this->AuditTrail->Create();
+    if ($this->AuditTrail->save($audit)) {
+      $this->log($this->args[0], 'audit_success');
+    } else {
+      $this->log('Error creating an audit trail', 'notifications_error');
       $this->log($this->args[0], 'notifications_error');
     }
   }
