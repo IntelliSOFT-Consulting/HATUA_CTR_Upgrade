@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is email configuration file.
  *
@@ -40,7 +41,8 @@
  * The origin email. See CakeEmail::from() about the valid values
  *
  */
-class EmailConfig {
+class EmailConfig
+{
 
 	public $default = array(
 		'transport' => 'Mail',
@@ -48,44 +50,53 @@ class EmailConfig {
 		//'charset' => 'utf-8',
 		//'headerCharset' => 'utf-8',
 	);
-	
+
 	public $gmail = array(
-        /* 'host' => 'ssl://smtp.gmail.com',
-          // 'host' => 'smtp.gmail.com',
-		'from' => array('edwardokemwa@gmail.com' => 'The Pharmacy and Poisons Board'),
-		'cc' => array('cta@pharmacyboardkenya.org', 'edwardabwao@pharmacyboardkenya.org', 'lydiatuitai@pharmacyboardkenya.org'),
-        'port' => 465,
-		'timeout' => 30,
-        'username' => 'edwardokemwa@gmail.com',
-        'password' => 'SafComBa033',
-        'transport' => 'Smtp'
-        */
-        'host' => 'ssl://smtp.gmail.com',
+
+		// 'transport' => 'Smtp',
+		// 'from' => array('regulatory@pharmacyboardkenya.org' => 'CTA: The Pharmacy and Poisons Board'),
+		// // 'cc' => array('jkiprotich@intellisoftkenya.com'),
+		// 'host' => 'smtp-relay.gmail.com',
+		// 'port' => 587,
+		// 'timeout' => 30,
+		// // 'username' => 'apps@intellisoftkenya.com',
+		// // 'password' => 'ICL_23!!', 
+		// 'username' => 'smp.web254@gmail.com',
+		// 'password' => 'awvbgahkpypuplqo',
+		// 'client' => null,
+		// 'log' => true,
+		// 'tls'=>true
+		'host' => 'ssl://smtp.gmail.com',
 		'from' => array('regulatory@pharmacyboardkenya.org' => 'CTA: The Pharmacy and Poisons Board'),
-        'port' => 465,
+        'port' => 465, 
 		'timeout' => 30,
         'username' => 'regulatory@pharmacyboardkenya.org',
-        'password' => 'lbetlikyrqhebbjh', //'qhYjEMKkv=v35c?*',
+        'password' => 'lbetlikyrqhebbjh', //'qhYjEMKkv=v35c?*', 
         'transport' => 'Smtp'
-    );
-	
+	);
+
 	public $smtp = array(
-		'transport' => 'Smtp',
-		'from' => array('site@localhost' => 'My Site'),
-		'cc' => array('cta@pharmacyboardkenya.org', 'edwardabwao@pharmacyboardkenya.org', 'lydiatuitai@pharmacyboardkenya.org'),
-		'host' => 'smtp-relay.gmail.com',
-		'port' => 587,
+		// 'transport' => 'Smtp', 
+		// 'from' => array('regulatory@pharmacyboardkenya.org' => 'CTA: The Pharmacy and Poisons Board'),
+		// // 'bcc' => array('jkiprotich@intellisoftkenya.com'),
+		// 'host' => 'smtp-relay.gmail.com',
+		// 'port' => 587,
+		// 'timeout' => 30, 
+		// 'username' => 'smp.web254@gmail.com',
+		// 'password' => 'awvbgahkpypuplqo',
+		// 'client' => null,
+		// 'log' => false,
+		'host' => 'ssl://smtp.gmail.com',
+		'from' => array('regulatory@pharmacyboardkenya.org' => 'CTA: The Pharmacy and Poisons Board'),
+        'port' => 465, 
 		'timeout' => 30,
-		'username' => 'drugreg.ppb@gmail.com',
-		'password' => 'mikalwetu',
-		'client' => null,
-		'log' => false,
-		//'charset' => 'utf-8',
-		//'headerCharset' => 'utf-8',
+        'username' => 'regulatory@pharmacyboardkenya.org',
+        'password' => 'lbetlikyrqhebbjh', //'qhYjEMKkv=v35c?*', 
+        'transport' => 'Smtp'
 	);
 
 	public $fast = array(
-		'from' => 'you@localhost',
+		'from' => 'apps@intellisoftkenya.com',
 		'sender' => null,
 		'to' => null,
 		'cc' => null,
@@ -114,5 +125,4 @@ class EmailConfig {
 		//'charset' => 'utf-8',
 		//'headerCharset' => 'utf-8',
 	);
-
 }

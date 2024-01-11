@@ -77,6 +77,11 @@
               array('controller' => 'groups', 'action' => 'index', 'admin' => true),
               array('escape' => false)); ?>
         </li>
+        <li>
+        <?php echo $this->Html->link('<i class="icon-refresh"></i> Audit Trail',
+              array('controller' => 'audit_trails', 'action' => 'index', 'admin' => true),
+              array('escape' => false)); ?>
+        </li>
       </ul>
       <hr>
       <h4><img alt="" src="/img/comments.ico" style="width: 25px;">&nbsp;<?php

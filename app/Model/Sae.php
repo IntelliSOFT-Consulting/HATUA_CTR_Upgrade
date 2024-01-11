@@ -16,7 +16,7 @@ class Sae extends AppModel {
             'start_date' => array('type' => 'query', 'method' => 'dummy'),
             'end_date' => array('type' => 'query', 'method' => 'dummy'),
             'drug_name' => array('type' => 'query', 'method' => 'findByDrugName', 'encode' => true),
-            'indication' => array('type' => 'query', 'method' => 'findByIndication', 'encode' => true),
+            // 'indication' => array('type' => 'query', 'method' => 'findByIndication', 'encode' => true),
             'gender' => array('type' => 'value'),
             'country_id' => array('type' => 'value'),
             'report_type' => array('type' => 'value'),

@@ -5,129 +5,143 @@ App::uses('AppModel', 'Model');
  *
  * @property User $User
  */
-class Application extends AppModel {
+class Application extends AppModel
+{
 
-        public $actsAs = array('Containable', 'Search.Searchable', 'SoftDelete');
-        public $filterArgs = array(
-            'protocol_no' => array('type' => 'like', 'encode' => true),
-            'disease_condition' => array('type' => 'like', 'encode' => true),
-            'product_type_biologicals' => array('type' => 'value'),
-            'product_type_proteins' => array('type' => 'value'),
-            'product_type_immunologicals' => array('type' => 'value'),
-            'product_type_vaccines' => array('type' => 'value'),
-            'product_type_hormones' => array('type' => 'value'),
-            'product_type_toxoid' => array('type' => 'value'),
-            'product_type_chemical' => array('type' => 'value'),
-            'product_type_medical_device' => array('type' => 'value'),
-            'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
-            'start_date' => array('type' => 'query', 'method' => 'dummy'),
-            'end_date' => array('type' => 'query', 'method' => 'dummy'),
-            'submitted' => array('type' => 'value'),
-            'approved' => array('type' => 'value'),
-            'deactivated' => array('type' => 'value'),
-            'deleted' => array('type' => 'value'),
-            'trial_status_id' => array('type' => 'value'),
-            'trial_human_pharmacology' => array('type' => 'value'),
-            'trial_therapeutic_exploratory' => array('type' => 'value'),
-            'trial_therapeutic_confirmatory' => array('type' => 'value'),
-            'trial_therapeutic_use' => array('type' => 'value'),
-            'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Application.created BETWEEN ? AND ?'),
-            'investigator' => array('type' => 'query', 'method' => 'findByInvestigators', 'encode' => true),
-            'users' => array('type' => 'query', 'method' => 'findByReviewer', 'encode' => true),
-            'ercs' => array('type' => 'query', 'method' => 'findByErc', 'encode' => true),
-            'sites' => array('type' => 'query', 'method' => 'orSites', 'encode' => true),
-            'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
+    public $actsAs = array('Containable', 'Search.Searchable', 'SoftDelete');
+    public $filterArgs = array(
+        'protocol_no' => array('type' => 'like', 'encode' => true),
+        'disease_condition' => array('type' => 'like', 'encode' => true),
+        'product_type_biologicals' => array('type' => 'value'),
+        'product_type_proteins' => array('type' => 'value'),
+        'product_type_immunologicals' => array('type' => 'value'),
+        'product_type_vaccines' => array('type' => 'value'),
+        'product_type_hormones' => array('type' => 'value'),
+        'product_type_toxoid' => array('type' => 'value'),
+        'product_type_chemical' => array('type' => 'value'),
+        'product_type_medical_device' => array('type' => 'value'),
+        'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
+        'start_date' => array('type' => 'query', 'method' => 'dummy'),
+        'end_date' => array('type' => 'query', 'method' => 'dummy'),
+        'submitted' => array('type' => 'value'),
+        'approved' => array('type' => 'value'),
+        'deactivated' => array('type' => 'value'),
+        'deleted' => array('type' => 'value'),
+        'trial_status_id' => array('type' => 'value'),
+        'trial_human_pharmacology' => array('type' => 'value'),
+        'trial_therapeutic_exploratory' => array('type' => 'value'),
+        'trial_therapeutic_confirmatory' => array('type' => 'value'),
+        'trial_therapeutic_use' => array('type' => 'value'),
+        'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Application.created BETWEEN ? AND ?'),
+        'investigator' => array('type' => 'query', 'method' => 'findByInvestigators', 'encode' => true),
+        'users' => array('type' => 'query', 'method' => 'findByReviewer', 'encode' => true),
+        'ercs' => array('type' => 'query', 'method' => 'findByErc', 'encode' => true),
+        'sites' => array('type' => 'query', 'method' => 'orSites', 'encode' => true),
+        'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
+    );
+
+    public function dummy($data = array())
+    {
+        return array('1' => '1');
+    }
+
+    public function findByInvestigators($data = array())
+    {
+        $cond = array($this->alias . '.id' => $this->InvestigatorContact->find('list', array(
+            'conditions' => array(
+                'OR' => array(
+                    'InvestigatorContact.given_name LIKE' => '%' . $data['investigator'] . '%',
+                    'InvestigatorContact.middle_name LIKE' => '%' . $data['investigator'] . '%',
+                    'InvestigatorContact.family_name LIKE' => '%' . $data['investigator'] . '%',
+                )
+            ),
+            'fields' => array('application_id', 'application_id')
+        )));
+        return $cond;
+    }
+
+    public function findByReviewer($data = array())
+    {
+        $cond = array($this->alias . '.id' => $this->Review->find('list', array(
+            'conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted', 'Review.user_id' => $data['users']),
+            'fields' => array('application_id', 'application_id')
+        )));
+        return $cond;
+    }
+
+    public function findByErc($data = array())
+    {
+        // debug($data['ercs']);
+        $cond = array($this->alias . '.id' => $this->EthicalCommittee->find('list', array(
+            'conditions' => array('EthicalCommittee.ethical_committee' => $data['ercs']),
+            'fields' => array('application_id', 'application_id')
+        )));
+        return $cond;
+    }
+
+    public function findByStage($data = array())
+    {
+        // debug($data);
+        $cond = array($this->alias . '.id' => $this->ApplicationStage->find('list', array(
+            'conditions' => array('ApplicationStage.status' => $data['status'], 'ApplicationStage.stage' => $data['stages']),
+            'fields' => array('application_id', 'application_id')
+        )));
+        return $cond;
+    }
+
+    public function orSites($data = array())
+    {
+        $counties = $this->SiteDetail->County->find('list', array(
+            'conditions' => array('County.county_name LIKE' => '%' . $data['sites'] . '%'),
+            'fields' => array('id')
+        ));
+        if (empty($counties)) $counties = 0;
+        $cond = array(
+            'OR' => array(
+                $this->alias . '.location_of_area LIKE' => '%' . $data['sites'] . '%',
+                $this->alias . '.id' => $this->SiteDetail->find('list', array(
+                    'conditions' => array(
+                        'OR' => array(
+                            'SiteDetail.site_name LIKE' => '%' . $data['sites'] . '%',
+                            'SiteDetail.county_id' => $counties
+                        )
+                    ),
+                    'fields' => array('application_id')
+                )),
+            )
         );
+        return $cond;
+    }
 
-        public function dummy($data = array()) {
-            return array( '1' => '1');
-        }
+    public function orConditions($data = array())
+    {
+        $filter = $data['filter'];
+        $cond = array(
+            'OR' => array(
+                $this->alias . '.study_title LIKE' => '%' . $filter . '%',
+                $this->alias . '.abstract_of_study LIKE' => '%' . $filter . '%',
+            )
+        );
+        return $cond;
+    }
 
-        public function findByInvestigators($data = array()) {
-            $cond = array($this->alias.'.id' => $this->InvestigatorContact->find('list', array(
-                'conditions' => array(
-                    'OR' => array(
-                        'InvestigatorContact.given_name LIKE' => '%' . $data['investigator'] . '%',
-                        'InvestigatorContact.middle_name LIKE' => '%' . $data['investigator'] . '%',
-                        'InvestigatorContact.family_name LIKE' => '%' . $data['investigator'] . '%', )),
-                'fields' => array('application_id', 'application_id')
-                    )));
-            return $cond;
-        }
+    public function makeRangeCondition($data = array())
+    {
+        if (!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
+        else $start_date = date('Y-m-d', strtotime('2012-05-01'));
 
-        public function findByReviewer($data = array()) {
-            $cond = array($this->alias.'.id' => $this->Review->find('list', array(
-                'conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted', 'Review.user_id' => $data['users']),
-                'fields' => array('application_id', 'application_id')
-                    )));
-            return $cond;
-        }
+        if (!empty($data['end_date'])) $end_date = date('Y-m-d', strtotime($data['end_date']));
+        else $end_date = date('Y-m-d');
 
-        public function findByErc($data = array()) {
-            // debug($data['ercs']);
-            $cond = array($this->alias.'.id' => $this->EthicalCommittee->find('list', array(
-                'conditions' => array('EthicalCommittee.ethical_committee' => $data['ercs']),
-                'fields' => array('application_id', 'application_id')
-                    )));
-            return $cond;
-        }
-
-        public function findByStage($data = array()) {
-            // debug($data);
-            $cond = array($this->alias.'.id' => $this->ApplicationStage->find('list', array(
-                'conditions' => array('ApplicationStage.status' => $data['status'], 'ApplicationStage.stage' => $data['stages']),
-                'fields' => array('application_id', 'application_id')
-                    )));
-            return $cond;
-        }
-
-        public function orSites($data = array()) {
-            $counties = $this->SiteDetail->County->find('list', array(
-                                    'conditions' => array('County.county_name LIKE' => '%'. $data['sites'] .'%'),
-                                    'fields' => array('id')
-                                    ));
-            if(empty($counties)) $counties = 0;
-            $cond = array(
-                'OR' => array(
-                    $this->alias . '.location_of_area LIKE' => '%' . $data['sites'] . '%',
-                    $this->alias . '.id' => $this->SiteDetail->find('list', array(
-                        'conditions' => array(
-                            'OR' => array(
-                                'SiteDetail.site_name LIKE' => '%'. $data['sites'].'%',
-                                'SiteDetail.county_id' => $counties
-                                )),
-                        'fields' => array('application_id')
-                    )),
-                ));
-            return $cond;
-        }
-
-        public function orConditions($data = array()) {
-            $filter = $data['filter'];
-            $cond = array(
-                'OR' => array(
-                    $this->alias . '.study_title LIKE' => '%' . $filter . '%',
-                    $this->alias . '.abstract_of_study LIKE' => '%' . $filter . '%',
-                ));
-            return $cond;
-        }
-
-        public function makeRangeCondition($data = array()) {
-            if(!empty($data['start_date'])) $start_date = date('Y-m-d', strtotime($data['start_date']));
-            else $start_date = date('Y-m-d', strtotime('2012-05-01'));
-
-            if(!empty($data['end_date'])) $end_date = date('Y-m-d', strtotime($data['end_date']));
-            else $end_date = date('Y-m-d');
-
-            return array($start_date, $end_date);
-        }
+        return array($start_date, $end_date);
+    }
     //The Associations below have been created with all possible keys, those that are not needed can be removed
 
-/**
- * belongsTo associations
- *
- * @var array
- */
+    /**
+     * belongsTo associations
+     *
+     * @var array
+     */
     public $belongsTo = array(
         'User' => array(
             'className' => 'User',
@@ -145,39 +159,39 @@ class Application extends AppModel {
         ),
     );
 
-/**
- * hasMany associations
- *
- * @var array
- */
+    /**
+     * hasMany associations
+     *
+     * @var array
+     */
 
     public $hasMany = array(
         'Review' => array(
-                                       'className' => 'Review',
-                                       'foreignKey' => 'application_id',
-                                       'dependent' => false,
-                          ),
+            'className' => 'Review',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
         'ManagerReview' => array(
-                                       'className' => 'Review',
-                                       'foreignKey' => 'application_id',
-                                       'dependent' => false,
-                          ),
-                         // 'Request' => array(
-                         //            'className' => 'Review',
-                         //            'foreignKey' => 'application_id',
-                         //            'dependent' => true,
-                         //            'conditions' => array('Request.type' => 'response'),
-                         //  ),
+            'className' => 'Review',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
+        // 'Request' => array(
+        //            'className' => 'Review',
+        //            'foreignKey' => 'application_id',
+        //            'dependent' => true,
+        //            'conditions' => array('Request.type' => 'response'),
+        //  ),
         'Acceptance' => array(
-                  'className' => 'Review',
-                  'foreignKey' => 'application_id',
-                  'dependent' => true,
-                  'conditions' => array('Acceptance.type' => 'acceptance'),
+            'className' => 'Review',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+            'conditions' => array('Acceptance.type' => 'acceptance'),
         ),
         'Amendment' => array(
-                     'className' => 'Amendment',
-                     'foreignKey' => 'application_id',
-                     'dependent' => false,
+            'className' => 'Amendment',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
         ),
         'InvestigatorContact' => array(
             'className' => 'InvestigatorContact',
@@ -254,24 +268,24 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
-                          'Attachment' => array(
-                                    'className' => 'Attachment',
-                                    'foreignKey' => 'foreign_key',
-                                    'dependent' => true,
-                                    'conditions' => array('Attachment.model' => 'Application', 'Attachment.group' => 'attachment'),
-                          ),
-                          'AnnualApproval' => array(
-                                    'className' => 'Attachment',
-                                    'foreignKey' => 'foreign_key',
-                                    'dependent' => true,
-                                    'conditions' => array('AnnualApproval.model' => 'AnnualApproval'),
-                          ),
-                          'Reminder' => array(
-                                    'className' => 'Reminder',
-                                    'foreignKey' => 'foreign_key',
-                                    'dependent' => true,
-                                    'conditions' => array('Reminder.model' => 'Application'),
-                          ),
+        'Attachment' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Attachment.model' => 'Application', 'Attachment.group' => 'attachment'),
+        ),
+        'AnnualApproval' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('AnnualApproval.model' => 'AnnualApproval'),
+        ),
+        'Reminder' => array(
+            'className' => 'Reminder',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Reminder.model' => 'Application'),
+        ),
         'ParticipantFlow' => array(
             'className' => 'ParticipantFlow',
             'foreignKey' => 'application_id',
@@ -287,12 +301,12 @@ class Application extends AppModel {
             'foreignKey' => 'application_id',
             'dependent' => false
         ),
-                          'Document' => array(
-                                    'className' => 'Attachment',
-                                    'foreignKey' => 'foreign_key',
-                                    'dependent' => true,
-                                    'conditions' => array('Document.model' => 'Application', 'Document.group' => 'document'),
-                          ),
+        'Document' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Document.model' => 'Application', 'Document.group' => 'document'),
+        ),
         'CoverLetter' => array(
             'className' => 'Attachment',
             'foreignKey' => 'foreign_key',
@@ -442,7 +456,7 @@ class Application extends AppModel {
                 'required' => true,
                 'message'  => 'Abstract : Please enter the Date of protocol.'
             ),
-        ),        
+        ),
         'study_drug' => array(
             'notEmpty' => array(
                 'rule'     => 'notEmpty',
@@ -606,17 +620,17 @@ class Application extends AppModel {
         ),
 
         // 'ecct_ref_number' => array(
-            // 'ifApplicable' => array(
-                // 'rule'     => array('ifApplicable'),
-                // 'required' => false,
-                // 'message'  => 'Please enter ECCT ref number if applicable'
-            // ),
+        // 'ifApplicable' => array(
+        // 'rule'     => array('ifApplicable'),
+        // 'required' => false,
+        // 'message'  => 'Please enter ECCT ref number if applicable'
+        // ),
         // ),
 
         // 'trial_status_id' => array(
-            // 'numeric' => array(
-                // 'rule' => array('numeric'),
-            // ),
+        // 'numeric' => array(
+        // 'rule' => array('numeric'),
+        // ),
         // ),
 
         'age_span' => array(
@@ -1042,11 +1056,11 @@ class Application extends AppModel {
             ),
         ),
         // 'site_capacity' => array(
-            // 'notEmpty' => array(
-                // 'rule'     => 'notEmpty',
-                // 'required' => true,
-                // 'message'  => 'Please enter the capacity of the site(s).'
-            // ),
+        // 'notEmpty' => array(
+        // 'rule'     => 'notEmpty',
+        // 'required' => true,
+        // 'message'  => 'Please enter the capacity of the site(s).'
+        // ),
         // ),
         'estimated_duration' => array(
             'notEmpty' => array(
@@ -1142,11 +1156,11 @@ class Application extends AppModel {
             ),
         ),
         // 'applicant_approval_letter' => array(
-            // 'notEmptyCheckbox' => array(
-                // 'rule'     => array('notEmptyCheckbox', 'applicant_approval_letter'),
-                // 'required' => true,
-                // 'message'  => 'Please upload the Copy of approval letter(s) from collaborating institutions or other regulatory authorities, if applicable'
-            // ),
+        // 'notEmptyCheckbox' => array(
+        // 'rule'     => array('notEmptyCheckbox', 'applicant_approval_letter'),
+        // 'required' => true,
+        // 'message'  => 'Please upload the Copy of approval letter(s) from collaborating institutions or other regulatory authorities, if applicable'
+        // ),
         // ),
         'applicant_statement' => array(
             'notEmptyCheckbox' => array(
@@ -1157,11 +1171,11 @@ class Application extends AppModel {
             ),
         ),
         // 'applicant_participating_countries' => array(
-            // 'notEmptyCheckbox' => array(
-                // 'rule'     => array('notEmptyCheckbox', 'applicant_participating_countries'),
-                // 'required' => true,
-                // 'message'  => 'Please upload the cover letter'
-            // ),
+        // 'notEmptyCheckbox' => array(
+        // 'rule'     => array('notEmptyCheckbox', 'applicant_participating_countries'),
+        // 'required' => true,
+        // 'message'  => 'Please upload the cover letter'
+        // ),
         // ),
         'applicant_fees' => array(
             'notEmptyCheckbox' => array(
@@ -1202,29 +1216,34 @@ class Application extends AppModel {
         ),
     );
 
-    public function notEmptyCheckbox($field = null, $key) {
+    public function notEmptyCheckbox($field = null, $key)
+    {
         return $field[$key] > 0;
     }
 
-            public function notEmptyRadioControlled($field = null, $key) {
-                if($this->data['Application']['design_controlled'] == 'Yes') return !empty($field[$key]);
-                return true;
-            }
+    public function notEmptyRadioControlled($field = null, $key)
+    {
+        if ($this->data['Application']['design_controlled'] == 'Yes') return !empty($field[$key]);
+        return true;
+    }
 
-    public function ifApplicable($field = null) {
+    public function ifApplicable($field = null)
+    {
         // pr($this->data['Application']['ecct_not_applicable']);
         if ($this->data['Application']['ecct_not_applicable'] == '0') return !empty($field['ecct_ref_number']);
         return true;
     }
 
-    public function ifProductType($field = null) {
+    public function ifProductType($field = null)
+    {
         return $this->data['Application']['product_type_biologicals'] == '1' ||
-                $this->data['Application']['product_type_chemical'] == '1' ||
-                $this->data['Application']['product_type_medical_device'] == '1';
+            $this->data['Application']['product_type_chemical'] == '1' ||
+            $this->data['Application']['product_type_medical_device'] == '1';
     }
 
-    public function ifProductTypeBiologicals($field = null) {
-        if($field['product_type_biologicals'] == 1) {
+    public function ifProductTypeBiologicals($field = null)
+    {
+        if ($field['product_type_biologicals'] == 1) {
             return $this->data['Application']['product_type_proteins'] == '1' ||
                 $this->data['Application']['product_type_immunologicals'] == '1' ||
                 $this->data['Application']['product_type_vaccines'] == '1' ||
@@ -1234,107 +1253,119 @@ class Application extends AppModel {
         return true;
     }
 
-    public function ifProductTypeChemical($field = null) {
-        if($field['product_type_chemical'] == 1) {
+    public function ifProductTypeChemical($field = null)
+    {
+        if ($field['product_type_chemical'] == 1) {
             return !empty($this->data['Application']['product_type_chemical_name']);
         }
         return true;
     }
 
-    public function ifProductTypeMedicalDevice($field = null) {
-        if($field['product_type_medical_device'] == 1) {
+    public function ifProductTypeMedicalDevice($field = null)
+    {
+        if ($field['product_type_medical_device'] == 1) {
             return !empty($this->data['Application']['product_type_medical_device_name']);
         }
         return true;
     }
 
-    public function ifSiteExists($field = null) {
+    public function ifSiteExists($field = null)
+    {
         return $this->data['Application']['single_site_member_state'] == 'Yes' ||
-                $this->data['Application']['multiple_sites_member_state'] == 'Yes' ||
-                $this->data['Application']['multiple_countries'] == 'Yes';
+            $this->data['Application']['multiple_sites_member_state'] == 'Yes' ||
+            $this->data['Application']['multiple_countries'] == 'Yes';
     }
 
-            public function ifSingleSite($field = null) {
-                if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['location_of_area'])) {
-                    return true;
-                } else if($this->data['Application']['single_site_member_state'] == 'No' && empty($field['location_of_area'])) {
-                    return true;
-                }
-                return false;
-             }
+    public function ifSingleSite($field = null)
+    {
+        if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['location_of_area'])) {
+            return true;
+        } else if ($this->data['Application']['single_site_member_state'] == 'No' && empty($field['location_of_area'])) {
+            return true;
+        }
+        return false;
+    }
 
-            public function ifSingleSite1($field = null) {
-                if (isset($this->data['Application']['single_site_member_state'])) {
-                    if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['single_site_physical_address'])) {
-                        return true;
-                    } else if($this->data['Application']['single_site_member_state'] == 'No' && empty($field['single_site_physical_address'])) {
-                        return true;
-                    }
-                } else if(!isset($this->data['Application']['single_site_member_state']) && !empty($field['single_site_physical_address'])) {
-                    return true;
-                }
-                return false;
-            }
-
-             public function ifSingleSite2($field = null) {
-                   if (isset($this->data['Application']['single_site_member_state'])) {
-                       if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['single_site_contact_person'])) {
-                           return true;
-                       } else if($this->data['Application']['single_site_member_state'] == 'No' && empty($field['single_site_contact_person'])) {
-                           return true;
-                       }
-                    } else if(!isset($this->data['Application']['single_site_member_state']) && !empty($field['single_site_contact_person'])) {
-                        return true;
-                    }
-                   return false;
-             }
-
-    public function ifSingleSite3($field = null) {
-           if (isset($this->data['Application']['single_site_member_state'])) {
-                        if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['single_site_telephone'])) {
+    public function ifSingleSite1($field = null)
+    {
+        if (isset($this->data['Application']['single_site_member_state'])) {
+            if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['single_site_physical_address'])) {
                 return true;
-                           } else if($this->data['Application']['single_site_member_state'] == 'No' && empty($field['single_site_telephone'])) {
-                    return true;
-                           }
-                    } else if(!isset($this->data['Application']['single_site_member_state']) && !empty($field['single_site_telephone'])) {
-                        return true;
-                    }
-           return false;
+            } else if ($this->data['Application']['single_site_member_state'] == 'No' && empty($field['single_site_physical_address'])) {
+                return true;
+            }
+        } else if (!isset($this->data['Application']['single_site_member_state']) && !empty($field['single_site_physical_address'])) {
+            return true;
+        }
+        return false;
     }
 
-    public function ifMultipleSites($field = null) {
+    public function ifSingleSite2($field = null)
+    {
+        if (isset($this->data['Application']['single_site_member_state'])) {
+            if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['single_site_contact_person'])) {
+                return true;
+            } else if ($this->data['Application']['single_site_member_state'] == 'No' && empty($field['single_site_contact_person'])) {
+                return true;
+            }
+        } else if (!isset($this->data['Application']['single_site_member_state']) && !empty($field['single_site_contact_person'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function ifSingleSite3($field = null)
+    {
+        if (isset($this->data['Application']['single_site_member_state'])) {
+            if ($this->data['Application']['single_site_member_state'] == 'Yes' && !empty($field['single_site_telephone'])) {
+                return true;
+            } else if ($this->data['Application']['single_site_member_state'] == 'No' && empty($field['single_site_telephone'])) {
+                return true;
+            }
+        } else if (!isset($this->data['Application']['single_site_member_state']) && !empty($field['single_site_telephone'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function ifMultipleSites($field = null)
+    {
         if ($this->data['Application']['multiple_sites_member_state'] == 'Yes' && !empty($field['number_of_sites'])) {
             return true;
-        } else if($this->data['Application']['multiple_sites_member_state'] == 'No' && empty($field['number_of_sites'])) {
+        } else if ($this->data['Application']['multiple_sites_member_state'] == 'No' && empty($field['number_of_sites'])) {
             return true;
         }
         return false;
     }
 
-    public function ifMultipleStates1($field = null) {
+    public function ifMultipleStates1($field = null)
+    {
         if ($this->data['Application']['multiple_countries'] == 'Yes' && !empty($field['multiple_member_states'])) {
             return true;
-        } else if($this->data['Application']['multiple_countries'] == 'No' && empty($field['multiple_member_states'])) {
+        } else if ($this->data['Application']['multiple_countries'] == 'No' && empty($field['multiple_member_states'])) {
             return true;
         }
         return false;
     }
 
-    public function ifMultipleStates2($field = null) {
+    public function ifMultipleStates2($field = null)
+    {
         if ($this->data['Application']['multiple_countries'] == 'Yes' && !empty($field['multi_country_list'])) {
             return true;
-        } else if($this->data['Application']['multiple_countries'] == 'No' && empty($field['multi_country_list'])) {
+        } else if ($this->data['Application']['multiple_countries'] == 'No' && empty($field['multi_country_list'])) {
             return true;
         }
         return false;
     }
 
-    public function ifAgeSpanExists($field = null) {
+    public function ifAgeSpanExists($field = null)
+    {
         return $this->data['Application']['population_less_than_18_years'] == 'Yes' ||
-                $this->data['Application']['population_above_18'] == 'Yes';
+            $this->data['Application']['population_above_18'] == 'Yes';
     }
 
-    public function ifBelow18years($field = null) {
+    public function ifBelow18years($field = null)
+    {
         if ($this->data['Application']['population_less_than_18_years'] == 'No') {
             return $this->data['Application']['population_utero'] != 'Yes' &&  $this->data['Application']['population_preterm_newborn'] != 'Yes' &&
                 $this->data['Application']['population_newborn'] != 'Yes' && $this->data['Application']['population_infant_and_toddler'] != 'Yes' &&
@@ -1344,143 +1375,159 @@ class Application extends AppModel {
     }
 
 
-    public function ifAbove18years($field = null) {
+    public function ifAbove18years($field = null)
+    {
         if ($this->data['Application']['population_above_18'] == 'No') {
-            return $this->data['Application']['population_adult'] != 'Yes' &&  $this->data['Application']['population_elderly'] != 'Yes' ;
+            return $this->data['Application']['population_adult'] != 'Yes' &&  $this->data['Application']['population_elderly'] != 'Yes';
         }
         return true;
     }
 
-    public function ifVulnerableOptions($field = null) {
-      if ($this->data['Application']['subjects_vulnerable_populations'] == 'No') {
-        return $this->data['Application']['subjects_patients'] != 'Yes' &&  $this->data['Application']['subjects_women_child_bearing'] != 'Yes'  &&
-            $this->data['Application']['subjects_women_using_contraception'] != 'Yes' &&  $this->data['Application']['subjects_pregnant_women'] != 'Yes'  &&
-            $this->data['Application']['subjects_nursing_women'] != 'Yes' &&  $this->data['Application']['subjects_emergency_situation'] != 'Yes'  &&
-            $this->data['Application']['subjects_incapable_consent'] != 'Yes' &&  $this->data['Application']['subjects_others'] != 'Yes' ;
-      }
-      return true;
+    public function ifVulnerableOptions($field = null)
+    {
+        if ($this->data['Application']['subjects_vulnerable_populations'] == 'No') {
+            return $this->data['Application']['subjects_patients'] != 'Yes' &&  $this->data['Application']['subjects_women_child_bearing'] != 'Yes'  &&
+                $this->data['Application']['subjects_women_using_contraception'] != 'Yes' &&  $this->data['Application']['subjects_pregnant_women'] != 'Yes'  &&
+                $this->data['Application']['subjects_nursing_women'] != 'Yes' &&  $this->data['Application']['subjects_emergency_situation'] != 'Yes'  &&
+                $this->data['Application']['subjects_incapable_consent'] != 'Yes' &&  $this->data['Application']['subjects_others'] != 'Yes';
+        }
+        return true;
     }
 
-    public function ifIncapableConsent($field = null) {
+    public function ifIncapableConsent($field = null)
+    {
         if ($this->data['Application']['subjects_incapable_consent'] == 'Yes' && !empty($field['subjects_specify'])) {
             return true;
-        } else if($this->data['Application']['subjects_incapable_consent'] == 'No' && empty($field['subjects_specify'])) {
+        } else if ($this->data['Application']['subjects_incapable_consent'] == 'No' && empty($field['subjects_specify'])) {
             return true;
         }
         return false;
     }
 
-    public function ifSubjectsOthers($field = null) {
+    public function ifSubjectsOthers($field = null)
+    {
         if ($this->data['Application']['subjects_others'] == 'Yes' && !empty($field['subjects_others_specify'])) {
             return true;
-        } else if($this->data['Application']['subjects_others'] == 'No' && empty($field['subjects_others_specify'])) {
+        } else if ($this->data['Application']['subjects_others'] == 'No' && empty($field['subjects_others_specify'])) {
             return true;
         }
         return false;
     }
 
-    public function ifGenderExists($field = null) {
+    public function ifGenderExists($field = null)
+    {
         return $this->data['Application']['gender_female'] == '1' ||
-                $this->data['Application']['gender_male'] == '1';
+            $this->data['Application']['gender_male'] == '1';
     }
 
-    public function atLeastScope($field = null) {
+    public function atLeastScope($field = null)
+    {
         return $this->data['Application']['scope_diagnosis'] + $this->data['Application']['scope_prophylaxis'] +
             $this->data['Application']['scope_therapy'] + $this->data['Application']['scope_safety'] +
             $this->data['Application']['scope_efficacy'] + $this->data['Application']['scope_pharmacokinetic'] +
             $this->data['Application']['scope_pharmacodynamic'] + $this->data['Application']['scope_bioequivalence'] +
             $this->data['Application']['scope_dose_response'] + $this->data['Application']['scope_pharmacogenetic'] +
             $this->data['Application']['scope_pharmacogenomic'] + $this->data['Application']['scope_pharmacoecomomic'] +
-            $this->data['Application']['scope_others'] > 0 ;
+            $this->data['Application']['scope_others'] > 0;
     }
 
-    public function ifScopeOthers($field = null) {
-        if($this->data['Application']['scope_others'] == '1' && empty($field['scope_others_specify'])) return false;
+    public function ifScopeOthers($field = null)
+    {
+        if ($this->data['Application']['scope_others'] == '1' && empty($field['scope_others_specify'])) return false;
         return true;
     }
 
-    public function atLeastPhase($field = null) {
+    public function atLeastPhase($field = null)
+    {
         return $this->data['Application']['trial_human_pharmacology'] + $this->data['Application']['trial_administration_humans'] +
             $this->data['Application']['trial_bioequivalence_study'] + $this->data['Application']['trial_other'] +
             $this->data['Application']['trial_therapeutic_exploratory'] + $this->data['Application']['trial_therapeutic_confirmatory'] +
-            $this->data['Application']['trial_therapeutic_use'] > 0 ;
+            $this->data['Application']['trial_therapeutic_use'] > 0;
     }
 
-    public function ifTrialOther($field = null) {
-        if($this->data['Application']['trial_other'] == '1' && empty($field['trial_other_specify'])) return false;
+    public function ifTrialOther($field = null)
+    {
+        if ($this->data['Application']['trial_other'] == '1' && empty($field['trial_other_specify'])) return false;
         return true;
     }
 
-    public function ifDesignControlledOther($field = null) {
+    public function ifDesignControlledOther($field = null)
+    {
         if ($this->data['Application']['design_controlled_other'] == 'Yes' && !empty($field['design_controlled_specify'])) {
-              return true;
-        } else if($this->data['Application']['design_controlled_other'] == 'No' && empty($field['design_controlled_specify'])) {
-                                return true;
-                          } else if(empty($this->data['Application']['design_controlled_other']) && empty($field['design_controlled_specify'])) {
-              return true;
+            return true;
+        } else if ($this->data['Application']['design_controlled_other'] == 'No' && empty($field['design_controlled_specify'])) {
+            return true;
+        } else if (empty($this->data['Application']['design_controlled_other']) && empty($field['design_controlled_specify'])) {
+            return true;
         }
         return false;
     }
 
-    public function ifDesignControlledComparator($field = null) {
+    public function ifDesignControlledComparator($field = null)
+    {
         if ($this->data['Application']['design_controlled'] == 'Yes' && !empty($field['design_controlled_comparator'])) {
             return true;
-        } else if($this->data['Application']['design_controlled'] == 'No' && empty($field['design_controlled_comparator'])) {
+        } else if ($this->data['Application']['design_controlled'] == 'No' && empty($field['design_controlled_comparator'])) {
             return true;
-        } else if(empty($this->data['Application']['design_controlled']) && empty($field['design_controlled_comparator'])) {
-                                       return true;
-                          }
+        } else if (empty($this->data['Application']['design_controlled']) && empty($field['design_controlled_comparator'])) {
+            return true;
+        }
         return false;
     }
 
-    public function ifDesignMedicinalSpecify($field = null) {
+    public function ifDesignMedicinalSpecify($field = null)
+    {
         if ($this->data['Application']['design_controlled_medicinal_other'] == 'Yes' && !empty($field['design_controlled_medicinal_specify'])) {
             return true;
-        } else if($this->data['Application']['design_controlled_medicinal_other'] == 'No' && empty($field['design_controlled_medicinal_specify'])) {
-                                       return true;
-                          } else if(empty($this->data['Application']['design_controlled_medicinal_other']) && empty($field['design_controlled_medicinal_specify'])) {
+        } else if ($this->data['Application']['design_controlled_medicinal_other'] == 'No' && empty($field['design_controlled_medicinal_specify'])) {
             return true;
-        }  else if(empty($this->data['Application']['design_controlled']) && empty($field['design_controlled_medicinal_specify'])) {
-                                  return true;
-                          }
+        } else if (empty($this->data['Application']['design_controlled_medicinal_other']) && empty($field['design_controlled_medicinal_specify'])) {
+            return true;
+        } else if (empty($this->data['Application']['design_controlled']) && empty($field['design_controlled_medicinal_specify'])) {
+            return true;
+        }
         return false;
     }
 
     // END -- custom validation rules
 
     // BEGIN -- model callback methods
-    public function beforeValidate() {
-        if(isset($this->data['Application']['multiple_sites_member_state']) && $this->data['Application']['multiple_sites_member_state'] == 'No') {
+    public function beforeValidate()
+    {
+        if (isset($this->data['Application']['multiple_sites_member_state']) && $this->data['Application']['multiple_sites_member_state'] == 'No') {
             $this->SiteDetail->validator()->remove('site_name')->remove('contact_details')->remove('contact_person')
-                                        ->remove('physical_address')->remove('county_id');
+                ->remove('physical_address')->remove('county_id');
         }
-        if(isset($this->data['Application']['organisations_transferred_']) && $this->data['Application']['organisations_transferred_'] == 'No') {
+        if (isset($this->data['Application']['organisations_transferred_']) && $this->data['Application']['organisations_transferred_'] == 'No') {
             $this->Organization->validator()->remove('organization')->remove('contact_person')->remove('address')->remove('telephone_number')
-            ->remove('all_tasks')->remove('monitoring')->remove('regulatory')->remove('investigator_recruitment')
-                                       ->remove('ivrs_treatment_randomisation')
-                                       ->remove('data_management')->remove('e_data_capture')->remove('susar_reporting')
-                                       ->remove('quality_assurance_auditing')->remove('statistical_analysis')->remove('medical_writing')
-                                       ->remove('other_duties');
+                ->remove('all_tasks')->remove('monitoring')->remove('regulatory')->remove('investigator_recruitment')
+                ->remove('ivrs_treatment_randomisation')
+                ->remove('data_management')->remove('e_data_capture')->remove('susar_reporting')
+                ->remove('quality_assurance_auditing')->remove('statistical_analysis')->remove('medical_writing')
+                ->remove('other_duties');
         }
-        if(isset($this->data['Application']['placebo_present']) && $this->data['Application']['placebo_present'] == 'No') {
+        if (isset($this->data['Application']['placebo_present']) && $this->data['Application']['placebo_present'] == 'No') {
             $this->Placebo->validator()->remove('pharmaceutical_form')->remove('route_of_administration')->remove('composition')
-            ->remove('identical_indp')->remove('major_ingredients');
+                ->remove('identical_indp')->remove('major_ingredients');
         }
-                          if(isset($this->data['Application']['protocol_no'])) {
-                                $this->validator()
-                                ->add('protocol_no', 'notEmpty', array(
-                                    'rule' => 'notEmpty',
-                                    'required' => true,
-                                    'message' => 'Please enter a valid protocol number.'))
-                                ->add('protocol_no', 'unique', array(
-                                    'rule' => 'isUnique',
-                                    'required' => true,
-                                    'message' => 'The protocol number you have is already in use! Protocol number must be unique.'));
-                          }
+        if (isset($this->data['Application']['protocol_no'])) {
+            $this->validator()
+                ->add('protocol_no', 'notEmpty', array(
+                    'rule' => 'notEmpty',
+                    'required' => true,
+                    'message' => 'Please enter a valid protocol number.'
+                ))
+                ->add('protocol_no', 'unique', array(
+                    'rule' => 'isUnique',
+                    'required' => true,
+                    'message' => 'The protocol number you have is already in use! Protocol number must be unique.'
+                ));
+        }
         return true;
     }
 
-    public function beforeSave() {
+    public function beforeSave()
+    {
         if (!empty($this->data['Application']['date_of_protocol'])) {
             $this->data['Application']['date_of_protocol'] = $this->dateFormatBeforeSave($this->data['Application']['date_of_protocol']);
         }
@@ -1497,21 +1544,22 @@ class Application extends AppModel {
             $this->data['Application']['declaration_date2'] = $this->dateFormatBeforeSave($this->data['Application']['declaration_date2']);
         }
 
-        if(empty($this->data['Application']['ecct_ref_number'])){
+        if (empty($this->data['Application']['ecct_ref_number'])) {
             $this->data['Application']['ecct_ref_number'] = '';
         }
         return true;
     }
 
 
-    function afterFind($results) {
+    function afterFind($results)
+    {
         foreach ($results as $key => $val) {
             if (isset($val['Application']['date_of_protocol'])) {
                 $results[$key]['Application']['date_of_protocol'] = $this->dateFormatAfterFind($val['Application']['date_of_protocol']);
             }
-                                        if (isset($val['Application']['approval_date'])) {
-                                            $results[$key]['Application']['approval_date'] = $this->dateFormatAfterFind($val['Application']['approval_date']);
-                                        }
+            if (isset($val['Application']['approval_date'])) {
+                $results[$key]['Application']['approval_date'] = $this->dateFormatAfterFind($val['Application']['approval_date']);
+            }
             if (isset($val['Application']['date_submitted'])) {
                 $results[$key]['Application']['date_submitted'] = $this->dateFormatAfterFind($val['Application']['date_submitted']);
             }
@@ -1540,7 +1588,7 @@ class Application extends AppModel {
                 return $response;
     }*/
 
-            /*public function isOwnedBy($amendment, $user) {
+    /*public function isOwnedBy($amendment, $user) {
                 // $this->recursive = -1;
                   $my_amndt = $this->find('first', array('conditions' => array('Amendment.id' => $amendment)));
                   $response['Amendment'] = $my_amndt;

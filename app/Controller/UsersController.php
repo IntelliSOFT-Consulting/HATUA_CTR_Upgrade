@@ -90,6 +90,7 @@ class UsersController extends AppController {
                 $this->request->data['Application']['user_id'] = $this->Auth->User('id');
                 if ($this->Application->save($this->request->data, true, array('user_id', 'email_address'))) {
                     $this->Session->setFlash(__('The application has been created'), 'alerts/flash_success');
+                    
                     $this->redirect(array('controller' => 'applications', 'action' => 'applicant_edit', $this->Application->id));
                 } else {
                     $this->Session->setFlash(__('The application could not be saved. Please, try again.'), 'alerts/flash_error');
@@ -156,9 +157,11 @@ class UsersController extends AppController {
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
-        $this->set('saes', $this->Sae->find('all', array(
-            'order' => 'Sae.created DESC'
-            )));
+        $sae=[];
+        $this->set('saes', $sae);
+        // $this->set('saes', $this->Sae->find('all', array(
+        //     'order' => 'Sae.created DESC'
+        //     )));
         $this->set('meetingDates', $this->MeetingDate->find('all', array(
             'limit' => 5,
             'conditions' => array('MeetingDate.approved >' => 0), 'order' => 'MeetingDate.created DESC'

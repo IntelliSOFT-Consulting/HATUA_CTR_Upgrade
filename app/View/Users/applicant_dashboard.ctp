@@ -105,12 +105,8 @@
                 echo $this->Form->end(array(
                     'label' => 'Create',
                     'value' => 'Create',
-                    'class' => 'btn btn-success btn-large',
-                    // 'div' => array(
-                        // 'class' => 'form-actions',
-                    // )
-                ));
-                // echo $this->Form->end(__('Submit'), array('class' => 'btn btn-large btn-success'));
+                    'class' => 'btn btn-success btn-large', 
+                )); 
             ?>
             <hr>
             <p><small><i class="icon-minus"></i> <span class="label label-info">NOTE!</span> Fields marked with <span class="sterix">*</span> are mandatory and your application will not be submitted to PPB without first completing them.</small></p>

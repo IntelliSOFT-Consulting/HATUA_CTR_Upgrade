@@ -14,18 +14,19 @@ class TestShell extends AppShell {
     public function main() {
        $this->out('Hello world.');
        $email = new CakeEmail();
-       $email->config('gmail');
-       //$email->template('default');
-       //$email->emailFormat('html');
-       //$email->from(array('eddyokemwa@gmail.com' => 'My test'));
-       $email->to('jkiprotich@intellisoftkenya.com');
-    //    $email->to('cgichuki@intellisoftkenya.com');
+       $email->config('gmail'); 
+    //    $email->to('jkiprotich@intellisoftkenya.com');
+       $email->to('cgichuki@intellisoftkenya.com');
+    // $email->to('kiprotich.japheth19@gmail.com');
        // $email->subject(Configure::read('Emails.registration.subject'));
        $email->subject('test email');
        //$email->viewVars(array('message' => 'This is a dummy message. seen'));
        if(!$email->send('My message to you')) {
            $this->log($email, 'test_email');
-       }
+           $this->out('Experienced problems!!.');
+        }else{
+         $this->out('Successfully Sent!!!.');
+        }
     }
     public function que(){
            // Enqueue the job

@@ -384,7 +384,7 @@
                   ?>
                 </td>
               </tr>
-              <tr style="background-color: azure;"> 
+              <tr style="background-color: azure;">  
                 <td colspan="5">
                   <?php
                     $stages = $this->requestAction('applications/stages/'.$application['Application']['id']);
