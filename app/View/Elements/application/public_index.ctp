@@ -201,7 +201,7 @@
                 <th style="width: 13%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
                 <th style="width: 26%;"><?php echo $this->Paginator->sort('study_title'); ?></th>
                 <th style="width: 26%;">Investigator(s) &amp; Site(s)</th>
-                <th style="width: 27%">Application Status </th>
+                <!-- <th style="width: 27%">Application Status </th> -->
                 <th style="width: 5%;"><i class="icon-link"></i></th>
               </tr>
             </thead>
@@ -248,11 +248,9 @@
                           echo "<br>";
                           $cound++;
                         }?> &nbsp; </td>
-                <td>
-                  <?php //echo $this->fetch('attributes'); ?>
-                  <?php echo $this->element($this->fetch('attributes'), array('application' => $application)); ?>
-                  <?php  // echo $this->element('application/attributes/applicant_attributes', array('application' => $application)); ?>
-                </td>
+                <!-- <td> 
+                  <?php //echo $this->element($this->fetch('attributes'), array('application' => $application)); ?>
+                 </td> -->
 
                 <td>
                   <?php
