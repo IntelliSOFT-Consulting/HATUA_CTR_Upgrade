@@ -1102,8 +1102,8 @@ class ApplicationsController extends AppController {
                               'AuditTrail' => array(
                                   'foreign_key' => $this->Application->field('id'),
                                   'model' => 'Application',
-                                  'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . 'has been successfully approved by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
-                                  'ip' =>  $this->Application->field('protocol_no', array('id' => $this->args[0]['id']))
+                                  'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully approved by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+                                  'ip' =>  $this->Application->field('protocol_no')
                               )
                           );
                           $this->AuditTrail->Create();
