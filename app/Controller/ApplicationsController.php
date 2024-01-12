@@ -1095,6 +1095,25 @@ class ApplicationsController extends AppController {
                         }
                         //**********************************    END   *********************************
                         //end
+                          // Create a Audit Trail
+                          $this->loadModel('User');
+                          $this->loadModel('AuditTrail');
+                          $audit = array(
+                              'AuditTrail' => array(
+                                  'foreign_key' => $this->Application->field('id'),
+                                  'model' => 'Application',
+                                  'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . 'has been successfully approved by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+                                  'ip' =>  $this->Application->field('protocol_no', array('id' => $this->args[0]['id']))
+                              )
+                          );
+                          $this->AuditTrail->Create();
+                          if ($this->AuditTrail->save($audit)) {
+                              $this->log($this->args[0], 'audit_success');
+                          } else {
+                              $this->log('Error creating an audit trail', 'notifications_error');
+                              $this->log($this->args[0], 'notifications_error');
+                          }
+  
                         
                         $this->Session->setFlash(__('Successfully approved the protocol. '), 'alerts/flash_success');
                         $this->redirect(array('action' => 'view', $id));

@@ -6,7 +6,7 @@ App::uses('AppController', 'Controller');
  * @property Review $Review
  */
 class ReviewsController extends AppController {
-    public $uses = array('Review', 'Application');
+    public $uses = array('Review', 'Application','AuditTrail','User');
 
     public function beforeFilter() {
         parent::beforeFilter();
@@ -395,6 +395,22 @@ class ReviewsController extends AppController {
                     //     }
                     // }
                     // $this->Review->saveField('summary', implode("\n\n",$results));
+                       // Create a Audit Trail
+                       $audit = array(
+                        'AuditTrail' => array(
+                            'foreign_key' => $application_id,
+                            'model' => 'Application',
+                            'message' => 'A Review has been sumitted for the report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $application_id)) . ' by ' . $this->Auth->User('username'),
+                            'ip' =>  $this->Application->field('protocol_no', array('id' => $application_id))
+                        )
+                    );
+                    $this->AuditTrail->Create();
+                    if ($this->AuditTrail->save($audit)) {
+                        $this->log($this->args[0], 'audit_success');
+                    } else {
+                        $this->log('Error creating an audit trail', 'notifications_error');
+                        $this->log($this->args[0], 'notifications_error');
+                    }
                     $this->Review->saveField('summary', $results);
                 		$this->Session->setFlash(__('The review has been submitted'), 'alerts/flash_success');
                 } else {                	
