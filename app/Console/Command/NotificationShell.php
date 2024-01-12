@@ -9,41 +9,13 @@ App::uses('CakeEmail', 'Network/Email');
 
 class NotificationShell extends Shell
 {
-  public $uses = array('User', 'Application', 'Amendment', 'Review', 'Notification', 'Message');
+  public $uses = array('User', 'Application', 'Amendment', 'AuditTrail', 'Review', 'Notification', 'Message');
 
   public function perform()
   {
     $this->initialize();
     $this->{array_shift($this->args)}();
   }
-
-  /*   public function testEmail(){
-        $messages = $this->Message->find('list', array(
-                                              'conditions' => array('Message.name' => array('registration_email_subject', 'registration_email')),
-                                              'fields' => array('Message.name', 'Message.content')));
-        $variables = array(
-          'name' => '<strong>Edward Okemwa</strong>',
-          'full_base_url' => FULL_BASE_URL,
-          'ppb_ctr' => 'Pharmacy and Poisons Board Kenya Clinical Trials Registry',
-          'username' => 'eddie',
-          'activation_link' => Router::url(array('controller' => 'users', 'action' => 'activate_account', 'activation_key'), true));
-          // 'activation_link' => $this->Html->link('ACTIVATE',  array('controller' => 'users', 'action' => 'activate_account',
-          //             'full_base' => true, 'activation_key'))
-
-        $message = String::insert($messages['registration_email'], $variables);
-        // $this->log($message, 'email_message');
-       $email = new CakeEmail();
-       $email->config('gmail');
-       $email->template('default');
-       $email->emailFormat('html');
-       $email->to('edward.okemwa@intellisoftkenya.com');
-       $email->subject($messages['registration_email_subject']);
-       $email->viewVars(array('message' => $message));
-
-       if(!$email->send()) {
-           $this->log($email, 'registration_email');
-       }
-   }*/
 
   public function sendEmail()
   {
@@ -88,13 +60,30 @@ class NotificationShell extends Shell
     $email->to($this->args[0]['User']['email']);
     $sponsor_email = $this->args[0]['User']['email'];
     if (!empty($this->args[0]['User']['sponsor_email'])) $sponsor_email = $this->args[0]['User']['sponsor_email'];
-    $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org', $sponsor_email));
-    $email->bcc(array('edward.okemwa@intellisoftkenya.com'));
+    // $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org', $sponsor_email));
+    $email->bcc(array('kiprotich.japheth19@gmail.com'));
     // $email->subject(Configure::read('Emails.registration.subject'));
     $email->subject($messages['registration_email_subject']);
     $email->viewVars(array('message' => $message));
     if (!$email->send()) {
       $this->log($email, 'registration_email');
+    }
+
+    // Create a Audit Trail
+    $audit = array(
+      'AuditTrail' => array(
+        'foreign_key' => $this->args[0]['User']['id'],
+        'model' => 'User',
+        'message' => 'A new user account with the email ' . $this->args[0]['User']['email'] . ' has been created',
+        'ip' => $this->args[0]['User']['id']
+      )
+    );
+    $this->AuditTrail->Create();
+    if ($this->AuditTrail->save($audit)) {
+      $this->log($this->args[0], 'audit_success');
+    } else {
+      $this->log('Error creating user signup audit trail', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
     }
 
     $save_data = array(
@@ -147,6 +136,23 @@ class NotificationShell extends Shell
       );
     }
 
+    // Create a Audit Trail
+    $audit = array(
+      'AuditTrail' => array(
+        'foreign_key' => $this->args[0]['Application']['id'],
+        'model' => 'Application',
+        'message' => 'New Report with protocol number ' . $this->args[0]['Application']['protocol_no'] . ' has been submitted by ' . $this->args[0]['Application']['email_address'],
+        'ip' => $this->args[0]['Application']['protocol_no']
+      )
+    );
+    $this->AuditTrail->Create();
+    if ($this->AuditTrail->save($audit)) {
+      $this->log($this->args[0], 'audit_success');
+    } else {
+      $this->log('Error creating an audit trail', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
+    }
+
     // TODO : Set email accounts to cc notification
     $this->Notification->Create();
     if ($this->Notification->saveMany($save_data)) {
@@ -163,7 +169,7 @@ class NotificationShell extends Shell
     $email->template('default');
     $email->emailFormat('html');
     $email->to($this->args[0]['Application']['email']);
-    $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org'));
+    // $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org'));
     $email->bcc(array('kiprotich.japheth19@gmail.com'));
     $email->subject(Sanitize::html(String::insert($messages['applicant_submit_email_subject'], $variables), array('remove' => true)));
     $email->viewVars(array('message' => $message));
@@ -201,7 +207,22 @@ class NotificationShell extends Shell
             'user_message' => $review['Review']['text'],
           ),
         );
-
+        // Create a Audit Trail
+        $audit = array(
+          'AuditTrail' => array(
+            'foreign_key' => $review['Review']['application_id'],
+            'model' => 'Application',
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review by ' . $this->Auth->User('username'),
+            'ip' =>  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
+          )
+        );
+        $this->AuditTrail->Create();
+        if ($this->AuditTrail->save($audit)) {
+          $this->log($this->args[0], 'audit_success');
+        } else {
+          $this->log('Error creating an audit trail', 'notifications_error');
+          $this->log($this->args[0], 'notifications_error');
+        }
         //<!-- Send email to reviewers -->
         $revs = $this->User->find('all', array('conditions' => array('id' => $review['Review']['user_id'], 'is_active' => 1, 'group_id' => 3), 'contain' => array()));
 
@@ -212,7 +233,7 @@ class NotificationShell extends Shell
           $email->template('default');
           $email->emailFormat('html');
           $email->to($manager->email);
-          $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org'));
+          // $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org'));
           $email->bcc(array('kiprotich.japheth19@gmail.com'));
           $email->subject(Sanitize::html(String::insert($messages['reviewer_new_application_subject'], $variables), array('remove' => true)));
           $email->viewVars(array('message' => $message));
@@ -342,6 +363,22 @@ class NotificationShell extends Shell
     $this->Notification->Create();
     if (!$this->Notification->save($save_data)) {
       $this->log('The Notifications were not sent at managerCommentNotifyApplicant.', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
+    }
+    // Create a Audit Trail
+    $audit = array(
+      'AuditTrail' => array(
+        'foreign_key' => $this->args[0]['application_id'],
+        'model' => 'Application',
+        'message' => 'Manager comments has been sent for report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $this->args[0]['application_id'])) . ' by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+        'ip' =>  $this->Application->field('protocol_no', array('id' => $this->args[0]['application_id']))
+      )
+    );
+    $this->AuditTrail->Create();
+    if ($this->AuditTrail->save($audit)) {
+      $this->log($this->args[0], 'audit_success');
+    } else {
+      $this->log('Error creating an audit trail', 'notifications_error');
       $this->log($this->args[0], 'notifications_error');
     }
   }
