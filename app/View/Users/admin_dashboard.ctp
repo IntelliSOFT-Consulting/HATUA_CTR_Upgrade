@@ -84,6 +84,23 @@
         </li>
       </ul>
       <hr>
+
+      <h5>Screening & Reviewer Comments <small class="muted">(Templates)</small> </h5>
+      <ul class="nav nav-tabs nav-stacked">        
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-search"></i> Screening <small class="muted">(Edit content)</small>',
+          array('controller' => 'pockets', 'action' => 'edit', 50, 'admin' => true), array('escape' => false));
+        ?>
+        </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-stethoscope"></i> Reviewer Comments <small class="muted">(Edit content)</small>',
+          array('controller' => 'pockets', 'action' => 'edit', 51, 'admin' => true), array('escape' => false));
+        ?>
+        </li>
+      </ul>
+      <hr>
       <h4><img alt="" src="/img/comments.ico" style="width: 25px;">&nbsp;<?php
         echo $this->Html->link('User Feedback', array('controller' => 'feedbacks'), array('escape' => false));
         ?><small class="muted">&nbsp;(From Contact Us page)</small></h4>
