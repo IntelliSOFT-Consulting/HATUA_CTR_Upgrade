@@ -67,6 +67,30 @@ class ApplicationsController extends AppController
             $ccolor = 'success';
             $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Application <br>Creation', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
 
+            // Incase It was unsubmitted Unsubmitted
+            if ($application['Application']['unsubmitted']) {
+                $stages['Unsubmitted'] = ['label' => 'Unsubmitted', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=Unsubmitted].id')) {
+                    $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
+                    $scr_s = new DateTime($scr['start_date']);
+                    $scr_e = new DateTime($scr['end_date']);
+                    $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
+                    // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                    $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
+
+                    $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
+                    // $stages['Unsubmitted']['days'] = $scr_s->diff($scr_e)->format('%a');                
+                    $stages['Unsubmitted']['days'] = $this->diff_wdays($scr_s, $scr_e);
+
+                    if ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 0 && $stages['Unsubmitted']['days'] <= 5) {
+                        $stages['Unsubmitted']['color'] = 'warning';
+                    } elseif ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 5) {
+                        $stages['Unsubmitted']['color'] = 'danger';
+                    } else {
+                        $stages['Unsubmitted']['color'] = 'success';
+                    }
+                }
+            }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if (Hash::check($application['ApplicationStage'], '{n}[stage=Screening].id')) {
@@ -1697,7 +1721,65 @@ class ApplicationsController extends AppController
             $this->redirect(array('action' => 'index'));
         }
 
+        $app = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+        ));
+        // debug($app['Application']['date_submitted']);
+        // exit;
+        $current = $app['Application']['date_submitted'];
         if ($this->Application->saveField('submitted', 0)) {
+
+            $formattedDate  = date('Y-m-d H:i:s', strtotime($current));
+            $this->Application->saveField('unsubmitted', 1);
+            $this->Application->saveField('initial_date_submitted', $formattedDate);
+
+            $stages = $this->Application->ApplicationStage->find('all', array(
+                'contain' => array(),
+                'conditions' => array('ApplicationStage.application_id' => $id)
+            ));
+            if (!Hash::check($stages, '{n}.ApplicationStage[stage=Unsubmitted].id')) {
+                $this->Application->ApplicationStage->create();
+                $this->Application->ApplicationStage->save(
+                    array(
+                        'ApplicationStage' => array(
+                            'application_id' => $id,
+                            'stage' => 'Unsubmitted',
+                            'status' => 'Current',
+                            'comment' => 'Admin unsubmission',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d')
+                        )
+                    )
+                );
+            } else {
+                $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Unsubmitted]');
+                if (!empty($var)) {
+                    $s1['ApplicationStage'] = min($var);
+                    if (empty($s1['ApplicationStage']['end_date'])) {
+                        $this->Application->ApplicationStage->create();
+                        $s1['ApplicationStage']['status'] = 'Current';
+                        $s1['ApplicationStage']['comment'] = 'Admin unsubmission';
+                        $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                        $this->Application->ApplicationStage->save($s1);
+                    }
+                }
+            }
+            $this->loadModel('AuditTrail');
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $id,
+                    'model' => 'Application',
+                    'message' => 'A Report with protocol number ' . $app['Application']['protocol_no'] . ' has been unsubmitted by ' . $this->Auth->user('name'),
+                    'ip' => $app['Application']['protocol_no']
+                )
+            );
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($app['Application']['protocol_no'], 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'audit_error');
+                $this->log($app['Application']['protocol_no'], 'audit_error');
+            }
             $this->Session->setFlash(__('The application has been successfully Unsubmitted.
                 The user is now able to edit the application.'), 'alerts/flash_success');
             $this->redirect($this->referer());
