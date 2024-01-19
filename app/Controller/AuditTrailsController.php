@@ -29,7 +29,7 @@ class AuditTrailsController extends AppController {
 	public function admin_index()
     {
 		$this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '20' => '20', '50' => '50');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
         else $this->paginate['limit'] = reset($page_options);

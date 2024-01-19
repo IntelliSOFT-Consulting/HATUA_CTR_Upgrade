@@ -143,7 +143,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
  * config.font_names = 'Arial;Times New Roman;Verdana';
  */
 CKEDITOR.config.font_names =
-	'Arial/Arial, Helvetica, sans-serif;' +
+	'Arial/Arial, Helvetica, sans-serif;'+
+    'Bookman Old Style/Bookman Old Style, serif;' +
 	'Comic Sans MS/Comic Sans MS, cursive;' +
 	'Courier New/Courier New, Courier, monospace;' +
 	'Georgia/Georgia, serif;' +
