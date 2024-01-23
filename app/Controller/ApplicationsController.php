@@ -1438,6 +1438,19 @@ class ApplicationsController extends AppController
      * @param string $id
      * @return void
      */
+
+    public function clear_all_other_stages($id = null)
+    {
+        $stages = $this->Application->ApplicationStage->find('all', array(
+            'contain' => array(),
+            'conditions' => array('ApplicationStage.application_id' => $id)
+        ));
+        if($stages){
+            foreach ($stages as $stage) {
+                $this->Application->ApplicationStage->delete($stage['ApplicationStage']['id']);
+            }
+        }
+    }
     public function applicant_edit($id = null)
     {
         $this->Application->id = $id;
@@ -1465,6 +1478,7 @@ class ApplicationsController extends AppController
                 $this->request->data['Application']['submitted'] = 1;
                 $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
                 //Start application stage
+                $this->clear_all_other_stages($id);
                 $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
                 $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
                 $this->request->data['ApplicationStage'][0]['status'] = 'Current';
