@@ -134,7 +134,7 @@ class AnnualLettersController extends AppController
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
             'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
-            'study_title' => $application['Application']['short_title'],
+            'study_title' => $application['Application']['study_title'],
             'checklist' => $checkstring,
             'expiry_date' => $expiry_date
         );
@@ -858,7 +858,7 @@ class AnnualLettersController extends AppController
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
             'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
-            'study_title' => $application['Application']['short_title'],
+            'study_title' => $application['Application']['study_title'],
             'checklist' => $checkstring,
             'expiry_date' => $expiry_date
         );
