@@ -1514,6 +1514,24 @@ class ApplicationsController extends AppController
                         );
                         CakeResque::enqueue('default', 'NotificationShell', array('ppbNewApplication', $data));
 
+                        // Create a Audit Trail
+                        $audit = array(
+                            'AuditTrail' => array(
+                                'foreign_key' => $response['Application']['id'],
+                                'model' => 'Application',
+                                'message' => 'New Report with protocol number ' . $response['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
+                                'ip' => $response['Application']['protocol_no']
+                            )
+                        );
+                        $this->loadModel('AuditTrail');
+                        $this->AuditTrail->Create();
+                        if ($this->AuditTrail->save($audit)) {
+                            $this->log($this->request->data, 'audit_success');
+                        } else {
+                            $this->log('Error creating an audit trail', 'notifications_error');
+                            $this->log($this->request->data, 'notifications_error');
+                        }
+
                         $this->Session->setFlash(__('You have successfully submitted the application to PPB.
                             Your assigned protocol number is ' . $data['Application']['protocol_no'] . '. PPB will review
                             this application and notify you on the progress. You can view the progress of the application by clicking on

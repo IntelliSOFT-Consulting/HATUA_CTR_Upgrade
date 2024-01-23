@@ -136,22 +136,7 @@ class NotificationShell extends Shell
       );
     }
 
-    // Create a Audit Trail
-    $audit = array(
-      'AuditTrail' => array(
-        'foreign_key' => $this->args[0]['Application']['id'],
-        'model' => 'Application',
-        'message' => 'New Report with protocol number ' . $this->args[0]['Application']['protocol_no'] . ' has been submitted by ' . $this->args[0]['Application']['email_address'],
-        'ip' => $this->args[0]['Application']['protocol_no']
-      )
-    );
-    $this->AuditTrail->Create();
-    if ($this->AuditTrail->save($audit)) {
-      $this->log($this->args[0], 'audit_success');
-    } else {
-      $this->log('Error creating an audit trail', 'notifications_error');
-      $this->log($this->args[0], 'notifications_error');
-    }
+   
 
     // TODO : Set email accounts to cc notification
     $this->Notification->Create();
