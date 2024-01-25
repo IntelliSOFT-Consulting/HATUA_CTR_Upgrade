@@ -32,14 +32,14 @@ class Application extends AppModel
         'trial_therapeutic_exploratory' => array('type' => 'value'),
         'trial_therapeutic_confirmatory' => array('type' => 'value'),
         'trial_therapeutic_use' => array('type' => 'value'),
-        'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Application.created BETWEEN ? AND ?'),
+        'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Application.date_submitted BETWEEN ? AND ?'),
         'investigator' => array('type' => 'query', 'method' => 'findByInvestigators', 'encode' => true),
         'users' => array('type' => 'query', 'method' => 'findByReviewer', 'encode' => true),
         'ercs' => array('type' => 'query', 'method' => 'findByErc', 'encode' => true),
         'sites' => array('type' => 'query', 'method' => 'orSites', 'encode' => true),
         'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
         'month_year' => array('type' => 'query', 'method' => 'dummy'),
-        'mode' => array('type' => 'expression', 'method' => 'makeMonthYearCondition', 'field' => 'Application.created BETWEEN ? AND ?'),
+        'mode' => array('type' => 'expression', 'method' => 'makeMonthYearCondition', 'field' => 'Application.date_submitted BETWEEN ? AND ?'),
     );
 
     public function dummy($data = array())
@@ -1582,6 +1582,9 @@ class Application extends AppModel
             }
             if (isset($val['Application']['date_submitted'])) {
                 $results[$key]['Application']['date_submitted'] = $this->dateFormatAfterFind($val['Application']['date_submitted']);
+            }
+            if (isset($val['Application']['initial_date_submitted'])) {
+                $results[$key]['Application']['initial_date_submitted'] = $this->dateFormatAfterFind($val['Application']['initial_date_submitted']);
             }
             if (isset($val['Application']['declaration_date1'])) {
                 $results[$key]['Application']['declaration_date1'] = $this->dateFormatAfterFind($val['Application']['declaration_date1']);
