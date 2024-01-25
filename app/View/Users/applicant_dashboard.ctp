@@ -15,7 +15,9 @@
       $stages = $this->requestAction(
           'applications/stages/'.key($apps)   //get first element of array
       );
-         // debug($stages);
+      // debug(key($apps));
+      //    debug($stages);
+      //    exit;
   ?>
 <div class="row-fluid">  
   <div class="span12">

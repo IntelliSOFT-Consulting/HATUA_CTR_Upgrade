@@ -121,7 +121,7 @@
         ?>
         </fieldset>
       <?php echo  $this->Form->end(array(
-                'label' => 'Paste Signagure and Upload',
+                'label' => 'Paste Signature and Upload',
                 'value' => 'Approve',
                 'class' => 'btn btn-success',
                 'div' => array(
