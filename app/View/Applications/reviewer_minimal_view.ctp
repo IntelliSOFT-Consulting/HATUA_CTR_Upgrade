@@ -70,6 +70,28 @@
                     </div> </div>',
               'options' => array('declined' => 'Decline'),
             ));
+            
+            echo $this->Form->input('conflict', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+              'class' => 'conflict',
+              'before' => '<div class="control-group">   <label class="control-label required">
+              Do you have any conflict? <span class="sterix">*</span></label>  <div class="controls">
+                <input type="hidden" value="" id="ReviewApproved_" name="data[Review][conflict]"> <label class="radio inline">',
+              'after' => '</label>',
+              'options' => array('Yes' => 'Yes'),
+            ));
+            echo $this->Form->input('conflict', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'conflict',
+              'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+              'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+              'before' => '<label class="radio inline">',
+              'after' => '</label>
+                    <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                    onclick="$(\'.conflict\').removeAttr(\'checked disabled\')">
+                    <em class="accordion-toggle">clear!</em></a> </span>
+                    </div> </div>',
+              'options' => array('No' => 'No'),
+            ));
             echo $this->Form->input('password', array('type' => 'password', 'label' => 'Your Password *'));
             echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
             echo $this->Form->input('recommendation', array('type' => 'textarea', 'rows' => 3, 'label' => 'Message <small>(if any)</small>'));
