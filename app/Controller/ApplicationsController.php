@@ -232,7 +232,7 @@ class ApplicationsController extends AppController
             $stages['AnnualApproval'] = ['label' => 'Annual <br>Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if (Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
                 $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
-                $ann_s = new DateTime();
+                $ann_s = new DateTime($ann['start_date']);
                 $ann_e = new DateTime($ann['end_date']);
 
                 $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
