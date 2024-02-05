@@ -1,4 +1,7 @@
 <?php
+
+App::import('Vendor', 'QRCode', array('file' => 'chillerlan' . DS . 'QRCode' . DS . 'QRCode.php'));
+
 App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
@@ -12,6 +15,15 @@ App::uses('Sanitize', 'Utility');
 class AnnualLettersController extends AppController
 {
     public $uses = array('User', 'Application', 'Message', 'Pocket', 'AnnualLetter');
+    public $helpers = array('QrCode');
+
+
+    public function beforeFilter()
+    {
+        parent::beforeFilter();
+        // $this->Auth->allow();
+        $this->Auth->allow('verify');
+    }
     /**
      * index method
      *
@@ -22,7 +34,22 @@ class AnnualLettersController extends AppController
         $this->AnnualLetter->recursive = 0;
         $this->set('AnnualLetters', $this->paginate());
     }
+    public function verify($id = null)
+    {
+        $this->AnnualLetter->id = $id;
+        if (!$this->AnnualLetter->exists()) {
+            throw new NotFoundException(__('Invalid annual approval letter'));
+        }
 
+        $data = $this->AnnualLetter->read(null, $id);
+        $this->pdfConfig = array(
+            'filename' => 'ApprovalLetter_' . $id,
+            'orientation' => 'portrait',
+        );
+        $this->set('AnnualLetter', $data);
+
+        $this->render('pdf/download');
+    }
     /**
      * view method
      *
@@ -43,11 +70,20 @@ class AnnualLettersController extends AppController
                 'orientation' => 'portrait',
             );
         }
-        
-        $data = $this->AnnualLetter->read(null, $id); 
-        $htmlContent = $data['AnnualLetter']['content'];
-        $modifiedHtmlContent = $this->removeAddressLenanaSection($htmlContent);
-        $data['AnnualLetter']['content']=$modifiedHtmlContent; 
+
+        // $data = $this->AnnualLetter->read(null, $id); 
+
+        $data = $this->AnnualLetter->find('first',array(
+                'contain' => array(),
+                'conditions' => array('AnnualLetter.id' => $id)
+            )
+        );
+
+        debug($data);
+        exit;
+        // $htmlContent = $data['AnnualLetter']['content'];
+        // $modifiedHtmlContent = $this->removeAddressLenanaSection($htmlContent);
+        // $data['AnnualLetter']['content']=$modifiedHtmlContent; 
         $this->set('AnnualLetter', $data);
 
         $this->render('download');
@@ -57,14 +93,14 @@ class AnnualLettersController extends AppController
         $patterns = [
             '/<h3[^>]*>.*?<\/h3>/s', // Remove <h3> section
             '/<p style="text-align: center;">.*?<\/p>/s', // Remove additional section
-            '/<address>.*?<\/address>/s', 
+            '/<address>.*?<\/address>/s',
         ];
-    
+
         // Remove both specified sections using regular expressions
         foreach ($patterns as $pattern) {
             $htmlContent = preg_replace($pattern, '', $htmlContent);
         }
-    
+
         return $htmlContent;
     }
 
@@ -389,7 +425,7 @@ class AnnualLettersController extends AppController
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
             'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
-            'study_title' => $application['Application']['short_title'],
+            'study_title' => $application['Application']['study_title'],
             'checklist' => $checkstring,
             'status' => $application['TrialStatus']['name'],
             'expiry_date' => $expiry_date

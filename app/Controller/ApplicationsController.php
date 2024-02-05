@@ -65,32 +65,14 @@ class ApplicationsController extends AppController
             //creation
             $csd = new DateTime($application['Application']['created']);
             $ccolor = 'success';
-            $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Application <br>Creation', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
+            $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Application <br>Creation', 'days' => '0', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
 
-            // Incase It was unsubmitted Unsubmitted
-            if ($application['Application']['unsubmitted']) {
-                $stages['Unsubmitted'] = ['label' => 'Unsubmitted', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
-                if (Hash::check($application['ApplicationStage'], '{n}[stage=Unsubmitted].id')) {
-                    $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
-                    $scr_s = new DateTime($scr['start_date']);
-                    $scr_e = new DateTime($scr['end_date']);
-                    $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
-                    // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
-                    $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
-
-                    $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
-                    // $stages['Unsubmitted']['days'] = $scr_s->diff($scr_e)->format('%a');                
-                    $stages['Unsubmitted']['days'] = $this->diff_wdays($scr_s, $scr_e);
-
-                    if ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 0 && $stages['Unsubmitted']['days'] <= 5) {
-                        $stages['Unsubmitted']['color'] = 'warning';
-                    } elseif ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 5) {
-                        $stages['Unsubmitted']['color'] = 'danger';
-                    } else {
-                        $stages['Unsubmitted']['color'] = 'success';
-                    }
-                }
-            }
+            //Submisssion
+            // if ($application['Application']['submitted']) {
+            //     $csd = new DateTime($application['Application']['date_submited']);
+            //     $ccolor = 'success';
+            //     $stages['Submission'] = ['application_name' => $application_name, 'label' => 'Application <br>Submission', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
+            // }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if (Hash::check($application['ApplicationStage'], '{n}[stage=Screening].id')) {
@@ -104,6 +86,7 @@ class ApplicationsController extends AppController
                 $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');
                 // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
                 $stages['Screening']['days'] = $this->diff_wdays($scr_s, $scr_e);
+                $stages['Screening']['end_date'] = $scr_e->format('d-M-Y');
 
                 if ($scr['status'] == 'Current' && $stages['Screening']['days'] > 0 && $stages['Screening']['days'] <= 5) {
                     $stages['Screening']['color'] = 'warning';
@@ -113,7 +96,32 @@ class ApplicationsController extends AppController
                     $stages['Screening']['color'] = 'success';
                 }
             }
+            // Incase It was unsubmitted Unsubmitted
+            if ($application['Application']['unsubmitted']) {
+                $stages['Unsubmitted'] = ['label' => 'Unsubmitted', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=Unsubmitted].id')) {
+                    $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
+                    $scr_s = new DateTime($scr['start_date']);
+                    $scr_e = new DateTime($scr['end_date']);
+                    $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
+                    $stages['Creation']['end_date'] = $scr_e->format('d-M-Y');
+                    // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                    $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
 
+                    $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
+                    $stages['Unsubmitted']['end_date'] = $scr_e->format('d-M-Y');
+                    // $stages['Unsubmitted']['days'] = $scr_s->diff($scr_e)->format('%a');                
+                    $stages['Unsubmitted']['days'] = $this->diff_wdays($scr_s, $scr_e);
+
+                    if ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 0 && $stages['Unsubmitted']['days'] <= 5) {
+                        $stages['Unsubmitted']['color'] = 'warning';
+                    } elseif ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 5) {
+                        $stages['Unsubmitted']['color'] = 'danger';
+                    } else {
+                        $stages['Unsubmitted']['color'] = 'success';
+                    }
+                }
+            }
             //Submission by sponsor
             $stages['ScreeningSubmission'] = ['label' => 'Response to <br>Queries', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if (Hash::check($application['ApplicationStage'], '{n}[stage=ScreeningSubmission].id')) {
@@ -122,6 +130,7 @@ class ApplicationsController extends AppController
                 $ssb_e = new DateTime($ssb['end_date']);
 
                 $stages['ScreeningSubmission']['start_date'] = $ssb_s->format('d-M-Y');
+                $stages['ScreeningSubmission']['end_date'] = $ssb_e->format('d-M-Y');
                 // $stages['ScreeningSubmission']['days'] = $ssb_s->diff($ssb_e)->format('%a');  
                 $stages['ScreeningSubmission']['days'] = $this->diff_wdays($ssb_s, $ssb_e);
 
@@ -142,6 +151,7 @@ class ApplicationsController extends AppController
                 $asn_e = new DateTime($asn['end_date']);
 
                 $stages['Assign']['start_date'] = $asn_s->format('d-M-Y');
+                $stages['Assign']['end_date'] = $asn_e->format('d-M-Y');
                 // $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a'); 
                 $stages['Assign']['days'] = $this->diff_wdays($asn_s, $asn_e);
 
@@ -162,6 +172,7 @@ class ApplicationsController extends AppController
                 $rev_e = new DateTime($rev['end_date']);
 
                 $stages['Review']['start_date'] = $rev_s->format('d-M-Y');
+                $stages['Review']['end_date'] = $rev_e->format('d-M-Y');
                 // $stages['Review']['days'] = $rev_s->diff($rev_e)->format('%a');  
                 $stages['Review']['days'] = $this->diff_wdays($rev_s, $rev_e);
 
@@ -182,6 +193,7 @@ class ApplicationsController extends AppController
                 $rsb_e = new DateTime($rsb['end_date']);
 
                 $stages['ReviewSubmission']['start_date'] = $rsb_s->format('d-M-Y');
+                $stages['ReviewSubmission']['end_date'] = $rsb_e->format('d-M-Y');
                 // $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a'); 
                 $stages['ReviewSubmission']['days'] = $this->diff_wdays($rsb_s, $rsb_e);
 
@@ -202,6 +214,7 @@ class ApplicationsController extends AppController
                 $fin_e = new DateTime($fin['end_date']);
 
                 $stages['FinalDecision']['start_date'] = $fin_s->format('d-M-Y');
+                $stages['FinalDecision']['end_date'] = $fin_e->format('d-M-Y');
                 // $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
                 $stages['FinalDecision']['days'] = $this->diff_wdays($fin_s, $fin_e);
 
@@ -223,6 +236,8 @@ class ApplicationsController extends AppController
                 $ann_e = new DateTime($ann['end_date']);
 
                 $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
+                $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
+
                 $stages['AnnualApproval']['days'] = $ann_s->diff($ann_e)->format('%a');
 
                 if ($ann['status'] == 'Current') {
@@ -821,7 +836,7 @@ class ApplicationsController extends AppController
             'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request',  'Review.application_id' => $id),
             'fields' => array('Review.id', 'Review.accepted')
         ));
-        debug($my_applications);
+        // debug($my_applications);
         $accept = array_search('accepted', $my_applications);
         $declined = array_search('declined', $my_applications);
         // if (isset($my_applications[$id])) {
@@ -1445,9 +1460,13 @@ class ApplicationsController extends AppController
             'contain' => array(),
             'conditions' => array('ApplicationStage.application_id' => $id)
         ));
-        if($stages){
+        // debug($stages);
+        // exit;
+        if ($stages) {
             foreach ($stages as $stage) {
-                $this->Application->ApplicationStage->delete($stage['ApplicationStage']['id']);
+                if ($stage['ApplicationStage']['stage'] !== 'Unsubmitted') {
+                    $this->Application->ApplicationStage->delete($stage['ApplicationStage']['id']);
+                }
             }
         }
     }
@@ -1477,11 +1496,29 @@ class ApplicationsController extends AppController
                 $validate = 'first';
                 $this->request->data['Application']['submitted'] = 1;
                 $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
-                //Start application stage
-                $this->clear_all_other_stages($id);
-                $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
-                $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
-                $this->request->data['ApplicationStage'][0]['status'] = 'Current';
+                //Start application stage 
+                if ($response['Application']['unsubmitted']) {
+                    $stages = $this->Application->ApplicationStage->find('all', array(
+                        'contain' => array(),
+                        'conditions' => array('ApplicationStage.application_id' => $id)
+                    ));
+                    $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Unsubmitted]');
+                    if (!empty($var)) {
+                        $s1['ApplicationStage'] = min($var);
+                        if (empty($s1['ApplicationStage']['end_date'])) {
+                            $this->Application->ApplicationStage->create();
+                            $s1['ApplicationStage']['status'] = 'Complete';
+                            $s1['ApplicationStage']['comment'] = 'Principal Investigator Re Submission';
+                            $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                            $this->Application->ApplicationStage->save($s1);
+                        }    
+                    }        
+
+                } else {
+                    $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
+                    $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
+                    $this->request->data['ApplicationStage'][0]['status'] = 'Current';
+                }
                 //
                 if (empty($response['Application']['protocol_no'])) {
                     $count = $this->Application->find('count',  array('conditions' => array(
@@ -1778,8 +1815,7 @@ class ApplicationsController extends AppController
                             'stage' => 'Unsubmitted',
                             'status' => 'Current',
                             'comment' => 'Admin unsubmission',
-                            'start_date' => date('Y-m-d'),
-                            'end_date' => date('Y-m-d')
+                            'start_date' => date('Y-m-d'), 
                         )
                     )
                 );

@@ -254,21 +254,28 @@ echo $this->Session->flash();
             echo "<li>";
             $responded = false;
             foreach ($application['Review'] as $response) {
+              
               if ($response['user_id'] == $user_id) {
                 if ($response['type'] == 'request' && $response['accepted'] == '') {
                   $responded = true;
                   echo '<p class="text-info"><i class="icon-check-empty"> </i> ' . $user . '.
                                <small class="muted">(Notified but no response yet. 
                                 <a class="ResendReview tiptip" href="#" id="' . $response['id'] . '" title="Resend Notification?">Resend?</a>)</small> </p>';
-                } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
+                                if($response['conflict'] != ''){
+                                echo '<p>Has Conflict of interest? <b>'.$response['conflict'].'</b> </p>';}
+                                             } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
                   $responded = true;
                   echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . ' <small class="muted">(Accepts)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
                   // echo '<p><i class="icon-minus"> </i> '.$response['text'].'</p>';
+                  echo '<p>Has Conflict of interest? '.$response['conflict'].' </p>';
                 } elseif ($response['type'] == 'request' && $response['accepted'] == 'declined') {
                   $responded = true;
                   echo '<p class="text-error"><i class="icon-remove"> </i> ' . $user . ' <small class="muted">(Declines)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
+                  echo '<p>Has Conflict of interest? '.$response['conflict'].' </p>';
+                   
                 }
               }
+             
             }
 
             if (!$responded) {
