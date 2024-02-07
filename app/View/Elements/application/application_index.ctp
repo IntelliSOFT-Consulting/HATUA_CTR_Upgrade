@@ -156,7 +156,7 @@
               <?php
                 echo $this->Form->input('start_date',
                   array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
-                      'label' => array('class' => 'required', 'text' => 'Application Create Dates'), 'placeHolder' => 'Start Date'));
+                      'label' => array('class' => 'required', 'text' => 'Application Submission Dates'), 'placeHolder' => 'Start Date'));
                 echo $this->Form->input('end_date',
                   array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
                        'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
@@ -232,6 +232,18 @@
                 }
                 ?>
               </td>              
+            </tr>
+            <tr class="searchmore" style="display: none;">
+            <td>
+                <?php
+                  //pr($this->request->params); //REMEMBER to limit this for administrators, managers and inspector only
+                  if($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                    echo $this->Form->input('month_year',
+                    array('div' => false, 'type' => 'text', 'class' => 'input-small datepicker', 'after' => '',
+                        'label' => array('class' => 'required', 'text' => 'Month/Year'), 'placeHolder' => 'Select Month'));
+                  }
+                ?>
+              </td>
             </tr>
           </tbody>
          </table>
@@ -447,6 +459,24 @@ $(function() {
       $(this).html('<small><i class="icon-caret-right"></i> Extended search...</small>');
     }
   });
+  $('.datepicker').datepicker({
+    changeMonth: true,
+    changeYear: true,
+    showButtonPanel: true,
+    maxDate: "-0D",
+    dateFormat: 'mm-yy', // Set the datepicker format
+   
+    beforeShow: function (input, inst) {
+        inst.dpDiv.css({marginTop: '0', marginLeft: input.offsetWidth + 'px'});
+        if ((datestr = $(this).val()).length > 0) {
+            year = datestr.substring(datestr.length-4, datestr.length);
+            month = datestr.substring(0, 2);
+            $(this).datepicker('option', 'defaultDate', new Date(year, month-1, 1));
+            $(this).datepicker('setDate', new Date(year, month-1, 1));
+        }
+    }
+});
+
 
 
 });

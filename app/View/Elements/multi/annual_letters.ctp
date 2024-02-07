@@ -88,7 +88,65 @@
               ) {               
   ?>
     <div class="ctr-groups">
+      <!-- Add tabs for comments here -->
+      <ul id="rreview_tab" class="nav nav-tabs">
+        <li class="active"><a href="#letter_view">Annual Letter</a></li> 
+        <li><a href="#query">Comments</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="letter_view">
         <?php   echo $anl["content"]; ?> &nbsp;
+       
+        <?php  
+        if(!empty($anl['qrcode'])){
+        $decodedImage = base64_decode($anl['qrcode']);
+        echo $decodedImage;}
+        ?>
+         
+
+        </div>
+        <div class="tab-pane" id="query"> 
+        <div class="row-fluid">
+            <div class="span12">
+              <br>
+              <div class="amend-form">
+                <ul id="rreview_tab" class="nav nav-tabs">
+                  <li class="active"><a href="#rreview_comment_list">COMMENTS/QUERIES</a></li>
+                  <li><a href="#rreview_comments_add">Add Comment</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="rreview_comment_list">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <?php echo $this->element('comments/list_expandable', ['comments' => $anl['ExternalComment']]) ?>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="tab-pane " id="rreview_comments_add">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <?php
+                        echo $this->element('comments/add', [
+                          'model' => [
+                            'model_id' => $application['Application']['id'], 
+                            'foreign_key' => $anl['id'],
+                            'model' => 'AnnualLetter',
+                            'type' => 0, 
+                            'category' => 'annual', 
+                            'url' => 'add_annual_letter'
+                          ]
+                        ])
+                        ?>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!--/span-->
+          </div><!--/row-->   
+        </div>
+      </div>
     </div>
   <?php } } } ?>
 
@@ -137,7 +195,7 @@
         ?>
         </fieldset>
       <?php echo  $this->Form->end(array(
-                'label' => 'Paste Signagure and Approve',
+                'label' => 'Paste Signature and Approve',
                 'value' => 'Approve',
                 'class' => 'btn btn-success',
                 'div' => array(

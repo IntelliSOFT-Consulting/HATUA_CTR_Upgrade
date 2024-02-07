@@ -1,5 +1,5 @@
 <?php
-  // $this->Html->script('jqprint.0.3', array('inline' => false));
+  $this->Html->script('conflict', array('inline' => false));
   $this->assign('Applications', 'active');
  ?>
 
@@ -48,9 +48,32 @@
                       array('url' => array('controller' => 'reviews', 'action' => 'respond')));
             $acceptedError = '';
             if($this->Form->isFieldError('title')) $acceptedError = 'error';
+          
+            
+            echo $this->Form->input('conflict', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+              'class' => 'conflict ',
+              'before' => '<div class="control-group">   <label class="control-label required">
+              Do you have any conflict? <span class="sterix">*</span></label>  <div class="controls">
+                <input type="hidden" value="" id="ReviewApproved_" name="data[Review][conflict]"> <label class="radio inline">',
+              'after' => '</label>',
+              'options' => array('Yes' => 'Yes'),
+            ));
+            echo $this->Form->input('conflict', array(
+              'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'conflict',
+              'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+              'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+              'before' => '<label class="radio inline">',
+              'after' => '</label>
+                    <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                    onclick="$(\'.conflict\').removeAttr(\'checked disabled\')">
+                    <em class="accordion-toggle">clear!</em></a> </span>
+                    </div> </div>',
+              'options' => array('No' => 'No'),
+            ));
             echo $this->Form->input('accepted', array(
               'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
-              'class' => 'accepted_',
+              'class' => 'accepted_ conflictStatus',
               'before' => '<div class="control-group '.$acceptedError.'">
                       <label class="control-label required"> </label> <div class="controls">
                       <input type="hidden" value="" id="ReviewAccepted_" name="data[Review][accepted]"> <label class="radio inline">',
@@ -59,7 +82,7 @@
             ));
             echo $this->Form->input('accepted', array(
               'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false,
-              'class' => 'accepted_',
+              'class' => 'accepted_ conflictStatus',
               'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
               'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
               'before' => '<label class="radio inline">',

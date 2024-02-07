@@ -108,7 +108,7 @@
   </div>
   
 <!-- Annual Approval Checklists -->
-  <h4 style="background-color: #37732c; color: #fff; text-align: center;">Annual Approval Checklist</h4>
+  <h4 style="background-color: #37732c; color: #fff; text-align: center;">Annual Approval Checklist </h4>
   <p><small>All submitted documents should be version referenced and dated.</small></p>
   <table  class="table table-bordered table-condensed table-striped">
     <thead>
@@ -178,8 +178,15 @@
   <hr>
   <h5>Checklist Form</h5>
     <?php 
-    if ($redir == 'applicant') {       
+    if ($redir == 'applicant') {     
+      if(empty($application['Application']['trial_status_id'])){
     ?>
+  <div class="well">  
+    <h4>Please Update Protocol's trial status to proceed</h4>
+  </div>
+  <?php
+      }
+  else{?>
       <div class="well">        
         <table id="pastyears"  class="table table-bordered  table-condensed table-striped">
           <thead>
@@ -279,4 +286,4 @@
           </tbody>
         </table>
       </div>
-    <?php } ?>
+    <?php } } ?>

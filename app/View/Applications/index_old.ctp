@@ -64,7 +64,7 @@
 				<?php
 					echo $this->Form->input('start_date',
 						array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
-							  'label' => array('class' => 'required', 'text' => 'Application Create Dates'), 'placeHolder' => 'Start Date'));
+							  'label' => array('class' => 'required', 'text' => 'Application Submission Dates'), 'placeHolder' => 'Start Date'));
 					echo $this->Form->input('end_date',
 						array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
 							   'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
@@ -247,7 +247,7 @@ $(function() {
         <?php
           echo $this->Form->input('start_date',
             array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
-                'label' => array('class' => 'required', 'text' => 'Application Create Dates'), 'placeHolder' => 'Start Date'));
+                'label' => array('class' => 'required', 'text' => 'Application Submission Dates'), 'placeHolder' => 'Start Date'));
           echo $this->Form->input('end_date',
             array('div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
                  'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >

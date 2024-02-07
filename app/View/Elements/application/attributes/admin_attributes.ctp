@@ -59,7 +59,11 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
         <td><span><?php
                   if ($application['Application']['submitted']) {
                     echo "<span class='text-success'><i class='icon-ok'></i> <em>(submitted!)</em></span>";
+                    if ($application['Application']['unsubmitted']) {
+                      echo "<br>".$application['Application']['initial_date_submitted'];
+                    }else{
                     echo "<br>".$application['Application']['date_submitted'];
+                    }
                   } else {
                     echo "<span class='text-error'><i class='icon-remove'></i> <em>(not submitted!)</em></span>";
                   }

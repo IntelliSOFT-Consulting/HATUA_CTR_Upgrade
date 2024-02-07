@@ -1,0 +1,1 @@
+ALTER TABLE `applications` ADD `unsubmitted` TINYINT(2) NULL DEFAULT '0' AFTER `date_submitted`, ADD `initial_date_submitted` DATETIME NULL AFTER `unsubmitted`;
