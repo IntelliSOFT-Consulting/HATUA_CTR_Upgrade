@@ -238,7 +238,9 @@ class ApplicationsController extends AppController
                 $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
                 $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
 
-                $stages['AnnualApproval']['days'] = $ann_s->diff($ann_e)->format('%a');
+                $ann_now = new DateTime();
+
+                $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
 
                 if ($ann['status'] == 'Current') {
                     $stages['AnnualApproval']['color'] = 'success';
