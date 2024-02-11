@@ -160,10 +160,6 @@
 
                     echo $this->Html->link('<i class="icon-remove"></i> Clear', array('action' => 'index'), array('class' => 'btn', 'escape' => false, 'style' => array('margin-bottom: 5px')));
                     echo "<br>";
-                    // if($redir) echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array('action' => 'index', 'ext' => 'csv'), array('class' => 'btn btn-success', 'escape' => false));
-                    // debug($this->request->named);
-                    // debug($this->request['named']);
-                    // debug($this->request->params['named']);
                     if ($redir) echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array_merge(array('action' => 'index', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     // echo $this->Html->link('<i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel', array('action' => 'index', 'ext' => 'csv', '?' => $this->request->query), array('class' => 'btn btn-success', 'escape' => false));
                     ?>
@@ -254,7 +250,6 @@
                         ),
                         'label' => array('class' => 'required', 'text' => 'Status'),
                       ));
-                     
                     }
                     ?>
                   </td>
@@ -286,20 +281,22 @@
                   </td>
                 </tr>
                 <tr class="searchmore" style="display: none;">
-                  <!-- <td>
-                <?php
-                //pr($this->request->params); //REMEMBER to limit this for administrators, managers and inspector only
-                if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
-                  echo $this->Form->input(
-                    'month_year',
-                    array(
-                      'div' => false, 'type' => 'text', 'class' => 'input-small datepicker', 'after' => '',
-                      'label' => array('class' => 'required', 'text' => 'Month/Year'), 'placeHolder' => 'Select Month'
-                    )
-                  );
-                }
-                ?>
-              </td> -->
+                  <td>
+                    <?php
+                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                      echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'index', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false)); 
+                    }
+                    ?>
+                  </td>
+                  <td>
+                    <?php
+                  if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                   
+                      echo $this->Html->link('<i class="icon-file-alt"></i> Amendment Report', array_merge(array('action' => 'index', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
+                    }
+                    ?>
+                  </td>
+                  <td></td>    <td></td>    <td></td>    <td></td>
                 </tr>
               </tbody>
             </table>

@@ -18,6 +18,7 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
+    <li><a href="#amendments" data-toggle="tab" style="color: #52A652;">Amendments</a></li>
     <?php
     $count_reviews = 0;
     $count_comments = 0;
@@ -204,7 +205,7 @@ echo $this->Session->flash();
               <li><a href="#comment_query">Add Comment</a></li>
             </ul>
             <div class="tab-content">
-              <div class="tab-pane active" id="feedback_list"> 
+              <div class="tab-pane active" id="feedback_list">
                 <div class="row-fluid">
                   <div class="span12">
                     <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment']]) ?>
@@ -218,12 +219,12 @@ echo $this->Session->flash();
                     <?php
                     if (!empty($eid))   echo $this->element('comments/add_editor', [
                       'model' => [
-                        'model_id' => $application['Application']['id'], 
+                        'model_id' => $application['Application']['id'],
                         'foreign_key' => $eid['id'],
-                        'model' => 'ApplicationStage', 
-                        'category' => 'external', 
+                        'model' => 'ApplicationStage',
+                        'category' => 'external',
                         'url' => 'add_screening_query',
-                        'type'=>50
+                        'type' => 50
                       ]
                     ])
                     ?>
@@ -254,28 +255,27 @@ echo $this->Session->flash();
             echo "<li>";
             $responded = false;
             foreach ($application['Review'] as $response) {
-              
+
               if ($response['user_id'] == $user_id) {
                 if ($response['type'] == 'request' && $response['accepted'] == '') {
                   $responded = true;
                   echo '<p class="text-info"><i class="icon-check-empty"> </i> ' . $user . '.
                                <small class="muted">(Notified but no response yet. 
                                 <a class="ResendReview tiptip" href="#" id="' . $response['id'] . '" title="Resend Notification?">Resend?</a>)</small> </p>';
-                                if($response['conflict'] != ''){
-                                echo '<p>Has Conflict of interest? <b>'.$response['conflict'].'</b> </p>';}
-                                             } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
+                  if ($response['conflict'] != '') {
+                    echo '<p>Has Conflict of interest? <b>' . $response['conflict'] . '</b> </p>';
+                  }
+                } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
                   $responded = true;
                   echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . ' <small class="muted">(Accepts)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
                   // echo '<p><i class="icon-minus"> </i> '.$response['text'].'</p>';
-                  echo '<p>Has Conflict of interest? '.$response['conflict'].' </p>';
+                  echo '<p>Has Conflict of interest? ' . $response['conflict'] . ' </p>';
                 } elseif ($response['type'] == 'request' && $response['accepted'] == 'declined') {
                   $responded = true;
                   echo '<p class="text-error"><i class="icon-remove"> </i> ' . $user . ' <small class="muted">(Declines)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
-                  echo '<p>Has Conflict of interest? '.$response['conflict'].' </p>';
-                   
+                  echo '<p>Has Conflict of interest? ' . $response['conflict'] . ' </p>';
                 }
               }
-             
             }
 
             if (!$responded) {
@@ -624,6 +624,16 @@ echo $this->Session->flash();
           <?php echo $this->element('multi/annual_letters'); ?>
         </div>
       </div>
+    </div>
+
+    <div class="tab-pane" id="amendments">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php 
+          echo $this->element('multi/amendments');
+           ?>
+        </div>
+      </div>                
     </div>
 
   </div>
