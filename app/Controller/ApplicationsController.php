@@ -417,7 +417,119 @@ class ApplicationsController extends AppController
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
     }
+    public function manager_stages_summary()
+    {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+        else $this->paginate['limit'] = reset($page_options);
 
+        $criteria = $this->Application->parseCriteria($this->passedArgs);
+        if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Application.created' => 'desc');
+ 
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+            $applications = $this->Application->find(
+                'all',
+                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => array())
+            );
+            $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
+            $this->set(compact('applications'));
+            $this->layout = false;
+            $this->render('stage_csv_export');
+        }
+        //end csv export
+
+
+        //in case of pdf export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
+           
+            $applications = $this->Application->find(
+                'all',
+                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+            );
+            // $this->response->download('applications_' . date('Ymd_Hi') . '.pdf'); // <= setting the file name
+            $this->set(compact('applications'));
+            $this->layout = false;
+            $this->render('csv_export');
+            $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
+
+           
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->loadModel('Erc');
+        $this->set('ercs', $this->Erc->find('list', array('fields' => array('Erc.name', 'Erc.name'),)));
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
+    }
+
+    public function manager_amendment_summary()
+    {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+        else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Application->parseCriteria($this->passedArgs);
+        if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Application.created' => 'desc');
+
+        $this->paginate['contain'] = array(
+            'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
+            'TrialStatus',
+            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+        );
+
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+            $applications = $this->Application->find(
+                'all',
+                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+            );
+            $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
+            $this->set(compact('applications'));
+            $this->layout = false;
+            $this->render('csv_export');
+        }
+        //end csv export
+
+
+        //in case of pdf export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
+            $this->csv_export($this->Application->find(
+                'all',
+                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+            ));
+
+            if (strpos($this->request->url, 'pdf') !== false) {
+                $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
+            }
+        }
+        //end pdf export
+
+        $this->set('page_options', $page_options);
+        $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->loadModel('Erc');
+        $this->set('ercs', $this->Erc->find('list', array('fields' => array('Erc.name', 'Erc.name'),)));
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
+    }
     //workflow
     public function manager_workflow()
     {
@@ -1513,9 +1625,8 @@ class ApplicationsController extends AppController
                             $s1['ApplicationStage']['comment'] = 'Principal Investigator Re Submission';
                             $s1['ApplicationStage']['end_date'] = date('Y-m-d');
                             $this->Application->ApplicationStage->save($s1);
-                        }    
-                    }        
-
+                        }
+                    }
                 } else {
                     $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
                     $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
@@ -1817,7 +1928,7 @@ class ApplicationsController extends AppController
                             'stage' => 'Unsubmitted',
                             'status' => 'Current',
                             'comment' => 'Admin unsubmission',
-                            'start_date' => date('Y-m-d'), 
+                            'start_date' => date('Y-m-d'),
                         )
                     )
                 );

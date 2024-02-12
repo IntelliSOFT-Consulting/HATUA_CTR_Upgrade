@@ -281,10 +281,18 @@
                   </td>
                 </tr>
                 <tr class="searchmore" style="display: none;">
-                  <td>
+                <td></td> 
+                <td colspan="1">
                     <?php
                     if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
-                      echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'index', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false)); 
+                      echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'stages_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false)); 
+                    }
+                    ?>
+                  </td>
+                  <td colspan="2">
+                    <?php
+                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                      echo $this->Html->link('<i class="icon-file"></i> Summary Report PDF', array_merge(array('action' => 'stages_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false)); 
                     }
                     ?>
                   </td>
@@ -292,11 +300,16 @@
                     <?php
                   if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                    
-                      echo $this->Html->link('<i class="icon-file-alt"></i> Amendment Report', array_merge(array('action' => 'index', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
+                      echo $this->Html->link('<i class="icon-file-alt"></i> Amendment Report', array_merge(array('action' => 'amendment_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     }
                     ?>
                   </td>
-                  <td></td>    <td></td>    <td></td>    <td></td>
+                    <td colspan="2"> <?php
+                  if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                   
+                      echo $this->Html->link('<i class="icon-file"></i> Amendment Report PDF', array_merge(array('action' => 'amendment_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
+                    }
+                    ?></td>     
                 </tr>
               </tbody>
             </table>
