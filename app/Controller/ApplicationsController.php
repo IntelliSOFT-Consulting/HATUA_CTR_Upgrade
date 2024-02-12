@@ -452,11 +452,10 @@ class ApplicationsController extends AppController
             $applications = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
-            );
-            // $this->response->download('applications_' . date('Ymd_Hi') . '.pdf'); // <= setting the file name
+            ); 
             $this->set(compact('applications'));
-            $this->layout = false;
-            $this->render('csv_export');
+            // $this->layout = false;
+            // $this->render('csv_export');
             $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
 
            
