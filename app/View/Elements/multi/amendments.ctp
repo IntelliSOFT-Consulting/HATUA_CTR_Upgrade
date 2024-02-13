@@ -12,7 +12,7 @@
         <?php
         App::uses('Hash', 'Utility');
         $former = $this->requestAction('/pockets/checklist/amendment');
-        $years = array_unique(Hash::extract($application['AnnualApproval'], '{n}.year'));
+        $years = array_unique(Hash::extract($application['AmendmentChecklist'], '{n}.year'));
         rsort($years);
         foreach ($years as $year) : ?>
             <tr class="">
@@ -25,7 +25,7 @@
                         echo "<div id='$rem$year'>";
                         echo "$f. ";
                         echo "$mer<br/>";
-                        foreach ($application['AnnualApproval'] as $anc) {
+                        foreach ($application['AmendmentChecklist'] as $anc) {
                             if ($anc['year'] == $year && $anc['pocket_name'] == $rem) {
                                 $id = $anc['id'];
                                 echo "&nbsp;&nbsp; <span id='$rem$id'> &nbsp;<i class='icon-file-text-alt'></i> ";
@@ -39,7 +39,7 @@
                                 echo "</span>&nbsp;
                           <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>
                           <span id='fileDate$id' style='margin-left:10px;'>Dated: $file_date</span>
-                          <span id='AnnualApproval$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>
+                          <span id='AmendmentChecklist$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>
                           <br>";
                             }
                         }
@@ -58,19 +58,23 @@
 if ($redir == 'applicant') { ?>
     <h5>Checklist Form</h5>
     <div class="well">
-        <table id="pastyears" class="table table-bordered  table-condensed table-striped">
+        <table id="amendmentchecklisttable" class="table table-bordered  table-condensed table-striped">
             <thead>
                 <tr id="approvalsTableHeader">
                     <th>#</th>
                     <th style="width: 10%;">
-                        <small class="muted">Select Number</small>
+                        <small class="muted">Select year</small>
                         <?php
-                        $options = range(1, 10);
-
-                        echo $this->Form->input('number', array(
+                        // $date = 2019;
+                        echo $this->Form->input('Fake.year', array(
+                            'type' => 'text',
                             'label' => false,
-                            'options' => array_combine($options, $options),
-                            'class' => 'span12'
+                            'between' => false,
+                            'after' => false,
+                            'div' => false,
+                            'value' => date('Y'), 'readonly' => 'readonly',
+                            'data-original-title' => "Click here to change years",
+                            'class' => 'span12 checklistyear tiptip'
                         ));
                         ?>
                     </th>
@@ -93,38 +97,37 @@ if ($redir == 'applicant') { ?>
                             echo $i; ?></td>
                         <td>
                             <?php
-                            echo $this->Form->input('AnnualApproval.' . $key . '.model', array('type' => 'hidden', 'value' => 'AnnualApproval'));
-                            echo $this->Form->input('AnnualApproval.' . $key . '.group', array('type' => 'hidden', 'value' => $pos));
-                            echo $this->Form->input('AnnualApproval.' . $key . '.filesize', array('type' => 'hidden'));
-                            echo $this->Form->input('AnnualApproval.' . $key . '.basename', array('type' => 'hidden'));
-                            echo $this->Form->input('AnnualApproval.' . $key . '.checksum', array('type' => 'hidden'));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.model', array('type' => 'hidden', 'value' => 'AmendmentChecklist'));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.group', array('type' => 'hidden', 'value' => $pos));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.filesize', array('type' => 'hidden'));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.basename', array('type' => 'hidden'));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.checksum', array('type' => 'hidden'));
 
-                            echo $this->Form->input('AnnualApproval.' . $key . '.year', array(
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.year', array(
                                 'type' => 'text', 'label' => false, 'between' => false, 'after' => false, 'div' => false,
-                                'readonly' => 'readonly', 'class' => 'span11 approvalyear'
+                                'readonly' => 'readonly', 'class' => 'span11 checklistyearyear'
                             ));
                             ?>
 
                         </td>
                         <td>
                             <?php
-                            echo $this->Form->input('AnnualApproval.' . $key . '.description', array('type' => 'hidden', 'value' => $value));
-                            echo $this->Form->input('AnnualApproval.' . $key . '.pocket_name', array('type' => 'hidden', 'value' => $pos));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.description', array('type' => 'hidden', 'value' => $value));
+                            echo $this->Form->input('AmendmentChecklist.' . $key . '.pocket_name', array('type' => 'hidden', 'value' => $pos));
                             echo '<p>' . $value . '</p>';
                             ?>
                         </td>
-                        <td class="files">
-                            <?php
-                            echo $this->Form->input('AnnualApproval.' . $key . '.file', array(
-                                'label' => false, 'between' => false, 'after' => false, 'div' => false, 'class' => 'span12 input-file',
-                                'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
-                                'type' => 'file',
-                            ));
-                            ?>
+                        <td class="files"><?php
+                                            echo $this->Form->input('AmendmentChecklist.' . $key . '.file', array(
+                                                'label' => false, 'between' => false, 'after' => false, 'div' => false, 'class' => 'span12 input-file',
+                                                'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
+                                                'type' => 'file',
+                                            ));
+                                            ?>
                         </td>
                         <td>
                             <?php
-                            if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AnnualApproval.' . $key . '.version_no', array(
+                            if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AmendmentChecklist.' . $key . '.version_no', array(
                                 'label' => false, 'between' => false, 'after' => false, 'div' => false, 'placeholder' => 'Version', 'class' => 'span12 input-file',
                                 'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
                             ));
@@ -132,7 +135,7 @@ if ($redir == 'applicant') { ?>
                         </td>
                         <td>
                             <?php
-                            if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AnnualApproval.' . $key . '.file_date', array(
+                            if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AmendmentChecklist.' . $key . '.file_date', array(
                                 'type' => 'text', 'label' => false, 'between' => false, 'after' => false, 'div' => false, 'placeholder' => 'dd-mm-yyyy', 'class' => 'span12 input-file pickadate',
                                 'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
                             ));
@@ -155,6 +158,76 @@ if ($redir == 'applicant') { ?>
                 ?>
             </tbody>
         </table>
+        <div>
+            <h5><i class="icon-file"></i> Do you have additional files that you would like to send to PPB? click on the button to add them:
+                <button id="addRowButton" class="btn btn-success"><i class="icon-plus"></i></button>
+            </h5>
+            <table id="buildattachmentsform"  class="table table-bordered  table-condensed table-striped">
+			<thead>
+			  <tr id="attachmentsTableHeader">
+				<th>#</th>
+				<th width="45%">File</th>
+				<th width="45%">Text Description</th>
+				<th>	</th>
+			  </tr>
+			</thead>
+			<tbody>
+			<?php
+				if (!empty($this->request->data['Attachment'])) {
+					for ($i = 0; $i <= count($this->request->data['Attachment'])-1; $i++) {
+			?>
+			  <tr>
+				<td><?php echo $i+1; ?></td>
+				<td>
+					<div class="control-group"><?php
+						echo $this->Form->input('Attachment.'.$i.'.id');
+						echo $this->Form->input('Attachment.'.$i.'.model', array('type'=>'hidden', 'value'=>'Application'));
+						echo $this->Form->input('Attachment.'.$i.'.group', array('type'=>'hidden', 'value'=>'attachment'));
+						echo $this->Form->input('Attachment.'.$i.'.filesize', array('type' => 'hidden'));
+						echo $this->Form->input('Attachment.'.$i.'.basename', array('type' => 'hidden'));
+						echo $this->Form->input('Attachment.'.$i.'.checksum', array('type' => 'hidden'));
+						if (!empty($this->request->data['Attachment'][$i]['id']) &&
+							!empty($this->request->data['Attachment'][$i]['basename'])) {
+							echo $this->Html->link(__($this->request->data['Attachment'][$i]['basename']),
+								array('controller' => 'attachments',  'action' => 'download',
+									$this->request->data['Attachment'][$i]['id'], 'full_base' => true),
+								array('class' => 'btn btn-info')
+								);
+							// echo $this->Form->input('Attachment.'.$i.'.filename', array('type' => 'hidden'));
+						} else {
+							echo $this->Form->input('Attachment.'.$i.'.file', array(
+								'label' => false, 'between' => false, 'after' => false, 'class' => 'span12 input-file',
+								'error' => array('escape' => false, 'attributes' => array( 'class' => 'help-block')),
+								'type' => 'file',
+							));
+						}
+					?>
+				</div>
+				</td>
+				<td>
+					<?php
+						if (!empty($this->request->data['Attachment'][$i]['id']) &&
+							!empty($this->request->data['Attachment'][$i]['basename'])) {
+							echo $this->request->data['Attachment'][$i]['description'];
+							echo $this->Form->input('Attachment.'.$i.'.description', array('type' => 'hidden'));
+						} else {
+							echo $this->Form->input('Attachment.'.$i.'.description', array(
+								'label' => false, 'between' => false, 'rows' => '1', 'after' => false, 'class' => 'span11',));
+						}
+					?>
+				</td>
+				<td>
+					<button  type="button" class="btn-mini remove-row" 	value="<?php if (isset($this->request->data['Attachment'][$i]['id'])) { echo $this->request->data['Attachment'][$i]['id']; } ?>" >
+						&nbsp;<i class="icon-minus"></i>&nbsp;
+					</button>
+				</td>
+			  </tr>
+			  <?php } } ; ?>
+
+			</tbody>
+	  </table>
+            
+        </div>
     </div>
 <?php
 } ?>
