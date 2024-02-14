@@ -201,33 +201,39 @@ echo $this->Session->flash();
           <br>
 
           <div class="amend-form">
-            <ul id="rreview_tab" class="nav nav-tabs">
-              <li class="active"><a href="#feedback_list">FEEDBACK/QUERIES</a></li>
-              <li><a href="#comment_query">Add Comment</a></li>
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#list">FEEDBACK/QUERIES</a></li>
+              <li><a href="#comm">Add Comment</a></li>
             </ul>
             <div class="tab-content">
-              <div class="tab-pane active" id="feedback_list">
+              <div class="tab-pane " id="list">
                 <div class="row-fluid">
                   <div class="span12">
-                    <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment']]) ?>
+                 
+                    <?php 
+                       debug($eid);
+                    if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment']]) ?>
                   </div>
                 </div>
               </div>
 
-              <div class="tab-pane" id="comment_query">
+              <div class="tab-pane active" id="comm">
                 <div class="row-fluid">
                   <div class="span12">
                     <?php
-                    if (!empty($eid))   echo $this->element('comments/add_editor', [
-                      'model' => [
-                        'model_id' => $application['Application']['id'],
-                        'foreign_key' => $eid['id'],
-                        'model' => 'ApplicationStage',
-                        'category' => 'external',
-                        'url' => 'add_screening_query',
-                        'type' => 50
-                      ]
-                    ])
+                    // if (!empty($eid))   
+                    // echo $this->element('comments/add', [
+                    //   'model' => [
+                    //     'model_id' => $application['Application']['id'],
+                    //     'foreign_key' => $eid['id'],
+                    //     'model' => 'ApplicationStage',
+                    //     'category' => 'external',
+                    //     'url' => 'add_screening_query',
+                    //     'type' => 50
+                    //   ]
+                    // ])
+
+                    echo "Test Comments"
                     ?>
                   </div>
                 </div>

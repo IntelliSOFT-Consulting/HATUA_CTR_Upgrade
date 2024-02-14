@@ -322,6 +322,12 @@ class Application extends AppModel
             'dependent' => true,
             'conditions' => array('AnnualApproval.model' => 'AnnualApproval'),
         ),
+        'AmendmentChecklist' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('AmendmentChecklist.model' => 'AmendmentChecklist'),
+        ),
         'Reminder' => array(
             'className' => 'Reminder',
             'foreignKey' => 'foreign_key',

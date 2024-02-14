@@ -1604,13 +1604,14 @@ class ApplicationsController extends AppController
 
         $response = $this->_isApplicant($id);
 
-        // debug($this->request->data);
-        // return;
+       
         if ($response['Application']['deactivated']) {
             $this->redirect(array('action' => 'view', $id));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
             // debug($this->request->data);
+            // debug($this->request->data);
+            // exit;
             if (isset($this->request->data['cancelReport'])) {
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
