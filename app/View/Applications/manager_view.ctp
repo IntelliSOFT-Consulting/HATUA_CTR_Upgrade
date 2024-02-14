@@ -8,6 +8,7 @@ $this->assign('Applications', 'active');
 $this->Html->script('ckeditor/ckeditor', array('inline' => false));
 $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 $this->Html->script('jquery.blockUI.js', array('inline' => false));
+$this->Html->script('multi/amendments-checklist', array('inline' => false));
 ?>
 
 <?php
