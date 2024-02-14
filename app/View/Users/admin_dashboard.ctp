@@ -185,6 +185,12 @@
             array('controller' => 'pockets', 'action' => 'cindex', 'admin' => true), array('escape' => false));
           ?>
         </li>
+        <li>
+          <?php
+          echo $this->Html->link('<i class="icon-file"></i> Amendment Checklist <small class="muted">(Files required)</small>',
+            array('controller' => 'pockets', 'action' => 'aindex', 'admin' => true), array('escape' => false));
+          ?>
+        </li>
       </ul>
 
       <h5>Initial & Annual approval Letters <small class="muted">(Templates)</small> </h5>

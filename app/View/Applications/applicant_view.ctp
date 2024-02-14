@@ -15,7 +15,7 @@
       $this->Html->script('bootstrap-editable', array('inline' => false));
       $this->Html->css('bootstrap-editable', null, array('inline' => false));
       //Only meant for applicant
-      // $this->Html->script('multi/approval', array('inline' => false));
+      $this->Html->script('multi/amendments-checklist', array('inline' => false));
       $this->Html->script('multi/approvalyear', array('inline' => false));
       $this->Html->script('multi/documents', array('inline' => false));
       $this->Html->script('multi/afro_attachments', array('inline' => false));
@@ -38,6 +38,7 @@
       <ul class="nav nav-tabs">
           <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
           <li><a href="#tab17" data-toggle="tab">Screening</a></li>
+          <li><a href="#amendments" data-toggle="tab" style="color: #52A652;">Amendments</a></li>
           <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments  <small>(<?php echo $reviewers_comments;?>)</small></a></li>          
           <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
           <li><a href="#tab7" data-toggle="tab">SAE/SUSAR (<?php echo count($application['Sae']) ?>)</a></li>
@@ -403,6 +404,17 @@ $this->end();
       <div class="row-fluid">
         <div class="span12">
           <?php echo $this->element('multi/annual_letters'); ?>
+        </div>
+      </div>                
+    </div>
+
+
+    <div class="tab-pane" id="amendments">   
+      <div class="row-fluid">
+        <div class="span12">
+          <?php 
+          echo $this->element('multi/amendments');
+           ?>
         </div>
       </div>                
     </div>
