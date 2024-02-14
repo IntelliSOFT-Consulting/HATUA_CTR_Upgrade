@@ -191,6 +191,11 @@ class Application extends AppModel
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'ActiveInspector' => array(
+            'className' => 'ActiveInspector',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
         'ManagerReview' => array(
             'className' => 'Review',
             'foreignKey' => 'application_id',

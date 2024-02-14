@@ -166,14 +166,17 @@ class UsersController extends AppController {
     }
 
     public function inspector_dashboard() {
-        $applications = $this->Application->find('all', array(
-            'limit' => 5,
-            'fields' => array('Application.id','Application.created', 'Application.study_drug', 'Application.submitted'),
+        $my_applications = $this->User->ActiveInspector->find('list', array(
+            'conditions' => array('ActiveInspector.user_id' => $this->Auth->User('id')),
+            'fields' => array('ActiveInspector.application_id'),
+            'contain' => array()));
+        // pr($my_applications);
+        $this->set('applications', $this->Application->find('all', array(
+            'limit' => 5, 'fields' => array('id','study_drug', 'created'),
             'order' => array('Application.created' => 'desc'),
-            'conditions' => array('submitted' => 1),
-            'contain' => array(),
-        ));
-        $this->set('applications', $applications);
+            'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
+            'contain' => array('ActiveInspector'),
+        ))); 
         $this->User->Notification->recursive = -1;
         $this->set('notifications', $this->User->Notification->find('all', array(
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5

@@ -59,8 +59,13 @@ class User extends AppModel {
                   //      'foreignKey' => 'application_id',
                   //      'dependent' => false,
                   // ),
-                 'Review' => array(
+                  'Review' => array(
                     'className' => 'Review',
+                    'foreignKey' => 'user_id',
+                    'dependent' => false,
+                 ),
+                 'ActiveInspector' => array(
+                    'className' => 'ActiveInspector',
                     'foreignKey' => 'user_id',
                     'dependent' => false,
                  ),

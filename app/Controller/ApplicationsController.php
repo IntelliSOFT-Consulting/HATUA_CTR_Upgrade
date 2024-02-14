@@ -23,6 +23,7 @@ class ApplicationsController extends AppController
         $this->Auth->allow('index', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
 
+    
     /**
      * stages method
      *
@@ -475,6 +476,11 @@ class ApplicationsController extends AppController
 
         $criteria = $this->Application->parseCriteria($this->passedArgs);
         if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+        $my_applications = $this->Application->ActiveInspector->find('list', array(
+            'conditions' => array('ActiveInspector.user_id' => $this->Auth->User('id')),
+            'fields' => array('ActiveInspector.application_id')
+        ));
+        $criteria['Application.id'] = $my_applications;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
 
@@ -810,7 +816,9 @@ class ApplicationsController extends AppController
         $this->set('application', $application);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
         $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 2, 6), 'User.is_active' => 1))));
+        $this->set('inspectors', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(2, 6), 'User.is_active' => 1))));
 
+        
         $this->request->data = $application;
 
         if (strpos($this->request->url, 'pdf') !== false) {
