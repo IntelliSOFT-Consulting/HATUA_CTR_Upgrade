@@ -100,7 +100,8 @@
         <?php  
         if(!empty($anl['qrcode'])){
         $decodedImage = base64_decode($anl['qrcode']);
-        echo $decodedImage;}
+        echo $decodedImage;
+      }
         ?>
          
 

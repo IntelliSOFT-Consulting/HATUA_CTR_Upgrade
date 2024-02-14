@@ -1,7 +1,6 @@
 <?php
 
-App::import('Vendor', 'QRCode', array('file' => 'chillerlan' . DS . 'QRCode' . DS . 'QRCode.php'));
-
+ 
 App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
@@ -17,14 +16,19 @@ App::uses('HttpSocket', 'Network/Http');
 class AnnualLettersController extends AppController
 {
     public $uses = array('User', 'Application', 'Message', 'Pocket', 'AnnualLetter');
-    public $helpers = array('QrCode');
+     
 
 
     public function beforeFilter()
     {
         parent::beforeFilter();
         // $this->Auth->allow();
-        $this->Auth->allow('verify','genereateQRCode');
+        $this->Auth->allow('verify','genereateQRCode','manager_download');
+    }
+
+    public function manager_download($id=null)
+    {
+        
     }
     /**
      * index method
@@ -37,26 +41,33 @@ class AnnualLettersController extends AppController
         $this->set('AnnualLetters', $this->paginate());
     }
 
-    public function genereateQRCode($id=null){
-         
-        
-         $currentId= base64_encode($id);
-          
-         echo $currentUrl = Router::url('/annual_letters/verify/'.$currentId, true);
-        
-        
-          $base64EncodedUrl = base64_encode($currentUrl);
+    public function genereateQRCode($id = null)
+    {
 
-         echo $base64EncodedUrl;
+
+        $currentId = base64_encode($id);
+
+        $currentUrl = Router::url('/annual_letters/verify/' . $id, true);
+
+        // debug($currentUrl);
+        // exit;
+        //   $base64EncodedUrl = $$currentUrl;//base64_encode($currentUrl);
+
+        //    $base64EncodedUrl;
         $options = array(
             'ssl_verify_peer' => false
         );
         $HttpSocket = new HttpSocket($options);
 
         //Request Access Token
-        $initiate = $HttpSocket->get('https://smp.imeja.co.ke/api/qr/generate/'.$base64EncodedUrl,null,
+        $initiate = $HttpSocket->post(
+            'https://smp.imeja.co.ke/api/qr/generate',
+            array('url' => $currentUrl),
             array('header' => array())
         );
+
+        // debug($initiate);
+        // exit;
         if ($initiate->isOk()) {
 
             $body = $initiate->body;
@@ -65,22 +76,20 @@ class AnnualLettersController extends AppController
             if (!$this->AnnualLetter->exists()) {
                 throw new NotFoundException(__('Invalid annual approval letter'));
             }
-            $qr_code=$resp['data']['qr_code'];
+            $qr_code = $resp['data']['qr_code'];
             $data = $this->AnnualLetter->read(null, $id);
-            $data['AnnualLetter']['qrcode']=$qr_code;
+            $data['AnnualLetter']['qrcode'] = $qr_code;
 
             $this->AnnualLetter->Create();
-            if ($this->AnnualLetter->save($data)) { 
+            if ($this->AnnualLetter->save($data)) {
             }
- 
-        }else{
+        } else {
             $body = $initiate->body;
-             
         }
     }
     public function verify($id = null)
     {
-       $id =base64_decode($id);
+    //    $id =base64_decode($id);
         $this->AnnualLetter->id = $id;
         if (!$this->AnnualLetter->exists()) {
             throw new NotFoundException(__('Invalid annual approval letter'));
@@ -114,23 +123,14 @@ class AnnualLettersController extends AppController
                 'filename' => 'ApprovalLetter_' . $id,
                 'orientation' => 'portrait',
             );
-        }
-
-        // $data = $this->AnnualLetter->read(null, $id); 
+        } 
 
         $data = $this->AnnualLetter->find('first',array(
                 'contain' => array(),
                 'conditions' => array('AnnualLetter.id' => $id)
             )
-        );
-
-        // debug($data);
-        // exit;
-        // $htmlContent = $data['AnnualLetter']['content'];
-        // $modifiedHtmlContent = $this->removeAddressLenanaSection($htmlContent);
-        // $data['AnnualLetter']['content']=$modifiedHtmlContent; 
+        ); 
         $this->set('AnnualLetter', $data);
-
         $this->render('download');
     }
     private function removeAddressLenanaSection($htmlContent)
