@@ -276,6 +276,7 @@ class NotificationShell extends Shell
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id']))
           )
         );
+        $this->loadModel('AuditTrail');
         $this->AuditTrail->Create();
         if ($this->AuditTrail->save($audit)) {
           $this->log($this->args[0], 'audit_success');

@@ -522,7 +522,9 @@ echo $this->Session->flash();
 
                   if ($response['user_id'] == $user_id) {
                     $responded = true;
-                    echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . ' <small class="muted"></small></p>';
+                    echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . '<small class="muted">
+                     '.$this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'active_inspectors', 'action' => 'revoke', $response['id'],$application['Application']['id']), array('escape' => false)).'
+                    </small></p>'; 
                   }
                 }
 
