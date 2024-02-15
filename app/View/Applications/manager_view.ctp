@@ -211,7 +211,7 @@ echo $this->Session->flash();
               <div class="tab-pane active" id="feedback_list">
                 <div class="row-fluid">
                   <div class="span12">
-                    <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment']]) ?>
+                    <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment'],'category'=>true]) ?>
                   </div>
                 </div>
               </div>
@@ -229,7 +229,7 @@ echo $this->Session->flash();
                         'url' => 'add_screening_query',
                         'type' => 50
                       ]
-                    ])
+                    ]) 
                     ?>
                   </div>
                 </div>

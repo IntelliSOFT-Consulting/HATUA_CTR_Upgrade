@@ -10,6 +10,12 @@ App::uses('HtmlHelper', 'View/Helper');
  */
 class CommentsController extends AppController {
 
+    public function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->Auth->allow('manager_comment_content_download');
+    }
 
 /**
  * manager_index method
@@ -19,6 +25,21 @@ class CommentsController extends AppController {
     public function manager_index() {
         $this->Comment->recursive = 0;
         $this->set('comments', $this->paginate());
+    }
+
+    public function manager_comment_content_download($id=null){
+        $this->Comment->id = $id;
+        if (!$this->Comment->exists()) {
+            throw new NotFoundException(__('Invalid comment'));
+        }
+        $data = $this->Comment->read(null, $id);
+        $this->pdfConfig = array(
+            'filename' => 'Screening' . $id,
+            'orientation' => 'portrait',
+        );
+        $this->set('Comment', $data);
+
+        $this->render('download');
     }
 
 
@@ -93,7 +114,7 @@ class CommentsController extends AppController {
                           array('escape' => false)),
                       );
                       $datum = array(
-                        'email' => ($sae['SiteInspection']['reporter_email'] && $actioner == 'applicant') ? $sae['SiteInspection']['reporter_email'] : $user['User']['email'],
+                        'email' =>  $user['User']['email'],
                         'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_si_feedback', 'model' => 'SiteInspection',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
@@ -211,7 +232,7 @@ class CommentsController extends AppController {
                           array('escape' => false)),
                       );
                       $datum = array(
-                        'email' => ($sae['Sae']['reporter_email'] && $actioner == 'applicant') ? $sae['Sae']['reporter_email'] : $user['User']['email'],
+                        'email' => $user['User']['email'],
                         'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'manager_sae_feedback', 'model' => 'Sae',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
@@ -585,7 +606,7 @@ class CommentsController extends AppController {
           if(!Hash::check($stages, '{n}.ApplicationStage[stage=ReviewSubmission].id')) {
               $this->ApplicationStage->create();
               $this->ApplicationStage->save(array('ApplicationStage' => array(
-                      'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Current', 'comment' => 'Manager review response', 'start_date' => date('Y-m-d')
+                      'application_id' => $this->request->data['Comment']['model_id'], 'stage' => 'ReviewSubmission', 'status' => 'Current', 'comment' => 'Manager review response', 'start_date' => date('Y-m-d')
                       ))
               );
           } else {

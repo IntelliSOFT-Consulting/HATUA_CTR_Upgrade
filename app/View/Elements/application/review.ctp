@@ -187,7 +187,7 @@ if (isset($this->params['named']['rreview_view'])) {
                   <div class="tab-pane active" id="rreview_comment_list">
                     <div class="row-fluid">
                       <div class="span12">
-                        <?php echo $this->element('comments/list_expandable', ['comments' => $rreview['InternalComment']]) ?>
+                        <?php echo $this->element('comments/list_expandable', ['comments' => $rreview['InternalComment'],'category'=>false]) ?>
                       </div>
 
                     </div>

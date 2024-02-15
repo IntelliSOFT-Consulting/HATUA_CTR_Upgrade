@@ -3,9 +3,10 @@
 <?php
 foreach ($comments as $key => $comment) {
 ?>
-    <a class="btn btn-link btn-comment" role="button" data-toggle="collapse" href="#comment<?php echo $comment['id'] ?>"  aria-controls="comment<?php echo $comment['id'] ?>">
+    <a class="btn btn-link btn-comment" role="button" data-toggle="collapse" href="#comment<?php echo $comment['id'] ?>" aria-controls="comment<?php echo $comment['id'] ?>">
         <?php echo ($key + 1) . '.  ' . $comment['sender'] . ' <small><em>' . $comment['created'] . '</em></small> <br><small class="muted">' . $comment['category'] . '</small>' ?>
-    </a>
+    </a> 
+
     <div id="comment<?php echo $comment['id'] ?>" class="bs-example collapse show">
         <table class="table table-condensed">
             <tbody>
@@ -59,6 +60,25 @@ foreach ($comments as $key => $comment) {
 
             ?>
         </td>
+    </tr>
+    <tr>
+        <th><?php
+             echo '<p>';
+                    echo $this->Html->link("Download",
+                        array(
+                            'controller' => 'comments',  'action' => 'comment_content_download', $comment['id'],
+                            'admin' => false
+                        ),
+                        array('class' => 'btn btn-link')
+                    ); 
+                    echo '</p>';
+
+
+                    echo $this->Html->link(__('<i class="icon-download-alt"></i> Download <small>(PDF)</small>'),
+                    array('controller' => 'comments', 'ext' => 'pdf', 'action' => 'comment_content_download', $comment['id']),
+                    array('escape' => false, 'class' => 'btn pull-right', 'style'=>'margin-right: 10px;'));
+                    ?>
+        </th>
     </tr>
     </tbody>
     </table>
