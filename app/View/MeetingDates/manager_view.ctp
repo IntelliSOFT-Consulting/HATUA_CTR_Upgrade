@@ -31,7 +31,7 @@
             <h5 class="text-center"><u>FEEDBACK</u></h5>
             <div class="row-fluid">
               <div class="span8">    
-                <?php echo $this->element('comments/list', ['comments' => $meetingDate['Comment']]) ?> 
+                <?php echo $this->element('comments/list', ['comments' => $meetingDate['Comment'],'show'=>false]) ?> 
               </div>
               <div class="span4 lefty">
               <?php  

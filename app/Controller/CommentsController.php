@@ -14,7 +14,7 @@ class CommentsController extends AppController {
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('manager_comment_content_download');
+        $this->Auth->allow('manager_comment_content_download','applicant_comment_content_download');
     }
 
 /**
@@ -27,7 +27,14 @@ class CommentsController extends AppController {
         $this->set('comments', $this->paginate());
     }
 
-    public function manager_comment_content_download($id=null){
+ public function manager_comment_content_download($id=null){
+    $this->comment_content_download($id);
+ }
+ public function applicant_comment_content_download($id=null){
+    $this->comment_content_download($id);
+ }
+
+    public function comment_content_download($id=null){
         $this->Comment->id = $id;
         if (!$this->Comment->exists()) {
             throw new NotFoundException(__('Invalid comment'));

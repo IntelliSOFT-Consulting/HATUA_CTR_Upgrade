@@ -109,7 +109,7 @@
               <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
               <div class="row-fluid">
                 <div class="span8">    
-                  <?php echo $this->element('comments/list', ['comments' => $deviation['ExternalComment']]) ?> 
+                  <?php echo $this->element('comments/list', ['comments' => $deviation['ExternalComment'],'show'=>false]) ?> 
                 </div>
                 <div class="span4 lefty">
                   <?php  

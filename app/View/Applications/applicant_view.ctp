@@ -189,7 +189,7 @@ $this->end();
                       $eid = null;
                       if(!empty($var)) $eid = min($var);
                       // debug($eid);
-                      if(!empty($eid)) echo $this->element('comments/list', ['comments' => $eid['Comment']]);
+                      if(!empty($eid)) echo $this->element('comments/list', ['comments' => $eid['Comment'],'show'=>true]);
                     ?> 
                   </div>
                   <div class="span4 lefty">
@@ -252,7 +252,7 @@ $this->end();
                       $rid = null;
                       if(!empty($var)) $rid = min($var);
                       // debug($rid);
-                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment']]);
+                      if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'],'show'=>false]);
                     ?> 
                   </div>
                   <div class="span4 lefty">

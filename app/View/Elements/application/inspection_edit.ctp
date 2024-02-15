@@ -141,7 +141,7 @@
               <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
               <div class="row-fluid">
                 <div class="span8">    
-                  <?php echo $this->element('comments/list', ['comments' => $site_inspection['InternalComment']]) ?> 
+                  <?php echo $this->element('comments/list', ['comments' => $site_inspection['InternalComment'],'show'=>false]) ?> 
                 </div>
                 <div class="span4 lefty">
                   <?php  
@@ -166,7 +166,7 @@
               <h5 class="text-center"><u>COMMENTS/QUERIES</u></h5>
               <div class="row-fluid">
                 <div class="span8">    
-                  <?php echo $this->element('comments/list', ['comments' => $site_inspection['ExternalComment']]) ?> 
+                  <?php echo $this->element('comments/list', ['comments' => $site_inspection['ExternalComment'],'show'=>false]) ?> 
                 </div>
                 <div class="span4 lefty">
                   <?php  
