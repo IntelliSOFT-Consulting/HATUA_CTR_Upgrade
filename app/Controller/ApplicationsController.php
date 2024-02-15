@@ -20,7 +20,7 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
+        $this->Auth->allow('index','manager_amendment_summary','manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
     public function manager_stages_summary()
     {
