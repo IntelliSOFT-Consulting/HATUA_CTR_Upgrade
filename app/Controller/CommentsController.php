@@ -14,9 +14,66 @@ class CommentsController extends AppController {
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('manager_comment_content_download','applicant_comment_content_download');
+        $this->Auth->allow('manager_comment_content_download','applicant_comment_content_download','manager_add_annual_letter');
     }
+    public function manager_add_annual_letter() {
+        if ($this->request->is('post')) {
+            $this->Comment->create();
+            if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+                
+                //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                  $this->loadModel('Message');
+                  $html = new HtmlHelper(new ThemeView());
+                  $message = $this->Message->find('first', array('conditions' => array('name' => 'review_response')));
+                  $this->loadModel('Application');
+                  $app = $this->Application->find('first', array(
+                      'contain' => array(),
+                      'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
+                  ));
 
+                  $users = $this->Comment->User->find('all', array(
+                      'contain' => array(),
+                      'conditions' => array('OR' => array('User.id' => $app['Application']['user_id'], 'User.group_id' => 2))
+                  ));
+                  foreach ($users as $user) {
+                      // $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'applicant';
+                      if ($user['User']['group_id'] == 2) {
+                        $actioner =  'manager';
+                      } elseif ($user['User']['group_id'] == 3) {
+                        $actioner =  'reviewer';
+                      } else {
+                        $actioner =  'applicant';
+                      }
+
+                      $variables = array(
+                        'name' => $user['User']['name'], 'protocol_no' => $app['Application']['protocol_no'], 
+                        'comment_subject' => $this->request->data['Comment']['subject'],
+                        'comment_content' => $this->request->data['Comment']['content'],
+                        'reference_link' => $html->link($app['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $app['Application']['id'],
+                             $actioner => true, 'full_base' => true), 
+                          array('escape' => false)),
+                      );
+                      $datum = array(
+                        'email' => $user['User']['email'],
+                        'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'review_response', 'model' => 'ApplicationStage',
+                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'message' => String::insert($message['Message']['content'], $variables)
+                      );
+                      CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                      CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                  }
+                //**********************************    END   *********************************
+
+                $this->Session->setFlash(__('The comment has been sent to the user'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+                $this->Session->setFlash(__('The comment could not be saved. Please, try again.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        }
+        $users = $this->Comment->User->find('list');
+        $this->set(compact('users'));
+    }
 /**
  * manager_index method
  *
