@@ -722,6 +722,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/manager_index');
         $this->Acl->allow($group, 'controllers/Applications/manager_workflow');
         $this->Acl->allow($group, 'controllers/Applications/manager_view');
+        $this->Acl->allow($group, 'controllers/Applications/manager_stages_summary');
+        $this->Acl->allow($group, 'controllers/Applications/manager_amendment_summary');
         $this->Acl->allow($group, 'controllers/Applications/manager_view_notification');
         $this->Acl->allow($group, 'controllers/Applications/manager_approve');
         $this->Acl->allow($group, 'controllers/Applications/manager_delete');
