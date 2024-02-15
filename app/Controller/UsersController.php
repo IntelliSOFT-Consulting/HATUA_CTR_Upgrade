@@ -156,9 +156,9 @@ class UsersController extends AppController {
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
-        $this->set('saes', $this->Sae->find('all', array(
-            'order' => 'Sae.created DESC'
-            )));
+        // $this->set('saes', $this->Sae->find('all', array(
+        //     'order' => 'Sae.created DESC'
+        //     )));
         $this->set('meetingDates', $this->MeetingDate->find('all', array(
             'limit' => 5,
             'conditions' => array('MeetingDate.approved >' => 0), 'order' => 'MeetingDate.created DESC'
