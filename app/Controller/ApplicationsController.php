@@ -831,7 +831,71 @@ class ApplicationsController extends AppController
     }
     public function inspector_view($id = null)
     {
+        $my_applications = $this->Application->ActiveInspector->find('list', array(
+            'conditions' => array('ActiveInspector.user_id' => $this->Auth->User('id'),  'ActiveInspector.application_id' => $id),
+            'fields' => array('ActiveInspector.application_id')
+        ));
+        if (in_array($id, $my_applications)) {
         $this->aview($id);
+        }else{
+            $this->Session->setFlash(__('You don\'t have access to this protocol.'), 'alerts/flash_info');
+            $this->redirect(array('action' => 'index')); 
+        }
+    }
+    
+    
+
+    public function inspector_view_alt($id = null)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            throw new NotFoundException(__('Invalid application'));
+        }
+
+        #TODO: in this condition, add the search for if I have accepted to review the app
+        $my_applications = $this->Application->Review->find('list', array(
+            'conditions' => array('Review.user_id' => $this->Auth->User('id'), 'Review.type' => 'request',  'Review.application_id' => $id),
+            'fields' => array('Review.id', 'Review.accepted')
+        ));
+        // debug($my_applications);
+        $accept = array_search('accepted', $my_applications);
+        $declined = array_search('declined', $my_applications);
+        // if (isset($my_applications[$id])) {
+        // if ($my_applications[$id] == 'accepted') {
+        if ($accept) {
+            $contains = $this->a_contain;
+            $contains['Review']['conditions'] = array('Review.user_id' => $this->Auth->User('id'),  'Review.type' => 'reviewer_comment');
+            $contains['ManagerReview'] = array('conditions' => array('ManagerReview.type' => 'ppb_comment'), 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User');
+            $application = $this->Application->find('first', array(
+                'conditions' => array('Application.id' => $id),
+                'contain' => $contains
+            ));
+            $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+            $this->set('application', $application);
+            if ($application['Application']['deactivated']) {
+                $this->render('reviewer_minimal_view');
+            }
+        } elseif ($declined) {
+            $this->Session->setFlash(__('You have declined to review this protocol.'), 'alerts/flash_info');
+            $this->redirect(array('action' => 'index'));
+        } else {
+            $application = $this->Application->find('first', array(
+                'conditions' => array('Application.id' => $id),
+                'contain' => array('Review' => array('conditions' => array('Review.user_id' => $this->Auth->User('id')))),
+            ));
+            $this->set('application', $application);
+            $this->render('reviewer_minimal_view');
+        }
+
+        if ($application['Application']['deactivated'] || $application['Application']['approved'] == 1) {
+            $this->render('applicant_minimal_view');
+        }
+
+        $this->request->data = $application;
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
+        }
     }
 
     public function reviewer_view($id = null)
