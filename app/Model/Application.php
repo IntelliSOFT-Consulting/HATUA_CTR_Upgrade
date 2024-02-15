@@ -40,8 +40,28 @@ class Application extends AppModel
         'stages' => array('type' => 'query', 'method' => 'findByStage', 'encode' => true),
         'month_year' => array('type' => 'query', 'method' => 'dummy'),
         'mode' => array('type' => 'expression', 'method' => 'makeMonthYearCondition', 'field' => 'Application.date_submitted BETWEEN ? AND ?'),
+        'phase'=>array('type' => 'query', 'method' => 'phaseConditions', 'encode' => true),
     );
+    public function phaseConditions($data=array()){
+        $filter = $data['phase'];     
+        $cond = array();
+    
+        if ($filter == 1) {
+            $cond[$this->alias . '.trial_human_pharmacology'] = 1;
+        } elseif ($filter == 2) {
+            $cond[$this->alias . '.trial_therapeutic_exploratory'] = 1;
+        } elseif ($filter == 3) {
+            $cond[$this->alias . '.trial_therapeutic_confirmatory'] = 1;
+        } elseif ($filter == 4) {
+            $cond[$this->alias . '.trial_therapeutic_use'] = 1;
+        }
+    
+        // Add other conditions if needed
+    
+        return $cond;
+     
 
+    }
     public function dummy($data = array())
     {
         return array('1' => '1');
