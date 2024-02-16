@@ -32,14 +32,29 @@ foreach ($comments as $key => $comment) {
                     </th>
                     <td>
                         <p class="form-control-static"><?php echo $comment['subject'] ?></p>
+                        
                     </td>
                 </tr>
                 <tr>
                     <th>
                         <p><strong> Content </strong>
+                        
                     </th>
                     <td>
                         <p class="form-control-static"><?php echo $comment['content'] ?></p>
+                        <p>
+                            <?php
+                            
+                            if ($category) {
+                                if (!empty($comment['qrcode'])) {
+                                    $decodedImage = base64_decode($comment['qrcode']);
+                                    echo $decodedImage;
+                                  }
+                            }
+                            ?>
+
+
+                        </p>
                     </td>
     </div>
     <tr>

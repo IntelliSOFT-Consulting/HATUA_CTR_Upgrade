@@ -2,6 +2,7 @@
 App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
+App::uses('HttpSocket', 'Network/Http');
 App::uses('HtmlHelper', 'View/Helper');
 /**
  * Comments Controller
@@ -14,7 +15,58 @@ class CommentsController extends AppController {
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('manager_comment_content_download','applicant_comment_content_download','manager_add_annual_letter');
+        $this->Auth->allow('manager_comment_content_download','verify','generateQRCode','applicant_comment_content_download','manager_add_annual_letter');
+    }
+    public function verify($id=null) {
+        $id = base64_decode($id);
+        $this->Comment->id = $id;
+        if (!$this->Comment->exists()) {
+            throw new NotFoundException(__('Invalid Screening Query approval letter'));
+        }
+
+        $data = $this->Comment->read(null, $id);
+        $this->pdfConfig = array(
+            'filename' => 'ScreeningQuery' . $id,
+            'orientation' => 'portrait',
+        );
+        $this->set('Comment', $data);
+
+        $this->render('pdf/download');
+	}
+    public function generateQRCode($id=null){
+        $currentId = base64_encode($id);
+
+        $currentUrl = Router::url('/comments/verify/' . $currentId, true); 
+        $options = array(
+            'ssl_verify_peer' => false
+        );
+        $HttpSocket = new HttpSocket($options);
+
+        //Request Access Token
+        $initiate = $HttpSocket->post(
+            'https://smp.imeja.co.ke/api/qr/generate',
+            array('url' => $currentUrl),
+            array('header' => array())
+        );
+
+        // debug($initiate);
+        // exit;
+        if ($initiate->isOk()) {
+
+            $body = $initiate->body;
+            $resp = json_decode($body, true);
+            $this->Comment->id = $id;
+            if (!$this->Comment->exists()) {
+                throw new NotFoundException(__('Invalid annual approval letter'));
+            }
+            $qr_code = $resp['data']['qr_code'];
+            $data = $this->Comment->read(null, $id);
+            $data['Comment']['qrcode'] = $qr_code;
+
+            $this->Comment->Create();
+            if ($this->Comment->save($data)) {
+            }
+        }
     }
     public function manager_add_annual_letter() {
         if ($this->request->is('post')) {
@@ -511,6 +563,9 @@ class CommentsController extends AppController {
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+
+                //Get ID of the currently saved record 
+                $this->generateQRCode($this->Comment->id);
                 
                 //******************       Send Email and Notifications to Applicant and Managers          *****************************
                   $this->loadModel('Message');
