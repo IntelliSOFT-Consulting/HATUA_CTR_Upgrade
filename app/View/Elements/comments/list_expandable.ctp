@@ -4,7 +4,15 @@
 foreach ($comments as $key => $comment) {
 ?>
     <a class="btn btn-link btn-comment" role="button" data-toggle="collapse" href="#comment<?php echo $comment['id'] ?>" aria-controls="comment<?php echo $comment['id'] ?>">
-        <?php echo ($key + 1) . ' <small><em>' . $comment['created'] . '</em></small> <br><small class="muted">' . $comment['category'] . '</small>' ?>
+        <?php
+        if($redir != 'applicant') {
+        echo ($key + 1) .' ' .$comment['sender'].   ' <small><em>' . $comment['created'] . '
+        </em></small> <br><small class="muted">' . $comment['category'] . '</small>';
+        }else{
+            echo ($key + 1) .' <small><em>' . $comment['created'] . '
+            </em></small> <br><small class="muted">' . $comment['category'] . '</small>';
+        } ?>
+
     </a>
 
     <div id="comment<?php echo $comment['id'] ?>" class="bs-example collapse show">
