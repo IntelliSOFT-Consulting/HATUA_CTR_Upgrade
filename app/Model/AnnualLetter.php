@@ -25,6 +25,22 @@ class AnnualLetter extends AppModel {
 		)
 	);
 
+	public $hasMany = array(
+         
+        'InternalComment' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('InternalComment.model' => 'AnnualLetter', 'InternalComment.category' => 'annual' ),
+        ),
+        'ExternalComment' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('ExternalComment.model' => 'AnnualLetter', 'ExternalComment.category' => 'annual' ),
+        ),
+    );
+
 	public function beforeSave() {
 		if (!empty($this->data['AnnualLetter']['approval_date'])) {
 			$this->data['AnnualLetter']['approval_date'] = $this->dateFormatBeforeSave($this->data['AnnualLetter']['approval_date']);
