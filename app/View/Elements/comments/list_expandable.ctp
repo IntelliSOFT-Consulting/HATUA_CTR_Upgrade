@@ -12,7 +12,8 @@ foreach ($comments as $key => $comment) {
             <tbody>
 
             <!-- Hide the identity -->
-                <!-- <tr>
+            <?php  if ($redir != 'applicant') {?>
+                <tr>
                     <th>
                         <p><strong>Sender</strong></p>
                     </th>
@@ -20,12 +21,13 @@ foreach ($comments as $key => $comment) {
                         <div>
                             <p class="form-control-static">
                                 <?php 
-                                // echo $comment['sender'] 
+                                 echo $comment['sender'] 
                                 ?>
                                 </p>
                         </div>
                     </td>
-                </tr> -->
+                </tr>
+                <?php } ?>
                 <tr>
                     <th>
                         <p><strong>Subject</strong>

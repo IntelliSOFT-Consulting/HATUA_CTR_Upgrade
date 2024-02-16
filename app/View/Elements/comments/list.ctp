@@ -10,20 +10,22 @@ foreach ($comments as $key => $comment) {
     <table class="table table-condensed">
       <tbody>
         <!-- Hide the sender identity -->
-        <!-- <tr> -->
-          <!-- <th>
-            <p><strong>Sender</strong></p>
-          </th> -->
-          <!-- <td>
-            <div>
-              <p class="form-control-static">
-                <?php 
-                // echo $comment['sender'] 
-                ?>
-              </p>
-            </div>
-          </td> -->
-        <!-- </tr> -->
+        <?php  if ($redir != 'applicant') {?>
+                <tr>
+                    <th>
+                        <p><strong>Sender</strong></p>
+                    </th>
+                    <td>
+                        <div>
+                            <p class="form-control-static">
+                                <?php 
+                                 echo $comment['sender'] 
+                                ?>
+                                </p>
+                        </div>
+                    </td>
+                </tr>
+                <?php } ?>
         <tr>
           <th>
             <p><strong>Subject</strong>
