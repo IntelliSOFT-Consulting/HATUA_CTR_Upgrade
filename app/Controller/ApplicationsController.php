@@ -1188,7 +1188,7 @@ class ApplicationsController extends AppController
                             'names' => $names,
                             'professional_address' => $professional_address,
                             'telephone' => $telephone,
-                            'study_title' => $application['Application']['short_title'],
+                            'study_title' => $application['Application']['study_title'],
                             'checklist' => $checkstring,
                             'expiry_date' => $expiry_date
                         );
