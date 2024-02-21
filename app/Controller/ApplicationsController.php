@@ -847,6 +847,19 @@ class ApplicationsController extends AppController
                                     )
                                 )
                             ));
+
+
+                            if (isset($this->request->data['AmendmentChecklist']))
+                            $this->set('response', array(
+                                'message' => 'Success',
+                                'content' => $this->Application->Attachment->find(
+                                    'first',
+                                    array(
+                                        'conditions' => array('Attachment.id' => $this->Application->AmendmentChecklist->id),
+                                        'contain' => array()
+                                    )
+                                )
+                            ));
                         // CakeResque::enqueue('default', 'ManagerShell', array('newAnnualApproval', $response));
                         if (isset($this->request->data['Document'])) {
                             $this->set('response', array(

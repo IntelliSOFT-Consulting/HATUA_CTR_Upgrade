@@ -58,17 +58,27 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
                 </td>
                 <?php if ($redir === 'manager') { ?>
                     <td>
-                         <?php
-                          echo '<p>';
-                          echo $this->Html->link('Approve',
-                              array(
-                                  'controller' => 'attachments',  'action' => 'approve', $year,
-                                  'admin' => false
-                              ),
-                              array('class' => 'btn  btn-primary btn-link')
-                          ); 
-                          echo '</p>';
-                         ?>
+                        <?php
+                        echo '<p>';
+                        echo $this->Html->link(
+                            'Approve',
+                            array(
+                                'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
+                                'admin' => false
+                            ),
+                            array('class' => 'btn btn-primary btn-link')
+                        );
+                        echo '</p>';
+                        echo $this->Html->link(
+                            'Download',
+                            array(
+                                'controller' => 'amendment_letters',  'ext' => 'pdf', 'action' => 'download', $year,
+                                'admin' => false
+                            ),
+                            array('class' => 'btn btn-info btn-link')
+                        );
+                        echo '</p>';
+                        ?>
                     </td>
                 <?php } ?>
             </tr>
@@ -198,7 +208,7 @@ if ($redir == 'applicant') {
         <div class="tab-pane" id="bbb">
             <div class="span12">
 
-                <!-- <div class="row-fluid">
+                <div class="row-fluid">
                     <div class="span11">
                         <div class="uploadsTableA">
                             <h6 class="muted"><b>Attach File(s) </b>
@@ -207,9 +217,9 @@ if ($redir == 'applicant') {
                             <hr>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
-                <?php echo $this->element('multi/amendment_attachment');
+                <?php //echo $this->element('multi/amendment_attachment');
                 ?>
             </div>
         </div>

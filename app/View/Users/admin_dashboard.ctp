@@ -99,6 +99,12 @@
           array('controller' => 'pockets', 'action' => 'edit', 51, 'admin' => true), array('escape' => false));
         ?>
         </li>
+        <li>
+        <?php
+        echo $this->Html->link('<i class="icon-file"></i> Amendments Letter <small class="muted">(Edit content)</small>',
+          array('controller' => 'pockets', 'action' => 'edit', 52, 'admin' => true), array('escape' => false));
+        ?>
+        </li>
       </ul>
       <hr>
       <h4><img alt="" src="/img/comments.ico" style="width: 25px;">&nbsp;<?php

@@ -263,6 +263,12 @@ class Application extends AppModel
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'AmendmentLetter' => array(
+            'className' => 'AmendmentLetter',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
+        
         'Organization' => array(
             'className' => 'Organization',
             'foreignKey' => 'application_id',
@@ -324,6 +330,12 @@ class Application extends AppModel
             'foreignKey' => 'foreign_key',
             'dependent' => true,
             'conditions' => array('AnnualApproval.model' => 'AnnualApproval'),
+        ),
+        'AmendmentChecklist' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('AmendmentChecklist.model' => 'AmendmentChecklist'),
         ),
         'Reminder' => array(
             'className' => 'Reminder',
