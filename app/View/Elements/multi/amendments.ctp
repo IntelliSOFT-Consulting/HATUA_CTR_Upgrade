@@ -10,6 +10,9 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
         <tr>
             <th>Year</th>
             <th class="actions"><?php echo __('Files'); ?></th>
+            <?php if ($redir === 'manager') { ?>
+                <th class="actions"><?php echo __('Action'); ?></th>
+            <?php } ?>
         </tr>
     </thead>
     <tbody>
@@ -53,6 +56,21 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
 
                     ?>
                 </td>
+                <?php if ($redir === 'manager') { ?>
+                    <td>
+                         <?php
+                          echo '<p>';
+                          echo $this->Html->link('Approve',
+                              array(
+                                  'controller' => 'attachments',  'action' => 'approve', $year,
+                                  'admin' => false
+                              ),
+                              array('class' => 'btn  btn-primary btn-link')
+                          ); 
+                          echo '</p>';
+                         ?>
+                    </td>
+                <?php } ?>
             </tr>
         <?php endforeach; ?>
     </tbody>
@@ -191,7 +209,7 @@ if ($redir == 'applicant') {
                     </div>
                 </div> -->
 
-                <?php echo $this->element('multi/amendment_attachment'); 
+                <?php echo $this->element('multi/amendment_attachment');
                 ?>
             </div>
         </div>

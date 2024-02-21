@@ -15,8 +15,17 @@ class AttachmentsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('applicant_upload');
+        $this->Auth->allow('applicant_upload','approve');
     }
+
+
+    public function approve($id=null) {
+        $this->loadModel('Pocket');
+        $approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'initial_approval_letter')));
+
+      
+
+	}
     public function applicant_upload()
     {
         if ($this->request->is('post')) {
