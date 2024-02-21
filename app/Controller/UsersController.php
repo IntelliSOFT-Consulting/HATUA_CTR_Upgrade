@@ -166,17 +166,18 @@ class UsersController extends AppController {
     }
 
     public function inspector_dashboard() {
-        $my_applications = $this->User->ActiveInspector->find('list', array(
-            'conditions' => array('ActiveInspector.user_id' => $this->Auth->User('id')),
-            'fields' => array('ActiveInspector.application_id'),
-            'contain' => array()));
-        // pr($my_applications);
-        $this->set('applications', $this->Application->find('all', array(
-            'limit' => 5, 'fields' => array('id','study_drug', 'created'),
-            'order' => array('Application.created' => 'desc'),
-            'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
-            'contain' => array('ActiveInspector'),
-        ))); 
+      
+       $my_applications = $this->User->ActiveInspector->find('list', array(
+        'conditions' => array('ActiveInspector.user_id' => $this->Auth->User('id'), 'ActiveInspector.type' => 'request', 'ifnull(ActiveInspector.accepted,-1)' => array('accepted', '-1')),
+        'fields' => array('ActiveInspector.application_id'),
+        'contain' => array()));
+    // pr($my_applications);
+    $this->set('applications', $this->Application->find('all', array(
+        'limit' => 5, 'fields' => array('id','study_drug', 'created'),
+        'order' => array('Application.created' => 'desc'),
+        'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
+        'contain' => array('ActiveInspector'),
+    )));
         $this->User->Notification->recursive = -1;
         $this->set('notifications', $this->User->Notification->find('all', array(
             'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
