@@ -16,7 +16,7 @@ class CommentsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('manager_comment_content_download', 'verify', 'generateQRCode', 'applicant_comment_content_download', 'manager_add_annual_letter', 'applicant_add_annual_letter');
+        $this->Auth->allow('manager_comment_content_download','inspector_add_dev_external', 'verify', 'generateQRCode', 'applicant_comment_content_download', 'manager_add_annual_letter', 'applicant_add_annual_letter');
     }
     public function verify($id = null)
     {
@@ -488,6 +488,11 @@ class CommentsController extends AppController
         $this->add_dev_external();
     }
     public function monitor_add_dev_external()
+    {
+        $this->add_dev_external();
+    }
+    
+    public function inspector_add_dev_external()
     {
         $this->add_dev_external();
     }

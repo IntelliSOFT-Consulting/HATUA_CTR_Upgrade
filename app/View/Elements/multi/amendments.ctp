@@ -8,7 +8,7 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
 <table class="table table-bordered table-condensed table-striped">
     <thead>
         <tr>
-            <th>Year</th>
+            <th>Number</th>
             <th class="actions"><?php echo __('Files'); ?></th>
             <?php if ($redir === 'manager') { ?>
                 <th class="actions"><?php echo __('Action'); ?></th>

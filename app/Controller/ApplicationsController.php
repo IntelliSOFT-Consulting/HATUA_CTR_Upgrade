@@ -21,7 +21,7 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('index','manager_amendment_summary','genereateQRCode','manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
+        $this->Auth->allow('index', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
 
     public function genereateQRCode($id = null)
@@ -85,7 +85,7 @@ class ApplicationsController extends AppController
 
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
- 
+
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
             $applications = $this->Application->find(
@@ -102,17 +102,15 @@ class ApplicationsController extends AppController
 
         //in case of pdf export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
-           
+
             $applications = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
-            ); 
+            );
             $this->set(compact('applications'));
             // $this->layout = false;
             // $this->render('csv_export');
             $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
-
-           
         }
         //end pdf export
 
@@ -183,7 +181,7 @@ class ApplicationsController extends AppController
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
     }
-    
+
     /**
      * stages method
      *
@@ -859,7 +857,7 @@ class ApplicationsController extends AppController
                             ));
 
 
-                            if (isset($this->request->data['AmendmentChecklist']))
+                        if (isset($this->request->data['AmendmentChecklist']))
                             $this->set('response', array(
                                 'message' => 'Success',
                                 'content' => $this->Application->Attachment->find(
@@ -1001,7 +999,7 @@ class ApplicationsController extends AppController
         $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 2, 6), 'User.is_active' => 1))));
         $this->set('inspectors', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(2, 6), 'User.is_active' => 1))));
 
-        
+
         $this->request->data = $application;
 
         if (strpos($this->request->url, 'pdf') !== false) {
@@ -1014,7 +1012,7 @@ class ApplicationsController extends AppController
     }
     public function inspector_view($id = null)
     {
-        
+
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
             throw new NotFoundException(__('Invalid application'));
@@ -1065,8 +1063,8 @@ class ApplicationsController extends AppController
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
         }
     }
-    
-    
+
+
 
     public function inspector_view_alt($id = null)
     {
@@ -1808,9 +1806,8 @@ class ApplicationsController extends AppController
                             $s1['ApplicationStage']['comment'] = 'Principal Investigator Re Submission';
                             $s1['ApplicationStage']['end_date'] = date('Y-m-d');
                             $this->Application->ApplicationStage->save($s1);
-                        }    
-                    }        
-
+                        }
+                    }
                 } else {
                     $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
                     $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
@@ -2112,7 +2109,7 @@ class ApplicationsController extends AppController
                             'stage' => 'Unsubmitted',
                             'status' => 'Current',
                             'comment' => 'Admin unsubmission',
-                            'start_date' => date('Y-m-d'), 
+                            'start_date' => date('Y-m-d'),
                         )
                     )
                 );
@@ -2232,5 +2229,69 @@ class ApplicationsController extends AppController
         $this->set(compact('applications'));
         $this->layout = false;
         $this->render('csv_export');
+    }
+
+
+
+    public function admin_suspend($id = null)
+    {
+
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('Application does not exist!'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $data = $this->request->data;
+        // debug($data);
+        // exit;
+
+        if (empty($this->request->data['Application']['status'])) {
+            $this->Session->setFlash(__('Please select status'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+
+
+        if (empty($this->request->data['Application']['admin_stopped_reason'])) {
+            $this->Session->setFlash(__('Please provide reason'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+
+        $trial_statuses = "";
+        if ($data['Application']['status'] == 3) {
+            $trial_statuses = "Suspended";
+        } else {
+            $trial_statuses =  "Stopped";
+        }
+        $app = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+        ));
+        if ($this->Application->saveField('admin_stopped',true)) {
+            $this->Application->saveField('trial_status_id',$this->request->data['Application']['status']);
+            $this->Application->saveField('admin_stopped_reason',$this->request->data['Application']['admin_stopped_reason']);
+            $this->loadModel('AuditTrail');
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $id,
+                    'model' => 'Application',
+                    'message' => 'A Report with protocol number ' . $app['Application']['protocol_no'] . ' has been ' . $trial_statuses . ' by ' . $this->Auth->user('name'),
+                    'ip' => $app['Application']['protocol_no']
+                )
+            );
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($app['Application']['protocol_no'], 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'audit_error');
+                $this->log($app['Application']['protocol_no'], 'audit_error');
+            }
+            $this->Session->setFlash(__('The application has been successfully ' . $trial_statuses), 'alerts/flash_success');
+            $this->redirect($this->referer());
+        } else {
+            debug($this->Application->validationErrors);
+            exit;
+            $this->Session->setFlash(__('Failed to update the application status: '), 'alerts/flash_error'); // Displaying application save errors
+    $this->redirect($this->referer());
+        }
     }
 }

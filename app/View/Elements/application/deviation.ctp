@@ -6,7 +6,7 @@
   <div class="row-fluid">
     <div class="span12">      
         <?php 
-          if($redir == 'applicant' or $redir == 'monitor') {
+          if($redir == 'applicant' or $redir == 'monitor' or $redir == 'inspector') {
               echo $this->Html->link(__('<i class="icon-random"></i> Add Protocol Deviation'),
                         array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']),
                         array('escape' => false, 'class' => 'btn btn-info'));
@@ -44,6 +44,8 @@
                   if($redir === 'applicant' && $deviation['user_id'] == $this->Session->read('Auth.User.id')) echo $this->Html->link('<label class="label label-success">Edit</label>',
                                    array('action' => 'view', $application['Application']['id'], 'deviation_edit' => $deviation['id']), array('escape'=>false));
                   if($redir === 'monitor' && $deviation['user_id'] == $this->Session->read('Auth.User.id')) echo $this->Html->link('<label class="label label-success">Edit</label>',
+                                   array('action' => 'view', $application['Application']['id'], 'deviation_edit' => $deviation['id']), array('escape'=>false));
+                  if($redir === 'inspector' && $deviation['user_id'] == $this->Session->read('Auth.User.id')) echo $this->Html->link('<label class="label label-success">Edit</label>',
                                    array('action' => 'view', $application['Application']['id'], 'deviation_edit' => $deviation['id']), array('escape'=>false));
                   echo "&nbsp;";
 

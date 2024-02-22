@@ -17,6 +17,13 @@ class DeviationsController extends AppController {
  *
  * @return void
  */
+public function beforeFilter()
+{
+    parent::beforeFilter();
+    $this->Auth->allow('inspector_add','inspector_edit','inspector_download_deviation');
+}
+
+ 
     
 
     public function applicant_index() {
@@ -42,6 +49,7 @@ class DeviationsController extends AppController {
         $this->set('page_options', $page_options);
         $this->set('deviations', Sanitize::clean($this->paginate(), array('encode' => false)));
     }
+    
     public function monitor_index() {
         $this->Prg->commonProcess();
         $page_options = array('25' => '25', '20' => '20');
@@ -122,6 +130,10 @@ class DeviationsController extends AppController {
  * @param string $id
  * @return void
  */
+
+
+
+
     public function view($id = null) {
         // $this->Deviation->id = $id;
         // if (!$this->Deviation->exists()) {
@@ -239,6 +251,28 @@ class DeviationsController extends AppController {
             $this->Session->setFlash(__('The protocol deviation could not be created. Please notify the administrator.'), 'alerts/flash_error');
         }
     }
+    public function inspector_add($application_id = null) {
+        $this->Deviation->create();
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+            'contain' => array('InvestigatorContact')
+        ));
+        $count = $this->Deviation->find('count',  array('conditions' => array(
+                        'Deviation.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s")))));
+        $count++; 
+        $count = ($count < 10) ? "0$count" : $count;
+        $data = array('application_id' => $application_id,  'study_title' => $application['Application']['study_title'], 'user_id' => $this->Auth->User('id'),
+                      'reference_no' => 'DEV/'.date('Y').'/'.$count,
+                      'pi_name' => $application['InvestigatorContact'][0]['given_name'].' '.$application['InvestigatorContact'][0]['middle_name'].' '.$application['InvestigatorContact'][0]['family_name']
+                );
+        if ($this->Deviation->saveAssociated(array('Deviation' => $data))) {            
+            $this->Session->setFlash(__('The protocol deviation has been created. Kindly update the details and submit!!'), 'alerts/flash_info');
+            $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_edit' => $this->Deviation->id));
+        } else {
+            $this->Session->setFlash(__('The protocol deviation could not be created. Please notify the administrator.'), 'alerts/flash_error');
+        }
+    }
+
 
 /**
  * edit method
@@ -309,7 +343,38 @@ class DeviationsController extends AppController {
             $this->request->data = $application;
         }
     }
-
+    public function inspector_edit($id = null, $application_id = null) {
+        // debug($this->request);
+        $this->Deviation->id = $id;
+        if (!$this->Deviation->exists()) {
+            throw new NotFoundException(__('Invalid deviation'));
+        }
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->Deviation->saveMany($this->request->data['Deviation'], array('deep' => true))) {
+            	// debug($this->request->data);
+                if (isset($this->request->data['submitReport'])) {
+                  $this->Deviation->saveField('status', 'Submitted');                    
+	                $this->Session->setFlash(__('The protocol deviation has been submitted'), 'alerts/flash_success');
+	                $this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_view' => $id));
+                } else {
+              	   $this->Session->setFlash(__('The protocol deviation has been saved'), 'alerts/flash_success');
+                 	$this->redirect(array('controller' => 'applications' , 'action' => 'view', $application_id, 'deviation_edit' => $id));
+                }
+            } else {
+                $this->Session->setFlash(__('The protocol deviation could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        } else {
+            $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $application_id),
+            'contain' => array('Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 
+                'AnnualApproval', 'Document', 'Review', 'Deviation'
+                )));
+            $this->request->data = $application;
+        }
+    }
+    
     public function manager_unsubmit($id = null) {
         if (!$this->request->is('post')) {
             throw new MethodNotAllowedException();

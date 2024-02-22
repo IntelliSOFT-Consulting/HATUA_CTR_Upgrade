@@ -10,7 +10,7 @@
 <hr>
 <?php
 $medals = $this->requestAction('/pockets/checklist/protocol');
-$reqs = $this->requestAction('/pockets/lchecklist/protocol');
+$reqs = $this->requestAction('/pockets/lchecklist/protocol'); 
 foreach ($medals as $lad => $medal) {
     $num++;
     ($reqs[$lad]) ? $req = '<span class="sterix">*</span>' : $req = '';

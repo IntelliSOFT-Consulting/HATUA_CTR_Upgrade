@@ -101,7 +101,14 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
             ?>
           </td>
         </tr>
-      <?php  } ?>
+
+        <?php if (!empty($application['Application']['admin_stopped_reason'])) { ?>
+        <tr>
+          <td colspan="2"> Reason for admin action: <br />
+          <?php   echo $application['Application']['admin_stopped_reason']; ?>
+          </td>
+        </tr>
+      <?php } } ?>
 
     </tbody>
   </table>
