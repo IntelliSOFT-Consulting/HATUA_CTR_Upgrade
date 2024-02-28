@@ -97,11 +97,12 @@ class AttachmentsController extends AppController
 
         foreach ($data as $formdata) {
             if ($formdata['year'] == $id) {
+                $pocket_name = !empty($formdata['pocket_name']) ? $formdata['pocket_name'] : $formdata['description'];
 
                 $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false, 'full_base' => true));
                 (isset($checklist[$formdata['pocket_name']])) ?
-                    $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>' :
-                    $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>';
+                    $checklist[$pocket_name] .= $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>' :
+                    $checklist[$pocket_name] = $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>';
             }
         }
         $deeds = $this->Pocket->find('list', array(
@@ -112,12 +113,15 @@ class AttachmentsController extends AppController
 
      
         $checkstring = '';
-        $num = 0;
-        foreach ($checklist as $kech => $check) {
-             
-            $num++;
-            $checkstring .= $num . '. ' . $deeds[$kech] . '<br>' . $check;
+        $num = 0; 
+        foreach ($checklist as $kech => $check) {             
+            $num++;            
+            // $checkstring .= $num . '. ' . $deeds[$kech] . '<br>' . $check;
+            $checkstring .= $num . '. ' . (isset($deeds[$kech]) ? $deeds[$kech] : $kech) . '<br>' . $check;
+
         }
+        // debug($checkstring);
+        // exit;
 
         $cnt = $this->Application->AmendmentLetter->find('count', array('conditions' => array('date_format(AmendmentLetter.created, "%Y")' => date("Y"))));
         $cnt++;
@@ -198,11 +202,11 @@ class AttachmentsController extends AppController
         //**********************************    END   *********************************
         //end
         // Create a Audit Trail
-        $this->loadModel('User');
+        // $this->loadModel('User');
         $this->loadModel('AuditTrail');
         $audit = array(
             'AuditTrail' => array(
-                'foreign_key' => $this->Application->field('id'),
+                'foreign_key' => $application['Application']['id'] ,
                 'model' => 'Application',
                 'message' => 'Amendment for the report with protocol number ' .  $application['Application']['protocol_no'] . ' has been successfully approved by ' . $this->Auth->user('username'),
                 'ip' =>  $application['Application']['protocol_no']
@@ -217,7 +221,7 @@ class AttachmentsController extends AppController
         }
         $this->genereateQRCode($this->AmendmentLetter->id);
         $this->Session->setFlash(__('Successfully approved the protocol. '), 'alerts/flash_success');
-        $this->redirect(array('action' => 'view', $application_id));
+        $this->redirect($this->referer());
     }
     public function applicant_upload()
     {
@@ -271,23 +275,7 @@ class AttachmentsController extends AppController
         }
         $this->set('attachment', $this->Attachment->read(null, $id));
     }
-
-    /*public function download($id = null) {
-        $this->viewClass = 'Media';
-        $this->Attachment->id = $id;
-        if (!$this->Attachment->exists()) {
-            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
-            $this->redirect($this->referer());
-        } else {
-            $attachment = $this->Attachment->read(null, $id);
-            $params = array(
-                'id'        => $attachment['Attachment']['basename'],
-                'download'  => true,
-                'path'      => 'media'. DS .'transfer'. DS .$attachment['Attachment']['dirname'] . DS
-            );
-            $this->set($params);
-        }
-    }*/
+ 
 
     public function download($id = null)
     {

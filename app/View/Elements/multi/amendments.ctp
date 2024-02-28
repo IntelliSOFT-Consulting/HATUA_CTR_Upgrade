@@ -2,8 +2,8 @@
 <?php
 $this->Html->script('multi/amendment_attachment', array('inline' => false));
 if ($redir === 'applicant') {
-// $this->Html->script('multi/amendment_checklist', array('inline' => false));
-$this->Html->script('multi/extras', array('inline' => false));
+    // $this->Html->script('multi/amendment_checklist', array('inline' => false));
+    $this->Html->script('multi/extras', array('inline' => false));
 }
 ?>
 
@@ -56,22 +56,23 @@ $this->Html->script('multi/extras', array('inline' => false));
                     }
                     echo "<h5>Additional Files</h5>";
 
-                    $cc=0;
+                    $ccloop=0;
                     foreach ($application['AmendmentChecklist'] as $anc) {
-                        $cc++;
+                       
                         if ($anc['year'] == $year && $anc['pocket_name'] == '') {
+                            $ccloop++;
                             $id = $anc['id'];
                             $version_no = $anc['version_no'];
                             $file_date = $anc['file_date'];
                             $description = $anc['description'];
-                            echo "<br>".$cc.". ".$description."<br>";
+                            echo "<br>" . $ccloop . ". " . $description . "<br>";
                             echo "&nbsp;&nbsp; <span id='$rem$id'> &nbsp;<i class='icon-file-text-alt'></i> ";
                             echo $this->Html->link(
                                 __($anc['basename']),
                                 array('controller' => 'attachments', 'action' => 'download', $anc['id'], 'full_base' => true),
                                 array('class' => '')
                             );
-                          
+
                             echo "</span>&nbsp;
                       <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>
                       <span id='fileDate$id' style='margin-left:10px;'>Dated: $file_date</span>
@@ -86,27 +87,29 @@ $this->Html->script('multi/extras', array('inline' => false));
 
                 <td>
                     <?php
-                    if ($redir === 'manager') {
+                    if (!empty($year)) {
+                        if ($redir === 'manager') {
 
-                        echo $this->Html->link(
-                            '<span class="label label-info"> Approve </span>',
-                            array(
-                                'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
-                                'admin' => false
-                            ),
-                            array('escape' => false)
-                        );
-                        echo "&nbsp;";
-                    } else {
-                        echo $this->Html->link(
-                            '<span class="label label-info"> Download </span>',
-                            array(
-                                'controller' => 'amendment_letters',  'ext' => 'pdf', 'action' => 'download', $year,
-                                'admin' => false
-                            ),
-                            array('escape' => false)
-                        );
-                        echo "&nbsp;";
+                            echo $this->Html->link(
+                                '<span class="label label-info"> Approve </span>',
+                                array(
+                                    'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
+                                    'admin' => false
+                                ),
+                                array('escape' => false)
+                            );
+                            echo "&nbsp;";
+                        } else {
+                            echo $this->Html->link(
+                                '<span class="label label-info"> Download </span>',
+                                array(
+                                    'controller' => 'amendment_letters',  'ext' => 'pdf', 'action' => 'download', $year,
+                                    'admin' => false
+                                ),
+                                array('escape' => false)
+                            );
+                            echo "&nbsp;";
+                        }
                     } ?>
                 </td>
 

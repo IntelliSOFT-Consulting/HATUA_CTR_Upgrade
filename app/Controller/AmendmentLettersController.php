@@ -34,7 +34,8 @@ class AmendmentLettersController extends AppController {
 
         $data = $this->AmendmentLetter->find('first',array(
                 'contain' => array(),
-                'conditions' => array('AmendmentLetter.status' => $id)
+                'conditions' => array('AmendmentLetter.status' => $id),
+                'order' => array('AmendmentLetter.created DESC')
             )
         ); 
         $this->set('AmendmentLetter', $data);
