@@ -18,6 +18,7 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
+    <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
     <?php
     $count_reviews = 0;
     $count_inspectors = 0;
@@ -211,7 +212,7 @@ echo $this->Session->flash();
               <div class="tab-pane active" id="feedback_list">
                 <div class="row-fluid">
                   <div class="span12">
-                    <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment'],'category'=>true]) ?>
+                    <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment'], 'category' => true]) ?>
                   </div>
                 </div>
               </div>
@@ -229,7 +230,7 @@ echo $this->Session->flash();
                         'url' => 'add_screening_query',
                         'type' => 50
                       ]
-                    ]) 
+                    ])
                     ?>
                   </div>
                 </div>
@@ -432,7 +433,7 @@ echo $this->Session->flash();
                   <div class="span8">
                     <?php
                     // debug($rid);
-                    if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'],'show'=>false]);
+                    if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'], 'show' => false]);
                     ?>
                   </div>
                   <div class="span4 lefty">
@@ -461,7 +462,7 @@ echo $this->Session->flash();
                   <div class="span8">
                     <?php
                     // debug($rid);
-                    if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment'],'show'=>false]);
+                    if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['InternalComment'], 'show' => false]);
 
                     //NEW*** Bring in all the assessment comments
                     $rcas = Hash::extract($application, 'Review.{n}[type=reviewer_comment]');
@@ -469,7 +470,7 @@ echo $this->Session->flash();
                       echo "<hr>";
                       echo "<h4 class='text-success' style='text-align: center; text-decoration: underline'>Assessment comments</h4>";
                       foreach ($rcas as $rca) {
-                        echo $this->element('comments/list', ['comments' => $rca['InternalComment'],'show'=>false]);
+                        echo $this->element('comments/list', ['comments' => $rca['InternalComment'], 'show' => false]);
                       }
                     }
                     //end
@@ -507,245 +508,254 @@ echo $this->Session->flash();
           <hr>
 
           <!-- start -->
-           
-              <?php
-              echo $this->Form->create(
-                'ActiveInspector',
-                array('url' => array('controller' => 'active_inspectors', 'action' => 'assign', $application['Application']['id']))
-              );
-              $counter = 0;
-              echo "<ol>";
-              foreach ($inspectors as $user_id => $user) {
-                echo "<li>";
-                $responded = false;
-                foreach ($application['ActiveInspector'] as $response) {
 
-                  if ($response['user_id'] == $user_id) {
-                    $responded = true;
-                    echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . '<small class="muted">
-                     '.$this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'active_inspectors', 'action' => 'revoke', $response['id'],$application['Application']['id']), array('escape' => false)).'
-                    </small></p>'; 
-                  }
-                }
+          <?php
+          echo $this->Form->create(
+            'ActiveInspector',
+            array('url' => array('controller' => 'active_inspectors', 'action' => 'assign', $application['Application']['id']))
+          );
+          $counter = 0;
+          echo "<ol>";
+          foreach ($inspectors as $user_id => $user) {
+            echo "<li>";
+            $responded = false;
+            foreach ($application['ActiveInspector'] as $response) {
 
-                if (!$responded) {
-                  echo '<label class="checkbox" style="color: #333333">';
-                  echo $this->Form->checkbox($counter . '.ActiveInspector.user_id', array('hiddenField' => false, 'value' => $user_id));
-                  echo $user;
-                  echo '</label>';
-                }
-                $counter++;
-                echo "</li>";
+              if ($response['user_id'] == $user_id) {
+                $responded = true;
+                echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . '<small class="muted">
+                     ' . $this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'active_inspectors', 'action' => 'revoke', $response['id'], $application['Application']['id']), array('escape' => false)) . '
+                    </small></p>';
               }
-              echo "</ol>";
-              echo $this->Form->input('Message.text', array('type' => 'textarea', 'rows' => 3, 'label' => 'Message'));
-              echo $this->Form->end(array('label' => 'Assign','value' => 'Assign', 'class' => 'btn btn-success'));
-              ?>
-            
-              <!-- end -->
+            }
 
-              <hr>
+            if (!$responded) {
+              echo '<label class="checkbox" style="color: #333333">';
+              echo $this->Form->checkbox($counter . '.ActiveInspector.user_id', array('hiddenField' => false, 'value' => $user_id));
+              echo $user;
+              echo '</label>';
+            }
+            $counter++;
+            echo "</li>";
+          }
+          echo "</ol>";
+          echo $this->Form->input('Message.text', array('type' => 'textarea', 'rows' => 3, 'label' => 'Message'));
+          echo $this->Form->end(array('label' => 'Assign', 'value' => 'Assign', 'class' => 'btn btn-success'));
+          ?>
 
-              <?php
-              echo $this->element('/application/inspection_edit');
-              ?>
-            </div>
-          </div>
+          <!-- end -->
+
+          <hr>
+
+          <?php
+          echo $this->element('/application/inspection_edit');
+          ?>
         </div>
-
-        <div class="tab-pane" id="tab7">
-          <div class="row-fluid">
-            <div class="span12">
-
-              <table class="table  table-bordered table-striped">
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Reference No.</th>
-                    <th>Report Type</th>
-                    <th>Patient Initials</th>
-                    <th>Created</th>
-                    <th class="actions"><?php echo __('Actions'); ?></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  foreach ($application['Sae'] as $sae) : ?>
-                    <tr class="">
-                      <td><?php echo h($sae['id']); ?>&nbsp;</td>
-                      <td><?php echo h($sae['reference_no']); ?>&nbsp;</td>
-                      <td><?php echo h($sae['report_type']);
-                          if ($sae['report_type'] == 'Followup') {
-                            echo "<br> Initial: ";
-                            echo $this->Html->link(
-                              '<label class="label label-info">' . substr($sae['reference_no'], 0, strpos($sae['reference_no'], '-')) . '</label>',
-                              array('controller' => 'saes', 'action' => 'view', $sae['sae_id']),
-                              array('escape' => false)
-                            );
-                          }
-                          ?>&nbsp;
-                      </td>
-                      <td><?php echo h($sae['patient_initials']); ?>&nbsp;</td>
-                      <td><?php echo h($sae['created']); ?>&nbsp;</td>
-                      <td class="actions">
-                        <?php if ($sae['approved'] > 0) echo $this->Html->link(
-                          __('<label class="label label-info">View</label>'),
-                          array('controller' => 'saes', 'action' => 'view', $sae['id']),
-                          array('target' => '_blank', 'escape' => false)
-                        ); ?>
-                        <?php if ($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('escape' => false)); ?>
-                        <?php
-                        if ($sae['approved'] < 1) {
-                          echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
-                        }
-                        if ($redir === 'applicant' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
-                        ?>
-                      </td>
-                    </tr>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab15">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('application/ciom'); ?>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab13">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('application/deviation'); ?>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab8">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('multi/approval'); ?>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab9">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('multi/final'); ?>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="tab-pane" id="tab10">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('multi/approval_participants'); ?>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab14">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('multi/annual_manufacturers'); ?>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab11">
-          <?php echo $this->element('multi/approval_budget'); ?>
-        </div>
-
-        <div class="tab-pane" id="tab12">
-          <div class="row-fluid">
-            <div class="span12">
-              <?php echo $this->element('multi/annual_letters'); ?>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <script text="type/javascript">
-      $.expander.defaults.slicePoint = 170;
-      $(function() {
-        $(document).ajaxStop($.unblockUI);
-        $("#tabs").tabs({
-          cookie: {
-            expires: 1
-          }
-        });
+    <div class="tab-pane" id="tab7">
+      <div class="row-fluid">
+        <div class="span12">
 
-        //https://stackoverflow.com/questions/18999501/bootstrap-3-keep-selected-tab-on-page-refresh
-        //from mcaz
-        $('#reviewer_tab a').click(function(e) {
-          e.preventDefault();
-          $(this).tab('show');
-        });
+          <table class="table  table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Reference No.</th>
+                <th>Report Type</th>
+                <th>Patient Initials</th>
+                <th>Created</th>
+                <th class="actions"><?php echo __('Actions'); ?></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              foreach ($application['Sae'] as $sae) : ?>
+                <tr class="">
+                  <td><?php echo h($sae['id']); ?>&nbsp;</td>
+                  <td><?php echo h($sae['reference_no']); ?>&nbsp;</td>
+                  <td><?php echo h($sae['report_type']);
+                      if ($sae['report_type'] == 'Followup') {
+                        echo "<br> Initial: ";
+                        echo $this->Html->link(
+                          '<label class="label label-info">' . substr($sae['reference_no'], 0, strpos($sae['reference_no'], '-')) . '</label>',
+                          array('controller' => 'saes', 'action' => 'view', $sae['sae_id']),
+                          array('escape' => false)
+                        );
+                      }
+                      ?>&nbsp;
+                  </td>
+                  <td><?php echo h($sae['patient_initials']); ?>&nbsp;</td>
+                  <td><?php echo h($sae['created']); ?>&nbsp;</td>
+                  <td class="actions">
+                    <?php if ($sae['approved'] > 0) echo $this->Html->link(
+                      __('<label class="label label-info">View</label>'),
+                      array('controller' => 'saes', 'action' => 'view', $sae['id']),
+                      array('target' => '_blank', 'escape' => false)
+                    ); ?>
+                    <?php if ($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('escape' => false)); ?>
+                    <?php
+                    if ($sae['approved'] < 1) {
+                      echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
+                    }
+                    if ($redir === 'applicant' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
+                    ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
 
-        $('#reviewer_tab a').on("shown", function(e) {
-          var id = $(e.target).attr("href");
-          localStorage.setItem('assessmentTab', id)
-        });
+        </div>
+      </div>
+    </div>
 
-        var assessmentTab = localStorage.getItem('assessmentTab');
-        if (assessmentTab != null) {
-          // console.log("select tab");
-          // console.log($('#reviewer_tab a[href="' + assessmentTab + '"]'));
-          $('#reviewer_tab a[href="' + assessmentTab + '"]').tab('show');
-        }
+    <div class="tab-pane" id="tab15">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('application/ciom'); ?>
+        </div>
+      </div>
+    </div>
 
-        var hashaTab = $('#reviewer_tab a[href="' + location.hash + '"]');
-        hashaTab && hashaTab.tab('show');
+    <div class="tab-pane" id="tab13">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('application/deviation'); ?>
+        </div>
+      </div>
+    </div>
 
-        $(".morecontent").expander();
-        $('#ReviewText').ckeditor();
-        $('#ReviewRecommendation').ckeditor();
+    <div class="tab-pane" id="tab8">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/approval'); ?>
+        </div>
+      </div>
+    </div>
 
-        $('.ResendReview').on('click', function() {
-          // console.log($(this).serialize())
-          var data_save = new Array();
-          var aindi = $(this).attr('id');
-          data_save.push({
-            name: "data[Review][id]",
-            value: aindi
-          });
-          $.ajax({
-            url: '/manager/notifications/resend/' + aindi,
-            type: 'put',
-            dataType: 'json',
-            data: data_save,
-            beforeSend: function() {
-              $.blockUI({
-                css: {
-                  border: 'none',
-                  padding: '15px',
-                  backgroundColor: '#000',
-                  '-webkit-border-radius': '10px',
-                  '-moz-border-radius': '10px',
-                  opacity: .5,
-                  color: '#fff'
-                },
-                message: '<p class="lead"><span><i class="icon-spinner icon-spin"></i> Please wait... </span></p>'
-              });
-            },
-            success: function(data) {
-              alert('Notification has been resent!');
-            },
-            error: function(xhr, err) {
-              alert('Error: Could not resend notification. Contact administrator.');
-            }
-          });
-          return false;
-        });
+    <div class="tab-pane" id="tab9">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/final'); ?>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="tab-pane" id="tab10">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/approval_participants'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab14">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/annual_manufacturers'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab11">
+      <?php echo $this->element('multi/approval_budget'); ?>
+    </div>
+
+    <div class="tab-pane" id="tab12">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/annual_letters'); ?>
+        </div>
+      </div>
+    </div>
+
+    <!-- Amendments Section -->
+    <div class="tab-pane" id="amendments">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('multi/amendments'); ?>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script text="type/javascript">
+  $.expander.defaults.slicePoint = 170;
+  $(function() {
+    $(document).ajaxStop($.unblockUI);
+    $("#tabs").tabs({
+      cookie: {
+        expires: 1
+      }
+    });
+
+    //https://stackoverflow.com/questions/18999501/bootstrap-3-keep-selected-tab-on-page-refresh
+    //from mcaz
+    $('#reviewer_tab a').click(function(e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+
+    $('#reviewer_tab a').on("shown", function(e) {
+      var id = $(e.target).attr("href");
+      localStorage.setItem('assessmentTab', id)
+    });
+
+    var assessmentTab = localStorage.getItem('assessmentTab');
+    if (assessmentTab != null) {
+      // console.log("select tab");
+      // console.log($('#reviewer_tab a[href="' + assessmentTab + '"]'));
+      $('#reviewer_tab a[href="' + assessmentTab + '"]').tab('show');
+    }
+
+    var hashaTab = $('#reviewer_tab a[href="' + location.hash + '"]');
+    hashaTab && hashaTab.tab('show');
+
+    $(".morecontent").expander();
+    $('#ReviewText').ckeditor();
+    $('#ReviewRecommendation').ckeditor();
+
+    $('.ResendReview').on('click', function() {
+      // console.log($(this).serialize())
+      var data_save = new Array();
+      var aindi = $(this).attr('id');
+      data_save.push({
+        name: "data[Review][id]",
+        value: aindi
       });
-    </script>
-    <?php $this->end(); ?>
+      $.ajax({
+        url: '/manager/notifications/resend/' + aindi,
+        type: 'put',
+        dataType: 'json',
+        data: data_save,
+        beforeSend: function() {
+          $.blockUI({
+            css: {
+              border: 'none',
+              padding: '15px',
+              backgroundColor: '#000',
+              '-webkit-border-radius': '10px',
+              '-moz-border-radius': '10px',
+              opacity: .5,
+              color: '#fff'
+            },
+            message: '<p class="lead"><span><i class="icon-spinner icon-spin"></i> Please wait... </span></p>'
+          });
+        },
+        success: function(data) {
+          alert('Notification has been resent!');
+        },
+        error: function(xhr, err) {
+          alert('Error: Could not resend notification. Contact administrator.');
+        }
+      });
+      return false;
+    });
+  });
+</script>
+<?php $this->end(); ?>

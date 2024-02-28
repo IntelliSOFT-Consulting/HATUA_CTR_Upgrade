@@ -1,6 +1,8 @@
 <!-- Annual Approval Checklists -->
 <?php
 $this->Html->script('multi/amendment_attachment', array('inline' => false));
+// $this->Html->script('multi/amendmentchecklist', array('inline' => false));
+$this->Html->script('multi/extra', array('inline' => false));
 ?>
 
 <h4 style="background-color: #37732c; color: #fff; text-align: center;">Amendments Checklist </h4>
@@ -9,10 +11,9 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
     <thead>
         <tr>
             <th>Number</th>
-            <th class="actions"><?php echo __('Files'); ?></th>
-            <?php if ($redir === 'manager') { ?>
+            <th class="actions"><?php echo __('Files'); ?></th> 
                 <th class="actions"><?php echo __('Action'); ?></th>
-            <?php } ?>
+            
         </tr>
     </thead>
     <tbody>
@@ -56,9 +57,10 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
 
                     ?>
                 </td>
-                <?php if ($redir === 'manager') { ?>
+                
                     <td>
                         <?php
+                        if ($redir === 'manager') { 
                         echo '<p>';
                         echo $this->Html->link(
                             'Approve',
@@ -69,6 +71,7 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
                             array('class' => 'btn btn-primary btn-link')
                         );
                         echo '</p>';
+                         } else {
                         echo $this->Html->link(
                             'Download',
                             array(
@@ -78,20 +81,20 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
                             array('class' => 'btn btn-info btn-link')
                         );
                         echo '</p>';
-                        ?>
+                     } ?>
                     </td>
-                <?php } ?>
+               
             </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
 
 <hr>
-<h5>Checklist Form</h5>
+
 <?php
 if ($redir == 'applicant') {
 ?>
-
+<h5>Checklist Form</h5>
     <ul id="amendment_tab" class="nav nav-tabs">
         <li class="active"><a href="#aaa">Checklist</a></li>
         <li><a href="#bbb">Additional Files</a></li>
@@ -208,19 +211,25 @@ if ($redir == 'applicant') {
         <div class="tab-pane" id="bbb">
             <div class="span12">
 
-                <div class="row-fluid">
-                    <div class="span11">
-                        <div class="uploadsTableA">
-                            <h6 class="muted"><b>Attach File(s) </b>
-                                <button type="button" class="btn btn-primary btn-small addUploadA">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
-                            </h6>
-                            <hr>
-                        </div>
-                    </div>
-                </div>
+            <p class="selected-year-name"></p>
+                <h5><i class="icon-file"></i> Add additional files:
+                    <button type="button" class="btn-mini" id="addAttachmentA">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
+                </h5>
+                <table id="buildamendmentform" class="table table-bordered  table-condensed table-striped">
+                    <thead>
+                        <tr id="amendmentsTableHeader">
+                            <th>#</th>
+                            <th width="30%">File</th>
+                            <th width="40%">Description</th>
+                            <th width="5%">Version</th>
+                            <th width="10%">Date</th>
+                            <th width="15%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                <?php //echo $this->element('multi/amendment_attachment');
-                ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

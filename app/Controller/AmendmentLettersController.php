@@ -27,7 +27,7 @@ class AmendmentLettersController extends AppController {
         if (strpos($this->request->url, 'pdf') !== false) {
 
             $this->pdfConfig = array(
-                'filename' => 'ApprovalLetter_' . $id,
+                'filename' => 'AmendmentLetter_' . $id,
                 'orientation' => 'portrait',
             );
         } 

@@ -7,7 +7,7 @@ $(function () {
     <tr class="attacho">\
         <td>\
             <input name="data[Attachment][{i}][id]" id="attachments-{i}-id" type="hidden"> \
-            <input name="data[Attachment][{i}][file]" id="attachments-{i}-file" type="file" class="firo">\
+            <input name="data[Attachment][{i}][file]" id="attachments-{i}-file" type="file" class="firo basic-file">\
         </td>\
         <td>\
             <input type="hidden" id="attachments-{i}-model" value="Comments" name="data[Attachment][{i}][model]" style="display: inline;">\

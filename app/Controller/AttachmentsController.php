@@ -20,7 +20,25 @@ class AttachmentsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('applicant_upload', 'genereateQRCode', 'approve');
+        $this->Auth->allow('applicant_upload', 'genereateQRCode', 'approve','update_amendment');
+    }
+
+
+    public function update_amendment($id=null ){
+        $this->Attachment->id = $id;
+
+        $data=$this->request->data;
+
+        $this->Attachment->saveField('description',$data['description']);
+        $this->Attachment->saveField('file_date',$data['date']);
+        $this->Attachment->saveField('version_no',$data['version']);
+        $this->Attachment->saveField('year',$data['amendmentId']);
+        $this->set([
+            'status' => 'success',
+            'message' => 'File updated Successfully',            
+            '_serialize' => ['status', 'message']
+        ]);
+
     }
     public function genereateQRCode($id = null)
     {
@@ -140,7 +158,7 @@ class AttachmentsController extends AppController
         );
         $this->AmendmentLetter->Create();
         if (!$this->AmendmentLetter->save($save_data)) {
-            $this->log('Annual approval letter was not saved!!', 'annual_letter_error');
+            $this->log('Amendment approval letter was not saved!!', 'annual_letter_error');
             $this->log($save_data, 'annual_letter_error');
         }
 

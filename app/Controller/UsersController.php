@@ -73,7 +73,7 @@ class UsersController extends AppController {
         $applications = $this->Application->find('all', array(
             'limit' => 20,
             'fields' => array('Application.id','Application.user_id', 'Application.created', 'Application.protocol_no',
-                'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'),
+                'Application.study_drug', 'Application.submitted', 'Application.trial_status_id','Application.admin_stopped','Application.admin_stopped_reason'),
             'order' => array('Application.created' => 'desc'),
             'contain' => array('Review'),
             'conditions' => array('Application.user_id' => $this->Auth->User('id')),

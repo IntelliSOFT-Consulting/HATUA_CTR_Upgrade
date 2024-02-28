@@ -815,9 +815,20 @@ class ApplicationsController extends AppController
             if (!isset($this->request->data['Application']['id']) || empty($this->request->data['Application']['id'])) {
                 $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
+            } elseif (
+                isset($this->request->data['Application']['trial_status_id']) ||
+                isset($this->request->data['Application']['final_report'])
+            ) {
+                // first check if stopped/suspended by admin 
+                $app = $this->Application->find('first', array(
+                    'conditions' => array('Application.id' => $id),
+                ));
+                if ($app['Application']['admin_stopped']) { 
+                    $this->request->data['Application']['trial_status_id']=$app['Application']['trial_status_id']; 
+                }
             } elseif (empty($this->request->data)) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file you provided could not be saved. Kindly ensure that the file is less than
-                    18 MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>'));
+                    20 MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>'));
             } elseif (!$this->Application->saveAll($this->request->data, array(
                 'validate' => 'only',
                 'fieldList' => array(
@@ -825,8 +836,9 @@ class ApplicationsController extends AppController
                 )
             ))) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file(s) is not valid. If the file(s) are more than
-                    18 MB in size please compress them to below 18 7MB first.'));
+                    20 MB in size please compress them to below 20 7MB first.'));
             } else {
+
                 if ($this->Application->saveAssociated($this->request->data, array('validate' => false))) {
                     // $this->log($this->Application->Document->id,'debug');
 
@@ -2266,9 +2278,9 @@ class ApplicationsController extends AppController
         $app = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
         ));
-        if ($this->Application->saveField('admin_stopped',true)) {
-            $this->Application->saveField('trial_status_id',$this->request->data['Application']['status']);
-            $this->Application->saveField('admin_stopped_reason',$this->request->data['Application']['admin_stopped_reason']);
+        if ($this->Application->saveField('admin_stopped', true)) {
+            $this->Application->saveField('trial_status_id', $this->request->data['Application']['status']);
+            $this->Application->saveField('admin_stopped_reason', $this->request->data['Application']['admin_stopped_reason']);
             $this->loadModel('AuditTrail');
             $audit = array(
                 'AuditTrail' => array(
@@ -2291,7 +2303,7 @@ class ApplicationsController extends AppController
             debug($this->Application->validationErrors);
             exit;
             $this->Session->setFlash(__('Failed to update the application status: '), 'alerts/flash_error'); // Displaying application save errors
-    $this->redirect($this->referer());
+            $this->redirect($this->referer());
         }
     }
 }
