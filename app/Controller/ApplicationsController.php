@@ -141,8 +141,7 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'TrialStatus','InvestigatorContact', 'Sponsor','AmendmentChecklist', 'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -154,21 +153,22 @@ class ApplicationsController extends AppController
             $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
             $this->set(compact('applications'));
             $this->layout = false;
-            $this->render('csv_export');
+            $this->render('amendment_csv_export');
         }
         //end csv export
 
 
         //in case of pdf export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
-            $this->csv_export($this->Application->find(
+
+            $applications = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
-            ));
-
-            if (strpos($this->request->url, 'pdf') !== false) {
-                $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
-            }
+            );
+            $this->set(compact('applications'));
+            // $this->layout = false;
+            // $this->render('csv_export');
+            $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
         }
         //end pdf export
 
@@ -823,8 +823,8 @@ class ApplicationsController extends AppController
                 $app = $this->Application->find('first', array(
                     'conditions' => array('Application.id' => $id),
                 ));
-                if ($app['Application']['admin_stopped']) { 
-                    $this->request->data['Application']['trial_status_id']=$app['Application']['trial_status_id']; 
+                if ($app['Application']['admin_stopped']) {
+                    $this->request->data['Application']['trial_status_id'] = $app['Application']['trial_status_id'];
                 }
             } elseif (empty($this->request->data)) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file you provided could not be saved. Kindly ensure that the file is less than

@@ -300,14 +300,14 @@
                     <?php
                   if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                    
-                      // echo $this->Html->link('<i class="icon-file-alt"></i> Amendment Report', array_merge(array('action' => 'amendment_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
+                      echo $this->Html->link('<i class="icon-file-alt"></i> Amendment Report', array_merge(array('action' => 'amendment_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     }
                     ?>
                   </td>
                     <td colspan="2"> <?php
                   if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                    
-                      // echo $this->Html->link('<i class="icon-file"></i> Amendment Report PDF', array_merge(array('action' => 'amendment_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
+                      echo $this->Html->link('<i class="icon-file"></i> Amendment Report PDF', array_merge(array('action' => 'amendment_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
                     }
                     ?></td>     
                 </tr>
