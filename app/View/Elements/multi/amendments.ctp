@@ -1,8 +1,10 @@
 <!-- Annual Approval Checklists -->
 <?php
 $this->Html->script('multi/amendment_attachment', array('inline' => false));
-// $this->Html->script('multi/amendmentchecklist', array('inline' => false));
-$this->Html->script('multi/extra', array('inline' => false));
+if ($redir === 'applicant') {
+// $this->Html->script('multi/amendment_checklist', array('inline' => false));
+$this->Html->script('multi/extras', array('inline' => false));
+}
 ?>
 
 <h4 style="background-color: #37732c; color: #fff; text-align: center;">Amendments Checklist </h4>
@@ -11,9 +13,8 @@ $this->Html->script('multi/extra', array('inline' => false));
     <thead>
         <tr>
             <th>Number</th>
-            <th class="actions"><?php echo __('Files'); ?></th> 
-                <th class="actions"><?php echo __('Action'); ?></th>
-            
+            <th class="actions"><?php echo __('Files'); ?></th>
+            <th class="actions"><?php echo __('Action'); ?></th>
         </tr>
     </thead>
     <tbody>
@@ -53,37 +54,62 @@ $this->Html->script('multi/extra', array('inline' => false));
                         }
                         echo "</div>";
                     }
+                    echo "<h5>Additional Files</h5>";
+
+                    $cc=0;
+                    foreach ($application['AmendmentChecklist'] as $anc) {
+                        $cc++;
+                        if ($anc['year'] == $year && $anc['pocket_name'] == '') {
+                            $id = $anc['id'];
+                            $version_no = $anc['version_no'];
+                            $file_date = $anc['file_date'];
+                            $description = $anc['description'];
+                            echo "<br>".$cc.". ".$description."<br>";
+                            echo "&nbsp;&nbsp; <span id='$rem$id'> &nbsp;<i class='icon-file-text-alt'></i> ";
+                            echo $this->Html->link(
+                                __($anc['basename']),
+                                array('controller' => 'attachments', 'action' => 'download', $anc['id'], 'full_base' => true),
+                                array('class' => '')
+                            );
+                          
+                            echo "</span>&nbsp;
+                      <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>
+                      <span id='fileDate$id' style='margin-left:10px;'>Dated: $file_date</span>
+                      <span id='AmendmentChecklist$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>
+                      <br>";
+                        }
+                    }
 
 
                     ?>
                 </td>
-                
-                    <td>
-                        <?php
-                        if ($redir === 'manager') { 
-                        echo '<p>';
+
+                <td>
+                    <?php
+                    if ($redir === 'manager') {
+
                         echo $this->Html->link(
-                            'Approve',
+                            '<span class="label label-info"> Approve </span>',
                             array(
                                 'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
                                 'admin' => false
                             ),
-                            array('class' => 'btn btn-primary btn-link')
+                            array('escape' => false)
                         );
-                        echo '</p>';
-                         } else {
+                        echo "&nbsp;";
+                    } else {
                         echo $this->Html->link(
-                            'Download',
+                            '<span class="label label-info"> Download </span>',
                             array(
                                 'controller' => 'amendment_letters',  'ext' => 'pdf', 'action' => 'download', $year,
                                 'admin' => false
                             ),
-                            array('class' => 'btn btn-info btn-link')
+                            array('escape' => false)
                         );
-                        echo '</p>';
-                     } ?>
-                    </td>
-               
+                        echo "&nbsp;";
+                    } ?>
+                </td>
+
             </tr>
         <?php endforeach; ?>
     </tbody>
@@ -94,7 +120,7 @@ $this->Html->script('multi/extra', array('inline' => false));
 <?php
 if ($redir == 'applicant') {
 ?>
-<h5>Checklist Form</h5>
+    <h5>Checklist Form</h5>
     <ul id="amendment_tab" class="nav nav-tabs">
         <li class="active"><a href="#aaa">Checklist</a></li>
         <li><a href="#bbb">Additional Files</a></li>
@@ -211,7 +237,7 @@ if ($redir == 'applicant') {
         <div class="tab-pane" id="bbb">
             <div class="span12">
 
-            <p class="selected-year-name"></p>
+                <p class="selected-year-name"></p>
                 <h5><i class="icon-file"></i> Add additional files:
                     <button type="button" class="btn-mini" id="addAttachmentA">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
                 </h5>
