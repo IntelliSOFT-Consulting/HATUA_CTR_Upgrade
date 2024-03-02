@@ -119,6 +119,8 @@
                 echo $this->Form->input('investigator', array('type' => 'hidden'));
                 echo $this->Form->input('sites', array('type' => 'hidden'));
                 echo $this->Form->input('users', array('type' => 'hidden'));
+                echo $this->Form->input('stages', array('type' => 'hidden'));
+                echo $this->Form->input('phase', array('type' => 'hidden'));
               ?>
               </td>
               <td>

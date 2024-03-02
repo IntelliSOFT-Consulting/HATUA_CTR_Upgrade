@@ -121,6 +121,15 @@
                       'label' => array('class' => 'required', 'text' => 'Study Title'),
                       'type' => 'text',
                     ));
+
+                    // 
+                    if ($this->fetch('is-applicant') == 'true'){
+                      echo $this->Form->input('stages', array('type' => 'hidden'));
+                      echo $this->Form->input('phase', array('type' => 'hidden')); 
+                      echo $this->Form->input('disease_condition', array('type' => 'hidden'));
+                      echo $this->Form->input('users', array('type' => 'hidden'));
+                      echo $this->Form->input('ercs', array('type' => 'hidden')); 
+                    }
                     ?>
                   </th>
                   <th>
