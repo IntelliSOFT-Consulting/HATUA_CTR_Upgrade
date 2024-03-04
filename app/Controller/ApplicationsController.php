@@ -24,6 +24,53 @@ class ApplicationsController extends AppController
         $this->Auth->allow('index', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
 
+    public function manager_invoice($id)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('Application does not exist!'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $options = array(
+            'ssl_verify_peer' => false
+        );
+
+        $HttpSocket = new HttpSocket($options);
+
+        $header_options = array(
+            'header' => array(
+                'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
+                'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+                'Content-Type' => 'application/json',
+            )
+        );
+        // //Request Access Token
+        $initiate = $HttpSocket->get(
+            'https://invoices.pharmacyboardkenya.org/token',
+            false,
+            $header_options
+        );
+
+        if ($initiate->isOk()) {
+            $body = $initiate->body;
+            $resp = json_decode($body, true);
+            $session_token = $resp['session_token'];
+            $invoice_total = 1000;
+
+            $invoice_total = $invoice_total * 0.0075;
+            $data = array(
+                'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials
+                'amount_due' => $invoice_total, // from your invoice
+                'user_id' => 1, // from PRIMS login
+                'session_token' => $session_token // from above
+            );
+
+            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice',$data,$header_options);
+            debug($next);
+            exit;
+        }
+    }
     public function genereateQRCode($id = null)
     {
 
@@ -141,7 +188,7 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus','InvestigatorContact', 'Sponsor','AmendmentChecklist', 'SiteDetail' => array('County')
+            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist', 'SiteDetail' => array('County')
         );
 
         //in case of csv export
