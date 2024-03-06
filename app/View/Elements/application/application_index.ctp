@@ -123,12 +123,12 @@
                     ));
 
                     // 
-                    if ($this->fetch('is-applicant') == 'true'){
+                    if ($this->fetch('is-applicant') == 'true' || $redir == 'reviewer' ) {
                       echo $this->Form->input('stages', array('type' => 'hidden'));
-                      echo $this->Form->input('phase', array('type' => 'hidden')); 
+                      echo $this->Form->input('phase', array('type' => 'hidden'));
                       echo $this->Form->input('disease_condition', array('type' => 'hidden'));
                       echo $this->Form->input('users', array('type' => 'hidden'));
-                      echo $this->Form->input('ercs', array('type' => 'hidden')); 
+                      echo $this->Form->input('ercs', array('type' => 'hidden'));
                     }
                     ?>
                   </th>
@@ -290,35 +290,35 @@
                   </td>
                 </tr>
                 <tr class="searchmore" style="display: none;">
-                <td></td> 
-                <td colspan="1">
+                  <td></td>
+                  <td colspan="1">
                     <?php
                     if ($this->fetch('is-manager') == 'true') {
-                      echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'stages_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false)); 
+                      echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'stages_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     }
                     ?>
                   </td>
                   <td colspan="2">
                     <?php
                     if ($this->fetch('is-manager') == 'true') {
-                      echo $this->Html->link('<i class="icon-file"></i> Summary Report PDF', array_merge(array('action' => 'stages_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false)); 
+                      echo $this->Html->link('<i class="icon-file"></i> Summary Report PDF', array_merge(array('action' => 'stages_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
                     }
                     ?>
                   </td>
                   <td>
                     <?php
-                  if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
-                   
+                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+
                       echo $this->Html->link('<i class="icon-file-alt"></i> Amendment Report', array_merge(array('action' => 'amendment_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     }
                     ?>
                   </td>
-                    <td colspan="2"> <?php
-                  if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
-                   
-                      echo $this->Html->link('<i class="icon-file"></i> Amendment Report PDF', array_merge(array('action' => 'amendment_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
-                    }
-                    ?></td>     
+                  <td colspan="2"> <?php
+                                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+
+                                      echo $this->Html->link('<i class="icon-file"></i> Amendment Report PDF', array_merge(array('action' => 'amendment_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
+                                    }
+                                    ?></td>
                 </tr>
               </tbody>
             </table>
@@ -522,7 +522,7 @@
                         //   'action' => 'suspend',
                         //   $application['Application']['id']
                         // ), array('escape' => false), __('Are you sure you want to Stop/Suspend Application No. %s? All other actions will be blocked!', $application['Application']['id']));
-                       
+
                       }
                       ?>
                     </td>

@@ -288,7 +288,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
             ),
           ));
           echo $this->Form->input('id');
-
+         
           echo $this->Form->input('status', array(
             'type' => 'select',
             'options' => array(
@@ -296,12 +296,12 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
               '4' => 'Stopped'
             ),
             'empty' => true,
-            'label' => array('class' => 'control-label required', 'text' => 'Trial Status <span class="sterix">*</span>'),
+            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Trial Status  <span class="sterix">*</span></h5>'),
             'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
             'escape' => false,
           ));
           echo $this->Form->input('admin_stopped_reason', array(
-            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Reason</h5>'),
+            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Reason <span class="sterix">*</span></h5>'),
             'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
             'escape' => false,
           ));

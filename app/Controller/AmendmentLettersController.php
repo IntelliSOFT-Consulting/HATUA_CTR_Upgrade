@@ -132,6 +132,10 @@ class AmendmentLettersController extends AppController
             $this->pdfConfig = array(
                 'filename' => 'AmendmentLetter_' . $id,
                 'orientation' => 'portrait',
+                'download' => true, 
+                'options' => [
+                    'font-family' => 'Bookman Old Style' // Specify the font family
+                ]
             );
         }
 
