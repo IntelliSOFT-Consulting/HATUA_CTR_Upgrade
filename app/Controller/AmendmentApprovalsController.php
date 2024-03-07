@@ -26,7 +26,7 @@ class AmendmentApprovalsController extends AppController
 	public function beforeFilter()
 	{
 		parent::beforeFilter();
-		$this->Auth->allow('manager_approve','genereateQRCode');
+		$this->Auth->allow('manager_approve','genereateQRCode','file_download');
 	}
 	public function genereateQRCode($id = null)
     {
@@ -78,8 +78,7 @@ class AmendmentApprovalsController extends AppController
 			$this->redirect($this->referer());
 		} else {
 			if ($this->Auth->password($this->request->data['AmendmentApproval']['password']) === $this->Auth->User('confirm_password')) {
-				// debug($this->request->data);
-				// 	exit;
+				 
 				$id=$this->request->data['AmendmentApproval']['amendment'];
 				$this->AmendmentApproval->create();
 				if ($this->AmendmentApproval->saveAssociated($this->request->data, array('deep' => true))) {
@@ -239,5 +238,21 @@ class AmendmentApprovalsController extends AppController
 				$this->redirect($this->referer());
 			}
 		}
+	}
+
+	public function file_download($id){
+		$this->viewClass = 'Media';
+        $this->AmendmentApproval->Attachment->id = $id;
+        if (!$this->AmendmentApproval->Attachment->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } 
+        $attachment = $this->AmendmentApproval->Attachment->find('first', array('conditions' => array('Attachment.id' => $id, 'model' => 'AmendmentApproval')));
+        $params = array(
+            'id'        => $attachment['Attachment']['basename'],
+            'download'  => true,
+            'path'      => 'media' . DS . 'transfer' . DS . $attachment['Attachment']['dirname'] . DS
+        );
+        $this->set($params);
 	}
 }

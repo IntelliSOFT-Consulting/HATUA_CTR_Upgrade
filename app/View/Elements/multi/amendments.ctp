@@ -4,6 +4,7 @@
 $this->Html->script('ckeditor/ckeditor', array('inline' => false));
 $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 $this->Html->script('multi/amendment_attachment', array('inline' => false));
+$this->Html->script('summary/sum', array('inline' => false));
 if ($redir === 'applicant') {
     // $this->Html->script('multi/amendment_checklist', array('inline' => false));
     $this->Html->script('multi/extras', array('inline' => false));
@@ -105,7 +106,7 @@ if ($redir === 'applicant') {
                                                     <?php
                                                     echo $this->Form->create('AmendmentApproval', array(
                                                         'url' => array('action' => 'approve', $application['Application']['id']),
-                                                        'type' => 'post',
+                                                        'type' => 'file',
                                                         'class' => 'form-horizontal',
                                                         'inputDefaults' => array(
                                                             'div' => array('class' => 'control-group'),
@@ -156,7 +157,7 @@ if ($redir === 'applicant') {
                                                         <div class="span11">
                                                             <div class="uploadsTable">
                                                                 <h6 class="muted"><b>Attach File(s) </b>
-                                                                    <button type="button" class="btn btn-primary btn-small addUpload">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
+                                                                    <button type="button" class="btn btn-primary btn-small addUploadAmendmentApproval">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
                                                                 </h6>
                                                                 <hr>
                                                             </div>
@@ -181,7 +182,7 @@ if ($redir === 'applicant') {
                                         <div class="tab-pane" id="amendment_summary">
                                             <div class="row-fluid">
                                                 <div class="span12">
-                                                    <?php 
+                                                    <?php
                                                     foreach ($application['AmendmentApproval'] as $key => $comment) { ?>
                                                         <table class="table table-condensed">
                                                             <tbody>
@@ -214,29 +215,30 @@ if ($redir === 'applicant') {
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-        <th>
-            <p> <strong> File(s) </strong> </p>
-        </th>
-        <td>
-            <?php
-            if (isset($comment['Attachment'])) {
-                foreach ($comment['Attachment'] as $key => $value) {
-                    echo '<p>';
-                    echo $this->Html->link(
-                        __($value['basename']),
-                        array(
-                            'controller' => 'comments',  'action' => 'comment_file_download', $value['id'],
-                            'admin' => false
-                        ),
-                        array('class' => 'btn btn-link')
-                    ); 
-                    echo '</p>';
-                }
-            }
+                                                                    <th>
+                                                                        <p> <strong> File(s) </strong> </p>
+                                                                    </th>
+                                                                    <td>
+                                                                        <?php
+                                                                       
+                                                                        if (isset($comment['Attachment'])) {
+                                                                            foreach ($comment['Attachment'] as $key => $value) {
+                                                                                echo '<p>';
+                                                                                echo $this->Html->link(
+                                                                                    __($value['basename']),
+                                                                                    array(
+                                                                                        'controller' => 'amendment_approvals',  'action' => 'file_download', $value['id'],
+                                                                                        'admin' => false
+                                                                                    ),
+                                                                                    array('class' => 'btn btn-link')
+                                                                                );
+                                                                                echo '</p>';
+                                                                            }
+                                                                        }
 
-            ?>
-        </td>
-    </tr>
+                                                                        ?>
+                                                                    </td>
+                                                                </tr>
                                                             </tbody>
                                                         </table>
 
@@ -247,15 +249,7 @@ if ($redir === 'applicant') {
                                     </div>
                                 </div>
                             </div>
-                            <!-- // echo $this->Html->link(
-                            //     '<span class="label label-info"> Generate Letter </span>',
-                            //     array(
-                            //         'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
-                            //         'admin' => false
-                            //     ),
-                            //     array('escape' => false)
-                            // );
-                            // echo "&nbsp;"; -->
+                          
                     <?php  }
                     }
 
