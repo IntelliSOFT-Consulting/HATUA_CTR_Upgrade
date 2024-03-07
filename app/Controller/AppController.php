@@ -35,7 +35,7 @@ class AppController extends Controller {
   protected $a_contain = array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail'  => array('County'), 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
-                'AnnualApproval','AmendmentChecklist','AmendmentLetter', 'ParticipantFlow', 'Budget', 'Document', 'ActiveInspector',
+                'AnnualApproval','AmendmentApproval','AmendmentChecklist','AmendmentLetter', 'ParticipantFlow', 'Budget', 'Document', 'ActiveInspector',
                 'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'), 
                 'Sae','AmendmentLetter', 'AnnualLetter' => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')), 'StudyRoute', 'Manufacturer', 'Ciom',
                 'Deviation' => array('ExternalComment' => array('Attachment')),

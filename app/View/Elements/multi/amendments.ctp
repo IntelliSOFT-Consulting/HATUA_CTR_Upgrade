@@ -85,18 +85,178 @@ if ($redir === 'applicant') {
 
                     echo "<h5>Approval Letters</h5>";
                     if (!empty($year)) {
-                        if ($redir === 'manager') {
+                        if ($redir === 'manager') { ?>
 
-                            echo $this->Html->link(
-                                '<span class="label label-info"> Generate Letter </span>',
-                                array(
-                                    'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
-                                    'admin' => false
-                                ),
-                                array('escape' => false)
-                            );
-                            echo "&nbsp;";
-                        }
+                            <a class="btn btn-link btn-comment" role="button" data-toggle="collapse" href="#amendment-summary" aria-controls="amendment-summary">Review & Approve</a>
+
+                            <div id="amendment-summary" class="collapse show">
+                                <div class="amend-form">
+                                    <ul id="rreview_tab" class="nav nav-tabs">
+                                        <li class="active"><a href="#amendment_approval">Approval</a></li>
+                                        <li><a href="#amendment_summary">Summary Report</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="amendment_approval">
+                                            <div class="row-fluid">
+                                                <div class="span12">
+                                                    <h4 class="text-success">Approve or Reject Amendment <span class="muted"></span></h4>
+                                                    <hr>
+                                                    <?php
+                                                    echo $this->Form->create('AmendmentApproval', array(
+                                                        'url' => array('action' => 'approve', $application['Application']['id']),
+                                                        'type' => 'post',
+                                                        'class' => 'form-horizontal',
+                                                        'inputDefaults' => array(
+                                                            'div' => array('class' => 'control-group'),
+                                                            'label' => array('class' => 'control-label'),
+                                                            'between' => '<div class="controls">',
+                                                            'after' => '</div>',
+                                                            'class' => '',
+                                                            'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                                                            'error' => array('attributes' => array('class' => 'controls help-block')),
+                                                        ),
+                                                    ));
+                                                    echo $this->Form->input('application_id', array('value' => $application['Application']['id'], 'type' => 'hidden'));
+                                                    echo $this->Form->input('approval_date', array('value' => date('d-m-Y'), 'type' => 'hidden'));
+                                                    echo $this->Form->input('amendment', array('value' =>  $year, 'type' => 'hidden'));
+                                                    echo $this->Form->input('status', array(
+                                                        'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                                                        'class' => 'approved',
+                                                        'before' => '<div class="control-group">   <label class="control-label required">
+                        Approve? <span class="sterix">*</span></label>  <div class="controls">
+                        <input type="hidden" value="" id="ApplicationApproved_" name="data[AmendmentApproval][approved]"> <label class="radio inline">',
+                                                        'after' => '</label>',
+                                                        'options' => array('approved' => 'Yes'),
+                                                    ));
+                                                    echo $this->Form->input('status', array(
+                                                        'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'approved',
+                                                        'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                                                        'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
+                                                        'before' => '<label class="radio inline">',
+                                                        'after' => '</label>
+                            <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
+                            onclick="$(\'.approved\').removeAttr(\'checked disabled\')">
+                            <em class="accordion-toggle">clear!</em></a> </span>
+                            </div> </div>',
+                                                        'options' => array('rejected' => 'No'),
+                                                    ));
+
+                                                    echo $this->Form->input('content', array(
+                                                        'label' => array('class' => 'control-label', 'text' => 'Message'),
+                                                        'placeholder' => ' ', 'class' => 'input-xlarge',  'rows' => '3'
+                                                    ));
+                                                    echo $this->Form->input('password', array(
+                                                        'label' => array('class' => 'control-label', 'text' => 'Your Password <span class="sterix">*</span>'),
+                                                        'placeholder' => 'password', 'class' => 'input-large',
+                                                    ));
+                                                    ?>
+
+                                                    <div class="row-fluid">
+                                                        <div class="span11">
+                                                            <div class="uploadsTable">
+                                                                <h6 class="muted"><b>Attach File(s) </b>
+                                                                    <button type="button" class="btn btn-primary btn-small addUpload">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
+                                                                </h6>
+                                                                <hr>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="controls">
+                                                        <?php
+                                                        echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+                                                            'name' => 'submit',
+                                                            'class' => 'btn btn-primary',
+                                                            'id' => 'ApproveProtocol',
+                                                        ));
+                                                        ?>
+                                                    </div>
+                                                    <?php
+                                                    echo $this->Form->end();
+
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="amendment_summary">
+                                            <div class="row-fluid">
+                                                <div class="span12">
+                                                    <?php 
+                                                    foreach ($application['AmendmentApproval'] as $key => $comment) { ?>
+                                                        <table class="table table-condensed">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th>
+                                                                        <p><strong>Message</strong></p>
+                                                                    </th>
+                                                                    <td>
+                                                                        <div>
+                                                                            <p class="form-control-static">
+                                                                                <?php
+                                                                                echo $comment['content']
+                                                                                ?>
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>
+                                                                        <p><strong>Status</strong></p>
+                                                                    </th>
+                                                                    <td>
+                                                                        <div>
+                                                                            <p class="form-control-static">
+                                                                                <?php
+                                                                                echo $comment['status']
+                                                                                ?>
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+        <th>
+            <p> <strong> File(s) </strong> </p>
+        </th>
+        <td>
+            <?php
+            if (isset($comment['Attachment'])) {
+                foreach ($comment['Attachment'] as $key => $value) {
+                    echo '<p>';
+                    echo $this->Html->link(
+                        __($value['basename']),
+                        array(
+                            'controller' => 'comments',  'action' => 'comment_file_download', $value['id'],
+                            'admin' => false
+                        ),
+                        array('class' => 'btn btn-link')
+                    ); 
+                    echo '</p>';
+                }
+            }
+
+            ?>
+        </td>
+    </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                    <?php } ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- // echo $this->Html->link(
+                            //     '<span class="label label-info"> Generate Letter </span>',
+                            //     array(
+                            //         'controller' => 'attachments',  'action' => 'approve', $year, $application['Application']['id'],
+                            //         'admin' => false
+                            //     ),
+                            //     array('escape' => false)
+                            // );
+                            // echo "&nbsp;"; -->
+                    <?php  }
                     }
 
                     ?>
@@ -140,9 +300,9 @@ if ($redir === 'applicant') {
                                                     echo $this->Html->link('<span class="label label-warning"> Approve </span>', array('controller' => 'amendment_letters', 'action' => 'capprove', $anl['id']), array('escape' => false));
                                                 }
                                             }
-                                                echo "&nbsp;";
-                                                echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'amendment_letters', 'action' => 'download', $anl['id'], 'ext' => 'pdf',), array('escape' => false));
-                                            
+                                            echo "&nbsp;";
+                                            echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'amendment_letters', 'action' => 'download', $anl['id'], 'ext' => 'pdf',), array('escape' => false));
+
                                             ?>
                                         </td>
                                     </tr>
@@ -394,7 +554,18 @@ if ($redir == 'applicant') {
         </div>
     </div>
 
+    <div class="ctr-groups">
 
+        <?php
+
+        echo $this->Html->link(
+            __('<i class="icon-thumbs-up"></i> Submit All'),
+            array('action' => 'submitall', $application['Application']['id']),
+            array('escape' => false, 'class' => 'btn btn-info')
+        );
+
+        ?>
+    </div>
 
 <?php }  ?>
 

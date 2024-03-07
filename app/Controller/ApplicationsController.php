@@ -21,9 +21,79 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
+        $this->Auth->allow('index','applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
+    public function applicant_submitall($id) {
 
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
+        }
+
+        // get latest AmendmentChecklist
+
+        $this->loadModel('Attachment');
+        $latest = $this->Attachment->find('list', array(
+            'fields' => array('Attachment.year', 'Attachment.foreign_key'),
+            'conditions' => array('Attachment.foreign_key' => $id,'Attachment.model'=>'AmendmentChecklist'),
+            'recursive' => 0
+        ));
+        if($latest){
+        $this->loadModel('Message');
+        $this->loadModel('User');
+        $html = new HtmlHelper(new ThemeView());
+        $message = $this->Message->find('first', array('conditions' => array('name' => 'amendment_submission')));
+
+        $users = $this->Application->User->find('all', array(
+            'contain' => array('Group'),
+            'conditions' => array('OR' => array('User.id' => $this->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+            // 'conditions' => array('User.group_id' => 2) //Applicant and managers
+        ));
+        foreach ($users as $user) {
+            $variables = array(
+                'name' => $user['User']['name'],  
+                 'protocol_no' => $this->Application->field('protocol_no'),
+                'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
+                    'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
+                    'full_base' => true
+                ), array('escape' => false)),
+                'approval_date' => $this->Application->field('approval_date')
+            );
+            $datum = array(
+                'email' => $user['User']['email'],
+                'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'amendment_submission', 'model' => 'AnnaulLetter',
+                'subject' => String::insert($message['Message']['subject'], $variables),
+                'message' => String::insert($message['Message']['content'], $variables)
+            );
+            CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+            CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+        }
+        //**********************************    END   *********************************
+        //end
+        // Create a Audit Trail
+       
+        $this->loadModel('AuditTrail');
+        $audit = array(
+            'AuditTrail' => array(
+                'foreign_key' => $this->Application->field('id'),
+                'model' => 'Application',
+                'message' => 'An amendment for the report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully submitted by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+                'ip' =>  $this->Application->field('protocol_no')
+            )
+        );
+        $this->AuditTrail->Create();
+        if ($this->AuditTrail->save($audit)) {
+            $this->log($this->args[0], 'audit_success');
+        } else {
+            $this->log('Error creating an audit trail', 'notifications_error');
+            $this->log($this->args[0], 'notifications_error');
+        }
+    }
+        $this->Session->setFlash(__('Successfully submitted the protocol amendment. '), 'alerts/flash_success');
+        $this->redirect(array('action' => 'view', $id));
+
+	}
     public function manager_invoice($id)
     {
         $this->Application->id = $id;
