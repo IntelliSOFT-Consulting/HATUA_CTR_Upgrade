@@ -27,7 +27,8 @@
                  <tr>
                      <th style="width:3%">#</th>
                      <th style="width: 27%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
-                     <th style="width: 70%">Amendments </th>
+                     <th style="width: 35%">Date </th>
+                     <th style="width: 35%">Amendments </th>
                  </tr>
              </thead>
              <tbody>
@@ -35,22 +36,39 @@
                  <?php
                     $count = 0;
                     foreach ($applications as $application) {
+                        if (!empty($application['AmendmentApproval'])) {
+                        $years = array_unique(Hash::extract($application['AmendmentChecklist'], '{n}.year'));
+                        rsort($years);
                     ?>
                      <tr>
                          <td><?php $count++;
                                 echo $count; ?></td>
                          <td> <?php echo $application['Application']['protocol_no']; ?></td>
+                        
+                         <td>
+                             <?php
+
+                                foreach ($years as $year) {
+                                    $approved = 0;
+                                    foreach ($application['AmendmentApproval'] as $apr) {
+
+                                        if ($apr['amendment'] == $year) { 
+                                            $approved++;
+                                            ?>
+                                            <p> <?=$apr['approval_date'];?></p>
+                                          
+                                      <?php  }
+                                    }
+                                }
+                                ?>
+
+                         </td>
                          <td> <?php
-                                $cound = 0;
-                                $former = $this->requestAction('/pockets/checklist/amendment');
-                                $years = array_unique(Hash::extract($application['AmendmentChecklist'], '{n}.year'));
-                                rsort($years);
-                                $uniqueYearCount = count($years);
-                                echo $uniqueYearCount;
+                                echo $approved;
                                 ?>
                          </td>
                      </tr>
-                 <?php } ?>
+                 <?php } } ?>
              </tbody>
          </table>
          <!-- In table end -->

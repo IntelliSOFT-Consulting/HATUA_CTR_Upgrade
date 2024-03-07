@@ -258,7 +258,7 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist', 'SiteDetail' => array('County')
+            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist','AmendmentApproval', 'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -272,16 +272,18 @@ class ApplicationsController extends AppController
             $this->layout = false;
             $this->render('amendment_csv_export');
         }
-        //end csv export
+        //end csv exports
 
 
         //in case of pdf export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
 
+
+            $contain = $this->a_contain; 
             $applications = $this->Application->find(
                 'all',
-                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
-            );
+                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $contain)
+            ); 
             $this->set(compact('applications'));
             // $this->layout = false;
             // $this->render('csv_export');
