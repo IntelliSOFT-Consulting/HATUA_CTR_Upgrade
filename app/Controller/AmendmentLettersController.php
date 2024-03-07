@@ -47,13 +47,14 @@ class AmendmentLettersController extends AppController
         //******************       Send Email and Notifications to Applicant and Managers    *****************************
         $this->loadModel('Message');
         $html = new HtmlHelper(new ThemeView());
-        $message = $this->Message->find('first', array('conditions' => array('name' => 'annual_approval_letter')));
+        $message = $this->Message->find('first', array('conditions' => array('name' => 'amendment_approval_letter')));
         $anl = $this->AmendmentLetter->find('first', array('contain' => array('Application'), 'conditions' => array('AmendmentLetter.id' => $this->AmendmentLetter->id)));
-
+       
         $users = $this->AmendmentLetter->Application->User->find('all', array(
             'contain' => array('Group'),
-            'conditions' => array('OR' => array('User.id' => $this->AmendmentLetter->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
-        ));
+           'conditions' => array('OR' => array('User.id' => $anl['Application']['user_id'], 'User.group_id' => 2)) //Applicant and managers
+       ));
+  
         foreach ($users as $user) {
             $variables = array(
                 'name' => $user['User']['name'],
@@ -68,7 +69,7 @@ class AmendmentLettersController extends AppController
             );
             $datum = array(
                 'email' => $user['User']['email'],
-                'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'annual_approval_letter', 'model' => 'AnnaulLetter',
+                'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'amendment_approval_letter', 'model' => 'AnnaulLetter',
                 'subject' => String::insert($message['Message']['subject'], $variables),
                 'message' => String::insert($message['Message']['content'], $variables)
             );
@@ -132,7 +133,7 @@ class AmendmentLettersController extends AppController
             $this->pdfConfig = array(
                 'filename' => 'AmendmentLetter_' . $id,
                 'orientation' => 'portrait',
-                'download' => true, 
+                'download' => true,
                 'options' => [
                     'font-family' => 'Bookman Old Style' // Specify the font family
                 ]
