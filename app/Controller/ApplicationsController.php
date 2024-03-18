@@ -23,11 +23,11 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice','download_invoice');
+        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice', 'download_invoice');
     }
-public function download_invoice($id){
-    
-}
+    public function download_invoice($id)
+    {
+    }
 
     public function applicant_submitall($id)
     {
@@ -188,7 +188,7 @@ public function download_invoice($id){
                         // debug($ecitizen->body); 
                         $this->Session->setFlash(__('Invoice Generated Successfully.'), 'alerts/flash_success');
                         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id));
-                    }else{
+                    } else {
                         $this->Session->setFlash(__('Experience problems connecting to remote server.'), 'alerts/flash_error');
                         $this->redirect($this->referer());
                     }
@@ -2429,8 +2429,6 @@ public function download_invoice($id){
         }
 
         $data = $this->request->data;
-        // debug($data);
-        // exit;
 
         if (empty($this->request->data['Application']['status'])) {
             $this->Session->setFlash(__('Please select status'), 'alerts/flash_error');
@@ -2444,15 +2442,20 @@ public function download_invoice($id){
         }
 
         $trial_statuses = "";
+        $stopped = false;
         if ($data['Application']['status'] == 3) {
             $trial_statuses = "Suspended";
-        } else {
+            $stopped = true;
+        } else  if ($data['Application']['status'] == 4) {
             $trial_statuses =  "Stopped";
+            $stopped = true;
+        } else {
+            $trial_statuses =  $data['Application']['status'];
         }
         $app = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
         ));
-        if ($this->Application->saveField('admin_stopped', true)) {
+        if ($this->Application->saveField('admin_stopped', $stopped)) {
             $this->Application->saveField('trial_status_id', $this->request->data['Application']['status']);
             $this->Application->saveField('admin_stopped_reason', $this->request->data['Application']['admin_stopped_reason']);
             $this->loadModel('AuditTrail');
