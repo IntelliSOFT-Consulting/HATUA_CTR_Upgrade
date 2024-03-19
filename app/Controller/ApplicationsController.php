@@ -318,10 +318,20 @@ class ApplicationsController extends AppController
 
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-            $applications = $this->Application->find(
+
+            $applications = array();
+            $apps = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
             );
+
+            foreach ($apps as $app) { 
+                if (!empty($app['AmendmentApproval'])) {
+                    $applications[] = $app;
+                }
+
+            }
+           
             $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
             $this->set(compact('applications'));
             $this->layout = false;
@@ -335,13 +345,13 @@ class ApplicationsController extends AppController
 
 
             $contain = $this->a_contain;
-            $applications = $this->Application->find(
+            $apps = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $contain)
             );
+
+
             $this->set(compact('applications'));
-            // $this->layout = false;
-            // $this->render('csv_export');
             $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
         }
         //end pdf export

@@ -13,12 +13,18 @@ foreach ($applications as $application) :
         if (array_key_exists($key, $application['Application'])) {
             $row[$key] = '"' . preg_replace('/"/', '""', $application['Application'][$key]) . '"';
         } elseif ($key == 'amendment') {
-            if (!empty($application['AmendmentChecklist'])) {
+            if (!empty($application['AmendmentApproval'])) {
+
                 $years = array_unique(Hash::extract($application['AmendmentChecklist'], '{n}.year'));
                 rsort($years);
                 foreach ($years as $year) {
+                    foreach ($application['AmendmentApproval'] as $apr) {
 
-                    (isset($row[$key])) ? $row[$key] .= '; ' . $year : $row[$key] = $year;
+                        if ($apr['amendment'] == $year) {
+
+                            (isset($row[$key])) ? $row[$key] .= '; ' . $year.'-'.$apr['approval_date'] : $row[$key] = $year.'-'.$apr['approval_date'] ;
+                        }
+                    }
                 }
                 (isset($row[$key])) ? $row[$key] = '"' . preg_replace('/"/', '""', $row[$key]) . '"' : $row[$key] = '""';
             }
