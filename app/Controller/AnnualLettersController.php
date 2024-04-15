@@ -217,6 +217,7 @@ class AnnualLettersController extends AppController
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
             'study_title' => $application['Application']['study_title'],
             'checklist' => $checkstring,
+            'status' => $application['TrialStatus']['name'],
             'expiry_date' => $expiry_date
         );
 
@@ -485,7 +486,8 @@ class AnnualLettersController extends AppController
         // $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
         $expiry_date = date('jS F Y', strtotime('+1 year'));
         $variables = array(
-            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
+            'approval_no' => $approval_no, 
+            'protocol_no' => $application['Application']['protocol_no'],
             'letter_date' => date('j M Y', strtotime($application['Application']['approval_date'])),
             'qualification' => $application['InvestigatorContact'][0]['qualification'],
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],

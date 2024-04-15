@@ -21,9 +21,10 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('index','applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
+        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
     }
-    public function applicant_submitall($id) {
+    public function applicant_submitall($id)
+    {
 
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
@@ -36,64 +37,63 @@ class ApplicationsController extends AppController
         $this->loadModel('Attachment');
         $latest = $this->Attachment->find('list', array(
             'fields' => array('Attachment.year', 'Attachment.foreign_key'),
-            'conditions' => array('Attachment.foreign_key' => $id,'Attachment.model'=>'AmendmentChecklist'),
+            'conditions' => array('Attachment.foreign_key' => $id, 'Attachment.model' => 'AmendmentChecklist'),
             'recursive' => 0
         ));
-        if($latest){
-        $this->loadModel('Message');
-        $this->loadModel('User');
-        $html = new HtmlHelper(new ThemeView());
-        $message = $this->Message->find('first', array('conditions' => array('name' => 'amendment_submission')));
+        if ($latest) {
+            $this->loadModel('Message');
+            $this->loadModel('User');
+            $html = new HtmlHelper(new ThemeView());
+            $message = $this->Message->find('first', array('conditions' => array('name' => 'amendment_submission')));
 
-        $users = $this->Application->User->find('all', array(
-            'contain' => array('Group'),
-            'conditions' => array('OR' => array('User.id' => $this->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
-            // 'conditions' => array('User.group_id' => 2) //Applicant and managers
-        ));
-        foreach ($users as $user) {
-            $variables = array(
-                'name' => $user['User']['name'],  
-                 'protocol_no' => $this->Application->field('protocol_no'),
-                'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
-                    'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
-                    'full_base' => true
-                ), array('escape' => false)),
-                'approval_date' => $this->Application->field('approval_date')
+            $users = $this->Application->User->find('all', array(
+                'contain' => array('Group'),
+                'conditions' => array('OR' => array('User.id' => $this->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+                // 'conditions' => array('User.group_id' => 2) //Applicant and managers
+            ));
+            foreach ($users as $user) {
+                $variables = array(
+                    'name' => $user['User']['name'],
+                    'protocol_no' => $this->Application->field('protocol_no'),
+                    'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
+                        'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
+                        'full_base' => true
+                    ), array('escape' => false)),
+                    'approval_date' => $this->Application->field('approval_date')
+                );
+                $datum = array(
+                    'email' => $user['User']['email'],
+                    'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'amendment_submission', 'model' => 'AnnaulLetter',
+                    'subject' => String::insert($message['Message']['subject'], $variables),
+                    'message' => String::insert($message['Message']['content'], $variables)
+                );
+                CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+            }
+            //**********************************    END   *********************************
+            //end
+            // Create a Audit Trail
+
+            $this->loadModel('AuditTrail');
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $this->Application->field('id'),
+                    'model' => 'Application',
+                    'message' => 'An amendment for the report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully submitted by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+                    'ip' =>  $this->Application->field('protocol_no')
+                )
             );
-            $datum = array(
-                'email' => $user['User']['email'],
-                'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'amendment_submission', 'model' => 'AnnaulLetter',
-                'subject' => String::insert($message['Message']['subject'], $variables),
-                'message' => String::insert($message['Message']['content'], $variables)
-            );
-            CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
-            CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($this->args[0], 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'notifications_error');
+                $this->log($this->args[0], 'notifications_error');
+            }
         }
-        //**********************************    END   *********************************
-        //end
-        // Create a Audit Trail
-       
-        $this->loadModel('AuditTrail');
-        $audit = array(
-            'AuditTrail' => array(
-                'foreign_key' => $this->Application->field('id'),
-                'model' => 'Application',
-                'message' => 'An amendment for the report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully submitted by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
-                'ip' =>  $this->Application->field('protocol_no')
-            )
-        );
-        $this->AuditTrail->Create();
-        if ($this->AuditTrail->save($audit)) {
-            $this->log($this->args[0], 'audit_success');
-        } else {
-            $this->log('Error creating an audit trail', 'notifications_error');
-            $this->log($this->args[0], 'notifications_error');
-        }
-    }
         $this->Session->setFlash(__('Successfully submitted the protocol amendment. '), 'alerts/flash_success');
         $this->redirect(array('action' => 'view', $id));
-
-	}
+    }
     public function manager_invoice($id)
     {
         $this->Application->id = $id;
@@ -136,7 +136,7 @@ class ApplicationsController extends AppController
                 'session_token' => $session_token // from above
             );
 
-            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice',$data,$header_options);
+            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice', $data, $header_options);
             debug($next);
             exit;
         }
@@ -258,7 +258,7 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist','AmendmentApproval', 'SiteDetail' => array('County')
+            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist', 'AmendmentApproval', 'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -279,11 +279,11 @@ class ApplicationsController extends AppController
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
 
 
-            $contain = $this->a_contain; 
+            $contain = $this->a_contain;
             $applications = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $contain)
-            ); 
+            );
             $this->set(compact('applications'));
             // $this->layout = false;
             // $this->render('csv_export');
@@ -518,7 +518,12 @@ class ApplicationsController extends AppController
 
                 $ann_now = new DateTime();
 
-                $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
+                if ($ann_now > $ann_e) {
+                    $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
+                } else {
+
+                    $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
+                }
 
                 if ($ann['status'] == 'Current') {
                     $stages['AnnualApproval']['color'] = 'success';
@@ -1430,7 +1435,8 @@ class ApplicationsController extends AppController
                             'professional_address' => $professional_address,
                             'telephone' => $telephone,
                             'study_title' => $application['Application']['study_title'],
-                            'checklist' => $checkstring,
+                            'checklist' => $checkstring,                            
+                            'status' => $application['TrialStatus']['name'],
                             'expiry_date' => $expiry_date
                         );
 
