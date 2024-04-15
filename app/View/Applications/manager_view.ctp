@@ -8,6 +8,7 @@ $this->assign('Applications', 'active');
 $this->Html->script('ckeditor/ckeditor', array('inline' => false));
 $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 $this->Html->script('jquery.blockUI.js', array('inline' => false));
+$this->Html->script('invoice', array('inline' => false));
 ?>
 
 <?php
@@ -163,9 +164,18 @@ echo $this->Session->flash();
               array('controller' => 'site_inspections', 'action' => 'add', $application['Application']['id']),
               array('escape' => false, 'class' => 'btn btn-info')
             );
+
+            echo "<hr>";
+            // echo $this->Html->link(
+            //   __('<i class="icon-download"></i> Generate Invoice'),
+            //   array('controller' => 'applications', 'action' => 'invoice', $application['Application']['id']),
+            //   array('escape' => false, 'class' => 'btn btn-success save-attachment')
+            // );
             // }
 
             ?>
+                 <!-- <button type="button" class="btn-mini save-attachment" >&nbsp;<i class="icon-plus"></i>&nbsp;</button> -->
+               
           </div>
         <?php
         }

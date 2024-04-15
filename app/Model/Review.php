@@ -7,6 +7,7 @@ App::uses('AppModel', 'Model');
  */
 class Review extends AppModel {
 
+    public $actsAs = array('Timestamp');
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 

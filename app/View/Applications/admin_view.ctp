@@ -292,8 +292,15 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
           echo $this->Form->input('status', array(
             'type' => 'select',
             'options' => array(
+              '1'=>'Recruiting',
+              '2'=>'Not yet recruiting',
               '3' => 'Suspended',
-              '4' => 'Stopped'
+              '4' => 'Stopped',
+              '5'=>'Completed',
+              '6'=>'In follow-up',
+              '7'=>'Analysing',
+              '8'=>'Writing-up',
+              '9'=>'Application withdrawn'
             ),
             'empty' => true,
             'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Trial Status  <span class="sterix">*</span></h5>'),

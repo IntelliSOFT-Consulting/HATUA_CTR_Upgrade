@@ -6,6 +6,8 @@ App::uses('HtmlHelper', 'View/Helper');
 App::uses('Sanitize', 'Utility');
 App::uses('CakeTime', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
+
+
 /**
  * Applications Controller
  *
@@ -21,8 +23,13 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex');
+ 
+        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice', 'download_invoice');
     }
+    public function download_invoice($id)
+    {
+    }
+ 
     public function applicant_submitall($id)
     {
 
@@ -94,7 +101,7 @@ class ApplicationsController extends AppController
         $this->Session->setFlash(__('Successfully submitted the protocol amendment. '), 'alerts/flash_success');
         $this->redirect(array('action' => 'view', $id));
     }
-    public function manager_invoice($id)
+    public function applicant_invoice($id)
     {
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
@@ -127,18 +134,67 @@ class ApplicationsController extends AppController
             $resp = json_decode($body, true);
             $session_token = $resp['session_token'];
             $invoice_total = 1000;
-
-            $invoice_total = $invoice_total * 0.0075;
-            $data = array(
+            $postData = array(
                 'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials
                 'amount_due' => $invoice_total, // from your invoice
-                'user_id' => 1, // from PRIMS login
+                'user_id' => 29043, // from PRIMS login
                 'session_token' => $session_token // from above
             );
+            $header_options = array(
+                'header' => array(
+                    'Content-Type' => 'application/x-www-form-urlencoded'
+                )
+            );
+            $formData = http_build_query($postData);
 
-            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice', $data, $header_options);
-            debug($next);
-            exit;
+            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice', $formData, $header_options);
+            // debug($next);
+            if ($next->isOk()) {
+                $body1 = $next->body;
+                $resp1 = json_decode($body1, true);
+                $invoice_id = 285251; //$resp1['invoice_id'];
+                $payment_code = $resp1['payment_code'];
+
+                $raw_id = base64_encode($invoice_id);
+
+                $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
+
+                if ($prims->isOk()) {
+                    $body2 = $prims->body;
+                    $resp2 = json_decode($body2, true);
+                    // debug($resp2);
+                    // exit;
+                    $data = array(
+                        'secureHash' => $resp2["secureHash"],
+                        'apiClientID' => 42,
+                        'serviceID' => $resp2["serviceID"],
+                        'notificationURL' => 'https://practice.pharmacyboardkenya.org/ipn?id=' . $raw_id,
+                        'callBackURLOnSuccess' => 'https://practice.pharmacyboardkenya.org/callback?id=' . $raw_id,
+                        'billRefNumber' => $resp2["billRefNumber"],
+                        'currency' => $resp2["currency"],
+                        'amountExpected' => $resp2["amountExpected"],
+                        'billDesc' => $resp2["billDesc"],
+                        'pictureURL' => '', //$resp2["pictureURL"],
+                        'clientName' => $resp2["clientName"],
+                        'clientEmail' => $resp2["clientEmail"],
+                        'clientMSISDN' => $resp2["clientMSISDN"],
+                        'clientIDNumber' => $resp2["clientIDNumber"],
+                    );
+
+                    $payload = http_build_query($data);
+                    $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);
+
+                    // echo '<h2><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Download Invoice</a></h2>'; // Official PPB Invoice
+                    if ($ecitizen->isOk()) {
+                        // debug($ecitizen->body); 
+                        $this->Session->setFlash(__('Invoice Generated Successfully.'), 'alerts/flash_success');
+                        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id));
+                    } else {
+                        $this->Session->setFlash(__('Experience problems connecting to remote server.'), 'alerts/flash_error');
+                        $this->redirect($this->referer());
+                    }
+                }
+            }
         }
     }
     public function genereateQRCode($id = null)
@@ -263,10 +319,20 @@ class ApplicationsController extends AppController
 
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-            $applications = $this->Application->find(
+
+            $applications = array();
+            $apps = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
             );
+
+            foreach ($apps as $app) { 
+                if (!empty($app['AmendmentApproval'])) {
+                    $applications[] = $app;
+                }
+
+            }
+           
             $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
             $this->set(compact('applications'));
             $this->layout = false;
@@ -280,13 +346,13 @@ class ApplicationsController extends AppController
 
 
             $contain = $this->a_contain;
-            $applications = $this->Application->find(
+            $apps = $this->Application->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $contain)
             );
+
+
             $this->set(compact('applications'));
-            // $this->layout = false;
-            // $this->render('csv_export');
             $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
         }
         //end pdf export
@@ -2380,8 +2446,6 @@ class ApplicationsController extends AppController
         }
 
         $data = $this->request->data;
-        // debug($data);
-        // exit;
 
         if (empty($this->request->data['Application']['status'])) {
             $this->Session->setFlash(__('Please select status'), 'alerts/flash_error');
@@ -2395,15 +2459,20 @@ class ApplicationsController extends AppController
         }
 
         $trial_statuses = "";
+        $stopped = false;
         if ($data['Application']['status'] == 3) {
             $trial_statuses = "Suspended";
-        } else {
+            $stopped = true;
+        } else  if ($data['Application']['status'] == 4) {
             $trial_statuses =  "Stopped";
+            $stopped = true;
+        } else {
+            $trial_statuses =  $data['Application']['status'];
         }
         $app = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
         ));
-        if ($this->Application->saveField('admin_stopped', true)) {
+        if ($this->Application->saveField('admin_stopped', $stopped)) {
             $this->Application->saveField('trial_status_id', $this->request->data['Application']['status']);
             $this->Application->saveField('admin_stopped_reason', $this->request->data['Application']['admin_stopped_reason']);
             $this->loadModel('AuditTrail');
