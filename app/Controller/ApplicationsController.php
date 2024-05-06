@@ -23,13 +23,13 @@ class ApplicationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
- 
+
         $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice', 'download_invoice');
     }
     public function download_invoice($id)
     {
     }
- 
+
     public function applicant_submitall($id)
     {
 
@@ -317,22 +317,28 @@ class ApplicationsController extends AppController
             'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist', 'AmendmentApproval', 'SiteDetail' => array('County')
         );
 
+        $limit = isset($this->paginate['limit']) ? $this->paginate['limit'] : 1000;
+
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
 
             $applications = array();
             $apps = $this->Application->find(
                 'all',
-                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+                array(
+                    'conditions' => $this->paginate['conditions'], 
+                    'order' => $this->paginate['order'], 
+                    'contain' => $this->a_contain,
+                    'limit' => $limit
+                    )
             );
 
-            foreach ($apps as $app) { 
+            foreach ($apps as $app) {
                 if (!empty($app['AmendmentApproval'])) {
                     $applications[] = $app;
                 }
-
             }
-           
+
             $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
             $this->set(compact('applications'));
             $this->layout = false;
@@ -348,7 +354,12 @@ class ApplicationsController extends AppController
             $contain = $this->a_contain;
             $apps = $this->Application->find(
                 'all',
-                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $contain)
+                array(
+                    'conditions' => $this->paginate['conditions'],
+                    'order' => $this->paginate['order'],
+                    'contain' => $contain,
+                    'limit' => $limit
+                )
             );
 
 
@@ -1501,7 +1512,7 @@ class ApplicationsController extends AppController
                             'professional_address' => $professional_address,
                             'telephone' => $telephone,
                             'study_title' => $application['Application']['study_title'],
-                            'checklist' => $checkstring,                            
+                            'checklist' => $checkstring,
                             'status' => $application['TrialStatus']['name'],
                             'expiry_date' => $expiry_date
                         );
