@@ -2,7 +2,7 @@
 $this->Html->script('ckeditor/ckeditor', array('inline' => false));
 $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 $this->Html->script('jquery.blockUI.js', array('inline' => false));
- ?>
+?>
 <div class="marketing">
   <div class="row-fluid">
     <div class="span12">
@@ -54,77 +54,117 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
 <br>
 
 <br>
-<table class="table table-condensed table-bordered" style="margin-bottom: 2px;">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Recommendation</th>
-      <th>Comments</th>
-      <th>Status &amp; Type</th>
-      <th>User</th>
-      <th>Created</th>
-      <th><?php echo __('Actions'); ?></th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-    foreach ($application['Review'] as $akey => $rreview) {
-    ?>
-      <tr>
-        <td><?php echo $rreview['id'] ?></td>
-        <td>
-          <?php
-          if ($rreview['type'] == 'request') {
-            echo 'Assigned: ' . $rreview['accepted'] . '<br/>';
-          }
-          echo $rreview['summary'] . '<br/>';
-          echo $rreview['recommendation'];
+<div class="row-fluid">
+  <div class="span12">
+    <table class="table  table-bordered" style="margin-bottom: 1px;">
 
-          ?>
-        </td>
-        <td><?php
-            foreach ($rreview['InternalComment'] as $iComment) {
-              echo   $iComment['subject'] . "<br>";
-              echo   $iComment['content'] . "<br>";
-              echo   $iComment['sender'] . "<br>";
-              echo "<br>";
-            }
-            ?></td>
-        <td><?php echo $rreview['status'] . "<br>" . $rreview['type'] ?></td>
-        <td><?php echo $rreview['User']['name']; ?></td>
-        <td><?php echo $rreview['created'] ?></td>
-        <td>
-          <?php
-          if ($rreview['type'] != 'request' && $rreview['type'] != 'ppb_comment') {
-            if ($rreview['status'] == 'Unsubmitted') {
-              echo $this->Html->link(
-                '<span class="label label-success"> Edit </span>',
-                array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']),
-                array('escape' => false)
-              );
-              echo "&nbsp;";
-            } else {
-              echo $this->Html->link(
-                '<span class="label label-info"> View </span>',
-                array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']),
-                array('escape' => false)
-              );
-              echo "&nbsp;";
-            }
-          }
+      <thead>
+        <tr>
+          <th style="width:3%">ID</th>
+          <th style="width:3%">Recommendation</th>
+          <th style="width: 40%;">Comments</th>
+          <th style="width:3%">Status &amp; Type</th>
+          <th style="width:3%">User</th>
+          <th style="width:3%">Created</th>
+          <th style="width:3%"><?php echo __('Actions'); ?></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        foreach ($application['Review'] as $akey => $rreview) {
+        ?>
+          <tr>
+            <td><?php echo $rreview['id'] ?></td>
+            <td>
+              <?php
+              if ($rreview['type'] == 'request') {
+                echo 'Assigned: ' . $rreview['accepted'] . '<br/>';
+              }
+              // echo $rreview['summary'] . '<br/>';
+              echo $rreview['recommendation'];
+              if (!empty($rreview['summary'])) {
+              ?>
+
+                <button type="button" class="btn btn-small btn-info" data-toggle="modal" data-target="#myModal_<?php echo $rreview['id']; ?>">
+                  View Summary
+                </button>
+
+                <!-- Start -->
+                <div class="modal fade" id="myModal_<?php echo $rreview['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h4 class="modal-title">Clinical Summary</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      </div>
+
+                      <!-- Modal Body -->
+                      <div class="modal-body">
+                        <?php 
+                        
+                        echo $rreview['summary'];
+                        ?>
+
+                      </div>
+
+                      <!-- Modal Footer -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- End -->
+              <?php } ?>
+            </td>
+            <td><?php
+                foreach ($rreview['InternalComment'] as $iComment) {
+                  echo   $iComment['subject'] . "<br>";
+                  echo   $iComment['content'] . "<br>";
+                  echo   $iComment['sender'] . "<br>";
+                  echo "<br>";
+                }
+                ?></td>
+            <td><?php echo $rreview['status'] . "<br>" . $rreview['type'] ?></td>
+            <td><?php echo $rreview['User']['name']; ?></td>
+            <td><?php echo $rreview['created'] ?></td>
+            <td>
+              <?php
+              if ($rreview['type'] != 'request' && $rreview['type'] != 'ppb_comment') {
+                if ($rreview['status'] == 'Unsubmitted') {
+                  echo $this->Html->link(
+                    '<span class="label label-success"> Edit </span>',
+                    array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']),
+                    array('escape' => false)
+                  );
+                  echo "&nbsp;";
+                } else {
+                  echo $this->Html->link(
+                    '<span class="label label-info"> View </span>',
+                    array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']),
+                    array('escape' => false)
+                  );
+                  echo "&nbsp;";
+                }
+              }
 
 
-          if (($redir == 'manager')) {
-            // echo $this->Form->postLink(__('<label class="label label-inverse">Unsubmit</label>'), array('controller' => 'rreviews', 'action' => 'unsubmit', $rreview['id']), array('escape' => false), __('Are you sure you want to unsubmit the rreview # %s? The applicant will be able to edit it.', $rreview['id']));
-          }
+              if (($redir == 'manager')) {
+                // echo $this->Form->postLink(__('<label class="label label-inverse">Unsubmit</label>'), array('controller' => 'rreviews', 'action' => 'unsubmit', $rreview['id']), array('escape' => false), __('Are you sure you want to unsubmit the rreview # %s? The applicant will be able to edit it.', $rreview['id']));
+              }
 
-          ?>
-        </td>
-      </tr>
-    <?php } ?>
-  </tbody>
-</table>
-
+              ?>
+            </td>
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <br>
 <hr>
@@ -187,7 +227,7 @@ if (isset($this->params['named']['rreview_view'])) {
                   <div class="tab-pane active" id="rreview_comment_list">
                     <div class="row-fluid">
                       <div class="span12">
-                        <?php echo $this->element('comments/list_expandable', ['comments' => $rreview['InternalComment'],'category'=>false]) ?>
+                        <?php echo $this->element('comments/list_expandable', ['comments' => $rreview['InternalComment'], 'category' => false]) ?>
                       </div>
 
                     </div>
