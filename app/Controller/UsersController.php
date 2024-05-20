@@ -552,7 +552,7 @@ class UsersController extends AppController {
     public function edit() {
         if ($this->request->is('post') || $this->request->is('put')) {
             $fieldlist = array('name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address',
-                'institution_contact', 'county_id', 'country_id', 'sponsor_email', 'qualification');
+                'institution_contact', 'county_id', 'country_id', 'sponsor_email', 'qualification','national_id_number');
             if ($this->User->save($this->request->data, true, $fieldlist)) {
                 $this->Session->setFlash(__('Your registration details have been updated.'), 'alerts/flash_success');
                 $this->redirect(array('action' => 'profile'));
@@ -723,6 +723,8 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Applications/manager_index');
         $this->Acl->allow($group, 'controllers/Applications/manager_workflow');
         $this->Acl->allow($group, 'controllers/Applications/manager_view');
+        $this->Acl->allow($group, 'controllers/Applications/manager_verify_invoice');        
+        $this->Acl->allow($group, 'controllers/Applications/manager_stages_summary');
         $this->Acl->allow($group, 'controllers/Applications/manager_stages_summary');
         $this->Acl->allow($group, 'controllers/Applications/manager_amendment_summary');
         $this->Acl->allow($group, 'controllers/Applications/manager_view_notification');

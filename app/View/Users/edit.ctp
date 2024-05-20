@@ -46,8 +46,9 @@
 				echo $this->Form->input('phone_no', array('label' => array('class' => 'control-label', 'text' => 'Phone Number'),));
 				echo $this->Form->input('name_of_institution', array(
 					'label' => array('class' => 'control-label', 'text' => 'Name of Institution'),
-				));
-
+				)); 
+				echo $this->Form->input('national_id_number', array('label' => array('class' => 'control-label', 'text' => 'National ID'),));
+				
 				?>
 		</div><!--/span-->
 		<div class="span6">

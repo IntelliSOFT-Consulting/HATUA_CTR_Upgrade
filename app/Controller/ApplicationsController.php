@@ -101,8 +101,48 @@ class ApplicationsController extends AppController
         $this->Session->setFlash(__('Successfully submitted the protocol amendment. '), 'alerts/flash_success');
         $this->redirect(array('action' => 'view', $id));
     }
+
+    public function manager_verify_invoice($id = null)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('Application does not exist!'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $application = $this->Application->read(null, $id);
+        $invoice_id = $application['Application']['ecitizen_invoice'];
+
+        $options = array(
+            'ssl_verify_peer' => false
+        );
+        $raw_id = base64_encode($invoice_id);
+
+        $HttpSocket = new HttpSocket($options);
+        $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
+
+        if ($prims->isOk()) {
+            $body2 = $prims->body;
+            $resp2 = json_decode($body2, true);
+
+            debug($resp2);
+            exit;
+            $this->Session->setFlash(__('Invoice Details Retrieved Successfully.'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id, 'data' => $resp2));
+        } else {
+
+            $this->Session->setFlash(__('Experience problems connecting to remote server.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+    }
     public function applicant_invoice($id)
     {
+
+        $user = $this->Auth->User();
+        if (empty($user['national_id_number'])) {
+            $this->Session->setFlash(__('Kindly update your National ID to proceed.'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+        }
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
             $this->Session->setFlash(__('Application does not exist!'), 'alerts/flash_error');
@@ -112,33 +152,46 @@ class ApplicationsController extends AppController
         $options = array(
             'ssl_verify_peer' => false
         );
-
+        $application =   $this->Application->read(null, $id);
         $HttpSocket = new HttpSocket($options);
-
         $header_options = array(
             'header' => array(
-                'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
-                'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+                'APPID' => Configure::read('APPID'),
+                'APIKEY' => Configure::read('APIKEY'),
                 'Content-Type' => 'application/json',
             )
         );
+
+
+        //PRINCIPAL INVESTIGATOR
+        $multiArray = $application['InvestigatorContact'];
+        $firstEntry = reset($multiArray);
+        // debug($firstEntry); //$firstEntry['given_name'] | family_name | qualification | telephone | email
+        // exit;
+        $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
+        $billDesc = $name . "\n" . $application['Application']['short_title'];
+
         // //Request Access Token
         $initiate = $HttpSocket->get(
-            'https://invoices.pharmacyboardkenya.org/token',
+            Configure::read('e_citizen_token_url'),
             false,
             $header_options
         );
-
         if ($initiate->isOk()) {
             $body = $initiate->body;
             $resp = json_decode($body, true);
             $session_token = $resp['session_token'];
-            $invoice_total = 1000;
+            $invoice_total = 1000 * count($application['SiteDetail']);  /// calculated based on the number of sites::::
             $postData = array(
-                'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials
-                'amount_due' => $invoice_total, // from your invoice
-                'user_id' => 29043, // from PRIMS login
-                'session_token' => $session_token // from above
+                'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
+                'session_token' => $session_token, // from above  $application['Application']['short_title']
+                'billDesc' => $billDesc,
+                'currency' => 'USD',
+                'clientMSISDN' => $user['phone_no'],
+                'clientName' => $user['name'],
+                'clientIDNumber' => $user['national_id_number'],
+                'clientEmail' => $user['email'],
+                'amountExpected' => $invoice_total
             );
             $header_options = array(
                 'header' => array(
@@ -147,29 +200,42 @@ class ApplicationsController extends AppController
             );
             $formData = http_build_query($postData);
 
-            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice', $formData, $header_options);
+            $next = $HttpSocket->post(
+                Configure::read('e_citizen_invoice_url'),
+                $formData,
+                $header_options
+            );
             // debug($next);
+
+            // exit;
             if ($next->isOk()) {
                 $body1 = $next->body;
                 $resp1 = json_decode($body1, true);
-                $invoice_id = 285251; //$resp1['invoice_id'];
-                $payment_code = $resp1['payment_code'];
+                // debug($resp1);
+                // exit;
+                $invoice_id = $resp1[0]; //Default test:::: 285251
+                $payment_code = $resp1[1];
+                $this->Application->saveField('ecitizen_invoice', $invoice_id);
 
                 $raw_id = base64_encode($invoice_id);
 
-                $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
+                $prims = $HttpSocket->get(
+
+                    Configure::read('e_citizen_invoice_status_url')
+                        . $invoice_id,
+                    false,
+                    $options
+                );
 
                 if ($prims->isOk()) {
                     $body2 = $prims->body;
                     $resp2 = json_decode($body2, true);
-                    // debug($resp2);
-                    // exit;
                     $data = array(
                         'secureHash' => $resp2["secureHash"],
                         'apiClientID' => 42,
                         'serviceID' => $resp2["serviceID"],
-                        'notificationURL' => 'https://practice.pharmacyboardkenya.org/ipn?id=' . $raw_id,
-                        'callBackURLOnSuccess' => 'https://practice.pharmacyboardkenya.org/callback?id=' . $raw_id,
+                        'notificationURL' =>   Configure::read('notificationURL') . $raw_id,
+                        'callBackURLOnSuccess' =>   Configure::read('callBackURLOnSuccess') . $raw_id,
                         'billRefNumber' => $resp2["billRefNumber"],
                         'currency' => $resp2["currency"],
                         'amountExpected' => $resp2["amountExpected"],
@@ -182,11 +248,12 @@ class ApplicationsController extends AppController
                     );
 
                     $payload = http_build_query($data);
-                    $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);
-
-                    // echo '<h2><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Download Invoice</a></h2>'; // Official PPB Invoice
+                    // debug($payload);
+                    // exit;
+                    $ecitizen = $HttpSocket->post(Configure::read('payments_ecitizen_url'), $payload, $header_options);
+                    // debug($ecitizen);
+                    // exit;
                     if ($ecitizen->isOk()) {
-                        // debug($ecitizen->body); 
                         $this->Session->setFlash(__('Invoice Generated Successfully.'), 'alerts/flash_success');
                         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id));
                     } else {
@@ -326,11 +393,11 @@ class ApplicationsController extends AppController
             $apps = $this->Application->find(
                 'all',
                 array(
-                    'conditions' => $this->paginate['conditions'], 
-                    'order' => $this->paginate['order'], 
+                    'conditions' => $this->paginate['conditions'],
+                    'order' => $this->paginate['order'],
                     'contain' => $this->a_contain,
                     'limit' => $limit
-                    )
+                )
             );
 
             foreach ($apps as $app) {

@@ -42,6 +42,8 @@
 				<dd><?php echo $user['User']['qualification']; ?> &nbsp; </dd>
 				<dt>Phone No</dt>
 				<dd><?php echo $user['User']['phone_no']; ?> &nbsp; </dd>
+				<dt>National Id</dt>
+				<dd><?php echo $user['User']['national_id_number']; ?> &nbsp; </dd>
 				<dt>Name of institution</dt>
 				<dd><?php echo $user['User']['name_of_institution'];?>&nbsp; </dd>
 				<dt>Physical Address</dt>
