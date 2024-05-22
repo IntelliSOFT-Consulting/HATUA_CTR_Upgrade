@@ -832,6 +832,7 @@ class UsersController extends AppController {
         $this->Acl->allow($group, 'controllers/Amendments/applicant_edit');
         $this->Acl->allow($group, 'controllers/Amendments/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_index');
+        $this->Acl->allow($group, 'controllers/Applications/applicant_assign_protocol');
         // $this->Acl->allow($group, 'controllers/Applications/applicant_add');  //why?
         $this->Acl->allow($group, 'controllers/Applications/applicant_view');
         $this->Acl->allow($group, 'controllers/Applications/applicant_edit');

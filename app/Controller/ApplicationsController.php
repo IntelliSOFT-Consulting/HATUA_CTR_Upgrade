@@ -26,6 +26,45 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice', 'download_invoice');
     }
+
+    public function applicant_assign_protocol($id)
+    {
+        $this->loadModel('User');
+        $this->loadModel('Outsource');
+        if ($this->request->is('post')) {
+            $user = $this->User->find('first', array(
+                'conditions' => array(
+                    'OR' => array(
+                        array('User.username' => $this->request->data['Outsource']['username']),
+                        array('User.email' => $this->request->data['Outsource']['username'])
+                    )
+                ),
+                'contain' => array()
+            ));
+
+            if ($user) {
+
+                // Create a Audit Trail
+                $outsource = array(
+                    'Outsource' => array(
+                        'application_id' => $id,
+                        'user_id' => $user['User']['id'],
+                        'model' => 'SAE'
+                    )
+                );
+                $this->Outsource->Create();
+                if ($this->Outsource->save($outsource)) {
+                }
+
+                $this->Session->setFlash(__('Protocol successfully assigned to ' . $user['User']['name'] . ' for further processing'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+
+                $this->Session->setFlash(__('Account not found, please confirm details and try again.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        }
+    }
     public function download_invoice($id)
     {
     }
