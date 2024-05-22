@@ -2,6 +2,7 @@
 App::uses('String', 'Utility');
 App::uses('Sanitize', 'Utility');
 App::uses('Router', 'Routing');
+App::uses('HttpSocket', 'Network/Http');
 config('routes');
 App::uses('Shell', 'Console');
 App::uses('AppModel', 'Model');
@@ -11,6 +12,7 @@ class NotificationShell extends Shell
 {
   public $uses = array('User', 'Application', 'Amendment', 'AuditTrail', 'Review', 'Notification', 'Message');
 
+ 
   public function perform()
   {
     $this->initialize();
@@ -104,6 +106,134 @@ class NotificationShell extends Shell
     }
   }
 
+  public function generate_report_invoice($id)
+  {
+
+    $application = $this->Application->find('first', array(
+      'conditions' => array('Application.id' => $id),
+      'contain' => array('SiteDetail', 'User','InvestigatorContact')
+    )); 
+    if ($application) { 
+      $options = array('ssl_verify_peer' => false); 
+      $HttpSocket = new HttpSocket($options);
+      $header_options = array(
+        'header' => array(
+          'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
+          'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+          'Content-Type' => 'application/json',
+        )
+      ); 
+      $user = $application['User'];  
+      //PRINCIPAL INVESTIGATOR
+      $multiArray = $application['InvestigatorContact'];
+      $firstEntry = reset($multiArray);
+      $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
+      $billDesc = $name . "\n" . $application['Application']['short_title'];
+
+      // //Request Access Token
+      $initiate = $HttpSocket->get('https://invoices.pharmacyboardkenya.org/token', false, $header_options);
+ 
+      if ($initiate->isOk()) {
+        $body = $initiate->body;
+        $resp = json_decode($body, true);
+        $this->log($resp,'e-citizen-token-success');
+        $session_token = $resp['session_token'];
+        $invoice_total = 1000 * count($application['SiteDetail']);  /// calculated based on the number of sites::::
+        $postData = array(
+          'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
+          'session_token' => $session_token, // from above  $application['Application']['short_title']
+          'billDesc' => $billDesc,
+          'currency' => 'USD',
+          'clientMSISDN' => $user['phone_no'],
+          'clientName' => $user['name'],
+          'clientIDNumber' => $user['national_id_number'],
+          'clientEmail' => $user['email'],
+          'amountExpected' => $invoice_total
+        );
+        $header_options = array(
+          'header' => array(
+            'Content-Type' => 'application/x-www-form-urlencoded'
+          )
+        );
+        $formData = http_build_query($postData);
+
+        $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate',$formData,$header_options);
+        if ($next->isOk()) {
+          $body1 = $next->body;
+          $resp1 = json_decode($body1, true);     
+          $invoice_id = $resp1[0]; //Default test:::: 285251
+          $payment_code = $resp1[1];
+          $this->Application->id = $id;
+          if($this->Application->saveField('ecitizen_invoice', $invoice_id)){
+            $raw_id = base64_encode($invoice_id);
+            $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice='. $invoice_id, false, $options );
+            if ($prims->isOk()) {
+                $body2 = $prims->body;
+                $resp2 = json_decode($body2, true);
+                $data = array(
+                    'secureHash' => $resp2["secureHash"],
+                    'apiClientID' => 42,
+                    'serviceID' => $resp2["serviceID"],
+                    'notificationURL' => 'https://practice.pharmacyboardkenya.org/ipn?id='. $raw_id,
+                    'callBackURLOnSuccess' => 'https://practice.pharmacyboardkenya.org/callback?id='. $raw_id,
+                    'billRefNumber' => $resp2["billRefNumber"],
+                    'currency' => $resp2["currency"],
+                    'amountExpected' => $resp2["amountExpected"],
+                    'billDesc' => $resp2["billDesc"],
+                    'pictureURL' => '', //$resp2["pictureURL"],
+                    'clientName' => $resp2["clientName"],
+                    'clientEmail' => $resp2["clientEmail"],
+                    'clientMSISDN' => $resp2["clientMSISDN"],
+                    'clientIDNumber' => $resp2["clientIDNumber"],
+                );
+
+                    $payload = http_build_query($data); 
+                    $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);                    
+                    if ($ecitizen->isOk()) { 
+                    }
+                  }
+
+              //<!-- Send email to applicant -->
+
+              $variables = array(
+                // 'protocol_link' =>'https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id='.$raw_id,
+                'protocol_link' => '<a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Click here to view invoice</a>',
+                'protocol_no' => $application['Application']['protocol_no'],
+                'name' => $application['Application']['name']
+              );
+
+              $messages = $this->Message->find('list', array(
+                'conditions' => array('Message.name' => array( 
+                  'applicant_invoice_email', 'applicant_invoice_email_subject'
+                )),
+                'fields' => array('Message.name', 'Message.content')
+              ));
+    $message = String::insert($messages['applicant_invoice_email'], $variables);
+    $email = new CakeEmail();
+    $email->config('gmail');
+    $email->template('default');
+    $email->emailFormat('html');
+    $email->to($user['email']); 
+    $email->bcc(array('kiprotich.japheth19@gmail.com'));
+    $email->subject(Sanitize::html(String::insert($messages['applicant_invoice_email_subject'], $variables), array('remove' => true)));
+    $email->viewVars(array('message' => $message));
+    if (!$email->send()) {
+      $this->log($email, 'submit_email');
+    }
+          }else{
+            $this->log('saved application','e-citizen-error_saved');
+          }
+        }else{
+          $this->log('Failed to generate invoice','e-citizen-error');
+        }
+      }else{
+        $this->log('Failed to retrive token','e-citizen-error');
+      }
+    }else{
+       $this->log('sample application','test-app-error');
+    }
+  }
+
   public function ppbNewApplication()
   {
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 2, 'is_active' => 1), 'contain' => array()));
@@ -136,7 +266,11 @@ class NotificationShell extends Shell
       );
     }
 
-   
+    // Handle eCitizen Integration
+
+    $this->generate_report_invoice($this->args[0]['Application']['id']);
+
+
 
     // TODO : Set email accounts to cc notification
     $this->Notification->Create();
@@ -217,7 +351,7 @@ class NotificationShell extends Shell
           $email->config('gmail');
           $email->template('default');
           $email->emailFormat('html');
-          $email->to($manager->email); 
+          $email->to($manager->email);
           $email->bcc(array('kiprotich.japheth19@gmail.com'));
           $email->subject(Sanitize::html(String::insert($messages['reviewer_new_application_subject'], $variables), array('remove' => true)));
           $email->viewVars(array('message' => $message));
@@ -293,7 +427,7 @@ class NotificationShell extends Shell
           $email->config('gmail');
           $email->template('default');
           $email->emailFormat('html');
-          $email->to($manager->email); 
+          $email->to($manager->email);
           $email->bcc(array('kiprotich.japheth19@gmail.com'));
           $email->subject(Sanitize::html(String::insert($messages['inspector_new_application_subject'], $variables), array('remove' => true)));
           $email->viewVars(array('message' => $message));
