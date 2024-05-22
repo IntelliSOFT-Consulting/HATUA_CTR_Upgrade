@@ -195,8 +195,7 @@ class NotificationShell extends Shell
 
               //<!-- Send email to applicant -->
 
-              $variables = array(
-                // 'protocol_link' =>'https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id='.$raw_id,
+              $variables = array( 
                 'protocol_link' => '<a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Click here to view invoice</a>',
                 'protocol_no' => $application['Application']['protocol_no'],
                 'name' => $application['Application']['name']
