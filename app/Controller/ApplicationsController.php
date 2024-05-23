@@ -49,7 +49,7 @@ class ApplicationsController extends AppController
                     'Outsource' => array(
                         'application_id' => $id,
                         'user_id' => $user['User']['id'],
-                        'model' => 'SAE'
+                        'model' => $this->request->data['Outsource']['model']
                     )
                 );
                 $this->Outsource->Create();
@@ -164,8 +164,8 @@ class ApplicationsController extends AppController
             $body2 = $prims->body;
             $resp2 = json_decode($body2, true);
 
-            debug($resp2);
-            exit;
+            // debug($resp2);
+            // exit;
             $this->Session->setFlash(__('Invoice Details Retrieved Successfully.'), 'alerts/flash_success');
             $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id, 'data' => $resp2));
         } else {
@@ -2484,9 +2484,22 @@ class ApplicationsController extends AppController
             )
         ));
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
+
+            //check if assigned the report
             $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
-            $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
-            $this->redirect(array('action' => 'index'));
+
+            $aids = $this->Application->Outsource->find(
+                'list',array(
+                    'fields' => array(
+                        'application_id', 'application_id'
+                    ), 
+                    'conditions' => array('Outsource.user_id' => $this->Auth->User('id')))
+            );
+            
+            if (!in_array($response['Application']['id'], $aids)) {
+                $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
+                $this->redirect(array('action' => 'index'));
+            }
         } elseif ($response['Application']['submitted']) {
             $this->Session->setFlash(__('You cannot edit this application because it has been submitted to PPB.'), 'alerts/flash_error');
             $this->redirect(array('action' => 'index'));
@@ -2512,8 +2525,19 @@ class ApplicationsController extends AppController
         );
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
-            $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');
-            $this->redirect(array('action' => 'index'));
+            $aids = $this->Application->Outsource->find(
+                'list',array(
+                    'fields' => array(
+                        'application_id', 'application_id'
+                    ), 
+                    'conditions' => array('Outsource.user_id' => $this->Auth->User('id')))
+            );
+           
+            if (!in_array($response['Application']['id'], $aids)) {
+                $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
+                $this->redirect(array('action' => 'index'));
+            } 
+        
         }
         return $response;
     }
