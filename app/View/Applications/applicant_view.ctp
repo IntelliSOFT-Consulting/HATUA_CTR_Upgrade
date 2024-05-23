@@ -37,22 +37,26 @@ echo $this->Session->flash();
 <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
-    <li><a href="#tab17" data-toggle="tab">Screening</a></li>
-    <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
-    <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
-    <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
+    <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+      <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
+      <li><a href="#tab17" data-toggle="tab">Screening</a></li>
+      <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
+      <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
+      <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
+    <?php } ?>
     <li><a href="#tab7" data-toggle="tab">SAE/SUSAR (<?php echo count($application['Sae']) ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
     <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
-    <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
-    <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
-    <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
-    <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li>
-    <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Annual Approval Letter</a></li>
-    <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
-    <?php if ($application['Application']['approved'] == 2) { ?>
-      <li><a href="#tab9" data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
-    <?php } ?>
+    <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+      <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
+      <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
+      <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
+      <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li>
+      <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Annual Approval Letter</a></li>
+      <?php if ($application['Application']['approved'] == 2) { ?>
+        <li><a href="#tab9" data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
+    <?php }
+    } ?>
   </ul>
   <div class="tab-content my-tab-content">
     <div class="tab-pane active" id="tab1">
@@ -135,29 +139,80 @@ echo $this->Session->flash();
               array('escape' => false, 'class' => 'btn btn-primary', 'style' => 'margin-right: 10px;')
             );
           }
-          if (isset($this->params['named']['invoice'])) {
+          ?>
 
-            // echo '<button><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $this->params['named']['invoice'] . '">Download Invoice</a></button>'; 
-            // echo $this->Html->link(
-            //   __('<i class="icon-download"></i> Download Invoice'),
-            //   array('https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=',  $this->params['named']['invoice']),
-            //   array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
-            // );
-            echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $this->params['named']['invoice'] . '"><i class="icon-download"></i> Download Invoice</a></button>';
-          } else {
+
+
+          <?php
+          if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
+            if (isset($this->params['named']['invoice'])) {
+              echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $this->params['named']['invoice'] . '"><i class="icon-download"></i> Download Invoice</a></button>';
+            } else {
+              echo $this->Html->link(
+                __('<i class="icon-download"></i> Generate Invoice'),
+                array('controller' => 'applications', 'action' => 'invoice', $application['Application']['id']),
+                array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
+              );
+            }
+
             echo $this->Html->link(
-              __('<i class="icon-download"></i> Generate Invoice'),
-              array('controller' => 'applications', 'action' => 'invoice', $application['Application']['id']),
-              array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
+              __('<i class="icon-download-alt"></i> Download PDF'),
+              array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
+              array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
             );
           }
-          echo $this->Html->link(
-            __('<i class="icon-download-alt"></i> Download PDF'),
-            array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
-            array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
-          );
 
-          ?>
+          if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+            <!-- <a class="btn btn-primary" role="button" data-toggle="collapse" href="#protocolAssignment" aria-controls="protocolAssignment"><i class="icon-user"></i> Allocate Report</a> -->
+          <?php } ?>
+          <div id="protocolAssignment" class="collapse show">
+            <h5>Outsource Report</h5>
+            <?php
+            echo $this->Form->create('Outsource', array(
+              'url' => array('controller' => 'applications', 'action' => 'assign_protocol', $application['Application']['id']),
+              'type' => 'file',
+              'class' => 'form-horizontal',
+              'inputDefaults' => array(
+                'div' => array('class' => 'control-group'),
+                'label' => array('class' => 'control-label'),
+                'between' => '<div class="controls">',
+                'after' => '</div>',
+                'class' => '',
+                'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                'error' => array('attributes' => array('class' => 'controls help-block')),
+              ),
+            ));
+            echo $this->Form->input('id');
+            echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
+            echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'CIOM'));
+            ?>
+            <hr>
+            <?php
+
+            echo $this->Form->input('username', array(
+              'label' => array('class' => 'control-nolabel required', 'text' => 'Enter Username/Email'),
+              'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
+              'escape' => false,
+            ));
+            ?>
+            <?php
+            echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+              'name' => 'submitReport',
+              'formnovalidate' => 'formnovalidate',
+              'onclick' => "return confirm('Are you sure you wish to allocate the report?.');",
+              'class' => 'btn btn-info mapop',
+              'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
+              'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+              'div' => false,
+            ));
+
+            ?>
+            <hr>
+            <?php
+            echo $this->Form->end();
+            ?>
+          </div>
+          <!-- End -->
         </div>
       <?php
       }
@@ -328,59 +383,11 @@ echo $this->Session->flash();
               array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'),
               array('escape' => false, 'class' => 'btn btn-primary btn-mini')
             );
-          
+
           ?>
-          <a class="btn btn-mini btn-primary" role="button" data-toggle="collapse" href="#loop" aria-controls="loop"><i class="icon-user"></i> Allocate Report</a>
 
-          <div id="loop" class="collapse show">
-            <h5>Outsource Report</h5>
-            <?php
-            echo $this->Form->create('Outsource', array(
-              'url' => array('controller' => 'applications', 'action' => 'assign_protocol', $application['Application']['id']),
-              'type' => 'file',
-              'class' => 'form-horizontal',
-              'inputDefaults' => array(
-                'div' => array('class' => 'control-group'),
-                'label' => array('class' => 'control-label'),
-                'between' => '<div class="controls">',
-                'after' => '</div>',
-                'class' => '',
-                'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
-                'error' => array('attributes' => array('class' => 'controls help-block')),
-              ),
-            ));
-            echo $this->Form->input('id');
-            echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-            echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'SAE'));
-            ?>
-            <hr>
-            <?php
-
-            echo $this->Form->input('username', array(
-              'label' => array('class' => 'control-nolabel required', 'text' => 'Enter Username/Email'),
-              'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
-              'escape' => false,
-            ));
-            ?>
-            <?php
-            echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
-              'name' => 'submitReport',
-              'formnovalidate' => 'formnovalidate',
-              'onclick' => "return confirm('Are you sure you wish to allocate the report?.');",
-              'class' => 'btn btn-info mapop',
-              'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
-              'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
-              'div' => false,
-            ));
-
-            ?>
-            <hr>
-            <?php
-            echo $this->Form->end();
-            ?>
-          </div>
-          <br>
-          <br>
+            <br>
+            <br>
 
           <?php } ?>
           <table class="table  table-bordered table-striped">
@@ -475,6 +482,14 @@ echo $this->Session->flash();
         </div>
       </div>
     </div>
+    <div class="tab-pane" id="outsourcing">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('application/outsourcing'); ?>
+        </div>
+      </div>
+    </div>
+    
 
     <div class="tab-pane" id="tab10">
       <div class="row-fluid">

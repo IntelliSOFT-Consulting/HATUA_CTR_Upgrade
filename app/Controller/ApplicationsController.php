@@ -20,17 +20,51 @@ class ApplicationsController extends AppController
     public $components = array('Search.Prg');
     public $presetVars = true;
 
+
+    public $uses = array('Outsource', 'AuditTrail', 'User');
+
     public function beforeFilter()
     {
         parent::beforeFilter();
 
         $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice', 'download_invoice');
     }
+    public function applicant_revoke_assignment($id = null, $application_id)
+    {
+        $this->Outsource->id = $id;
+        if (!$this->Outsource->exists()) {
+            throw new NotFoundException(__('Invalid Assignment'));
+        }
 
+        $app = $this->Outsource->find('first', array(
+            'conditions' => array('Outsource.id' => $id),
+        ));
+        if ($this->Outsource->delete()) {
+
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $application_id,
+                    'model' => 'Application',
+                    'message' => 'Outsourced assigned to ' . $app['User']['username'] . ' for the protocol with reference number ' . $app['Application']['protocol_no'] . ' has been revorked by ' . $this->Auth->user('name'),
+                    'ip' => $app['Application']['protocol_no']
+                )
+            );
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($app['Application']['protocol_no'], 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'audit_error');
+                $this->log($app['Application']['protocol_no'], 'audit_error');
+            }
+            $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
+        }
+        $this->Session->setFlash(__('outsourced assignment was not deleted'));
+        $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
+    }
     public function applicant_assign_protocol($id)
     {
-        $this->loadModel('User');
-        $this->loadModel('Outsource');
+
         if ($this->request->is('post')) {
             $user = $this->User->find('first', array(
                 'conditions' => array(
@@ -1226,6 +1260,8 @@ class ApplicationsController extends AppController
             'conditions' => array('Application.id' => $id),
             'contain' => $this->a_contain
         ));
+        // debug($application);
+        // exit;
         $this->request->data = $application;
 
         if (strpos($this->request->url, 'pdf') === false && !$response['Application']['submitted'] && !$response['Application']['deactivated']) {
@@ -2489,13 +2525,15 @@ class ApplicationsController extends AppController
             $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
 
             $aids = $this->Application->Outsource->find(
-                'list',array(
+                'list',
+                array(
                     'fields' => array(
                         'application_id', 'application_id'
-                    ), 
-                    'conditions' => array('Outsource.user_id' => $this->Auth->User('id')))
+                    ),
+                    'conditions' => array('Outsource.user_id' => $this->Auth->User('id'))
+                )
             );
-            
+
             if (!in_array($response['Application']['id'], $aids)) {
                 $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
                 $this->redirect(array('action' => 'index'));
@@ -2526,18 +2564,19 @@ class ApplicationsController extends AppController
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
             $aids = $this->Application->Outsource->find(
-                'list',array(
+                'list',
+                array(
                     'fields' => array(
                         'application_id', 'application_id'
-                    ), 
-                    'conditions' => array('Outsource.user_id' => $this->Auth->User('id')))
+                    ),
+                    'conditions' => array('Outsource.user_id' => $this->Auth->User('id'))
+                )
             );
-           
+
             if (!in_array($response['Application']['id'], $aids)) {
                 $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
                 $this->redirect(array('action' => 'index'));
-            } 
-        
+            }
         }
         return $response;
     }

@@ -32,7 +32,7 @@ App::uses('Controller', 'Controller');
  * @link http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
-  protected $a_contain = array('Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail'  => array('County'), 'Organization', 'Placebo',
+  protected $a_contain = array('Amendment','Outsource'=>array('User'), 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail'  => array('County'), 'Organization', 'Placebo',
                 'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
                 'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist',
                 'AnnualApproval','AmendmentApproval' => array('Attachment'),'AmendmentChecklist','AmendmentLetter', 'ParticipantFlow', 'Budget', 'Document', 'ActiveInspector',
@@ -48,10 +48,10 @@ class AppController extends Controller {
             'authorize' => array(
                 'Actions' => array('actionPath' => 'controllers')
             ),
-           //  'authenticate' => array(
-           //    'Form' => array(
-           //        'fields' => array('username' => 'email')
-           //    )
+            // 'authenticate' => array(
+            //   'Form' => array(
+            //       'fields' => array('username' => 'email')
+            //   )
           	// )
         ),
         'RequestHandler' => array(
