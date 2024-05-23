@@ -328,7 +328,7 @@ echo $this->Session->flash();
               array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'),
               array('escape' => false, 'class' => 'btn btn-primary btn-mini')
             );
-          }
+          
           ?>
           <a class="btn btn-mini btn-primary" role="button" data-toggle="collapse" href="#loop" aria-controls="loop"><i class="icon-user"></i> Allocate Report</a>
 
@@ -351,6 +351,7 @@ echo $this->Session->flash();
             ));
             echo $this->Form->input('id');
             echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
+            echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'SAE'));
             ?>
             <hr>
             <?php
@@ -381,6 +382,7 @@ echo $this->Session->flash();
           <br>
           <br>
 
+          <?php } ?>
           <table class="table  table-bordered table-striped">
             <thead>
               <tr>
