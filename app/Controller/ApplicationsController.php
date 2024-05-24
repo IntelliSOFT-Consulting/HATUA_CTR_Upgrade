@@ -24,7 +24,7 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'applicant_invoice', 'download_invoice');
+        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
     public function download_invoice($id)
     {
@@ -112,6 +112,10 @@ class ApplicationsController extends AppController
         $options = array(
             'ssl_verify_peer' => false
         );
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+          ));
 
         $HttpSocket = new HttpSocket($options);
 
@@ -128,18 +132,34 @@ class ApplicationsController extends AppController
             false,
             $header_options
         );
+        $user = $application['User'];
+        $multiArray = $application['InvestigatorContact'];
+        $firstEntry = reset($multiArray);
+        $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
+        $billDesc = $name . "\n" . $application['Application']['short_title'];
 
         if ($initiate->isOk()) {
             $body = $initiate->body;
             $resp = json_decode($body, true);
             $session_token = $resp['session_token'];
             $invoice_total = 1000;
+            // $postData = array(
+            //     'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials
+            //     'amount_due' => $invoice_total, // from your invoice
+            //     'user_id' => 29043, // from PRIMS login
+            //     'session_token' => $session_token // from above
+            // );
             $postData = array(
-                'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials
-                'amount_due' => $invoice_total, // from your invoice
-                'user_id' => 29043, // from PRIMS login
-                'session_token' => $session_token // from above
-            );
+                'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
+                'session_token' => $session_token, // from above  $application['Application']['short_title']
+                'billDesc' => $billDesc,
+                'currency' => 'USD',
+                'clientMSISDN' => $user['phone_no'],
+                'clientName' => $user['name'],
+                'clientIDNumber' => $user['national_id_number'],
+                'clientEmail' => $user['email'],
+                'amountExpected' => $invoice_total
+              );
             $header_options = array(
                 'header' => array(
                     'Content-Type' => 'application/x-www-form-urlencoded'
@@ -147,15 +167,16 @@ class ApplicationsController extends AppController
             );
             $formData = http_build_query($postData);
 
-            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/invoice', $formData, $header_options);
-            // debug($next);
+            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
+            
             if ($next->isOk()) {
                 $body1 = $next->body;
                 $resp1 = json_decode($body1, true);
-                $invoice_id = 285251; //$resp1['invoice_id'];
-                $payment_code = $resp1['payment_code'];
+                $invoice_id = $resp1[0];//['invoice_id'];
+                $payment_code = $resp1[1];//['payment_code'];
 
                 $raw_id = base64_encode($invoice_id);
+                $this->Application->saveField('ecitizen_invoice', $invoice_id);
 
                 $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
 
@@ -184,11 +205,9 @@ class ApplicationsController extends AppController
                     $payload = http_build_query($data);
                     $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);
 
-                    // echo '<h2><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Download Invoice</a></h2>'; // Official PPB Invoice
-                    if ($ecitizen->isOk()) {
-                        // debug($ecitizen->body); 
+                     if ($ecitizen->isOk()) { 
                         $this->Session->setFlash(__('Invoice Generated Successfully.'), 'alerts/flash_success');
-                        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id));
+                        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
                     } else {
                         $this->Session->setFlash(__('Experience problems connecting to remote server.'), 'alerts/flash_error');
                         $this->redirect($this->referer());

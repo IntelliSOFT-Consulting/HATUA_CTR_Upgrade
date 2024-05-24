@@ -143,14 +143,23 @@ echo $this->Session->flash();
             //   array('https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=',  $this->params['named']['invoice']),
             //   array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
             // );
-            echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $this->params['named']['invoice'] . '"><i class="icon-download"></i> Download Invoice</a></button>';
-          }else{
-          // echo $this->Html->link(
-          //   __('<i class="icon-download"></i> Generate Invoice'),
-          //   array('controller' => 'applications', 'action' => 'invoice', $application['Application']['id']),
-          //   array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
-          // );
-        }
+            // echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $this->params['named']['invoice'] . '"><i class="icon-download"></i> Download Invoice</a></button>';
+          } else {
+          }
+
+          /**
+           * Check if the current user is the owner and has a invoice_id
+           * **/
+          if (empty($application['Application']['ecitizen_invoice'])) {
+            echo $this->Html->link(
+              __('<i class="icon-download"></i> Generate Invoice'),
+              array('controller' => 'applications', 'action' => 'invoice', $application['Application']['id']),
+              array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
+            );
+          } else {
+            $invoice=base64_encode($application['Application']['ecitizen_invoice']);
+            echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $invoice . '"><i class="icon-download"></i> Download Invoice</a></button>';
+          }
           echo $this->Html->link(
             __('<i class="icon-download-alt"></i> Download PDF'),
             array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
@@ -187,7 +196,7 @@ echo $this->Session->flash();
 
       <?php $this->start('endjs'); ?>
     </div> <!-- End or bootstrab tab1 -->
-   
+
     <div class="tab-pane" id="tab17">
       <div class="marketing">
         <div class="row-fluid">
