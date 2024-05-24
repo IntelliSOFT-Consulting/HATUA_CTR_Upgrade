@@ -26,6 +26,39 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
+
+
+    public function manager_verify_invoice($id = null)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('Application does not exist!'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $application = $this->Application->read(null, $id);
+        $invoice_id = $application['Application']['ecitizen_invoice'];
+
+        $options = array(
+            'ssl_verify_peer' => false
+        );
+        $raw_id = base64_encode($invoice_id);
+
+        $HttpSocket = new HttpSocket($options);
+        $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
+
+        if ($prims->isOk()) {
+            $body2 = $prims->body;
+            $resp2 = json_decode($body2, true);
+ 
+            $this->Session->setFlash(__('Invoice Details Retrieved Successfully.'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id, 'data' => $resp2));
+        } else {
+
+            $this->Session->setFlash(__('Experience problems connecting to remote server.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+    }
     public function download_invoice($id)
     {
     }

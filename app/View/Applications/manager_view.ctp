@@ -60,6 +60,9 @@ echo $this->Session->flash();
     <?php if ($application['Application']['approved'] == 2) { ?>
       <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
     <?php } ?>
+    <?php if (!empty($application['Application']['ecitizen_invoice'])) { ?>
+      <li><a href="#ecitizen_invoice" data-toggle="tab" style="color: #52A652;">eCitizen Invoice</a></li>
+    <?php } ?>
   </ul>
   <div class="tab-content my-tab-content">
     <div class="tab-pane active" id="tab1">
@@ -165,16 +168,8 @@ echo $this->Session->flash();
               array('escape' => false, 'class' => 'btn btn-info')
             );
 
-            echo "<hr>";
-            // echo $this->Html->link(
-            //   __('<i class="icon-download"></i> Generate Invoice'),
-            //   array('controller' => 'applications', 'action' => 'invoice', $application['Application']['id']),
-            //   array('escape' => false, 'class' => 'btn btn-success save-attachment')
-            // );
-            // }
-
+            echo "<hr>"; 
             ?>
-                 <!-- <button type="button" class="btn-mini save-attachment" >&nbsp;<i class="icon-plus"></i>&nbsp;</button> -->
                
           </div>
         <?php
@@ -508,6 +503,10 @@ echo $this->Session->flash();
 
     <div class="tab-pane" id="tab5">
       <?php echo $this->element('multi/manager_approve'); ?>
+    </div>
+
+    <div class="tab-pane" id="ecitizen_invoice">
+      <?php echo $this->element('application/invoice'); ?>
     </div>
 
     <div class="tab-pane" id="tab6">
