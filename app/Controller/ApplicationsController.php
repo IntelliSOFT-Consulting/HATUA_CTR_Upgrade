@@ -15,7 +15,7 @@ App::uses('HttpSocket', 'Network/Http');
  */
 class ApplicationsController extends AppController
 {
-
+ 
     public $paginate = array();
     public $components = array('Search.Prg');
     public $presetVars = true;
@@ -26,7 +26,80 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
+    public function applicant_revoke_assignment($id = null, $application_id)
+    {
+        $this->loadModel('Outsource');
+        $this->loadModel('AuditTrail');
 
+        $this->Outsource->id = $id;
+        if (!$this->Outsource->exists()) {
+            throw new NotFoundException(__('Invalid Assignment'));
+        }
+
+        $app = $this->Outsource->find('first', array(
+            'conditions' => array('Outsource.id' => $id),
+        ));
+        if ($this->Outsource->delete()) {
+
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $application_id,
+                    'model' => 'Application',
+                    'message' => 'Outsourced assigned to ' . $app['User']['username'] . ' for the protocol with reference number ' . $app['Application']['protocol_no'] . ' has been revorked by ' . $this->Auth->user('name'),
+                    'ip' => $app['Application']['protocol_no']
+                )
+            );
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($app['Application']['protocol_no'], 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'audit_error');
+                $this->log($app['Application']['protocol_no'], 'audit_error');
+            }
+            $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
+        }
+        $this->Session->setFlash(__('outsourced assignment was not deleted'));
+        $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
+    }
+    public function applicant_assign_protocol($id)
+    {$this->loadModel('Outsource');
+        $this->loadModel('User');
+
+        if ($this->request->is('post')) {
+            $user = $this->User->find('first', array(
+                'conditions' => array(
+                    'OR' => array(
+                        array('User.username' => $this->request->data['Outsource']['username']),
+                        array('User.email' => $this->request->data['Outsource']['username'])
+                    )
+                ),
+                'contain' => array()
+            ));
+
+            if ($user) {
+
+                // Create a Audit Trail
+                $outsource = array(
+                    'Outsource' => array(
+                        'application_id' => $id,
+                        'user_id' => $user['User']['id'],
+                        'model' => $this->request->data['Outsource']['model']
+                    )
+                );
+                $this->Outsource->Create();
+                if ($this->Outsource->save($outsource)) {
+                }
+
+                $this->Session->setFlash(__('Protocol successfully assigned to ' . $user['User']['name'] . ' for further processing'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+
+                $this->Session->setFlash(__('Account not found, please confirm details and try again.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        }
+    }
 
     public function manager_verify_invoice($id = null)
     {
@@ -2448,6 +2521,7 @@ class ApplicationsController extends AppController
         $contains['SiteInspection']['conditions'] = array('SiteInspection.summary_approved' => 2);
         $contains['Deviation']['conditions'] = array('Deviation.user_id' => $this->Auth->user('id'));
         $contains['Review']['conditions'] = array('Review.type' => 'ppb_comment');
+      
         // debug($contains);
         $response = $this->Application->find(
             'first',

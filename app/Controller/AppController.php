@@ -40,7 +40,8 @@ class AppController extends Controller {
                 'Sae','AmendmentLetter', 'AnnualLetter' => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')), 'StudyRoute', 'Manufacturer', 'Ciom',
                 'Deviation' => array('ExternalComment' => array('Attachment')),
                 'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User'),
-                'ApplicationStage' => array('Comment' => array('Attachment'))
+                'ApplicationStage' => array('Comment' => array('Attachment')),
+                'Outsource'=>array('User')
     );
   public $components = array(
         'Acl',
