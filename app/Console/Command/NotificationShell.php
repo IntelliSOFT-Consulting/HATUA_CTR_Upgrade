@@ -199,7 +199,7 @@ class NotificationShell extends Shell
             $variables = array(
               'protocol_link' => '<a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Click here to view invoice</a>',
               'protocol_no' => $application['Application']['protocol_no'],
-              'name' => $application['Application']['name']
+              'name' => $user['name']
             );
 
             $messages = $this->Message->find('list', array(
