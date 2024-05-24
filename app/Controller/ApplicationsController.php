@@ -1530,7 +1530,7 @@ class ApplicationsController extends AppController
                             'names' => $names,
                             'professional_address' => $professional_address,
                             'telephone' => $telephone,
-                            'study_title' => $application['Application']['study_title'],
+                            'study_title' => $application['Application']['short_title'],
                             'checklist' => $checkstring,
                             'status' => $application['TrialStatus']['name'],
                             'expiry_date' => $expiry_date
