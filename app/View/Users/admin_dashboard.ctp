@@ -45,7 +45,10 @@
             array('controller' => 'applications', 'action' => 'index', 'deleted'=>'1'),  array('escape' => false, 'class' =>  'text-error'));
         ?>
         </li>
-      </ul>
+      </ul> 
+      <hr>
+    
+      <h5>Outsourced <small class="muted">(requests)</small> </h5>
       <br>
       <hr>
       <h4><a href="http://www.google.com/analytics/" target="_blank"><i class="icon-globe"></i> Google Analytics</a></h4>
@@ -65,6 +68,11 @@
         <li>
         <?php echo $this->Html->link('<i class="icon-plus-sign"></i> Add User',
               array('controller' => 'users', 'action' => 'add', 'admin' => true),
+              array('escape' => false)); ?>
+        </li>
+        <li>
+        <?php echo $this->Html->link('<i class="icon-user-md"></i> Outsourced Users',
+              array('controller' => 'study_monitors', 'action' => 'index', 'admin' => true),
               array('escape' => false)); ?>
         </li>
         <li>
