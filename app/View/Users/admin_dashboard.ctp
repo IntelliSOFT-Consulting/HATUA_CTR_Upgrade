@@ -49,6 +49,23 @@
       <hr>
     
       <h5>Outsourced <small class="muted">(requests)</small> </h5>
+      <ul class="nav nav-tabs nav-stacked">
+      <?php if(count($outsources) > 0) { 
+        foreach ($outsources as $os) {?>
+        <li>
+          <?php     echo $this->Html->link('<i class="icon-ok"></i>'.$os['Application']['protocol_no'] .' ' .$os['Outsource']['name'],
+                      array('controller' => 'outsources', 'action' => 'view', $os['Outsource']['id']), array('escape' => false, 'class' =>  'text-success'));   ?>
+        </li>
+
+        <?php } } ?>
+        <li>
+        <?php
+          echo $this->Html->link('<i class="icon-table"></i> All requests',
+            array('controller' => 'outsources', 'action' => 'index'),  array('escape' => false));
+        ?>
+        </li>
+      </ul> 
+     
       <br>
       <hr>
       <h4><a href="http://www.google.com/analytics/" target="_blank"><i class="icon-globe"></i> Google Analytics</a></h4>
@@ -72,7 +89,7 @@
         </li>
         <li>
         <?php echo $this->Html->link('<i class="icon-user-md"></i> Outsourced Users',
-              array('controller' => 'study_monitors', 'action' => 'index', 'admin' => true),
+              array('controller' => 'protocol_outsources', 'action' => 'index', 'admin' => true),
               array('escape' => false)); ?>
         </li>
         <li>

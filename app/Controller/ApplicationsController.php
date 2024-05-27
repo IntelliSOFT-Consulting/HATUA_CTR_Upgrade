@@ -312,8 +312,10 @@ class ApplicationsController extends AppController
 
         $header_options = array(
             'header' => array(
-                'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
-                'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+                // 'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
+                // 'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+                'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
+                'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
                 'Content-Type' => 'application/json',
             )
         );
@@ -328,18 +330,14 @@ class ApplicationsController extends AppController
         $firstEntry = reset($multiArray);
         $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
         $billDesc = $name . "\n" . $application['Application']['short_title'];
-
+        debug($initiate);
+        exit;
         if ($initiate->isOk()) {
             $body = $initiate->body;
             $resp = json_decode($body, true);
             $session_token = $resp['session_token'];
             $invoice_total = 1000;
-            // $postData = array(
-            //     'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials
-            //     'amount_due' => $invoice_total, // from your invoice
-            //     'user_id' => 29043, // from PRIMS login
-            //     'session_token' => $session_token // from above
-            // );
+             
             $postData = array(
                 'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
                 'session_token' => $session_token, // from above  $application['Application']['short_title']
@@ -358,8 +356,10 @@ class ApplicationsController extends AppController
             );
             $formData = http_build_query($postData);
 
-            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
-
+            // $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
+            $next = $HttpSocket->post(  'https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
+debug($next);
+exit;
             if ($next->isOk()) {
                 $body1 = $next->body;
                 $resp1 = json_decode($body1, true);

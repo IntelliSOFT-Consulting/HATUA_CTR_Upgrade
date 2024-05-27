@@ -291,9 +291,14 @@ class UsersController extends AppController
 
     public function admin_dashboard()
     {
+        $this->loadModel('Outsource');
         $this->request->data['Feedback']['user_id'] = $this->Auth->User('id');
         $this->User->Feedback->recursive = -1;
         $this->set('previous_messages', $this->User->Feedback->find('all', array('limit' => 3, 'order' => array('id' => 'desc'))));
+        $this->set('outsources', $this->Outsource->find('all', array(
+            'limit' => 3, 
+            'conditions'=>array('Outsource.approved'=>0),
+            'order' => array('Outsource.id' => 'desc'))));
     }
 
     public function login()

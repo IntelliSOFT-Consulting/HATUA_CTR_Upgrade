@@ -11,6 +11,24 @@ App::uses('AppModel', 'Model');
 class Outsource extends AppModel
 {
 
+	public $actsAs = array('Containable', 'Search.Searchable');
+
+
+	public $filterArgs = array(
+		'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
+	  );
+	  public function orConditions($data = array())
+	  {
+		$filter = $data['filter'];
+		$cond = array(
+		  'OR' => array(
+			$this->alias . '.email LIKE' => '%' . $filter . '%',
+			$this->alias . '.name LIKE' => '%' . $filter . '%',
+			$this->alias . '.username LIKE' => '%' . $filter . '%',
+		  )
+		);
+		return $cond;
+	  }
 	/**
 	 * Validation rules
 	 *

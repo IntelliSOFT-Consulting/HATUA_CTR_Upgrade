@@ -475,8 +475,13 @@ class Application extends AppModel
             'className' => 'StudyMonitor',
             'foreignKey' => 'user_id',
             'dependent' => false,
+        ), 
+         'ProtocolOutsource' => array(
+            'className' => 'ProtocolOutsource',
+            'foreignKey' => 'user_id',
+            'dependent' => false,
         ),
-         
+        
         'Outsource' => array(
             'className' => 'Outsource',
             'foreignKey' => 'application_id',

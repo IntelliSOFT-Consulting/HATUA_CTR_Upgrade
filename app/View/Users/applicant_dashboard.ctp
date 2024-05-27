@@ -108,16 +108,16 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
             </div>
             <h4>New Application</h4>
             <?php
-            echo $this->Form->create('Application');
             echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
-            echo $this->Form->end(array(
-              'label' => 'Create',
-              'value' => 'Create',
-              'class' => 'btn btn-success btn-large',
-              // 'div' => array(
-              // 'class' => 'form-actions',
-              // )
-            ));
+            
+            echo $this->Html->link('<i class="icon-plus"></i> Create',
+            array('controller' => 'applications', 'action' => 'create'),
+            array('escape' => false, 'class' => 'btn btn-success',  'style' => 'margin-right: 10px;', 
+              )
+        );
+            // echo $this->Form->create('Application');
+            // echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
+            // echo $this->Form->end(array('label' => 'Create','value' => 'Create','class' => 'btn btn-success btn-large',// 'div' => array(// 'class' => 'form-actions',// )));
             // echo $this->Form->end(__('Submit'), array('class' => 'btn btn-large btn-success'));
             ?>
             <hr>

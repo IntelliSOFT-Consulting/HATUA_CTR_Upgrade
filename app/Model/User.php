@@ -87,11 +87,11 @@ class User extends AppModel
       'foreignKey' => 'user_id',
       'dependent' => false,
     ),
-    // 'ProtocolOutsource' => array(
-    //   'className' => 'ProtocolOutsource',
-    //   'foreignKey' => 'user_id',
-    //   'dependent' => false,
-    // ),
+    'ProtocolOutsource' => array(
+      'className' => 'ProtocolOutsource',
+      'foreignKey' => 'user_id',
+      'dependent' => false,
+    ),
 
 
   );
