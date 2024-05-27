@@ -476,6 +476,7 @@ class Application extends AppModel
             'foreignKey' => 'user_id',
             'dependent' => false,
         ),
+         
         'Outsource' => array(
             'className' => 'Outsource',
             'foreignKey' => 'application_id',

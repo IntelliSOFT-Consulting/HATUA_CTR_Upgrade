@@ -5,17 +5,78 @@ App::uses('AppModel', 'Model');
  *
  * @property Application $Application
  * @property User $User
+ * @property County $County
+ * @property Country $Country 
  */
-class Outsource extends AppModel {
+class Outsource extends AppModel
+{
 
+	/**
+	 * Validation rules
+	 *
+	 * @var array
+	 */
+	public $validate = array(
+		'username' => array(
+			'notEmpty' => array(
+				'rule'     => 'notEmpty',
+				'required' => true,
+				'message'  => 'Please provide username'
+			),
+		),
+		'name' => array(
+			'notEmpty' => array(
+				'rule'     => 'notEmpty',
+				'required' => true,
+				'message'  => 'Please provide name'
+			),
+		),
+		'email' => array(
+			'notEmpty' => array(
+				'rule'     => 'notEmpty',
+				'required' => true,
+				'message'  => 'Please provide email address'
+			),
+			'email' => array(
+				'rule' => array('email'),
+				'message' => 'Please provide email address',
+				//'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'phone_no' => array(
+			'notEmpty' => array(
+				'rule'     => 'notEmpty',
+				'required' => true,
+				'message'  => 'Please provide phone number'
+			), 
+		),
+		'country_id' => array(
+			'notEmpty' => array(
+				'rule'     => 'notEmpty',
+				'required' => true,
+				'message'  => 'Please provide user country'
+			),
+			'numeric' => array(
+				'rule' => array('numeric'),
+				'message' => 'Please provide user country',
+				//'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
-/**
- * belongsTo associations
- *
- * @var array
- */
+	/**
+	 * belongsTo associations
+	 *
+	 * @var array
+	 */
 	public $belongsTo = array(
 		'Application' => array(
 			'className' => 'Application',
@@ -27,6 +88,20 @@ class Outsource extends AppModel {
 		'User' => array(
 			'className' => 'User',
 			'foreignKey' => 'user_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'County' => array(
+			'className' => 'County',
+			'foreignKey' => 'county_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Country' => array(
+			'className' => 'Country',
+			'foreignKey' => 'country_id',
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''

@@ -4,12 +4,10 @@
         echo $this->Session->flash();
         ?>
         <div class="page-header">
-            <div class="styled_title">
 
-            </div>
             <div class="row-fluid">
-                <div class="span10">
-                    <a class="btn btn-primary" role="button" data-toggle="collapse" href="#outsourcingModal" aria-controls="outsourcingModal"><i class="icon-user"></i> Allocate Report</a>
+                <div class="span12">
+                    <a class="btn btn-primary" role="button" data-toggle="collapse" href="#outsourcingModal" aria-controls="outsourcingModal"><i class="icon-user"></i> Outsource Protocol</a>
 
                     <div id="outsourcingModal" class="collapse show">
 
@@ -25,22 +23,51 @@
                                 'after' => '</div>',
                                 'class' => '',
                                 'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
-                                'error' => array('attributes' => array('class' => 'controls help-block')),
+                                'error' => array('attributes' => array('class' => 'controls')),
                             ),
                         ));
                         echo $this->Form->input('id');
                         echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-                        echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'CIOM'));
+                        echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'Outsource'));
                         ?>
                         <hr>
                         <?php
+                        echo $this->Form->input(
+                            'username',
+                            array('label' => array('class' => 'control-label required', 'text' => 'Username <span class="sterix">*</span>'),)
+                        );
 
-                        echo $this->Form->input('username', array(
-                            'label' => array('class' => 'control-nolabel required', 'text' => 'Enter Username/Email'),
-                            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
-                            'escape' => false,
+                        echo $this->Form->input('name', array('label' => array('class' => 'control-label', 'text' => 'Name'),));
+                        echo $this->Form->input('email', array(
+                            'type' => 'email',
+                            'div' => array('class' => 'control-group required'),
+                            'label' => array('class' => 'control-label required', 'text' => 'E-MAIL ADDRESS <span class="sterix">*</span>')
+                        ));
+                        echo $this->Form->input(
+                            'phone_no',
+                            array('label' => array('class' => 'control-label required', 'text' => 'Phone Number <span class="sterix">*</span>'),)
+                        );
+                        ?>
+                        <?php
+                        echo $this->Form->input('name_of_institution', array(
+                            'label' => array('class' => 'control-label', 'text' => 'Name of Institution'),
+                        ));
+                        echo $this->Form->input('institution_physical', array(
+                            'label' => array('class' => 'control-label', 'text' => 'Physical Address'),
+                            'after' => '<p class="help-block"> Road, street.. </p></div>',
+                        ));
+                        echo $this->Form->input('institution_address', array('label' => array('class' => 'control-label', 'text' => 'Institution Address'),));
+                        echo $this->Form->input('institution_contact', array('label' => array('class' => 'control-label', 'text' => 'Institution Contacts'),));
+                        echo $this->Form->input('county_id', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'County'),
+                            'empty' => true, 'between' => '<div class="controls ui-widget">',
+                        ));
+                        echo $this->Form->input('country_id', array(
+                            'empty' => true,
+                            'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>')
                         ));
                         ?>
+
                         <?php
                         echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
                             'name' => 'submitReport',
@@ -64,7 +91,7 @@
             <div class="row-fluid">
                 <div class="span10">
                     <div class="styled_title">
-                        <h5>Assigned Investigators</h5>
+                        <h5>Outsourced Investigators</h5>
 
                     </div>
                     <ol>
@@ -73,8 +100,8 @@
                         foreach ($application['Outsource'] as $key => $auc) { ?>
                             <li>
                                 <?php
-                                echo '<p class="text-success"><i class="icon-check"> </i> ' . $auc['User']['name'] . '<small class="muted">
-            ' . $this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'applications', 'action' => 'revoke_assignment',$auc['id'], $application['Application']['id']), array('escape' => false)) . '
+                                echo '<p class="text-success"><i class="icon-check"> </i> ' . $auc['name'] . '<small class="muted">
+            ' . $this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'applications', 'action' => 'revoke_assignment', $auc['id'], $application['Application']['id']), array('escape' => false)) . '
            </small></p>';
                                 ?>
 
