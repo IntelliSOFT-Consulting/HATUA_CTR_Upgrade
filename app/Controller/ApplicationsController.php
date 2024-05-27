@@ -15,7 +15,7 @@ App::uses('HttpSocket', 'Network/Http');
  */
 class ApplicationsController extends AppController
 {
- 
+
     public $paginate = array();
     public $components = array('Search.Prg');
     public $presetVars = true;
@@ -26,19 +26,112 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
+
+
+
+    public function applicant_create()
+    {
+        $this->loadModel('User');
+        if ($this->request->is('post')) {
+            $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->User('id'))));
+            if (!empty($user['User']['sponsor_email'])) {
+                $this->request->data['Application']['user_id'] = $this->Auth->User('id');
+
+                // Extract the parent data
+                $parentData = $this->request->data['Application'];
+
+                // Extract the associated data
+                $associatedData = $this->request->data;
+                unset($associatedData['Application']);
+
+                // Temporarily save the parent data without validation
+                $this->Application->create();
+                if ($this->Application->save($parentData, array('validate' => false))) {
+                    $parentId = $this->Application->id;
+
+                    // Attach the parent ID to the associated data
+                    foreach ($associatedData as $model => &$modelData) {
+                        if (!empty($modelData)) {
+                            foreach ($modelData as &$data) {
+                                $data['application_id'] = $parentId; // Assuming the foreign key is 'application_id'
+                            }
+                        }
+                    }
+
+                    // Validate each associated model individually
+                    $isValid = true;
+                    foreach ($associatedData as $model => $modelData) {
+                        if (!empty($modelData)) {
+                            foreach ($modelData as $data) {
+                                $this->Application->$model->create($data);
+                                if (!$this->Application->$model->validates()) {
+                                    $isValid = false;
+                                    break 2; // Exit both foreach loops
+                                }
+                            }
+                        }
+                    }
+
+                    if ($isValid) {
+                        // Save each associated model individually
+                        $success = true;
+                        foreach ($associatedData as $model => $modelData) {
+                            if (!empty($modelData)) {
+                                foreach ($modelData as $data) {
+                                    $this->Application->$model->create($data);
+                                    if (!$this->Application->$model->save(null, array('validate' => false))) {
+                                        $success = false;
+                                        break 2; // Exit both foreach loops
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($success) {
+
+                            // Generate Invoice in the Background
+
+                            $data = array(
+                                'function' => 'ppbNewApplication',
+                                'Application' => array(
+                                    'id' => $this->Application->id,
+                                    'name' => $this->Auth->user('name'),
+                                    'email' => $this->Auth->user('email'),
+                                    'protocol_no' =>  $this->Application->protocol_no
+                                )
+                            );
+                            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $data));
+
+
+                            $this->Session->setFlash(__('The application has been created, An Invoice has been sent to your email with the invoice details'), 'alerts/flash_success');
+                            $this->redirect(array('controller' => 'applications', 'action' => 'applicant_edit', $this->Application->id));
+                        } else {
+                            $this->Session->setFlash(__('The associated data could not be saved. Please, try again.'), 'alerts/flash_warning');
+                        }
+                    } else {
+                        $this->Session->setFlash(__('The associated data validation failed. Please, correct the errors.'), 'alerts/flash_warning');
+                    }
+                } else {
+                    $this->Session->setFlash(__('The application could not be saved. Please, try again.'), 'alerts/flash_warning');
+                }
+            } else {
+                $this->Session->setFlash(__('Please update the sponsor\'s email before creating an application.'), 'alerts/flash_warning');
+                $this->redirect(array('controller' => 'users', 'action' => 'edit', 'admin' => false));
+            }
+        }
+    }
     public function applicant_revoke_assignment($id = null, $application_id)
     {
+
         $this->loadModel('Outsource');
         $this->loadModel('AuditTrail');
+       
 
         $this->Outsource->id = $id;
         if (!$this->Outsource->exists()) {
             throw new NotFoundException(__('Invalid Assignment'));
-        }
-
-        $app = $this->Outsource->find('first', array(
-            'conditions' => array('Outsource.id' => $id),
-        ));
+        } 
+        $app=$this->Outsource->read(null,$id);       
         if ($this->Outsource->delete()) {
 
             $audit = array(
@@ -59,45 +152,37 @@ class ApplicationsController extends AppController
             $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
             $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
         }
-        $this->Session->setFlash(__('outsourced assignment was not deleted'));
+        $this->Session->setFlash(__('outsourced assignment was not revorked'));
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
     }
     public function applicant_assign_protocol($id)
-    {$this->loadModel('Outsource');
+    {
+        $this->loadModel('Outsource');
         $this->loadModel('User');
 
         if ($this->request->is('post')) {
-            $user = $this->User->find('first', array(
-                'conditions' => array(
-                    'OR' => array(
-                        array('User.username' => $this->request->data['Outsource']['username']),
-                        array('User.email' => $this->request->data['Outsource']['username'])
-                    )
-                ),
-                'contain' => array()
-            ));
 
-            if ($user) {
-
-                // Create a Audit Trail
-                $outsource = array(
-                    'Outsource' => array(
-                        'application_id' => $id,
-                        'user_id' => $user['User']['id'],
-                        'model' => $this->request->data['Outsource']['model']
-                    )
-                );
-                $this->Outsource->Create();
-                if ($this->Outsource->save($outsource)) {
-                }
-
-                $this->Session->setFlash(__('Protocol successfully assigned to ' . $user['User']['name'] . ' for further processing'), 'alerts/flash_success');
+            $this->Outsource->Create();
+            if ($this->Outsource->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
+                $this->Session->setFlash(__('Request submitted for further processing'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
+                // $this->Session->setFlash(__('Failed to submit the request, please try again'), 'alerts/flash_error');
+                $validationErrors = $this->Outsource->validationErrors;
 
-                $this->Session->setFlash(__('Account not found, please confirm details and try again.'), 'alerts/flash_error');
+                // Concatenate validation errors into a single string
+                $errorMessage = 'Failed to submit the request. Please correct the following errors: <br>';
+                foreach ($validationErrors as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $errorMessage .= $error . ' <br>';
+                    }
+                }
+
+                // Set flash message with validation errors
+                $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
+            // }
         }
     }
 
@@ -123,7 +208,7 @@ class ApplicationsController extends AppController
         if ($prims->isOk()) {
             $body2 = $prims->body;
             $resp2 = json_decode($body2, true);
- 
+
             $this->Session->setFlash(__('Invoice Details Retrieved Successfully.'), 'alerts/flash_success');
             $this->redirect(array('controller' => 'applications', 'action' => 'view', $id, 'invoice' => $raw_id, 'data' => $resp2));
         } else {
@@ -221,7 +306,7 @@ class ApplicationsController extends AppController
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
-          ));
+        ));
 
         $HttpSocket = new HttpSocket($options);
 
@@ -265,7 +350,7 @@ class ApplicationsController extends AppController
                 'clientIDNumber' => $user['national_id_number'],
                 'clientEmail' => $user['email'],
                 'amountExpected' => $invoice_total
-              );
+            );
             $header_options = array(
                 'header' => array(
                     'Content-Type' => 'application/x-www-form-urlencoded'
@@ -274,12 +359,12 @@ class ApplicationsController extends AppController
             $formData = http_build_query($postData);
 
             $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
-            
+
             if ($next->isOk()) {
                 $body1 = $next->body;
                 $resp1 = json_decode($body1, true);
-                $invoice_id = $resp1[0];//['invoice_id'];
-                $payment_code = $resp1[1];//['payment_code'];
+                $invoice_id = $resp1[0]; //['invoice_id'];
+                $payment_code = $resp1[1]; //['payment_code'];
 
                 $raw_id = base64_encode($invoice_id);
                 $this->Application->saveField('ecitizen_invoice', $invoice_id);
@@ -311,7 +396,7 @@ class ApplicationsController extends AppController
                     $payload = http_build_query($data);
                     $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);
 
-                     if ($ecitizen->isOk()) { 
+                    if ($ecitizen->isOk()) {
                         $this->Session->setFlash(__('Invoice Generated Successfully.'), 'alerts/flash_success');
                         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
                     } else {
@@ -451,11 +536,11 @@ class ApplicationsController extends AppController
             $apps = $this->Application->find(
                 'all',
                 array(
-                    'conditions' => $this->paginate['conditions'], 
-                    'order' => $this->paginate['order'], 
+                    'conditions' => $this->paginate['conditions'],
+                    'order' => $this->paginate['order'],
                     'contain' => $this->a_contain,
                     'limit' => $limit
-                    )
+                )
             );
 
             foreach ($apps as $app) {
@@ -1112,6 +1197,7 @@ class ApplicationsController extends AppController
 
     public function applicant_view($id = null)
     {
+        $this->loadModel('Country');
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
             $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
@@ -1122,6 +1208,8 @@ class ApplicationsController extends AppController
 
         $this->set('application', $response);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+        $countries = $this->Country->find('list', array('order' => 'Country.name ASC'));
+        $this->set(compact('countries'));
 
         if ($response['Application']['deactivated'] || $response['Application']['approved'] == 1) {
             $this->render('applicant_minimal_view');
@@ -2521,7 +2609,7 @@ class ApplicationsController extends AppController
         $contains['SiteInspection']['conditions'] = array('SiteInspection.summary_approved' => 2);
         $contains['Deviation']['conditions'] = array('Deviation.user_id' => $this->Auth->user('id'));
         $contains['Review']['conditions'] = array('Review.type' => 'ppb_comment');
-      
+
         // debug($contains);
         $response = $this->Application->find(
             'first',
