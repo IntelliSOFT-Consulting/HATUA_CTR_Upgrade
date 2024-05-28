@@ -947,7 +947,73 @@ exit;
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
     }
+    public function outsource_index() {
+        $this->Prg->commonProcess();
+        $page_options = array('5' => '5', '10' => '10');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+        else $this->paginate['limit'] = reset($page_options);
 
+        $criteria = $this->Application->parseCriteria($this->passedArgs);
+        $criteria['Application.id'] = $this->Application->ProtocolOutsource->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('ProtocolOutsource.user_id' => $this->Auth->User('id'))));
+        $criteria['Application.submitted'] = 1;
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Application.created' => 'desc');
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'Review' => array('User'));
+
+        //  if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+        //     $this->csv_export($this->Application->find(
+        //         'all',
+        //         array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+        //     ));
+        // } 
+
+        $this->set('page_options', $page_options);
+        $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+
+        $trial_statuses = $this->Application->TrialStatus->find('list');
+        $this->set(compact('trial_statuses'));
+	}
+
+    public function outsource_view($id)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
+            $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
+        }
+
+        // $response = $this->_isOwnedBy($id);
+        $contains = $this->a_contain;
+        $response = $this->Application->find(
+            'first',
+            array(
+                'conditions' => array('Application.id' => $id, 'Application.submitted' => 1),
+                'contain' => $contains,
+            )
+        );
+        $aids = $this->Application->ProtocolOutsource->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('ProtocolOutsource.user_id' => $this->Auth->User('id'))));
+        // if($response['Application']['id'] != $this->Auth->user('sponsor')) {
+        if (!in_array($response['Application']['id'], $aids)) {
+            // $this->log("_isOwnedBy: application id = ".$response['Application']['id']." User = ".$this->Auth->user('sponsor'),'debug');
+            $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        $this->set('application', $response);
+        $this->set('counties', $this->Application->SiteDetail->County->find('list'));
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
+        }
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => $this->a_contain
+        ));
+        $this->request->data = $application; 
+    }
     public function manager_index()
     {
         $this->Prg->commonProcess();

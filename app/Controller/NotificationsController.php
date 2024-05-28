@@ -34,9 +34,9 @@ class NotificationsController extends AppController {
         $this->paginate['contain'] = array('User');
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-          $this->csv_export($this->Notification->find('all', 
-                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
-              ));
+        //   $this->csv_export($this->Notification->find('all', 
+        //           array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+        //       ));
         }
         //end pdf export
 
@@ -56,11 +56,11 @@ class NotificationsController extends AppController {
         $this->paginate['order'] = array('Notification.created' => 'desc');
         $this->paginate['contain'] = array('User');
         //in case of csv export
-        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-          $this->csv_export($this->Notification->find('all', 
-                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
-              ));
-        }
+        // if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+        //   $this->csv_export($this->Notification->find('all', 
+        //           array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+        //       ));
+        // }
         //end pdf export
 
         $this->set('page_options', $page_options);
@@ -83,9 +83,9 @@ class NotificationsController extends AppController {
         $this->paginate['contain'] = array('User');
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-          $this->csv_export($this->Notification->find('all', 
-                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
-              ));
+        //   $this->csv_export($this->Notification->find('all', 
+        //           array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+        //       ));
         }
         //end pdf export
 
@@ -102,6 +102,9 @@ class NotificationsController extends AppController {
         $this->index();
     }
     public function monitor_index() {
+        $this->index();
+    }
+    public function outsource_index() {
         $this->index();
     }
 
@@ -176,7 +179,7 @@ class NotificationsController extends AppController {
 		  $this->set('response', 'The notification has been resent.');
 		} else {
 		  $this->log('The application could not be saved at newAppNotifyReviewer. Please, try again.', 'notifications_error');
-		  $this->log($reviews, 'notifications_error');
+		//   $this->log($reviews, 'notifications_error');
 		  $this->log($save_data, 'notifications_error');
 		  $this->set('response', 'The notification could not be sent.');
 		}

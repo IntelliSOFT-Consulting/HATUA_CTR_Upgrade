@@ -1029,8 +1029,8 @@ class UsersController extends AppController
         $group->id = 8;
         $this->Acl->deny($group, 'controllers');
         $this->Acl->allow($group, 'controllers/Users/outsource_dashboard');
-        // $this->Acl->allow($group, 'controllers/Applications/outsource_index');  //
-        // $this->Acl->allow($group, 'controllers/Applications/outsource_view');  //
+        $this->Acl->allow($group, 'controllers/Applications/outsource_index');  //
+        $this->Acl->allow($group, 'controllers/Applications/outsource_view');  //
         // $this->Acl->allow($group, 'controllers/Applications/stages');  //
         // $this->Acl->allow($group, 'controllers/Attachments/outsource_download'); //
         // $this->Acl->allow($group, 'controllers/Attachments/download');  //
@@ -1038,22 +1038,22 @@ class UsersController extends AppController
         //   //
         // $this->Acl->allow($group, 'controllers/Users/profile'); //
         // $this->Acl->allow($group, 'controllers/Users/edit');  //
-        // $this->Acl->allow($group, 'controllers/Saes/outsource_add');  //
-        // $this->Acl->allow($group, 'controllers/Saes/outsource_edit');  //
-        // $this->Acl->allow($group, 'controllers/Saes/outsource_index');  //
-        // $this->Acl->allow($group, 'controllers/Saes/outsource_view');  //
-        // $this->Acl->allow($group, 'controllers/Saes/outsource_delete');   //
-        // $this->Acl->allow($group, 'controllers/Saes/outsource_followup');  //
-        // $this->Acl->allow($group, 'controllers/Cioms/outsource_add');  //
-        // $this->Acl->allow($group, 'controllers/Cioms/outsource_view');  //
-        // $this->Acl->allow($group, 'controllers/Cioms/outsource_index');  //
-        // $this->Acl->allow($group, 'controllers/Cioms/download');  //
-        // $this->Acl->allow($group, 'controllers/Deviations/outsource_add'); //
-        // $this->Acl->allow($group, 'controllers/Deviations/outsource_download_deviation'); //
-        // $this->Acl->allow($group, 'controllers/Deviations/outsource_index'); //
-        // $this->Acl->allow($group, 'controllers/Deviations/outsource_edit'); //
-        // $this->Acl->allow($group, 'controllers/Deviations/outsource_delete'); //
-        // $this->Acl->allow($group, 'controllers/Comments'); //
+        $this->Acl->allow($group, 'controllers/Saes/outsource_add');  //
+        $this->Acl->allow($group, 'controllers/Saes/outsource_edit');  //
+        $this->Acl->allow($group, 'controllers/Saes/outsource_index');  //
+        $this->Acl->allow($group, 'controllers/Saes/outsource_view');  //
+        $this->Acl->allow($group, 'controllers/Saes/outsource_delete');   //
+        $this->Acl->allow($group, 'controllers/Saes/outsource_followup');  //
+        $this->Acl->allow($group, 'controllers/Cioms/outsource_add');  //
+        $this->Acl->allow($group, 'controllers/Cioms/outsource_view');  //
+        $this->Acl->allow($group, 'controllers/Cioms/outsource_index');  //
+        $this->Acl->allow($group, 'controllers/Cioms/download');  //
+        $this->Acl->allow($group, 'controllers/Deviations/outsource_add'); //
+        $this->Acl->allow($group, 'controllers/Deviations/outsource_download_deviation'); //
+        $this->Acl->allow($group, 'controllers/Deviations/outsource_index'); //
+        $this->Acl->allow($group, 'controllers/Deviations/outsource_edit'); //
+        $this->Acl->allow($group, 'controllers/Deviations/outsource_delete'); //
+        $this->Acl->allow($group, 'controllers/Comments'); //
         //we add an exit to avoid an ugly "missing views" error message
         echo "all done";
         exit;

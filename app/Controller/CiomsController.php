@@ -65,6 +65,29 @@ class CiomsController extends AppController {
         $this->set('page_options', $page_options);
         $this->set('cioms', Sanitize::clean($this->paginate(), array('encode' => false)));
 	}
+    public function outsource_index() {
+		$this->Prg->commonProcess();
+        $page_options = array('25' => '25', '20' => '20');
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
+            else $this->paginate['limit'] = reset($page_options);
+
+        $criteria = $this->Ciom->parseCriteria($this->passedArgs);
+        $criteria['Ciom.user_id'] = $this->Auth->User('id');
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Ciom.created' => 'desc');
+        $this->paginate['contain'] = array('Application');
+
+        //in case of csv export
+        if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
+          $this->csv_export($this->Ciom->find('all', 
+                  array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
+              ));
+        }
+        //end pdf export
+        $this->set('page_options', $page_options);
+        $this->set('cioms', Sanitize::clean($this->paginate(), array('encode' => false)));
+	}
 	public function index() {
 		$this->Prg->commonProcess();
         $page_options = array('25' => '25', '20' => '20');
@@ -178,6 +201,25 @@ class CiomsController extends AppController {
             $this->pdfConfig = array('filename' => 'CIOM_' . $id,  'orientation' => 'portrait');
         }
 	}
+    public function outsource_view($id = null) {
+		$this->Ciom->id = $id;
+		if (!$this->Ciom->exists()) {
+			throw new NotFoundException(__('Invalid ciom'));
+		}
+		$ciom = $this->Ciom->read(null, $id);
+
+        // if ($ciom['Ciom']['user_id'] !== $this->Auth->User('sponsor')) {
+        //         $this->Session->setFlash(__('You don\'t have permission to access!!'), 'alerts/flash_error');
+        //         $this->redirect('/');
+        // }
+        
+        $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
+		$this->set(compact('ciom', 'e2b'));
+
+        if (strpos($this->request->url, 'pdf') !== false) {
+            $this->pdfConfig = array('filename' => 'CIOM_' . $id,  'orientation' => 'portrait');
+        }
+	}
 	public function aview($id = null) {
         $this->Ciom->id = $id;
 		if (!$this->Ciom->exists()) {
@@ -226,6 +268,27 @@ class CiomsController extends AppController {
         $this->set(compact('application_id'));
     }
 	public function monitor_add($id = null) {
+		if ($this->request->is('post')) {
+			$this->Ciom->create();
+			
+			// debug($this->request->data);
+
+			$file = new File($this->request->data['Ciom']['file']['tmp_name']);
+            $this->request->data['Ciom']['e2b_content'] = $file->read();
+
+			if ($this->Ciom->save($this->request->data)) {
+				$this->Session->setFlash(__('The ciom has been saved'), 'alerts/flash_success');
+				$this->redirect(array('action' => 'view', $this->Ciom->id));
+			} else {
+				$this->Session->setFlash(__('The ciom could not be saved. Please, try again.'), 'alerts/flash_error');
+			}
+		}
+		// $applications = $this->Ciom->Application->find('list');
+		// $users = $this->Ciom->User->find('list');
+		$application_id = $id;
+		$this->set(compact('application_id'));
+	}
+    public function outsource_add($id = null) {
 		if ($this->request->is('post')) {
 			$this->Ciom->create();
 			
