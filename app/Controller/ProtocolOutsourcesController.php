@@ -75,6 +75,7 @@ class ProtocolOutsourcesController extends AppController {
 						'name'=>$user['User']['name'],
 						'email'=>$user['User']['email'],
                         'user_id'=>$user['User']['id'],
+                        'new_user' =>false,
                     )
                 );
                 CakeResque::enqueue('default', 'NotificationShell', array('alertOutsourced', $data));

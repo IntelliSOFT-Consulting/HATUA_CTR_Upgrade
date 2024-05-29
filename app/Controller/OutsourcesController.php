@@ -36,7 +36,8 @@ class OutsourcesController extends AppController
 		$this->set('page_options', $page_options);
 		$this->set('users', $this->paginate('Outsource'));
 	}
-	public function generatePassword($length = 8) {
+	public function generatePassword($length = 8)
+	{
 		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 		$password = '';
 		for ($i = 0; $i < $length; $i++) {
@@ -57,56 +58,59 @@ class OutsourcesController extends AppController
 		if ($this->request->is('post')) {
 			// debug($outsource);
 			// exit;
-			$password=$this->generatePassword();
-			$this->request->data['User']['password']=$password;
-			$this->request->data['User']['confirm_password']=$password;
-			$this->request->data['User']['confirm_password']=$password;			
-            $this->request->data['User']['group_id'] = 8;
+			$password = $this->generatePassword();
+			$this->request->data['User']['password'] = $password;
+			$this->request->data['User']['confirm_password'] = $password;
+			$this->request->data['User']['confirm_password'] = $password;
+			$this->request->data['User']['group_id'] = 8;
 			$this->request->data['User']['country_id'] = $outsource['Outsource']['country_id'];
 			$this->request->data['User']['county_id'] = $outsource['Outsource']['county_id'];
 			$this->User->create();
 			if ($this->User->save($this->request->data)) {
 				// update the outsourced
-				$this->Outsource->id=$id;
-				$this->Outsource->saveField('approved',1);
+				$this->Outsource->id = $id;
+				$this->Outsource->saveField('approved', 1);
 
-				$application_id=$outsource['Outsource']['application_id'];
-				$user_id=$this->User->id;
+				$application_id = $outsource['Outsource']['application_id'];
+				$user_id = $this->User->id;
 				$this->loadModel('ProtocolOutsource');
 				$this->ProtocolOutsource->save(array('application_id' => $application_id, 'user_id' => $user_id, 'owner_id' => $this->Application->field('user_id', array('Application.id' => $application_id))));
-				
+
 				// Send Alert to the Outsourced User and update Audit Trails
 				$app = $this->Application->read(null, $application_id);
-                $data = array(
-                    'function' => 'alertOutsourced',
-                    'Application' => array(
-                        'id' => $this->Outsource->id,
-                        'protocol_no' => $app['Application']['protocol_no'],
-						'name'=>$outsource['Outsource']['name'],
-						'email'=>$outsource['Outsource']['email'],
-                        'user_id'=>$this->User->id,
-                    )
-                );
-                CakeResque::enqueue('default', 'NotificationShell', array('alertOutsourced', $data));
+				$data = array(
+					'function' => 'alertOutsourced',
+					'Application' => array(
+						'id' => $this->Outsource->id,
+						'protocol_no' => $app['Application']['protocol_no'],
+						'name' => $outsource['Outsource']['name'],
+						'email' => $outsource['Outsource']['email'],
+						'username' => $this->request->data['User']['username'],
+						'password' => $this->request->data['User']['password'],
+						'user_id' => $this->User->id,
+						'new_user' => true,
+					)
+				);
+				CakeResque::enqueue('default', 'NotificationShell', array('alertOutsourced', $data));
 
-                // Create a Audit Trail
-                $audit = array(
-                    'AuditTrail' => array(
-                        'foreign_key' => $id,
-                        'model' => 'Outsource',
-                        'message' => 'New outsource request for the Protocol with protocol number ' . $app['Application']['protocol_no'].' outsourced to '.$outsource['Outsource']['name'].  '  has been reviewed and approved by ' . $this->Auth->user('username'),
-                        'ip' => $app['Application']['protocol_no']
-                    )
-                );
-                $this->loadModel('AuditTrail');
-                $this->AuditTrail->Create();
-                if ($this->AuditTrail->save($audit)) {
-                    $this->log($this->request->data, 'audit_success');
-                } else {
-                    $this->log('Error creating an audit trail', 'notifications_error');
-                    $this->log($this->request->data, 'notifications_error');
-                }
-				
+				// Create a Audit Trail
+				$audit = array(
+					'AuditTrail' => array(
+						'foreign_key' => $id,
+						'model' => 'Outsource',
+						'message' => 'New outsource request for the Protocol with protocol number ' . $app['Application']['protocol_no'] . ' outsourced to ' . $outsource['Outsource']['name'] .  '  has been reviewed and approved by ' . $this->Auth->user('username'),
+						'ip' => $app['Application']['protocol_no']
+					)
+				);
+				$this->loadModel('AuditTrail');
+				$this->AuditTrail->Create();
+				if ($this->AuditTrail->save($audit)) {
+					$this->log($this->request->data, 'audit_success');
+				} else {
+					$this->log('Error creating an audit trail', 'notifications_error');
+					$this->log($this->request->data, 'notifications_error');
+				}
+
 				$this->Session->setFlash(__('The outsourced investigator has been saved. Please assign studies to the user.'), 'alerts/flash_success');
 				$this->redirect(array('action' => 'index'));
 			} else {
@@ -123,6 +127,4 @@ class OutsourcesController extends AppController
 		$countries = $this->User->Country->find('list', array('order' => 'Country.name ASC'));
 		$this->set(compact('countries'));
 	}
-
-	 
 }

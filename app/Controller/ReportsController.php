@@ -73,7 +73,7 @@ class ReportsController extends AppController {
             'fields' => array('Sae.form_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
             'contain' => array('Application'),
             'conditions' => array('Sae.approved' => array(1, 2)),
-            'group' => array('Sae.form_type', 'Application.protocol_no'),
+            'group' => array('Sae.form_type','Sae.id', 'Application.protocol_no'),
             'having' => array('COUNT(*) >' => 0),
           ));        
 
@@ -93,7 +93,7 @@ class ReportsController extends AppController {
             'fields' => array('Deviation.deviation_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
             'contain' => array('Application'),
             'conditions' => array('Deviation.status' => 'Submitted'),
-            'group' => array('Deviation.deviation_type', 'Application.protocol_no'),
+            'group' => array('Deviation.deviation_type','Deviation.id', 'Application.protocol_no'),
             'having' => array('COUNT(*) >' => 0),
           ));        
 
@@ -113,7 +113,7 @@ class ReportsController extends AppController {
             'fields' => array('TrialStatus.name', 'COUNT(*) as cnt'),
             'contain' => array('TrialStatus'),
             'conditions' => array('Application.approved' => array(1, 2)),
-            'group' => array('TrialStatus.name'),
+            'group' => array('TrialStatus.name','TrialStatus.id'),
             'having' => array('COUNT(*) >' => 0),
           ));        
 

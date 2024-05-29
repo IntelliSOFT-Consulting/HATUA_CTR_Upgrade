@@ -180,7 +180,7 @@ class UsersController extends AppController
         $aids = $this->Application->ProtocolOutsource->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('ProtocolOutsource.user_id' => $this->Auth->User('id'))));
         $this->set('saes', $this->Sae->find('all', array(
             'limit' => 20,
-            'conditions' => array('Sae.application_id' => $aids), 'order' => 'Sae.created DESC'
+            'conditions' => array('Sae.application_id' => $aids,'Sae.user_id'=>$this->Auth->User('id')), 'order' => 'Sae.created DESC'
         )));
     }
 
