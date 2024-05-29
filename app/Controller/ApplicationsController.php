@@ -125,13 +125,13 @@ class ApplicationsController extends AppController
 
         $this->loadModel('Outsource');
         $this->loadModel('AuditTrail');
-       
+
 
         $this->Outsource->id = $id;
         if (!$this->Outsource->exists()) {
             throw new NotFoundException(__('Invalid Assignment'));
-        } 
-        $app=$this->Outsource->read(null,$id);       
+        }
+        $app = $this->Outsource->read(null, $id);
         if ($this->Outsource->delete()) {
 
             $audit = array(
@@ -164,6 +164,39 @@ class ApplicationsController extends AppController
 
             $this->Outsource->Create();
             if ($this->Outsource->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
+
+                // Notify the Admins
+
+                $app = $this->Application->read(null, $id);
+                $data = array(
+                    'function' => 'outsourceApplication',
+                    'Application' => array(
+                        'id' => $this->Outsource->id,
+                        'protocol_no' => $app['Application']['protocol_no'],
+                        
+                    )
+                );
+                CakeResque::enqueue('default', 'NotificationShell', array('outsourceApplication', $data));
+
+                // Create a Audit Trail
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $id,
+                        'model' => 'Application',
+                        'message' => 'New outsource request for the Protocol with protocol number ' . $app['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
+                        'ip' => $app['Application']['protocol_no']
+                    )
+                );
+                $this->loadModel('AuditTrail');
+                $this->AuditTrail->Create();
+                if ($this->AuditTrail->save($audit)) {
+                    $this->log($this->request->data, 'audit_success');
+                } else {
+                    $this->log('Error creating an audit trail', 'notifications_error');
+                    $this->log($this->request->data, 'notifications_error');
+                }
+
+                // End of Notification
                 $this->Session->setFlash(__('Request submitted for further processing'), 'alerts/flash_success');
                 $this->redirect($this->referer());
             } else {
@@ -337,7 +370,7 @@ class ApplicationsController extends AppController
             $resp = json_decode($body, true);
             $session_token = $resp['session_token'];
             $invoice_total = 1000;
-             
+
             $postData = array(
                 'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
                 'session_token' => $session_token, // from above  $application['Application']['short_title']
@@ -357,9 +390,9 @@ class ApplicationsController extends AppController
             $formData = http_build_query($postData);
 
             // $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
-            $next = $HttpSocket->post(  'https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
-debug($next);
-exit;
+            $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
+            debug($next);
+            exit;
             if ($next->isOk()) {
                 $body1 = $next->body;
                 $resp1 = json_decode($body1, true);
@@ -947,7 +980,8 @@ exit;
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
     }
-    public function outsource_index() {
+    public function outsource_index()
+    {
         $this->Prg->commonProcess();
         $page_options = array('5' => '5', '10' => '10');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
@@ -974,7 +1008,7 @@ exit;
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
-	}
+    }
 
     public function outsource_view($id)
     {
@@ -1012,7 +1046,7 @@ exit;
             'conditions' => array('Application.id' => $id),
             'contain' => $this->a_contain
         ));
-        $this->request->data = $application; 
+        $this->request->data = $application;
     }
     public function manager_index()
     {
@@ -2307,6 +2341,7 @@ exit;
                     $this->request->data['ApplicationStage'][0]['status'] = 'Current';
                 }
                 //
+                 
                 if (empty($response['Application']['protocol_no'])) {
                     $count = $this->Application->find('count',  array('conditions' => array(
                         'Application.date_submitted BETWEEN ? and ?' => array(date("Y-m-01 00:00:00"), date("Y-m-d H:i:s"))

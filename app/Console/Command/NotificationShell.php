@@ -20,6 +20,8 @@ class NotificationShell extends Shell
 
   public function sendEmail()
   {
+    $messages=array();
+    $message=array();
     $email = new CakeEmail();
     $email->config('gmail');
     $email->template('default');
@@ -105,8 +107,9 @@ class NotificationShell extends Shell
     }
   }
 
-  public function generate_report_invoice($id)
+  public function generate_report_invoice()
   {
+    $id = $this->args[0]['Application']['id'];
 
     // $this->log('initiated report'.$id, 'e-citizen-initiate');
     $application = $this->Application->find('first', array(
@@ -119,8 +122,10 @@ class NotificationShell extends Shell
       $HttpSocket = new HttpSocket($options);
       $header_options = array(
         'header' => array(
-          'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
-          'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+          // 'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
+          // 'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
+          'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
+          'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
           'Content-Type' => 'application/json',
         )
       );
@@ -133,13 +138,13 @@ class NotificationShell extends Shell
       // $this->log('initiated report',$user, 'e-citizen-initiate-user');
       // //Request Access Token
       $initiate = $HttpSocket->get('https://invoices.pharmacyboardkenya.org/token', false, $header_options);
-      $this->log('process initiation'.$initiate, 'e-citizen-initiate-token');
+      $this->log('process initiation' . $initiate, 'e-citizen-initiate-token');
       if ($initiate->isOk()) {
         $body = $initiate->body;
         $resp = json_decode($body, true);
         $this->log($resp, 'e-citizen-token-success');
         $session_token = $resp['session_token'];
-        $invoice_total = 1000 * count($application['SiteDetail']);  /// calculated based on the number of sites::::
+        $invoice_total = 1000 *  $application['Application']['total_sites'];;  /// calculated based on the number of sites::::
         $postData = array(
           'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
           'session_token' => $session_token, // from above  $application['Application']['short_title']
@@ -158,12 +163,16 @@ class NotificationShell extends Shell
         );
         $formData = http_build_query($postData);
 
-        $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
+        // $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
+
+
+        $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
+
         if ($next->isOk()) {
           $body1 = $next->body;
           $resp1 = json_decode($body1, true);
-          $invoice_id = $resp1[0]; //Default test:::: 285251
-          $payment_code = $resp1[1];
+          $invoice_id = $resp1['invoice_id']; //[0]; //Default test:::: 285251
+          $payment_code = $resp1['payment_code']; //[1];
           $this->Application->id = $id;
           if ($this->Application->saveField('ecitizen_invoice', $invoice_id)) {
             $raw_id = base64_encode($invoice_id);
@@ -268,7 +277,7 @@ class NotificationShell extends Shell
 
     // Handle eCitizen Integration
 
-    
+
 
     // TODO : Set email accounts to cc notification
     $this->Notification->Create();
@@ -293,9 +302,113 @@ class NotificationShell extends Shell
     if (!$email->send()) {
       $this->log($email, 'submit_email');
     }
-    $this->generate_report_invoice($this->args[0]['Application']['id']);
+  }
 
+  public function alertOutsourced()
+  {
+    $managers = $this->User->find('all', array('conditions' => array('id' => $this->args[0]['Application']['user_id'], 'is_active' => 1), 'contain' => array()));
+    $messages = $this->Message->find('list', array(
+      'conditions' => array('Message.name' => array( 
+        'outsource_user_receive_email_subject', 'outsource_user_receive_email'
+      )),
+      'fields' => array('Message.name', 'Message.content')
+    ));
+    $save_data = array();
 
+    foreach ($managers as $manager) {
+
+      $variables = array(
+        'protocol_link' => Router::url(array(
+          'controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
+          'outsource' => true
+        ), true),
+        'protocol_no' => $this->args[0]['Application']['protocol_no'],
+        'name' => $manager['User']['name']
+      );
+      $save_data[] = array(
+        'Notification' => array(
+          'user_id' => $manager['User']['id'],
+          'type' => 'outsource_user_receive_email',
+          'model' => 'Application',
+          'foreign_key' => $this->args[0]['Application']['id'],
+          'title' => $messages['outsource_user_receive_email_subject'],
+          'system_message' => String::insert($messages['outsource_user_receive_email'], $variables),
+        ),
+      );
+      //<!-- Send email to admin -->
+      $message = String::insert($messages['outsource_user_receive_email'], $variables);
+      $email = new CakeEmail();
+      $email->config('gmail');
+      $email->template('default');
+      $email->emailFormat('html');
+      $email->to($manager['User']['email']);
+      $email->bcc(array('kiprotich.japheth19@gmail.com'));
+      $email->subject(Sanitize::html(String::insert($messages['outsource_user_receive_email_subject'], $variables), array('remove' => true)));
+      $email->viewVars(array('message' => $message));
+      if (!$email->send()) {
+        $this->log($email, 'submit_email');
+      }
+    }
+    $this->Notification->Create();
+    if ($this->Notification->saveMany($save_data)) {
+      $this->log($this->args[0], 'notifications_success');
+    } else {
+      $this->log('The Notifications were not sent at ppbNewApplication.', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
+    }
+  }
+  public function outsourceApplication()
+  {
+    $managers = $this->User->find('all', array('conditions' => array('group_id' => 1, 'is_active' => 1), 'contain' => array()));
+    $messages = $this->Message->find('list', array(
+      'conditions' => array('Message.name' => array( 
+        'outsource_email_subject', 'outsource_email'
+      )),
+      'fields' => array('Message.name', 'Message.content')
+    ));
+    $save_data = array();
+
+    foreach ($managers as $manager) {
+
+      $variables = array(
+        'protocol_link' => Router::url(array(
+          'controller' => 'outsources', 'action' => 'view', $this->args[0]['Application']['id'],
+          'admin' => true
+        ), true),
+        'protocol_no' => $this->args[0]['Application']['protocol_no'],
+        'name' => $manager['User']['name']
+      );
+      $save_data[] = array(
+        'Notification' => array(
+          'user_id' => $manager['User']['id'],
+          'type' => 'outsource_email',
+          'model' => 'Application',
+          'foreign_key' => $this->args[0]['Application']['id'],
+          'title' => $messages['outsource_email_subject'],
+          'system_message' => String::insert($messages['outsource_email'], $variables),
+        ),
+      );
+      //<!-- Send email to admin -->
+      $message = String::insert($messages['outsource_email'], $variables);
+      $email = new CakeEmail();
+      $email->config('gmail');
+      $email->template('default');
+      $email->emailFormat('html');
+      $email->to($manager['User']['email']);
+      $email->bcc(array('kiprotich.japheth19@gmail.com'));
+      $email->subject(Sanitize::html(String::insert($messages['outsource_email_subject'], $variables), array('remove' => true)));
+      $email->viewVars(array('message' => $message));
+      if (!$email->send()) {
+        $this->log($email, 'submit_email');
+      }
+    }
+    $this->Notification->Create();
+    if ($this->Notification->saveMany($save_data)) {
+      $this->log($this->args[0], 'notifications_success');
+    } else {
+      $this->log('The Notifications were not sent at ppbNewApplication.', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
+    }
   }
 
   public function  newAppNotifyReviewer()
@@ -491,7 +604,7 @@ class NotificationShell extends Shell
     $this->Notification->Create();
     if (!$this->Notification->saveMany($save_data)) {
       $this->log('The Notifications were not sent at ppbRequestReviewerResponse 2.', 'notifications_error');
-      $this->log($reviews, 'notifications_error');
+      // $this->log($reviews, 'notifications_error');
     }
   }
 
@@ -721,6 +834,7 @@ class NotificationShell extends Shell
     ));
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 2, 'is_active' => 1), 'contain' => array()));
 
+    $variables=array();
     foreach ($managers as $manager) {
       $save_data[] = array(
         'Notification' => array(

@@ -65,6 +65,37 @@ class ProtocolOutsourcesController extends AppController {
            
 
             $this->ProtocolOutsource->save(array('application_id' => $application_id, 'user_id' => $user_id, 'owner_id' => $this->Application->field('user_id', array('Application.id' => $application_id))));
+           // Send Alert to the Outsourced User and update Audit Trails
+				$app = $this->Application->read(null, $application_id);
+                $data = array(
+                    'function' => 'alertOutsourced',
+                    'Application' => array(
+                        'id' => $app['Application']['id'],
+                        'protocol_no' => $app['Application']['protocol_no'],
+						'name'=>$user['User']['name'],
+						'email'=>$user['User']['email'],
+                        'user_id'=>$user['User']['id'],
+                    )
+                );
+                CakeResque::enqueue('default', 'NotificationShell', array('alertOutsourced', $data));
+
+                // Create a Audit Trail
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $app['Application']['id'],
+                        'model' => 'Outsource',
+                        'message' => 'New outsource request for the Protocol with protocol number ' . $app['Application']['protocol_no'].' outsourced to '.$user['User']['name'].  '  has been reviewed and approved by ' . $this->Auth->user('username'),
+                        'ip' => $app['Application']['protocol_no']
+                    )
+                );
+                $this->loadModel('AuditTrail');
+                $this->AuditTrail->Create();
+                if ($this->AuditTrail->save($audit)) {
+                    $this->log($this->request->data, 'audit_success');
+                } else {
+                    $this->log('Error creating an audit trail', 'notifications_error');
+                    $this->log($this->request->data, 'notifications_error');
+                }
             $this->Session->setFlash(__('The application has been successfully assigned to the outsourced user'), 'alerts/flash_success');
              $this->redirect($this->referer());
         }

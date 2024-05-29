@@ -2,7 +2,7 @@
 	<?php
 	$this->assign('Reports', 'active');
 ?>
-  <h4>Assign Application to Study Monitor</h4>
+  <h4>Assign Application to Outsourced Users</h4>
   <hr>
   <div class="row-fluid">
     <div class="span12">

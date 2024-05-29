@@ -56,6 +56,12 @@
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>
             </li>
+
+            <li><?php
+                        echo $this->Html->link('<i class="icon-user-md"></i> Outsourced Users',  array('controller' => 'protocol_outsources', 'action'=>'index', 'admin' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
              <li><?php
                         echo $this->Html->link('<i class="icon-user-md"></i> Study Monitors',  array('controller' => 'study_monitors', 'action'=>'index', 'admin' => true ),
                                   array('escape' => false, 'tabindex' => '-1'));
