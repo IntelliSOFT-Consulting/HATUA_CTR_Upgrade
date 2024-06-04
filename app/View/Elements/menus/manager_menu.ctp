@@ -111,6 +111,28 @@
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>
             </li>
+            <li class="divider"></li>
+            <li><?php
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Participants distribution',  array('controller' => 'reports', 'action'=>'protocols_by_distribution', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+            <li><?php
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Placebo',  array('controller' => 'reports', 'action'=>'protocols_by_placebo', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+            <li><?php
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Study design type',  array('controller' => 'reports', 'action'=>'protocols_by_design_type', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+            <li><?php
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Scope of clinical trial',  array('controller' => 'reports', 'action'=>'protocols_by_clinical_trial', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+            
         </ul>
        </li>
 

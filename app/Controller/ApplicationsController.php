@@ -173,7 +173,7 @@ class ApplicationsController extends AppController
                     'Application' => array(
                         'id' => $this->Outsource->id,
                         'protocol_no' => $app['Application']['protocol_no'],
-                        
+
                     )
                 );
                 CakeResque::enqueue('default', 'NotificationShell', array('outsourceApplication', $data));
@@ -345,29 +345,38 @@ class ApplicationsController extends AppController
 
         $header_options = array(
             'header' => array(
-                // 'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
-                // 'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
-                'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
-                'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
-                'Content-Type' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded'
             )
         );
+        $postDataToken = array(
+            'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
+            'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
+        );
+
+        $formDataToken = http_build_query($postDataToken);
         // //Request Access Token
-        $initiate = $HttpSocket->get(
+        $initiate = $HttpSocket->post(
             'https://invoices.pharmacyboardkenya.org/token',
-            false,
+            $formDataToken,
             $header_options
         );
+
+        // debug($initiate);
+        // exit;
         $user = $application['User'];
         $multiArray = $application['InvestigatorContact'];
         $firstEntry = reset($multiArray);
         $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
         $billDesc = $name . "\n" . $application['Application']['short_title'];
-        debug($initiate);
-        exit;
+
         if ($initiate->isOk()) {
             $body = $initiate->body;
             $resp = json_decode($body, true);
+            if ($resp['success'] === false) {
+
+                $this->Session->setFlash(__($resp['status']), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
             $session_token = $resp['session_token'];
             $invoice_total = 1000;
 
@@ -391,13 +400,13 @@ class ApplicationsController extends AppController
 
             // $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
             $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
-            debug($next);
-            exit;
+            // debug($next);
+            // exit;
             if ($next->isOk()) {
                 $body1 = $next->body;
                 $resp1 = json_decode($body1, true);
-                $invoice_id = $resp1[0]; //['invoice_id'];
-                $payment_code = $resp1[1]; //['payment_code'];
+                $invoice_id = $resp1['invoice_id'];
+                $payment_code = $resp1['ppb_reference_code'];
 
                 $raw_id = base64_encode($invoice_id);
                 $this->Application->saveField('ecitizen_invoice', $invoice_id);
@@ -2341,7 +2350,7 @@ class ApplicationsController extends AppController
                     $this->request->data['ApplicationStage'][0]['status'] = 'Current';
                 }
                 //
-                 
+
                 if (empty($response['Application']['protocol_no'])) {
                     $count = $this->Application->find('count',  array('conditions' => array(
                         'Application.date_submitted BETWEEN ? and ?' => array(date("Y-m-01 00:00:00"), date("Y-m-d H:i:s"))

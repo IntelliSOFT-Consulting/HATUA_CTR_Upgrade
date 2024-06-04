@@ -1,5 +1,7 @@
 <?php
 $this->extend('/Elements/application/applicant_view');
+$ichecked = "&#x2611;";
+  $nchecked = "&#x2610;";
 ?>
 
 <!-- START AMENDMENT LEAD -->
@@ -36,7 +38,7 @@ echo $this->Session->flash();
 
 <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
+    <li class="active"><a href="#application" data-toggle="tab">Application</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
       <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
@@ -60,7 +62,7 @@ echo $this->Session->flash();
     <?php } } ?>
   </ul>
   <div class="tab-content my-tab-content">
-    <div class="tab-pane active" id="tab1">
+    <div class="tab-pane" id="tab1">
       <!-- content for tab1 comes here -->
 
       <div class="row-fluid">
@@ -121,11 +123,7 @@ echo $this->Session->flash();
         <div class="form-actions" style="margin-top: 0px; padding-left: 10px;">
           <?php
          
-          echo $this->Html->link(
-            __('<i class="icon-download-alt"></i> Download PDF'),
-            array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
-            array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
-          );
+         
 
           ?>
         </div>
@@ -204,6 +202,394 @@ echo $this->Session->flash();
       <div class="row-fluid">
         <div class="span12">
           <?php echo $this->element('application/outsourcing'); ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane active" id="application">
+      <div class="row-fluid">
+        <div class="span12">
+
+        <!-- Only show Abstract -->
+
+
+        <hr class="my-view" style="clear: left;">
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th class="table-label required">
+              <h5 style="text-align: center;">Study Title: <span class="sterix">*</span></h5>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><?php echo $application['Application']['study_title'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment'] as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['study_title'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+              </tr>
+              <tr class="table-viewlabel">
+                <td class="table-noline"> <?php echo $amendment['study_title'];  ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('study_title'); ?>
+        </tbody>
+      </table>
+      <table class="table  table-condensed">
+        <tbody>
+          <tr>
+            <td class="table-label required">
+              <p>Short Title: <span class="sterix">*</span></p>
+            </td>
+            <td>
+              <?php
+              if (!empty($application['Application']['short_title'])) {
+                echo $application['Application']['short_title'];
+              } else { ?>
+                <input name="data[Application][short_title]" class="input-xxlarge" placeholder=" " maxlength="30" id="ApplicationShortTitle" type="text">
+                <button name="submitStudyTitle" class="btn btn-info" id="ApplicationViewSaveShortTitle" type="button">
+                  <i class="icon-save"></i> Save
+                </button>
+              <?php }  ?>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <hr class="my-view">
+
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th class="table-label required">
+              <h5 style="text-align: center;">Laymans Summary: <span class="sterix">*</span></h5>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><?php echo $application['Application']['laymans_summary'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment'] as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['laymans_summary'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+              </tr>
+              <tr class="table-viewlabel">
+                <td class="table-noline"> <?php echo $amendment['laymans_summary'];  ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('laymans_summary'); ?>
+        </tbody>
+      </table>
+
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th class="table-label required">
+              <h5 style="text-align: center;">Abstract of the study: <span class="sterix">*</span></h5>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><?php echo $application['Application']['abstract_of_study'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment']  as $key => $amendment) {
+            if ($amendment['submitted'] == 1  && !empty($amendment['abstract_of_study'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+              </tr>
+              <tr class="table-viewlabel table-in">
+                <td class="table-noline">
+                  <?php
+                  if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'pdf') {
+                    echo ($amendment['abstract_of_study']);
+                  } else {   ?>
+                    <iframe width="100%" height="250" srcdoc='<?php echo ($amendment["abstract_of_study"]);  ?>'> </iframe>
+                  <?php  } ?>
+                </td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('abstract_of_study'); ?>
+        </tbody>
+      </table>
+
+      <table class="table  table-condensed">
+        <tbody>
+          <tr>
+            <td class="table-label required">
+              <p>Version No: <span class="sterix">*</span></p>
+            </td>
+            <td><?php echo $application['Application']['version_no'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment'] as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['version_no'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+                <td class=" table-noline"><?php echo $amendment['version_no'];  ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('version_no'); ?>
+          <tr>
+            <td class="table-label required">
+              <p>Date of Protocol <span class="sterix">*</span></p>
+            </td>
+            <td><?php echo $application['Application']['date_of_protocol'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment']  as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['date_of_protocol'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+                <td class=" table-noline"><?php echo $amendment['date_of_protocol'];  ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('date_of_protocol'); ?>
+          <tr>
+            <td class="table-label required">
+              <p>Study Drug <span class="sterix">*</span></p>
+            </td>
+            <td><?php echo $application['Application']['study_drug'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment']  as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['study_drug'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+                <td class=" table-noline"><?php echo $amendment['study_drug'];  ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('study_drug'); ?>
+
+
+          <tr>
+            <td class="table-label required">
+              <p>Route(s) of Administration <span class="sterix">*</span></p>
+            </td>
+            <td><?php
+                foreach ($application['StudyRoute'] as $route) {
+                  echo "<p>" . $route['study_route'] . "</p>";
+                }
+                ?></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table  table-condensed">
+        <tbody>
+          <tr>
+            <td class="table-label required">
+              <p>Disease condition being investigated <span class="sterix">*</span></p>
+            </td>
+            <td><?php echo $application['Application']['disease_condition'] ?></td>
+          </tr>
+          <?php
+          foreach ($application['Amendment'] as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['disease_condition'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+                <td class=" table-noline"><?php echo $amendment['disease_condition'];  ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('disease_condition'); ?>
+          <tr>
+            <td class="table-label required">
+              <p>Product Type <span class="sterix">*</span></p>
+            </td>
+            <td>
+              <p class="control-nolabel"><?php echo ($application['Application']['product_type_biologicals']   ? $ichecked : $nchecked); ?> Biologicals
+              </p>
+
+              <p class="control-nolabel">
+                <?php echo ($application['Application']['product_type_proteins']   ? $ichecked : $nchecked); ?> Proteins
+                <?php echo ($application['Application']['product_type_immunologicals']   ? $ichecked : $nchecked); ?> Immunologicals
+                <?php echo ($application['Application']['product_type_vaccines']   ? $ichecked : $nchecked); ?> Vaccines
+                <?php echo ($application['Application']['product_type_hormones']   ? $ichecked : $nchecked); ?> Hormones
+                <?php echo ($application['Application']['product_type_toxoid']   ? $ichecked : $nchecked); ?> Toxoid
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class=" table-noline"></td>
+            <td class=" table-noline">
+              <p class="control-nolabel"><?php echo ($application['Application']['product_type_chemical']   ? $ichecked : $nchecked); ?> Chemical</p>
+              <p><?php echo $application['Application']['product_type_chemical_name']; ?></p>
+            </td>
+          </tr>
+          <tr>
+            <td class=" table-noline"></td>
+            <td class=" table-noline">
+              <p class="control-nolabel"><?php echo ($application['Application']['product_type_medical_device']   ? $ichecked : $nchecked); ?> Medical Device</p>
+              <p><?php echo $application['Application']['product_type_medical_device_name']; ?></p>
+            </td>
+          </tr>
+          <?php
+          foreach ($application['Amendment'] as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['product_type'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?> </td>
+                <td class=" table-noline"><?php echo $amendment['product_type']; ?> </td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('product_type'); ?>
+        </tbody>
+      </table>
+
+      <p class="table-label required">MANUFACTURER(S)</p>
+      <?php foreach ($application['Manufacturer'] as $key => $manufacturer) { ?>
+        <span class="badge badge-info"><?php echo $key + 1; ?></span>
+        <table class="table  table-condensed">
+          <tbody>
+            <tr>
+              <td class="table-label">
+                <p>Name of manufacturer</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['manufacturer_name'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Manufacturing site address</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['address'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Phone</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['manufacturer_phone'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Email</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['manufacturer_email'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Manufacturing activities at site</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['manufacturing_activities'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>If others, specify</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['other_specify'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Country of manufacture</p>
+              </td>
+              <td><?php echo "<p>" . $manufacturer['manufacturer_country'] . "</p>";  ?></td>
+            </tr>
+          </tbody>
+        </table>
+      <?php } ?>
+
+      <table class="table  table-condensed">
+        <tbody>
+          <tr>
+            <td class="table-label required">
+              <p>Is there a comparator drug/medical device? <span class="sterix">*</span></p>
+            </td>
+            <td><?php echo $application['Application']['comparator'] ?></td>
+          </tr>
+          <tr>
+            <td class="table-label">
+              <p>If yes, give the name</p>
+            </td>
+            <td><?php echo $application['Application']['comparator_name'] ?></td>
+          </tr>
+          <tr>
+            <td class="table-label">
+              <p>If yes, is the comparator currently registered?</p>
+            </td>
+            <td><?php echo $application['Application']['comparator_registered'] ?></td>
+          </tr>
+          <tr>
+            <td class="table-label">
+              <p>List of the countries where the comparator is registered</p>
+            </td>
+            <td><?php echo $application['Application']['comparator_countries'] ?></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="table-label required">KENYA ETHICS REVIEW COMMITTEE(S)</p>
+      <?php foreach ($application['EthicalCommittee'] as $key => $date) { ?>
+        <span class="badge badge-info"><?php echo $key + 1; ?></span>
+        <table class="table  table-condensed">
+          <tbody>
+            <tr>
+              <td class="table-label">
+                <p>Name of Ethics Review Committee (ERC)</p>
+              </td>
+              <td><?php echo "<p>" . $date['ethical_committee'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Date of initial complete submission to ERC</p>
+              </td>
+              <td><?php echo "<p>" . $date['submission_date'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>ERC Reference Number</p>
+              </td>
+              <td><?php echo "<p>" . $date['erc_number'] . "</p>";  ?></td>
+            </tr>
+            <tr>
+              <td class="table-label">
+                <p>Initial approval date by ERC</p>
+              </td>
+              <td><?php echo "<p>" . $date['initial_approval'] . "</p>";  ?></td>
+            </tr>
+          </tbody>
+        </table>
+      <?php } ?>
+
+      <table>
+        <tbody>
+          <?php
+          foreach ($application['Amendment']  as $key => $amendment) {
+            if ($amendment['submitted'] == 1 && !empty($amendment['ethical_committees'])) {      ?>
+              <tr class="table-viewlabel">
+                <td class="table-viewlabel"><?php echo $key + 1; ?></td>
+                <td class=" table-noline"><?php echo $amendment['ethical_committees']; ?></td>
+              </tr>
+          <?php   }
+          } ?>
+          <?php echo $this->fetch('ethical_committees'); ?>
+
+          <?php /*
+              foreach($application['Amendment']  as $key => $amendment) {
+                if($amendment['submitted'] == 1 && !empty($amendment['approval_date'])){      ?>
+                  <tr class="table-viewlabel">
+                      <td class="table-viewlabel"><?php echo $key+1; ?></td>
+                      <td class=" table-noline"><?php  echo $amendment['approval_date'];  ?></td>
+                   </tr>
+             <?php   } } ?>
+              <?php echo $this->fetch('approval_date'); */ ?>
+        </tbody>
+      </table>
+
+      <!-- End of Abstract -->
+      
         </div>
       </div>
     </div>
