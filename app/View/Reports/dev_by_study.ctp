@@ -1,14 +1,53 @@
 <?php
-  $this->assign('Reports', 'active');        
-  echo $this->Session->flash();
-  // $this->Html->css('comments', null, array('inline' => false));
-  $this->Html->script('highcharts/highcharts', array('inline' => false));
-  $this->Html->script('highcharts/modules/data', array('inline' => false));
-  $this->Html->script('highcharts/modules/exporting', array('inline' => false));
-  $this->Html->script('highcharts/modules/export-data', array('inline' => false));
+$this->assign('Reports', 'active');
+echo $this->Session->flash();
+// $this->Html->css('comments', null, array('inline' => false));
+$this->Html->script('highcharts/highcharts', array('inline' => false));
+$this->Html->script('highcharts/modules/data', array('inline' => false));
+$this->Html->script('highcharts/modules/exporting', array('inline' => false));
+$this->Html->script('highcharts/modules/export-data', array('inline' => false));
 ?>
 
-<?php //pr($data) ;?>
+ 
+<?php
+echo $this->Form->create('Application', array(
+    'url' => array_merge(array('controller'=>'reports','action' => 'dev_by_study')),
+    'class' => 'ctr-groups', 'style' => array('padding:9px;', 'background-color: #F5F5F5'),
+));
+ 
+?>
+<div class="row-fluid">
+    <div class="span4">
+        <?php
+        echo $this->Form->input(
+            'start_date',
+            array(
+                'div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
+                'label' => array('class' => 'required', 'text' => 'Submission Dates'), 'placeHolder' => 'Start Date'
+            )
+        );
+        echo $this->Form->input(
+            'end_date',
+            array(
+                'div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
+                'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
+                      <em class="accordion-toggle">clear!</em></a>',
+                'label' => false, 'placeHolder' => 'End Date'
+            )
+        );
+        ?>
+    </div>
+    <div class="span2">
+          <?php
+            echo $this->Form->button('<i class="icon-search icon-white"></i> Search', array(
+                'class' => 'btn btn-inverse', 'div' => 'control-group', 'div' => false,
+                'style' => array('margin-top: 25px')
+            ));
+          ?>
+        </div>
+</div>
+
+<?php echo $this->Form->end(); ?>
 
 
 <div id="dev-by-study"></div>
@@ -24,44 +63,67 @@
         </tr>
     </thead>
     <tbody>
-      <?php
-          foreach ($data as $key => $value) {
-              echo "<tr>";
-                echo "<th>".$value['Application']['protocol_no']."</th>";
-                // echo "<td>".$value[0]['cnt']."</td>";
-                //echo "<td>".(($value['Deviation']['deviation_type'] == 'Violation') ? $value[0]['cnt'] : 0)."</td>";
-                echo "<td>".(($value['Deviation']['deviation_type'] == 'Deviation') ? $value[0]['cnt'] : 0)."</td>";
-                echo "<td>".(($value['Deviation']['deviation_type'] == 'Violation') ? $value[0]['cnt'] : 0)."</td>";
-              echo "</tr>";
-          }
-      ?>        
+        <?php
+        foreach ($data as $key => $value) {
+            echo "<tr>";
+            echo "<th>" . $value['Application']['protocol_no'] . "</th>"; 
+            echo "<td>" . (($value['Deviation']['deviation_type'] == 'Deviation') ? $value[0]['cnt'] : 0) . "</td>";
+            echo "<td>" . (($value['Deviation']['deviation_type'] == 'Violation') ? $value[0]['cnt'] : 0) . "</td>";
+            echo "</tr>";
+        }
+        ?>
     </tbody>
 </table>
 
 
-        <script type="text/javascript">
-Highcharts.chart('dev-by-study', {
-    data: {
-        table: 'datatable_dev'
-    },
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Deviations by study'
-    },
-    yAxis: {
-        allowDecimals: false,
+<script type="text/javascript">
+    Highcharts.chart('dev-by-study', {
+        data: {
+            table: 'datatable_dev'
+        },
+        chart: {
+            type: 'column'
+        },
         title: {
-            text: 'Units'
+            text: 'Deviations by study'
+        },
+        yAxis: {
+            allowDecimals: false,
+            title: {
+                text: 'Units'
+            }
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    this.point.y + ' ' + this.point.name.toLowerCase();
+            }
         }
-    },
-    tooltip: {
-        formatter: function () {
-            return '<b>' + this.series.name + '</b><br/>' +
-                this.point.y + ' ' + this.point.name.toLowerCase();
-        }
-    }
-});
-        </script>
+    });
+</script>
 
+<script type="text/javascript">
+$.expander.defaults.slicePoint = 70;
+$(function() {
+  var adates = $('#ApplicationStartDate, #ApplicationEndDate').datepicker({
+      minDate:"-100Y",
+      maxDate:"-0D",
+      dateFormat:'dd-mm-yy',
+      showButtonPanel:true,
+      changeMonth:true,
+      changeYear:true,
+      showAnim:'show',
+      onSelect: function( selectedDate ) {
+        var option = this.id == "ApplicationStartDate" ? "minDate" : "maxDate",
+          instance = $( this ).data( "datepicker" ),
+          date = $.datepicker.parseDate(
+            instance.settings.dateFormat ||
+            $.datepicker._defaults.dateFormat,
+            selectedDate, instance.settings );
+        adates.not( this ).datepicker( "option", option, date );
+      }
+    });
+  $(".morecontent").expander();
+
+});
+</script>

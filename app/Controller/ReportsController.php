@@ -8,6 +8,8 @@ App::uses('AppController', 'Controller');
 class ReportsController extends AppController
 {
   public $uses = array('SiteInspection', 'Application', 'Sae', 'Deviation');
+  
+  public $components = array('Search.Prg');
 
 
   /**
@@ -17,12 +19,18 @@ class ReportsController extends AppController
    */
   public function si_per_month()
   {
+
+    $criteria=array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['SiteInspection.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
     $data = $this->SiteInspection->find('all', array(
       'fields' => array('date_format(SiteInspection.created,"%M") as name', 'COUNT(*) as y'),
       'contain' => array(),
+      'conditions'=>$criteria,
       'group' => 'date_format(SiteInspection.created,"%M")'
     ));
-    $data = Hash::extract($data, '{n}.{n}');
+    // $data = Hash::extract($data, '{n}.{n}');
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
     $this->render('si_per_month');
@@ -38,12 +46,17 @@ class ReportsController extends AppController
 
   public function sae_per_month()
   {
+
+    $criteria=array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['Sae.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
     $data = $this->Sae->find('all', array(
       'fields' => array('date_format(Sae.created,"%M") as name', 'COUNT(*) as y'),
       'contain' => array(),
+      'conditions'=>$criteria,
       'group' => 'date_format(Sae.created,"%M")'
-    ));
-    $data = Hash::extract($data, '{n}.{n}');
+    )); 
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
     $this->render('sae_per_month');
@@ -59,12 +72,17 @@ class ReportsController extends AppController
 
   public function dev_per_month()
   {
+
+    $criteria=array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['Deviation.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
     $data = $this->Deviation->find('all', array(
       'fields' => array('date_format(Deviation.created,"%M") as name', 'COUNT(*) as y'),
       'contain' => array(),
+      'conditions'=>$criteria,
       'group' => 'date_format(Deviation.created,"%M")'
     ));
-    $data = Hash::extract($data, '{n}.{n}');
+    // $data = Hash::extract($data, '{n}.{n}');
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
     $this->render('dev_per_month');
@@ -80,13 +98,21 @@ class ReportsController extends AppController
 
   public function sae_by_type()
   {
+    
+    $criteria=array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['Sae.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
+    $criteria['Sae.approved']=array(1, 2);
     $data = $this->Sae->find('all', array(
       'fields' => array('Sae.form_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
-      'contain' => array('Application'),
-      'conditions' => array('Sae.approved' => array(1, 2)),
+      'contain' => array('Application'), 
+      'conditions'=>$criteria,
       'group' => array('Sae.form_type', 'Sae.id', 'Application.protocol_no'),
       'having' => array('COUNT(*) >' => 0),
     ));
+    // debug($data);
+    // exit;
 
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
@@ -103,10 +129,15 @@ class ReportsController extends AppController
 
   public function dev_by_study()
   {
+    $criteria=array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['Deviation.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+    
+    $criteria['Deviation.status']='Submitted';
     $data = $this->Deviation->find('all', array(
       'fields' => array('Deviation.deviation_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
-      'contain' => array('Application'),
-      'conditions' => array('Deviation.status' => 'Submitted'),
+      'contain' => array('Application'), 
+      'conditions'=>$criteria,
       'group' => array('Deviation.deviation_type', 'Deviation.id', 'Application.protocol_no'),
       'having' => array('COUNT(*) >' => 0),
     ));
@@ -235,10 +266,15 @@ class ReportsController extends AppController
 
   public function protocols_by_status()
   {
+
+    $criteria=array();
+    $criteria['Application.approved']=array(1,2);
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
     $data = $this->Application->find('all', array(
       'fields' => array('TrialStatus.name', 'COUNT(*) as cnt'),
-      'contain' => array('TrialStatus'),
-      'conditions' => array('Application.approved' => array(1, 2)),
+      'contain' => array('TrialStatus'), 
+      'conditions'=>$criteria,
       'group' => array('TrialStatus.name', 'TrialStatus.id'),
       'having' => array('COUNT(*) >' => 0),
     ));
@@ -258,6 +294,12 @@ class ReportsController extends AppController
 
   public function protocols_by_phase()
   {
+    
+    $criteria=array();
+    $criteria['Application.approved']=array(1,2);
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+    $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
     $data = $this->Application->find('all', array(
       'fields' => array('((case when Application.trial_human_pharmacology then "Phase I" 
                                       when Application.trial_therapeutic_exploratory then "Phase II" 
@@ -265,7 +307,7 @@ class ReportsController extends AppController
                                       when Application.trial_therapeutic_use then "Phase IV" 
                                       else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
       'contain' => array(),
-      'conditions' => array('Application.approved' => array(1, 2)),
+      'conditions' => $criteria,
       'group' => array('((case when Application.trial_human_pharmacology then "Phase I" 
                                       when Application.trial_therapeutic_exploratory then "Phase II" 
                                       when Application.trial_therapeutic_confirmatory then "Phase III" 
