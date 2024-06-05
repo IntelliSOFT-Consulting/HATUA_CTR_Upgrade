@@ -3,8 +3,8 @@ $this->assign('Applications', 'active');
 ?>
 
 <div class="row-fluid">
-  <?php echo $this->fetch('header'); ?>
-  <?php echo $this->Session->flash(); ?>
+    <?php echo $this->fetch('header'); ?>
+    <?php echo $this->Session->flash(); ?>
 </div>
 <div class="row-fluid">
     <div class="span12">
@@ -16,58 +16,104 @@ $this->assign('Applications', 'active');
 
         <hr>
         <div class="row-fluid">
-            <div class="thumbnail"> 
+            <div class="thumbnail">
                 <?php
                 echo $this->Form->create('Application');
-                echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));                
-                echo $this->Form->input('total_sites', array('type' => 'number','label'=>'Total Sites'));
-                echo $this->Form->input('short_title', array(
-                    'label' => array('class' => 'control-label required', 'text' => 'Short Title <span class="sterix">*</span>'),
-                    'maxlength' => 30,
-                    'placeholder' => ' ' , 'class' => 'input-xxlarge',
-                  )); 
+                echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
                 ?>
-                <div id="investigator_primary_contact">
-                    <h5> PRINCIPAL INVESTIGATOR </h5>
-                    <?php
-                    echo $this->Form->input('InvestigatorContact.0.id');
-                    echo $this->Form->input('InvestigatorContact.0.given_name', array(
-                        'label' => array('class' => 'control-label required', 'text' => 'Given name <span class="sterix">*</span>'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Form->input('InvestigatorContact.0.middle_name', array(
-                        'label' => array('class' => 'control-label', 'text' => 'Middle name, if applicable'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Form->input('InvestigatorContact.0.family_name', array(
-                        'label' => array('class' => 'control-label required', 'text' => 'Family name <span class="sterix">*</span>'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Form->input('InvestigatorContact.0.qualification', array(
-                        'label' => array('class' => 'control-label required', 'text' => 'Qualification <span class="sterix">*</span>'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Form->input('InvestigatorContact.0.professional_address', array(
-                        'label' => array('class' => 'control-label required', 'text' => 'Professional address <span class="sterix">*</span>'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Form->input('InvestigatorContact.0.telephone', array(
-                        'label' => array('class' => 'control-label required', 'text' => 'Telephone number <span class="sterix">*</span>'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Form->input('InvestigatorContact.0.email', array(
-                        'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'email address <span class="sterix">*</span>'),
-                        'placeholder' => ' ', 'class' => 'input-xxlarge'
-                    ));
-                    echo $this->Html->tag('hr', '', array('id' => 'InvestigatorContactHr0'));
-                    ?>
-                </div>
-                <?php echo $this->Form->end(array(
-                    'label' => 'Create', 'value' => 'Create', 'class' => 'btn btn-success btn-large',
 
-                ));
+                <div class="row-fluid">
+                    <div class="span4">
+
+                        <?php
+
+                        echo $this->Form->input('total_sites', array('type' => 'number','min'=>1, 'label' => 'Total Sites'));
+                        ?>
+                    </div>
+                    <div class="span4">
+                        <?php
+                        echo $this->Form->input('short_title', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'Short Title <span class="sterix">*</span>'),
+                            'maxlength' => 30,
+                            'placeholder' => ' ', 'class' => 'input-xxlarge',
+                        ));
+                        ?>
+                    </div>
+                </div>
+                <!-- <div id="investigator_primary_contact"> -->
+
+                <h5> PRINCIPAL INVESTIGATOR </h5>
+
+                <?php
+                echo $this->Html->tag('hr', '', array('id' => 'InvestigatorContactHr0')); ?>
+                <div class="row-fluid">
+                    <div class="span4">
+                        <?php
+                        echo $this->Form->input('InvestigatorContact.0.id');
+                        echo $this->Form->input('InvestigatorContact.0.given_name', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'Given name <span class="sterix">*</span>'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        ));
+                        ?>
+                    </div>
+                    <div class="span4">
+                        <?php
+                        echo $this->Form->input('InvestigatorContact.0.middle_name', array(
+                            'label' => array('class' => 'control-label', 'text' => 'Middle name, if applicable'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        ));
+                        ?>
+                    </div>
+                    <div class="span4">
+                        <?php
+                        echo $this->Form->input('InvestigatorContact.0.family_name', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'Family name <span class="sterix">*</span>'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        ));
+                        ?>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span3">
+                        <?php
+
+                        echo $this->Form->input('InvestigatorContact.0.qualification', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'Qualification <span class="sterix">*</span>'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        )); ?></div>
+                    <div class="span3">
+                        <?php
+                        echo $this->Form->input('InvestigatorContact.0.professional_address', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'Professional address <span class="sterix">*</span>'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        )); ?></div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span3">
+                        <?php
+                        echo $this->Form->input('InvestigatorContact.0.telephone', array(
+                            'label' => array('class' => 'control-label required', 'text' => 'Telephone number <span class="sterix">*</span>'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        )); ?></div>
+                    <div class="span3">
+                        <?php
+                        echo $this->Form->input('InvestigatorContact.0.email', array(
+                            'type' => 'email', 'label' => array('class' => 'control-label required', 'text' => 'email address <span class="sterix">*</span>'),
+                            'placeholder' => ' ', 'class' => 'input-xlarge'
+                        )); ?></div>
+                </div>
+                <?php
+                echo $this->Html->tag('hr', '', array('id' => 'InvestigatorContactHr0'));
                 ?>
             </div>
         </div>
+        <!-- </div> -->
+        <?php echo $this->Form->end(array(
+            'label' => 'Create', 'value' => 'Create', 'class' => 'btn btn-success btn-large',
+
+        ));
+        ?>
     </div>
+</div>
+</div>
 </div>
