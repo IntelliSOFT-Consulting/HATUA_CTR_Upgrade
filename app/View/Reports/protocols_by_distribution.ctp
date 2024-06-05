@@ -8,7 +8,46 @@
   $this->Html->script('highcharts/modules/export-data', array('inline' => false));
 ?>
 
-<?php //pr($data) ;?>
+
+<?php
+echo $this->Form->create('Application', array(
+    'url' => array_merge(array('controller'=>'reports','action' => 'protocols_by_distribution')),
+    'class' => 'ctr-groups', 'style' => array('padding:9px;', 'background-color: #F5F5F5'),
+));
+ 
+?>
+<div class="row-fluid">
+    <div class="span4">
+        <?php
+        echo $this->Form->input(
+            'start_date',
+            array(
+                'div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
+                'label' => array('class' => 'required', 'text' => 'Submission Dates'), 'placeHolder' => 'Start Date'
+            )
+        );
+        echo $this->Form->input(
+            'end_date',
+            array(
+                'div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
+                'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
+                      <em class="accordion-toggle">clear!</em></a>',
+                'label' => false, 'placeHolder' => 'End Date'
+            )
+        );
+        ?>
+    </div>
+    <div class="span2">
+          <?php
+            echo $this->Form->button('<i class="icon-search icon-white"></i> Search', array(
+                'class' => 'btn btn-inverse', 'div' => 'control-group', 'div' => false,
+                'style' => array('margin-top: 25px')
+            ));
+          ?>
+        </div>
+</div>
+
+<?php echo $this->Form->end(); ?>
 
 
 <div id="protocols-by-phase"></div>
@@ -58,6 +97,33 @@ Highcharts.chart('protocols-by-phase', {
                 this.point.y + ' ' + this.point.name.toLowerCase();
         }
     }
+});
+</script>
+
+
+<script type="text/javascript">
+$.expander.defaults.slicePoint = 70;
+$(function() {
+  var adates = $('#ApplicationStartDate, #ApplicationEndDate').datepicker({
+      minDate:"-100Y",
+      maxDate:"-0D",
+      dateFormat:'dd-mm-yy',
+      showButtonPanel:true,
+      changeMonth:true,
+      changeYear:true,
+      showAnim:'show',
+      onSelect: function( selectedDate ) {
+        var option = this.id == "ApplicationStartDate" ? "minDate" : "maxDate",
+          instance = $( this ).data( "datepicker" ),
+          date = $.datepicker.parseDate(
+            instance.settings.dateFormat ||
+            $.datepicker._defaults.dateFormat,
+            selectedDate, instance.settings );
+        adates.not( this ).datepicker( "option", option, date );
+      }
+    });
+  $(".morecontent").expander();
+
 });
 </script>
 

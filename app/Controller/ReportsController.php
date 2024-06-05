@@ -8,7 +8,7 @@ App::uses('AppController', 'Controller');
 class ReportsController extends AppController
 {
   public $uses = array('SiteInspection', 'Application', 'Sae', 'Deviation');
-  
+
   public $components = array('Search.Prg');
 
 
@@ -20,14 +20,14 @@ class ReportsController extends AppController
   public function si_per_month()
   {
 
-    $criteria=array();
+    $criteria = array();
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['SiteInspection.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['SiteInspection.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
     $data = $this->SiteInspection->find('all', array(
       'fields' => array('date_format(SiteInspection.created,"%M") as name', 'COUNT(*) as y'),
       'contain' => array(),
-      'conditions'=>$criteria,
+      'conditions' => $criteria,
       'group' => 'date_format(SiteInspection.created,"%M")'
     ));
     // $data = Hash::extract($data, '{n}.{n}');
@@ -47,16 +47,16 @@ class ReportsController extends AppController
   public function sae_per_month()
   {
 
-    $criteria=array();
+    $criteria = array();
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['Sae.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['Sae.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
     $data = $this->Sae->find('all', array(
       'fields' => array('date_format(Sae.created,"%M") as name', 'COUNT(*) as y'),
       'contain' => array(),
-      'conditions'=>$criteria,
+      'conditions' => $criteria,
       'group' => 'date_format(Sae.created,"%M")'
-    )); 
+    ));
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
     $this->render('sae_per_month');
@@ -73,13 +73,13 @@ class ReportsController extends AppController
   public function dev_per_month()
   {
 
-    $criteria=array();
+    $criteria = array();
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['Deviation.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['Deviation.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
     $data = $this->Deviation->find('all', array(
       'fields' => array('date_format(Deviation.created,"%M") as name', 'COUNT(*) as y'),
       'contain' => array(),
-      'conditions'=>$criteria,
+      'conditions' => $criteria,
       'group' => 'date_format(Deviation.created,"%M")'
     ));
     // $data = Hash::extract($data, '{n}.{n}');
@@ -98,16 +98,16 @@ class ReportsController extends AppController
 
   public function sae_by_type()
   {
-    
-    $criteria=array();
-    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['Sae.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
-    $criteria['Sae.approved']=array(1, 2);
+    $criteria = array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+      $criteria['Sae.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
+    $criteria['Sae.approved'] = array(1, 2);
     $data = $this->Sae->find('all', array(
       'fields' => array('Sae.form_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
-      'contain' => array('Application'), 
-      'conditions'=>$criteria,
+      'contain' => array('Application'),
+      'conditions' => $criteria,
       'group' => array('Sae.form_type', 'Sae.id', 'Application.protocol_no'),
       'having' => array('COUNT(*) >' => 0),
     ));
@@ -129,15 +129,15 @@ class ReportsController extends AppController
 
   public function dev_by_study()
   {
-    $criteria=array();
+    $criteria = array();
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['Deviation.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
-    
-    $criteria['Deviation.status']='Submitted';
+      $criteria['Deviation.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
+    $criteria['Deviation.status'] = 'Submitted';
     $data = $this->Deviation->find('all', array(
       'fields' => array('Deviation.deviation_type', 'Application.protocol_no', 'COUNT(*) as cnt'),
-      'contain' => array('Application'), 
-      'conditions'=>$criteria,
+      'contain' => array('Application'),
+      'conditions' => $criteria,
       'group' => array('Deviation.deviation_type', 'Deviation.id', 'Application.protocol_no'),
       'having' => array('COUNT(*) >' => 0),
     ));
@@ -167,15 +167,17 @@ class ReportsController extends AppController
 
   public function protocols_by_placebo()
   {
+    $criteria = array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
+    $criteria['Application.submitted'] = 1;
+
     $data = $this->Application->find('all', array(
-      'fields' => array('((case when Application.gender_male then "Male" 
-                                      when Application.gender_female then "Female"  
-                                      else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
-      'contain' => array(),
-      'conditions' => array('Application.approved' => array(1, 2)),
-      'group' => array('((case when Application.gender_male then "Male" 
-                                      when Application.gender_female then "Female"  
-                                      else "Unk" end))'),
+      'fields' => array('IF(Application.placebo_present IS NULL or Application.placebo_present = "", "No", Application.placebo_present) as placebo_present', 'COUNT(*) as cnt'),
+      'contain' => array(), 'recursive' => -1,
+      'conditions' => $criteria,
+      'group' => array('IF(Application.placebo_present IS NULL or Application.placebo_present = "", "No", Application.placebo_present)'),
       'having' => array('COUNT(*) >' => 0),
     ));
 
@@ -189,17 +191,34 @@ class ReportsController extends AppController
   }
   public function protocols_by_design_type()
   {
-    $data = $this->Application->find('all', array(
-      'fields' => array('((case when Application.gender_male then "Male" 
-                                      when Application.gender_female then "Female"  
-                                      else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
-      'contain' => array(),
-      'conditions' => array('Application.approved' => array(1, 2)),
-      'group' => array('((case when Application.gender_male then "Male" 
-                                      when Application.gender_female then "Female"  
-                                      else "Unk" end))'),
-      'having' => array('COUNT(*) >' => 0),
-    ));
+    $criteria = array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
+    $criteria['Application.submitted'] = 1;
+ 
+
+  $data = $this->Application->find('all', array(
+    'fields' => array(
+      '((case 
+            when Application.design_controlled = "No" then "Uncontrolled" 
+            when Application.design_controlled = "Yes" then "Controlled"   
+            else "Unk" 
+        end)) AS design_controlled',
+      'COUNT(*) as cnt'
+    ),
+    'contain' => array(),
+    'conditions' => $criteria,
+    'group' => array(
+      '((case 
+            when Application.design_controlled = "No" then "Uncontrolled" 
+            when Application.design_controlled = "Yes" then "Controlled"   
+            else "Unk" 
+        end))'
+    ),
+    'having' => array('COUNT(*) >' => 0),
+  ));
+
 
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
@@ -212,17 +231,33 @@ class ReportsController extends AppController
   }
   public function protocols_by_clinical_trial()
   {
+    $criteria = array();
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
+    $criteria['Application.approved'] = array(1,2);
     $data = $this->Application->find('all', array(
-      'fields' => array('((case when Application.gender_male then "Male" 
-                                      when Application.gender_female then "Female"  
+      'fields' => array('((case when Application.scope_diagnosis then "Diagnosis" 
+                                      when Application.scope_prophylaxis then "Prophylaxis"  
+                                      when Application.scope_therapy then "Therapy"  
+                                      when Application.scope_safety then "Safety"  
+                                      when Application.scope_efficacy then "Efficacy"  
+                                      when Application.scope_pharmacokinetic then "Pharmacokinetic"  
+                                      when Application.scope_pharmacodynamic then "Pharmacodynamic"  
                                       else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
-      'contain' => array(),
-      'conditions' => array('Application.approved' => array(1, 2)),
-      'group' => array('((case when Application.gender_male then "Male" 
-                                      when Application.gender_female then "Female"  
+      'contain' => array(),   
+      'conditions' => $criteria,
+      'group' => array('((case when Application.scope_diagnosis then "Diagnosis" 
+                                      when Application.scope_prophylaxis then "Prophylaxis"   
+                                       when Application.scope_therapy then "Therapy"  
+                                      when Application.scope_safety then "Safety"  
+                                      when Application.scope_efficacy then "Efficacy"  
+                                      when Application.scope_pharmacokinetic then "Pharmacokinetic"  
+                                      when Application.scope_pharmacodynamic then "Pharmacodynamic"  
                                       else "Unk" end))'),
       'having' => array('COUNT(*) >' => 0),
     ));
+ 
 
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
@@ -231,23 +266,26 @@ class ReportsController extends AppController
   }
 
   public function protocols_by_distribution()
-  { 
+  {
+    $criteria = array();
+    $criteria['Application.approved'] = array(1, 2);
+    if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
+      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+
     $data = $this->Application->find('all', array(
       'fields' => array(
-          '((case 
+        '((case 
               when Application.gender_male = 1 AND Application.gender_female = 0 then "Male" 
               when Application.gender_female = 1 AND Application.gender_male = 0 then "Female"  
               when Application.gender_male = 1 AND Application.gender_female = 1 then "Male & Female"
               else "Unk" 
-          end)) AS TrialPhase', 
-          'COUNT(*) as cnt'
+          end)) AS TrialPhase',
+        'COUNT(*) as cnt'
       ),
       'contain' => array(),
-      'conditions' => array(
-          'Application.approved' => array(1, 2)
-      ),
+      'conditions' => $criteria,
       'group' => array(
-          '((case 
+        '((case 
               when Application.gender_male = 1 AND Application.gender_female = 0 then "Male" 
               when Application.gender_female = 1 AND Application.gender_male = 0 then "Female"  
               when Application.gender_male = 1 AND Application.gender_female = 1 then "Male & Female"
@@ -255,8 +293,8 @@ class ReportsController extends AppController
           end))'
       ),
       'having' => array('COUNT(*) >' => 0),
-  ));
-  
+    ));
+
 
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
@@ -267,14 +305,14 @@ class ReportsController extends AppController
   public function protocols_by_status()
   {
 
-    $criteria=array();
-    $criteria['Application.approved']=array(1,2);
+    $criteria = array();
+    $criteria['Application.approved'] = array(1, 2);
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
     $data = $this->Application->find('all', array(
       'fields' => array('TrialStatus.name', 'COUNT(*) as cnt'),
-      'contain' => array('TrialStatus'), 
-      'conditions'=>$criteria,
+      'contain' => array('TrialStatus'),
+      'conditions' => $criteria,
       'group' => array('TrialStatus.name', 'TrialStatus.id'),
       'having' => array('COUNT(*) >' => 0),
     ));
@@ -294,11 +332,11 @@ class ReportsController extends AppController
 
   public function protocols_by_phase()
   {
-    
-    $criteria=array();
-    $criteria['Application.approved']=array(1,2);
+
+    $criteria = array();
+    $criteria['Application.approved'] = array(1, 2);
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-    $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
     $data = $this->Application->find('all', array(
       'fields' => array('((case when Application.trial_human_pharmacology then "Phase I" 

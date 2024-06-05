@@ -48,8 +48,7 @@ echo $this->Form->create('Application', array(
 <?php echo $this->Form->end(); ?>
 
 <div id="sae-per-month-new" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
- 
-<div id="protocols-by-phase"></div>
+  
 <hr>
 <h4>Raw Data</h4>
 <table class="table table-condensed table-bordered" id="datatable8">
