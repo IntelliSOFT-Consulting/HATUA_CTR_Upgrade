@@ -50,11 +50,14 @@ class OutsourcesController extends AppController
 		$outsource = $this->Outsource->find(
 			'first',
 			array(
-				'contain' => array('Application'),
+				'contain' => array('Application','Attachment'),
 				'conditions' => array('Outsource.id' => $id)
 			)
 		);
 
+
+		// debug($outsource);
+		// exit;
 		if ($this->request->is('post')) {
 			// debug($outsource);
 			// exit;

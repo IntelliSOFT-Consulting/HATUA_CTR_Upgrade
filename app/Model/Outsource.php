@@ -16,19 +16,19 @@ class Outsource extends AppModel
 
 	public $filterArgs = array(
 		'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
-	  );
-	  public function orConditions($data = array())
-	  {
+	);
+	public function orConditions($data = array())
+	{
 		$filter = $data['filter'];
 		$cond = array(
-		  'OR' => array(
-			$this->alias . '.email LIKE' => '%' . $filter . '%',
-			$this->alias . '.name LIKE' => '%' . $filter . '%',
-			$this->alias . '.username LIKE' => '%' . $filter . '%',
-		  )
+			'OR' => array(
+				$this->alias . '.email LIKE' => '%' . $filter . '%',
+				$this->alias . '.name LIKE' => '%' . $filter . '%',
+				$this->alias . '.username LIKE' => '%' . $filter . '%',
+			)
 		);
 		return $cond;
-	  }
+	}
 	/**
 	 * Validation rules
 	 *
@@ -69,7 +69,7 @@ class Outsource extends AppModel
 				'rule'     => 'notEmpty',
 				'required' => true,
 				'message'  => 'Please provide phone number'
-			), 
+			),
 		),
 		'country_id' => array(
 			'notEmpty' => array(
@@ -124,5 +124,14 @@ class Outsource extends AppModel
 			'fields' => '',
 			'order' => ''
 		)
+	);
+	public $hasMany = array(
+
+		'Attachment' => array(
+			'className' => 'Attachment',
+			'foreignKey' => 'foreign_key',
+			'dependent' => true,
+			'conditions' => array('Attachment.model' => 'Outsource', 'Attachment.group' => 'attachment'),
+		),
 	);
 }
