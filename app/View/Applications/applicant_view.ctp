@@ -419,6 +419,7 @@ echo $this->Session->flash();
     <div class="tab-pane" id="tab13">
       <div class="row-fluid">
         <div class="span12">
+       
           <?php echo $this->element('application/deviation'); ?>
         </div>
       </div>

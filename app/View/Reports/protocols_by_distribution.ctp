@@ -83,7 +83,7 @@ Highcharts.chart('protocols-by-phase', {
         type: 'column'
     },
     title: {
-        text: 'Protocols by Participants Distribution'
+        text: 'Protocols by Participants Gender Distribution'
     },
     yAxis: {
         allowDecimals: false,

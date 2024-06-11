@@ -10,7 +10,7 @@ $(function() {
 		} else {
 			intId = 1;
 		}
-		if ($("#site_details .site-group").length < 9) {
+		if ($("#site_details .site-group").length < 20) {
 			var new_sitedetail = $('<div class="site-group"> \
 				<p  class="topper" id="SiteDetailLabel{i}">{i} additional sites</p> \
 				<span class="badge badge-info">{i}</span> \

@@ -6,7 +6,7 @@
   <div class="row-fluid">
     <div class="span12">      
         <?php 
-          if($redir == 'applicant' or $redir == 'monitor') {
+          if($redir == 'applicant' or $redir == 'monitor' or $redir == 'outsource') {
               echo $this->Html->link(__('<i class="icon-random"></i> Add Protocol Deviation'),
                         array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']),
                         array('escape' => false, 'class' => 'btn btn-info'));

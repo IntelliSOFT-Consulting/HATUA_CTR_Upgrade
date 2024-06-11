@@ -113,7 +113,7 @@
             </li>
             <li class="divider"></li>
             <li><?php
-                        echo $this->Html->link('<i class="icon-bar-chart"></i> Participants distribution',  array('controller' => 'reports', 'action'=>'protocols_by_distribution', 'manager' => true ),
+                        echo $this->Html->link('<i class="icon-bar-chart"></i> Participants Gender distribution',  array('controller' => 'reports', 'action'=>'protocols_by_distribution', 'manager' => true ),
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>
             </li>

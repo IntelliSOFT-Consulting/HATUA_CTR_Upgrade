@@ -2360,6 +2360,17 @@ class ApplicationsController extends AppController
                     $count = ($count < 10) ? "0$count" : $count;
                     $this->request->data['Application']['protocol_no'] = 'ECCT/' . date('y/m') . '/' . $count;
                 }
+
+                // Check number of Sites
+
+                if(count($this->request->data['SiteDetail'])>$response['Application']['total_sites']){
+                    $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, '.$response['Application']['total_sites'].' sites allowed!'), 'alerts/flash_error');
+                    $this->redirect($this->referer());
+                }
+
+                // debug($response['Application']['total_sites']);
+                // debug(count($this->request->data['SiteDetail']));
+                // exit;
             }
 
             $filedata = $this->request->data;

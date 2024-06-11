@@ -6,7 +6,7 @@
   <div class="row-fluid">
     <div class="span12">      
         <?php 
-          if($redir == 'applicant') {
+          if($redir == 'applicant' || $redir == 'outsource') {
               echo $this->Html->link(__('<i class="icon-upload"></i> Upload CIOM'),
                         array('controller' => 'cioms', 'action' => 'add', $application['Application']['id']),
                         array('escape' => false, 'class' => 'btn btn-inverse'));

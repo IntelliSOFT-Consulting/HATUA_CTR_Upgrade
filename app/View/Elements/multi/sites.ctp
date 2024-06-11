@@ -1,5 +1,5 @@
 <?php
- 	$this->Html->script('multi/sites', array('inline' => false));
+ 	$this->Html->script('multi/site', array('inline' => false));
 ?>
 <div class="ctr-groups">
 	<?php
