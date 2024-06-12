@@ -28,7 +28,7 @@
                         ));
                         echo $this->Form->input('id');
                         echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-                        echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'Outsource'));
+                        // echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'Outsource'));
                         ?>
                         <hr>
 
@@ -54,6 +54,16 @@
                                 echo $this->Form->input('country_id', array(
                                     'empty' => true,
                                     'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>')
+                                ));
+                                echo $this->Form->input('model', array(
+                                    'empty' => true,
+                                    'label' => array('class' => 'control-label required', 'text' => 'Category <span class="sterix">*</span>'),
+                                    'type'=>'select',
+                                    'options'=>array(
+                                        'SAE/SUSAR'=>'SAE/SUSAR',
+                                        'CIOMS'=>'CIOMS',
+                                        'Deviations'=>'Deviations'
+                                    )
                                 ));
                                 ?>
                             </div>
@@ -120,7 +130,7 @@
                         foreach ($application['Outsource'] as $key => $auc) { ?>
                             <li>
                                 <?php
-                                echo '<p class="text-success"><i class="icon-check"> </i> ' . $auc['name'] . '<small class="muted">
+                                echo '<p class="text-success"><i class="icon-check"> </i> ' . $auc['name'] .' : ' .$auc['model'] . '<small class="muted">
             ' . $this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'applications', 'action' => 'revoke_assignment', $auc['id'], $application['Application']['id']), array('escape' => false)) . '
            </small></p>';
                                 ?>

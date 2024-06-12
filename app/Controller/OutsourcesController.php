@@ -50,24 +50,36 @@ class OutsourcesController extends AppController
 		$outsource = $this->Outsource->find(
 			'first',
 			array(
-				'contain' => array('Application','Attachment'),
+				'contain' => array('Country','County','Application','Attachment'),
 				'conditions' => array('Outsource.id' => $id)
 			)
-		);
-
-
-		// debug($outsource);
-		// exit;
-		if ($this->request->is('post')) {
-			// debug($outsource);
-			// exit;
+		); 
+	
+		if ($this->request->is('post') || $this->request->is('put')) {
+			
 			$password = $this->generatePassword();
+			$this->request->data['User']['username'] = $this->request->data['Outsource']['username'];
+			$this->request->data['User']['name'] = $this->request->data['Outsource']['name'];
+			$this->request->data['User']['email'] = $this->request->data['Outsource']['email'];
+			$this->request->data['User']['sponsor_email'] = $this->request->data['Outsource']['sponsor_email'];
+			$this->request->data['User']['qualification'] = $this->request->data['Outsource']['qualification'];
+			$this->request->data['User']['phone_no'] = $this->request->data['Outsource']['phone_no'];
+			$this->request->data['User']['is_active'] = $this->request->data['Outsource']['is_active'];			
 			$this->request->data['User']['password'] = $password;
 			$this->request->data['User']['confirm_password'] = $password;
 			$this->request->data['User']['confirm_password'] = $password;
 			$this->request->data['User']['group_id'] = 8;
-			$this->request->data['User']['country_id'] = $outsource['Outsource']['country_id'];
-			$this->request->data['User']['county_id'] = $outsource['Outsource']['county_id'];
+			$this->request->data['User']['country_id'] = $this->request->data['Outsource']['country_id'];
+			$this->request->data['User']['county_id'] = $this->request->data['Outsource']['county_id'];
+			$this->request->data['User']['institution_physical'] = $this->request->data['Outsource']['institution_physical'];
+			$this->request->data['User']['institution_address'] = $this->request->data['Outsource']['institution_address'];
+			$this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
+			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
+			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
+			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
+			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
+			// debug($this->request->data);
+			// exit;
 			$this->User->create();
 			if ($this->User->save($this->request->data)) {
 				// update the outsourced
@@ -114,13 +126,17 @@ class OutsourcesController extends AppController
 					$this->log($this->request->data, 'notifications_error');
 				}
 
-				$this->Session->setFlash(__('The outsourced investigator has been saved. Please assign studies to the user.'), 'alerts/flash_success');
+				$this->Session->setFlash(__('The outsourced investigator account has been created and assigned initial protocol'), 'alerts/flash_success');
 				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The user could not be saved. Please, try again.'), 'alerts/flash_error');
 			}
 		}
 
+		$this->request->data = $this->Outsource->find('first', array(
+			'conditions' => array('Outsource.id' => $id),  
+			'contain' => array('County', 'Country')
+		));
 
 		$this->set('outsource', $outsource);
 		$groups = $this->User->Group->find('list', array('order' => array('id' => 'desc')));

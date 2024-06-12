@@ -164,7 +164,7 @@ class ApplicationsController extends AppController
  
             $this->Outsource->Create();
             // if ($this->Outsoerererrrurce->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
-                if ($this->Outsource->saveAssociated($this->request->data, array('validate' => false, 'deep' => true))) {
+                if ($this->Outsource->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
 
                 // Notify the Admins
 

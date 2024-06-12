@@ -86,6 +86,13 @@ class Outsource extends AppModel
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		'model' => array(
+			'notEmpty' => array(
+				'rule'     => 'notEmpty',
+				'required' => true,
+				'message'  => 'Please provide Category'
+			),
+		),
 	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
