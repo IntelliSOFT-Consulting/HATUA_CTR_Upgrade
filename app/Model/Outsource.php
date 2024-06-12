@@ -85,16 +85,23 @@ class Outsource extends AppModel
 				//'last' => false, // Stop validation after this rule
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
-		),
+		), 
 		'model' => array(
-			'notEmpty' => array(
-				'rule'     => 'notEmpty',
+			'ifCategoryExists' => array(
+				'rule'     => array('ifCategoryExists'),
 				'required' => true,
-				'message'  => 'Please provide Category'
+				'message'  => 'Please select atleast one Category'
 			),
 		),
 	);
 
+
+	public function ifCategoryExists($field = null)
+	{
+		return $this->data['Outsource']['model_sae'] == '1' ||
+			$this->data['Outsource']['model_ciom'] == '1' ||
+			$this->data['Outsource']['model_dev'] == '1';
+	}
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 	/**

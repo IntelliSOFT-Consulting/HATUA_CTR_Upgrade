@@ -5,7 +5,7 @@
     <h2><?php echo __('Outsource Requests'); ?></h2>
     <?php
     echo $this->Form->create('Outsource', array(
-        'url' => array_merge(array('action' => 'index'), $this->params['pass']),
+        'url' => array_merge(array('action' => 'approved'), $this->params['pass']),
         'class' => 'ctr-groups', 'style' => array('padding:9px;', 'background-color: #F5F5F5'),
     ));
     ?>
@@ -104,8 +104,8 @@
                     <td><?php echo h($user['Outsource']['name']); ?>&nbsp;</td>
                     <td><?php echo h($user['Outsource']['email']); ?>&nbsp;</td>
                     <td><?php echo h($user['Application']['protocol_no']); ?>&nbsp;</td>
-                    <td>
-                        <input type="checkbox" name="selected_protocols[]" value="<?php echo h($user['Outsource']['model_sae']); ?>" <?php echo ($user['Outsource']['model_sae'] == 1) ? 'checked' : '';  ?> disabled> SAE/SUSAR <br>
+                    <td>                    
+                        <input type="checkbox" name="selected_protocols[]" value="<?php echo h($user['Outsource']['model_sae']); ?>" <?php echo ($user['Outsource']['model_sae'] == 1) ? 'checked' : ''; ?> disabled> SAE/SUSAR <br>
                         <input type="checkbox" name="selected_protocols[]" value="<?php echo h($user['Outsource']['model_ciom']); ?>" <?php echo ($user['Outsource']['model_ciom'] == 1) ? 'checked' : ''; ?> disabled> CIOMS <br>
                         <input type="checkbox" name="selected_protocols[]" value="<?php echo h($user['Outsource']['model_dev']); ?>" <?php echo ($user['Outsource']['model_dev'] == 1) ? 'checked' : ''; ?> disabled> Deviations <br>
 
@@ -113,7 +113,7 @@
                     </td>
                     <td><?php echo h($user['Outsource']['created']); ?>&nbsp;</td>
                     <td class="actions">
-                        <?php echo $this->Html->link(__('<label class="label label-info">Assign Study</label>'), array('action' => 'view', $user['Outsource']['id']), array('escape' => false)); ?>
+                        <?php echo $this->Html->link(__('<label class="label label-info">Assign Study</label>'), array('controller'=>'protocol_outsources','action' => 'view', $user['User']['id']), array('escape' => false)); ?>
 
 
                     </td>

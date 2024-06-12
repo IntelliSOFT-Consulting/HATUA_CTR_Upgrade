@@ -4,7 +4,7 @@
 ?> 
 	<h2><?php echo __('Outsource Users'); ?></h2>
     <?php
-        echo $this->Form->create('StudyMonitor', array(
+        echo $this->Form->create('ProtocolOutsource', array(
           'url' => array_merge(array('action' => 'index'), $this->params['pass']),
           'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
         ));

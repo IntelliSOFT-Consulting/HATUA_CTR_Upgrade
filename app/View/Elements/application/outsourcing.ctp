@@ -28,7 +28,6 @@
                         ));
                         echo $this->Form->input('id');
                         echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
-                        // echo $this->Form->input('model', array('type' => 'hidden', 'value' => 'Outsource'));
                         ?>
                         <hr>
 
@@ -54,19 +53,47 @@
                                 echo $this->Form->input('country_id', array(
                                     'empty' => true,
                                     'label' => array('class' => 'control-label required', 'text' => 'Country <span class="sterix">*</span>')
+                                )); 
+                                ?>
+
+                                <h5>Category <span class="sterix">*</span></h5>
+                              
+                                <?php
+                                echo $this->Form->input('model', array('type' => 'hidden', 'value' => ''));
+                                echo $this->Form->error(
+                                    'Outsource.model',
+                                    'Please select at least one category below',
+                                    array('wrap' => 'span', 'class' => 'controls required error', 'escape' => false)
+                                );
+                                $categoryError = '';
+                                if ($this->Form->isFieldError('model')) $categoryError = 'error';
+                                echo $this->Form->input('model_sae', array(
+                                    'before' => '<div class="control-group ' . $categoryError . '">',
+                                    'label' => false, 'div' => false, 'class' => false, 'hiddenField' => false,
+
+                                    'between' => '<div class="controls"><input type="hidden" value="0" id="OutsourceModelSae_" name="data[Outsource][model_sae]">
+                                  <label class="checkbox required">',
+                                    'after' => 'SAE/SUSAR </label></div></div>',
                                 ));
-                                echo $this->Form->input('model', array(
-                                    'empty' => true,
-                                    'label' => array('class' => 'control-label required', 'text' => 'Category <span class="sterix">*</span>'),
-                                    'type'=>'select',
-                                    'options'=>array(
-                                        'SAE/SUSAR'=>'SAE/SUSAR',
-                                        'CIOMS'=>'CIOMS',
-                                        'Deviations'=>'Deviations'
-                                    )
+
+                                echo $this->Form->input('model_ciom', array(
+                                    'before' => '<div class="control-group ' . $categoryError . '">',
+                                    'label' => false, 'div' => false, 'class' => false, 'hiddenField' => false,
+                                    'between' => '<div class="controls"><input type="hidden" value="0" id="OutsourceModelCiom_" name="data[Outsource][model_ciom]">
+                                  <label class="checkbox required">',
+                                    'after' => 'CIOMS </label></div></div>',
+                                ));
+
+                                echo $this->Form->input('model_dev', array(
+                                    'before' => '<div class="control-group ' . $categoryError . '">',
+                                    'label' => false, 'div' => false, 'class' => false, 'hiddenField' => false,
+                                    'between' => '<div class="controls"><input type="hidden" value="0" id="OutsourceModelDev_" name="data[Outsource][model_dev]">
+                                  <label class="checkbox required">',
+                                    'after' => 'Deviations </label></div></div>',
                                 ));
                                 ?>
                             </div>
+
                             <div class="span6">
                                 <?php
                                 echo $this->Form->input('name_of_institution', array(
@@ -90,7 +117,7 @@
                         <div class="row-fluid">
                             <div class="span10">
                                 <?php
-                                 echo $this->element('multi/outsource');
+                                echo $this->element('multi/outsource');
                                 ?>
 
                             </div>
@@ -130,7 +157,7 @@
                         foreach ($application['Outsource'] as $key => $auc) { ?>
                             <li>
                                 <?php
-                                echo '<p class="text-success"><i class="icon-check"> </i> ' . $auc['name'] .' : ' .$auc['model'] . '<small class="muted">
+                                echo '<p class="text-success"><i class="icon-check"> </i> ' . $auc['name'] . ' : ' . $auc['model'] . '<small class="muted">
             ' . $this->Html->link(__('<small class="muted primary">Revoke</small>'), array('controller' => 'applications', 'action' => 'revoke_assignment', $auc['id'], $application['Application']['id']), array('escape' => false)) . '
            </small></p>';
                                 ?>

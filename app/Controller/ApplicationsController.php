@@ -161,10 +161,10 @@ class ApplicationsController extends AppController
         $this->loadModel('User');
 
         if ($this->request->is('post')) {
- 
+
             $this->Outsource->Create();
             // if ($this->Outsoerererrrurce->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
-                if ($this->Outsource->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
+            if ($this->Outsource->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
 
                 // Notify the Admins
 
@@ -1056,6 +1056,36 @@ class ApplicationsController extends AppController
             'conditions' => array('Application.id' => $id),
             'contain' => $this->a_contain
         ));
+
+        // Get the specific assigned section 
+        // $sections = array_map(function ($item) {
+        //     return [
+        //         'assigned_user_id' => $item['user_id'],
+        //         'model_sae' => $item['model_sae'],
+        //         'model_ciom' => $item['model_ciom'],
+        //         'model_dev' => $item['model_dev']
+        //     ];
+        // }, $application['Outsource']);
+        // $current_user_id = $this->Auth->User('id');
+
+        // // Find the record matching the current user_id
+        // $matched_record = array_filter($sections, function ($section) use ($current_user_id) {
+        //     return $section['assigned_user_id'] == $current_user_id;
+        // });
+
+        // // If a matching record is found, append it to the application
+        // if (!empty($matched_record)) {
+        //     // Since array_filter returns an array, we need to get the first element
+        //     $matched_record = array_shift($matched_record);
+
+        //     // Append the matched record to the application
+        //     $application[]['MatchedOutsource'] = $matched_record;
+        // }
+
+        // debug($application['MatchedOutsource']); 
+        // exit;
+
+
         $this->request->data = $application;
     }
     public function manager_index()
@@ -2363,8 +2393,8 @@ class ApplicationsController extends AppController
 
                 // Check number of Sites
 
-                if(count($this->request->data['SiteDetail'])>$response['Application']['total_sites']){
-                    $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, '.$response['Application']['total_sites'].' sites allowed!'), 'alerts/flash_error');
+                if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
+                    $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
                     $this->redirect($this->referer());
                 }
 

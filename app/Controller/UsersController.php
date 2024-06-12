@@ -168,9 +168,12 @@ class UsersController extends AppController
                 'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'
             ),
             'order' => array('Application.created' => 'desc'),
-            'contain' => array('Review'),
+            'contain' => array('Review','Outsource'=>array('User')),
             'conditions' => array('Application.id' => Hash::extract($user['ProtocolOutsource'], '{n}.application_id'), 'Application.submitted' => 1),
         ));
+
+        // debug($applications);
+        // exit;
         $this->set('applications', $applications);
 
         $this->set('notifications', $this->User->Notification->find('all', array(

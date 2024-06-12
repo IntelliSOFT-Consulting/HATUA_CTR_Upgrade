@@ -19,6 +19,24 @@ class OutsourcesController extends AppController
 	public $components = array('Search.Prg');
 	public $presetVars = true;
 
+	
+	public function admin_approved()
+	{
+		$this->Prg->commonProcess();
+		$page_options = array('10' => '10', '20' => '20');
+		if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+		if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['Outsource']['limit'] = $this->passedArgs['pages'];
+		else $this->paginate['Outsource']['limit'] = reset($page_options);
+
+		$criteria = $this->Outsource->parseCriteria($this->passedArgs);
+		$criteria['Outsource.approved'] = 1;
+		$this->paginate['Outsource']['conditions'] = $criteria;
+		$this->paginate['Outsource']['order'] = array('Outsource.created' => 'desc');
+		$this->paginate['Outsource']['contain'] = array('User', 'Application');
+
+		$this->set('page_options', $page_options);
+		$this->set('users', $this->paginate('Outsource'));
+	}
 	public function admin_index()
 	{
 		$this->Prg->commonProcess();
@@ -74,20 +92,17 @@ class OutsourcesController extends AppController
 			$this->request->data['User']['institution_physical'] = $this->request->data['Outsource']['institution_physical'];
 			$this->request->data['User']['institution_address'] = $this->request->data['Outsource']['institution_address'];
 			$this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
-			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
-			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
-			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
-			// $this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
-			// debug($this->request->data);
-			// exit;
+			 
 			$this->User->create();
 			if ($this->User->save($this->request->data)) {
 				// update the outsourced
+				$user_id = $this->User->id;
 				$this->Outsource->id = $id;
 				$this->Outsource->saveField('approved', 1);
+				$this->Outsource->saveField('user_id', $user_id);
 
 				$application_id = $outsource['Outsource']['application_id'];
-				$user_id = $this->User->id;
+				
 				$this->loadModel('ProtocolOutsource');
 				$this->ProtocolOutsource->save(array('application_id' => $application_id, 'user_id' => $user_id, 'owner_id' => $this->Application->field('user_id', array('Application.id' => $application_id))));
 
@@ -100,8 +115,8 @@ class OutsourcesController extends AppController
 						'protocol_no' => $app['Application']['protocol_no'],
 						'name' => $outsource['Outsource']['name'],
 						'email' => $outsource['Outsource']['email'],
-						'username' => $this->request->data['User']['username'],
-						'password' => $this->request->data['User']['password'],
+						'username' => $this->User->username,
+						'password' => $password,
 						'user_id' => $this->User->id,
 						'new_user' => true,
 					)
