@@ -162,6 +162,15 @@ class ApplicationsController extends AppController
 
         if ($this->request->is('post')) {
 
+            if (isset($this->request->data['Outsource']['email']) && !empty($this->request->data['Outsource']['email'])) {
+                $parts = explode('@', $this->request->data['Outsource']['email']);
+                $this->request->data['Outsource']['username'] = $parts[0];
+            }
+
+            if (!isset($this->request->data['Attachment']) || empty($this->request->data['Attachment'])) { 
+                $this->Session->setFlash(__('Please upload at least one file.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }      
             $this->Outsource->Create();
             // if ($this->Outsoerererrrurce->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
             if ($this->Outsource->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {

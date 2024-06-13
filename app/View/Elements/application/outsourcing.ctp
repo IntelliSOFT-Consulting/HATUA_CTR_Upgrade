@@ -34,11 +34,7 @@
 
                         <div class="row-fluid">
                             <div class="span6">
-                                <?php
-                                echo $this->Form->input(
-                                    'username',
-                                    array('label' => array('class' => 'control-label required', 'text' => 'Username <span class="sterix">*</span>'),)
-                                );
+                                <?php 
                                 echo $this->Form->input('name', array('label' => array('class' => 'control-label', 'text' => 'Name'),));
                                 echo $this->Form->input('email', array(
                                     'type' => 'email',

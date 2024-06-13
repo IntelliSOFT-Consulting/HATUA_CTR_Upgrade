@@ -93,6 +93,13 @@ class OutsourcesController extends AppController
 			$this->request->data['User']['institution_address'] = $this->request->data['Outsource']['institution_address'];
 			$this->request->data['User']['institution_contact'] = $this->request->data['Outsource']['institution_contact'];
 			 
+			if (!isset($this->request->data['Outsource']['approved']) || empty($this->request->data['Outsource']['approved'])) { 
+                $this->Session->setFlash(__('Please provide approval status.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            } 
+			// debug($this->request->data);
+			// exit;
+			if($this->request->data['Outsource']['approved']=="2"){
 			$this->User->create();
 			if ($this->User->save($this->request->data)) {
 				// update the outsourced
@@ -145,6 +152,9 @@ class OutsourcesController extends AppController
 				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The user could not be saved. Please, try again.'), 'alerts/flash_error');
+			}}else{
+				$this->Session->setFlash(__('Outsource request rejected.'), 'alerts/flash_success');
+				$this->redirect(array('action' => 'index'));
 			}
 		}
 
@@ -152,6 +162,7 @@ class OutsourcesController extends AppController
 			'conditions' => array('Outsource.id' => $id),  
 			'contain' => array('County', 'Country')
 		));
+		$this->request->data['Outsource']['sponsor_email']=$outsource['Application']['email_address'];
 
 		$this->set('outsource', $outsource);
 		$groups = $this->User->Group->find('list', array('order' => array('id' => 'desc')));
