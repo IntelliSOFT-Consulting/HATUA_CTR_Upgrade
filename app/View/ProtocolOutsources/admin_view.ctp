@@ -1,7 +1,7 @@
 <div class="row-fluid">
-	<?php
-	$this->assign('Reports', 'active');
-?>
+  <?php
+  $this->assign('Reports', 'active');
+  ?>
   <h4>Assign Application to Outsourced Users</h4>
   <hr>
   <div class="row-fluid">
@@ -13,123 +13,157 @@
           &nbsp;
         </dd>
         <dt>Username</dt>
-        <dd><?php echo $user['User']['username'] ;?> &nbsp; </dd>
+        <dd><?php echo $user['User']['username']; ?> &nbsp; </dd>
         <dt>Name</dt>
         <dd><?php echo $user['User']['name']; ?> &nbsp; </dd>
         <dt>Email</dt>
         <dd><?php echo $user['User']['email']; ?> &nbsp; </dd>
       </dl>
       <?php if (count($user['ProtocolOutsource']) > 0) { ?>
-      <h5 class="text-success">Assigned protocols</h5>
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Protocol No.</th>
-            <th>Created</th>
-            <th><i class="icon-link"></i></th>
-          </tr>
-        </thead>
-        <?php
+        <h5 class="text-success">Assigned protocols</h5>
+        <!-- <table class="table table-condensed"> -->
+        <table class="table  table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Protocol No.</th>
+              <th>Task</th>
+              <th>Created</th>
+              <th><i class="icon-link"></i></th>
+            </tr>
+          </thead>
+          <?php
           $i = 0;
-          foreach ($user['ProtocolOutsource'] as $study_monitor) {
+          foreach ($user['ProtocolOutsource'] as $ptr) {
             $i++;
             echo "<tr>";
-            echo "<td>".$i."</td><td>".$study_monitor['Application']['protocol_no']."</td><td>".$study_monitor['created']."</td>";
-            echo "<td>".$this->Form->postLink(__('<span class="label label-important">Remove</span>'), array('action' => 'delete', $study_monitor['id']), array('escape' => false), 
-              __('Are you sure you want to remove protocol %s from user %s profile?', $study_monitor['Application']['protocol_no'], $user['User']['name']))."</td>";
+            echo "<td>" . $i . "</td><td>" . $ptr['Application']['protocol_no'] . "</td>";
+          ?>
+            <td>
+              <input type="checkbox" name="selected_protocols[]" value="<?php echo h($ptr['Outsource']['model_sae']); ?>" <?php echo ($ptr['Outsource']['model_sae'] == 1) ? 'checked' : '';  ?> disabled> SAE/SUSAR <br>
+              <input type="checkbox" name="selected_protocols[]" value="<?php echo h($ptr['Outsource']['model_ciom']); ?>" <?php echo ($ptr['Outsource']['model_ciom'] == 1) ? 'checked' : ''; ?> disabled> CIOMS <br>
+              <input type="checkbox" name="selected_protocols[]" value="<?php echo h($ptr['Outsource']['model_dev']); ?>" <?php echo ($ptr['Outsource']['model_dev'] == 1) ? 'checked' : ''; ?> disabled> Deviations <br>
+
+              <?php
+              if (count($ptr['Outsource']['PendingOutsourceRequest'])) { ?>
+                <h5>New Requests <span><?php echo count($ptr['Outsource']['PendingOutsourceRequest']) ?> </span></h5>
+                <table class="table  table-bordered table-striped">
+          <thead>
+          </thead>
+          <tbody>
+          <?php
+            $cc = 0;
+            foreach ($ptr['Outsource']['PendingOutsourceRequest'] as $request) {
+              $cc++;
+
+              // debug($request);
+              // exit;
+              
+              ?>
+             <tr>
+
+             <td>
+              <input type="checkbox" name="selected_protocols[]" value="<?php echo h($request['sae']); ?>" <?php echo ($request['sae'] == 1) ? 'checked' : '';  ?> disabled> SAE/SUSAR <br>
+              <input type="checkbox" name="selected_protocols[]" value="<?php echo h($request['ciom']); ?>" <?php echo ($request['ciom'] == 1) ? 'checked' : ''; ?> disabled> CIOMS <br>
+              <input type="checkbox" name="selected_protocols[]" value="<?php echo h($request['dev']); ?>" <?php echo ($request['dev'] == 1) ? 'checked' : ''; ?> disabled> Deviations <br>
+
+
+                <!-- Show the attached files -->
+                <?php
+                    if (count($request['Attachment']) > 0) {
+                    ?>
+                        <div class="row-fluid">
+                             
+                            <div class="span10">
+                                <h5>Supporting Documents </h5>
+
+                                <table id="buildoutsourceform" class="table table-bordered  table-condensed table-striped">
+                                    <thead>
+                                        <tr id="attachmentsTableHeader">
+                                            <th>#</th>
+                                            <th width="45%">File</th>
+                                            <th width="45%">Text Description</th>
+                                            <th> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($request['Attachment'] as $i => $file) {
+                                        ?> <tr>
+                                                <td>
+                                                    <span class="badge badge-info"><?php echo $i + 1; ?></span>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    echo $this->Html->link(
+                                                        __($file['basename']),
+                                                        array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
+                                                        array('class' => '')
+                                                    );
+                                                    ?>
+                                                </td>
+                                                <td></td>
+                                                <td> <?php
+                                                        echo $this->Html->link(
+                                                            __('Download'),
+                                                            array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
+                                                            array('class' => 'btn btn-sm btn-info')
+                                                        );
+                                                        ?></td>
+                                            </tr>
+
+                                        <?php }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> 
+
+                    <?php  } 
+                    
+                    
+                    echo  $this->Form->postLink(
+                      __('<span class="label label-success">Approve</span>'),
+                      array('controller'=>'protocol_outsources','action' => 'approve_other', $request['id']),
+                      array('escape' => false),
+                      __('Are you sure you want to approve this request?')
+                    );
+                    ?>
+
+
+
+                    <!-- End of file attachment -->
+
+                    
+             </td>
+             </tr>
+
+          
+          
+        <?php }  ?>
+
+        </tbody>
+                </table>
+
+              <?php }
+              ?>
+            </td>
+
+
+          <?php
+            echo "<td>" . $ptr['created'] . "</td>";
+            echo "<td>" . $this->Form->postLink(
+              __('<span class="label label-important">Remove</span>'),
+              array('action' => 'delete', $ptr['id']),
+              array('escape' => false),
+              __('Are you sure you want to remove protocol %s from user %s profile?', $ptr['Application']['protocol_no'], $user['User']['name'])
+            ) . "</td>";
             echo "</tr>";
           }
-        ?>
-      </table>
+          ?>
+        </table>
       <?php } ?>
+
+
     </div>
   </div>
   <hr>
-	
-    <?php
-        echo $this->Form->create('ProtocolOutsource', array(
-          'url' => array_merge(array('action' => 'view'), $this->params['pass']),
-          'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
-        ));
-      ?>
-     <div class="row-fluid">
-          <div class="span5">
-          <?php
-            echo $this->Form->input('protocol_no', array('div' => false, 'class' => 'span12 unauthorized_index',
-              'label' => array('class' => 'required', 'text' => 'Protocol No.'),
-              'type' => 'text',
-              ));
-          ?>
-          </div>
-          <div class="span5">
-          <?php
-            echo $this->Form->input('filter', array('div' => false, 'class' => 'span12 unauthorized_index',
-              'label' => array('class' => 'required', 'text' => 'Study Title'),
-              'type' => 'text',
-              ));
-          ?>
-          </div>
-          <div class="span2">
-            <br>
-            <?php
-              echo $this->Form->button('<i class="icon-search icon-white"></i> Search', array(
-                  'class' => 'btn btn-inverse', 'div' => 'control-group', 'div' => false,
-                  'style' => array('margin-bottom: 5px')
-              ));
-            ?>
-          </div>
-       </div>
-       <div class="row-fluid">
-         <div class="span12">
-            <p><?php
-              echo $this->Paginator->counter(array(
-              'format' => __('Page <span class="badge">{:page}</span> of <span class="badge">{:pages}</span>,
-                      showing <span class="badge">{:current}</span> Protocols out of
-                      <span class="badge badge-inverse">{:count}</span> total')
-              ));
-            ?></p>
-          </div>
-       </div>
-	
-          
-          
-          <?php echo $this->Form->end(); ?>
-          <div class="pagination">
-            <ul>
-            <?php
-              echo $this->Paginator->prev('&laquo;', array('tag' => 'li', 'escape' => false), null, array('class' => 'disabled', 'tag' => 'li', 'escape' => false));
-              echo $this->Paginator->numbers(array('separator' => '', 'tag' => 'li', 'currentClass' => 'active'));
-              echo $this->Paginator->next('&raquo;', array('tag' => 'li', 'escape' => false), null, array('class' => 'disabled', 'tag' => 'li', 'escape' => false ));
-            ?>
-            </ul>
-          </div>
-	<table  class="table  table-bordered table-striped">
-	 <thead>
-            <tr>
-		<th><?php echo $this->Paginator->sort('id'); ?></th>
-		<th><?php echo $this->Paginator->sort('protocol_no'); ?></th>
-    <th><?php echo $this->Paginator->sort('study_title'); ?></th>
-		<th>Owner</th>
-		<th class="actions"><?php echo __('Actions'); ?></th>
-	      </tr>
-       </thead>
-      <tbody>
-	<?php
-	foreach ($applications as $application): ?>
-	<tr>
-		<td><?php echo h($application['Application']['id']); ?>&nbsp;</td>
-		<td><?php echo h($application['Application']['protocol_no']); ?>&nbsp;</td>
-    <td><?php echo $this->Text->truncate($application['Application']['study_title'], 32, array('html' => true)); ?>&nbsp;</td>
-		<td><?php echo h($application['User']['name']); ?>&nbsp;</td>
-		<td class="actions">
-			<?php
-        echo $this->Form->postLink(__('<span class="badge badge-success">Assign</span>'), array('action' => 'view', $user['User']['id'], $application['Application']['id']), array('escape' => false), 
-              __('Are you sure you want to assign protocol %s to %s?', $application['Application']['protocol_no'], $user['User']['name']));
-      ?>
-		</td>
-	</tr>
-<?php endforeach; ?>
-		</tbody>
-	</table>
-</div>

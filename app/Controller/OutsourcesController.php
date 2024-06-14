@@ -111,7 +111,7 @@ class OutsourcesController extends AppController
 				$application_id = $outsource['Outsource']['application_id'];
 				
 				$this->loadModel('ProtocolOutsource');
-				$this->ProtocolOutsource->save(array('application_id' => $application_id, 'user_id' => $user_id, 'owner_id' => $this->Application->field('user_id', array('Application.id' => $application_id))));
+				$this->ProtocolOutsource->save(array('application_id' => $application_id,'outsource_id'=>$id, 'user_id' => $user_id, 'owner_id' => $this->Application->field('user_id', array('Application.id' => $application_id))));
 
 				// Send Alert to the Outsourced User and update Audit Trails
 				$app = $this->Application->read(null, $application_id);

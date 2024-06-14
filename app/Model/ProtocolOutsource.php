@@ -51,9 +51,9 @@ class ProtocolOutsource extends AppModel {
 			'fields' => '',
 			'order' => ''
 		),
-		'Amendment' => array(
-			'className' => 'Amendment',
-			'foreignKey' => 'amendment_id',
+		'Outsource' => array(
+			'className' => 'Outsource',
+			'foreignKey' => 'outsource_id',
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''

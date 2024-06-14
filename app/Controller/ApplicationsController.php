@@ -155,6 +155,27 @@ class ApplicationsController extends AppController
         $this->Session->setFlash(__('outsourced assignment was not revorked'));
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
     }
+
+    public function applicant_assign_other_protocol($id=null) {
+        $this->loadModel('OutsourceRequest');
+        $this->loadModel('User');
+        if (!isset($this->request->data['Attachment']) || empty($this->request->data['Attachment'])) { 
+            $this->Session->setFlash(__('Please upload at least one file.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }      
+        
+        if ($this->request->is('post')) {
+        }      
+        $this->OutsourceRequest->Create();
+        // if ($this->Outsoerererrrurce->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
+        if ($this->OutsourceRequest->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
+        }
+
+
+        $this->Session->setFlash(__('Request submitted for further processing'), 'alerts/flash_success');
+        $this->redirect($this->referer());
+       
+	}
     public function applicant_assign_protocol($id)
     {
         $this->loadModel('Outsource');

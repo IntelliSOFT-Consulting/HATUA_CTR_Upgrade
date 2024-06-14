@@ -147,5 +147,17 @@ class Outsource extends AppModel
 			'dependent' => true,
 			'conditions' => array('Attachment.model' => 'Outsource', 'Attachment.group' => 'attachment'),
 		),
+		'OutsourceRequest' => array(
+			'className' => 'OutsourceRequest',
+			'foreignKey' => 'outsource_id',
+			'dependent' => true,
+			'conditions' => '',
+		),
+		'PendingOutsourceRequest' => array(
+			'className' => 'OutsourceRequest',
+			'foreignKey' => 'outsource_id',
+			'dependent' => true,		
+			'conditions' => array('PendingOutsourceRequest.status' => '0'),
+		),
 	);
 }
