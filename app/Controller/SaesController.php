@@ -942,7 +942,7 @@ class SaesController extends AppController
         }
 
         //$sae = $this->request->data;
-        $aids = $this->Sae->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
+        $aids = $this->Sae->Application->ProtocolOutsource->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('ProtocolOutsource.user_id' => $this->Auth->User('id'))));
         $applications = $this->Sae->Application->find('list', array(
             'fields' => array('Application.id', 'Application.protocol_no'),
             'conditions' => array('Application.id' => $aids, 'Application.approved' => array(1, 2), 'Application.submitted' => array(1))

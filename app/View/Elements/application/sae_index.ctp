@@ -298,6 +298,8 @@
             <?php if($redir === 'manager' && $sae['Sae']['approved'] > 0) echo $this->Form->postLink('<span class="badge badge-inverse">Unsubmit</span>', array('action' => 'unsubmit', $sae['Sae']['id']), array('escape' => false), __('Unsubmit %s?', $sae['Sae']['reference_no'])); ?>
             <?php
               if($sae['Sae']['approved'] < 1 && $redir === 'applicant') {
+                // ensure it belongs to the user
+                
                 echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('action' => 'delete', $sae['Sae']['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['Sae']['id']));
               } 
               if($redir === 'applicant' && $sae['Sae']['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('action' => 'followup', $sae['Sae']['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['Sae']['reference_no']));

@@ -4,7 +4,7 @@
 <hr class="soften" style="margin: 10px 0px;">
 
 <?php
-  if (($this->Session->read('Auth.User.group_id') == '5' || $this->Session->read('Auth.User.group_id') == '6'|| $this->Session->read('Auth.User.group_id') == '7') and $deviation['status'] == 'Unsubmitted') {
+  if (($this->Session->read('Auth.User.group_id') == '5' || $this->Session->read('Auth.User.group_id') == '6' || $this->Session->read('Auth.User.group_id') == '8'|| $this->Session->read('Auth.User.group_id') == '7')   and $deviation['status'] == 'Unsubmitted') {
 
   echo $this->Form->create('Deviation', array(
         'url' => array('controller' => 'deviations','action' => 'edit', $deviation['id'], $deviation['application_id']),

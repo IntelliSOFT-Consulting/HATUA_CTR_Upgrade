@@ -748,12 +748,14 @@ echo $this->Session->flash();
                       array('controller' => 'saes', 'action' => 'view', $sae['id']),
                       array('target' => '_blank', 'escape' => false)
                     ); ?>
-                    <?php if ($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('target' => '_blank', 'escape' => false)); ?>
+                   
                     <?php
                     if ($sae['approved'] < 1) {
+                      if($sae['user_id'] == $this->Session->read('Auth.User.id')){
+                        echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('target' => '_blank', 'escape' => false));
                       echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
-                    }
-                    if ($redir === 'applicant' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
+                    }}
+                    if ($redir === 'outsource' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
                     ?>
                   </td>
                 </tr>

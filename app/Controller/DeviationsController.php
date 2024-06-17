@@ -21,7 +21,7 @@ class DeviationsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('inspector_add', 'inspector_edit', 'inspector_download_deviation');
+        $this->Auth->allow('inspector_add','outsource_edit', 'inspector_edit', 'inspector_download_deviation');
     }
 
 
@@ -408,6 +408,41 @@ class DeviationsController extends AppController
             $this->request->data = $application;
         }
     }
+ 
+
+        public function outsource_edit($id = null, $application_id = null)
+        {
+        $this->Deviation->id = $id;
+        if (!$this->Deviation->exists()) {
+            throw new NotFoundException(__('Invalid deviation'));
+        }
+        if ($this->request->is('post') || $this->request->is('put')) {
+            if ($this->Deviation->saveMany($this->request->data['Deviation'], array('deep' => true))) {
+                // debug($this->request->data);
+                if (isset($this->request->data['submitReport'])) {
+                    $this->Deviation->saveField('status', 'Submitted');
+                    $this->Session->setFlash(__('The protocol deviation has been submitted'), 'alerts/flash_success');
+                    $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id, 'deviation_view' => $id));
+                } else {
+                    $this->Session->setFlash(__('The protocol deviation has been saved'), 'alerts/flash_success');
+                    $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id, 'deviation_edit' => $id));
+                }
+            } else {
+                $this->Session->setFlash(__('The protocol deviation could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        } else {
+            $application = $this->Application->find('first', array(
+                'conditions' => array('Application.id' => $application_id),
+                'contain' => array(
+                    'Amendment', 'PreviousDate', 'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
+                    'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
+                    'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee',
+                    'AnnualApproval', 'Document', 'Review', 'Deviation'
+                )
+            ));
+            $this->request->data = $application;
+        }
+	}
     public function monitor_edit($id = null, $application_id = null)
     {
         // debug($this->request);

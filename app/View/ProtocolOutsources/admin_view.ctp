@@ -127,6 +127,14 @@
                       array('escape' => false),
                       __('Are you sure you want to approve this request?')
                     );
+                   echo "&nbsp;";
+
+                    echo$this->Form->postLink(
+                      __('<span class="label label-important">Reject</span>'),
+                      array('controller'=>'protocol_outsources','action' => 'reject_other', $request['id']),
+                      array('escape' => false),
+                      __('Are you sure you want to reject this request?')
+                    )
                     ?>
 
 

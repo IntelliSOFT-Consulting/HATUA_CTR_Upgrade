@@ -20,6 +20,24 @@ class ProtocolOutsourcesController extends AppController
     public $components = array('Search.Prg');
     public $presetVars = true;
 
+
+    public function admin_reject_other($id = null)
+    {
+        $this->loadModel('OutsourceRequest');
+        $data = $this->OutsourceRequest->find(
+            'first',
+            array(
+                'contain' => array(),
+                'conditions' => array('OutsourceRequest.id' => $id)
+            )
+        );
+        if ($data) {
+            $this->OutsourceRequest->id = $id;
+            $this->OutsourceRequest->saveField('status', '2');
+        }
+        $this->Session->setFlash(__('The application has been successfully rejected'), 'alerts/flash_success');
+        $this->redirect($this->referer());
+    }
     public function admin_approve_other($id = null)
     {
         $this->loadModel('OutsourceRequest');
@@ -31,8 +49,7 @@ class ProtocolOutsourcesController extends AppController
                 'conditions' => array('OutsourceRequest.id' => $id)
             )
         );
-        // debug($data);
-        // exit;
+       
         $outsource = $this->Outsource->find('first', array('conditions' => array('Outsource.id' => $data['Outsource']['id'])));
 
         if ($outsource) {

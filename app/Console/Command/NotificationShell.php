@@ -120,15 +120,7 @@ class NotificationShell extends Shell
     if ($application) {
       $options = array('ssl_verify_peer' => false);
       $HttpSocket = new HttpSocket($options);
-      $header_options = array(
-        'header' => array(
-          // 'APPID' => 'c4ca4238a0b923820dcc509a6f75849b',
-          // 'APIKEY' => 'YzM4ZWRhMTMwNzViMGJjZDJiMGVkNjkzOWRlNzFmMDhkZTA2YTUzNA==',
-          'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
-          'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
-          'Content-Type' => 'application/json',
-        )
-      );
+    
       $user = $application['User'];
       //PRINCIPAL INVESTIGATOR
       $multiArray = $application['InvestigatorContact'];
@@ -137,7 +129,27 @@ class NotificationShell extends Shell
       $billDesc = $name . "\n" . $application['Application']['short_title'];
       // $this->log('initiated report',$user, 'e-citizen-initiate-user');
       // //Request Access Token
-      $initiate = $HttpSocket->get('https://invoices.pharmacyboardkenya.org/token', false, $header_options);
+      // $initiate = $HttpSocket->get('https://invoices.pharmacyboardkenya.org/token', false, $header_options);
+
+
+      
+      $header_options = array(
+        'header' => array(
+            'Content-Type' => 'application/x-www-form-urlencoded'
+        )
+    );
+    $postDataToken = array(
+        'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
+        'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
+    );
+
+    $formDataToken = http_build_query($postDataToken);
+    // //Request Access Token
+    $initiate = $HttpSocket->post(
+        'https://invoices.pharmacyboardkenya.org/token',
+        $formDataToken,
+        $header_options
+    );
       $this->log('process initiation' . $initiate, 'e-citizen-initiate-token');
       if ($initiate->isOk()) {
         $body = $initiate->body;
@@ -172,7 +184,7 @@ class NotificationShell extends Shell
           $body1 = $next->body;
           $resp1 = json_decode($body1, true);
           $invoice_id = $resp1['invoice_id']; //[0]; //Default test:::: 285251
-          $payment_code = $resp1['payment_code']; //[1];
+          $payment_code = $resp1['ppb_reference_code']; //[1];
           $this->Application->id = $id;
           if ($this->Application->saveField('ecitizen_invoice', $invoice_id)) {
             $raw_id = base64_encode($invoice_id);
@@ -309,7 +321,7 @@ class NotificationShell extends Shell
     $managers = $this->User->find('all', array('conditions' => array('id' => $this->args[0]['Application']['user_id'], 'is_active' => 1), 'contain' => array()));
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array( 
-        'outsource_user_receive_email_subject', 'outsource_user_receive_email'
+        'outsource_user_receive_email_subject', 'outsource_user_receive_email','outsource_user_receive_credentials_email'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
@@ -321,8 +333,10 @@ class NotificationShell extends Shell
         'protocol_link' => Router::url(array(
           'controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
           'outsource' => true
-        ), true),
+        ), true), 
         'protocol_no' => $this->args[0]['Application']['protocol_no'],
+        'password' => $this->args[0]['Application']['password'],
+        'username' => $this->args[0]['Application']['username'],
         'name' => $manager['User']['name']
       );
       $save_data[] = array(
@@ -336,7 +350,8 @@ class NotificationShell extends Shell
         ),
       );
       //<!-- Send email to admin -->
-      $message = String::insert($messages['outsource_user_receive_email'], $variables);
+      $bodymessages=$this->args[0]['Application']['new_user']? $messages['outsource_user_receive_credentials_email'] : $messages['outsource_user_receive_email'];
+      $message = String::insert($bodymessages, $variables);
       $email = new CakeEmail();
       $email->config('gmail');
       $email->template('default');
