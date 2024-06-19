@@ -84,12 +84,12 @@ Highcharts.chart('sae-by-type', {
         type: 'column'
     },
     title: {
-        text: 'SAE/SUSARS by study'
+        text: 'SAE/SUSAR Reported per study'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

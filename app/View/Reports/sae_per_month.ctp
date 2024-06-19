@@ -81,12 +81,12 @@ echo $this->Form->create('Application', array(
         type: 'column'
     },
     title: {
-        text: 'SAE/SUSARs per Month'
+        text: 'SAE/SUSAR Reported per Month'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

@@ -83,7 +83,7 @@ Highcharts.chart('protocols-by-phase', {
         type: 'pie'
     },
     title: {
-        text: 'Protocols by Placebo'
+        text: 'Studies using Placebo'
     },
     yAxis: {
         allowDecimals: false,

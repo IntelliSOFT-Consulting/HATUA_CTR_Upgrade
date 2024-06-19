@@ -83,12 +83,12 @@ Highcharts.chart('protocols-by-phase', {
         type: 'column'
     },
     title: {
-        text: 'Protocols by phase'
+        text: 'Studies by phase'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

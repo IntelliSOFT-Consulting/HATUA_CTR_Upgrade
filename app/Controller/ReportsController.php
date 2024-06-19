@@ -196,28 +196,38 @@ class ReportsController extends AppController
       $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
     $criteria['Application.submitted'] = 1;
- 
 
-  $data = $this->Application->find('all', array(
-    'fields' => array(
-      '((case 
+
+    $data = $this->Application->find('all', array(
+      'fields' => array(
+        '((case 
             when Application.design_controlled = "No" then "Uncontrolled" 
-            when Application.design_controlled = "Yes" then "Controlled"   
+            when Application.design_controlled_randomised = "Yes" then "Randomised"  
+            when Application.design_controlled_open = "Yes" then "Open"
+            when Application.design_controlled_single_blind = "Yes" then "Single Blind"
+            when Application.design_controlled_double_blind = "Yes" then "Double Blind"
+            when Application.design_controlled_parallel_group = "Yes" then "Parallel group" 
+            when Application.design_controlled_cross_over = "Yes" then "Cross over" 
             else "Unk" 
         end)) AS design_controlled',
-      'COUNT(*) as cnt'
-    ),
-    'contain' => array(),
-    'conditions' => $criteria,
-    'group' => array(
-      '((case 
+        'COUNT(*) as cnt'
+      ),
+      'contain' => array(),
+      'conditions' => $criteria,
+      'group' => array(
+        '((case 
             when Application.design_controlled = "No" then "Uncontrolled" 
-            when Application.design_controlled = "Yes" then "Controlled"   
+            when Application.design_controlled_randomised = "Yes" then "Randomised"   
+            when Application.design_controlled_open = "Yes" then "Open"
+             when Application.design_controlled_single_blind = "Yes" then "Single Blind"
+             when Application.design_controlled_double_blind = "Yes" then "Double Blind"
+             when Application.design_controlled_parallel_group = "Yes" then "Parallel group"   
+             when Application.design_controlled_cross_over = "Yes" then "Cross over"   
             else "Unk" 
         end))'
-    ),
-    'having' => array('COUNT(*) >' => 0),
-  ));
+      ),
+      'having' => array('COUNT(*) >' => 0),
+    ));
 
 
     $this->set(compact('data'));
@@ -235,7 +245,7 @@ class ReportsController extends AppController
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
       $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
-    $criteria['Application.approved'] = array(1,2);
+    $criteria['Application.approved'] = array(1, 2);
     $data = $this->Application->find('all', array(
       'fields' => array('((case when Application.scope_diagnosis then "Diagnosis" 
                                       when Application.scope_prophylaxis then "Prophylaxis"  
@@ -245,7 +255,7 @@ class ReportsController extends AppController
                                       when Application.scope_pharmacokinetic then "Pharmacokinetic"  
                                       when Application.scope_pharmacodynamic then "Pharmacodynamic"  
                                       else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
-      'contain' => array(),   
+      'contain' => array(),
       'conditions' => $criteria,
       'group' => array('((case when Application.scope_diagnosis then "Diagnosis" 
                                       when Application.scope_prophylaxis then "Prophylaxis"   
@@ -257,7 +267,7 @@ class ReportsController extends AppController
                                       else "Unk" end))'),
       'having' => array('COUNT(*) >' => 0),
     ));
- 
+
 
     $this->set(compact('data'));
     $this->set('_serialize', 'data');
@@ -306,9 +316,10 @@ class ReportsController extends AppController
   {
 
     $criteria = array();
-    $criteria['Application.approved'] = array(1, 2);
+    $criteria['Application.approved'] = array(1, 2); 
+    $criteria = array_merge($criteria, array('Application.trial_status_id IS NOT NULL'));
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['Application.date_submitted between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
     $data = $this->Application->find('all', array(
       'fields' => array('TrialStatus.name', 'COUNT(*) as cnt'),
       'contain' => array('TrialStatus'),
@@ -333,10 +344,10 @@ class ReportsController extends AppController
   public function protocols_by_phase()
   {
 
-    $criteria = array();
+    $criteria = array(); 
     $criteria['Application.approved'] = array(1, 2);
     if (!empty($this->request->data['Application']['start_date']) && !empty($this->request->data['Application']['end_date']))
-      $criteria['Application.created between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
+      $criteria['Application.date_submitted between ? and ?'] = array(date('Y-m-d', strtotime($this->request->data['Application']['start_date'])), date('Y-m-d', strtotime($this->request->data['Application']['end_date'])));
 
     $data = $this->Application->find('all', array(
       'fields' => array('((case when Application.trial_human_pharmacology then "Phase I" 

@@ -80,12 +80,12 @@ echo $this->Form->create('Application', array(
         type: 'column'
     },
     title: {
-        text: 'Site Inspections per Month'
+        text: 'GCP Study Inspections conducted per month'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

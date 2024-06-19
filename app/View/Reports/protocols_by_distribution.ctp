@@ -83,12 +83,12 @@ Highcharts.chart('protocols-by-phase', {
         type: 'column'
     },
     title: {
-        text: 'Protocols by Participants Gender Distribution'
+        text: 'Studies by Participants Gender Distribution'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

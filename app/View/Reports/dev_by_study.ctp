@@ -85,12 +85,12 @@ echo $this->Form->create('Application', array(
             type: 'column'
         },
         title: {
-            text: 'Deviations by study'
+            text: 'Deviations Reported per study'
         },
         yAxis: {
             allowDecimals: false,
             title: {
-                text: 'Units'
+                text: 'Values'
             }
         },
         tooltip: {

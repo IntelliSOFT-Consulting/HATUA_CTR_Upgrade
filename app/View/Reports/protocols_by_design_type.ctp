@@ -83,12 +83,12 @@ Highcharts.chart('protocols-by-phase', {
         type: 'pie'
     },
     title: {
-        text: 'Protocols by Design Type'
+        text: 'Studies by design type'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

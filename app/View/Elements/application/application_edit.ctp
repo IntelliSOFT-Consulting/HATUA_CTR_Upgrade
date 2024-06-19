@@ -1266,7 +1266,7 @@ $this->Html->script('jUpload/jquery.fileupload.js', array('inline' => false));
         ?>
         <div class="ctr-groups">
           <p class="topper"><em class="text-success">If Yes, Specify</em></p>
-          <?php
+          <?php 
           echo $this->Form->input('design_controlled_randomised', array(
             'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
             'class' => 'design_controlled_randomised design_controlled design_controlled_',

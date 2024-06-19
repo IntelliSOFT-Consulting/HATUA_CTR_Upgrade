@@ -82,12 +82,12 @@ Highcharts.chart('protocols-by-phase', {
         type: 'column'
     },
     title: {
-        text: 'Protocols by Clinical Trials'
+        text: 'Scope of Studies'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

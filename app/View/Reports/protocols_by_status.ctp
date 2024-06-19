@@ -83,12 +83,12 @@ Highcharts.chart('protocols-by-status', {
         type: 'column'
     },
     title: {
-        text: 'Protocols by status'
+        text: 'Status of Studies'
     },
     yAxis: {
         allowDecimals: false,
         title: {
-            text: 'Units'
+            text: 'Values'
         }
     },
     tooltip: {

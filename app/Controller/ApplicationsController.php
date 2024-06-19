@@ -1399,18 +1399,20 @@ class ApplicationsController extends AppController
             if (!isset($this->request->data['Application']['id']) || empty($this->request->data['Application']['id'])) {
                 $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
-            } elseif (
-                isset($this->request->data['Application']['trial_status_id']) ||
-                isset($this->request->data['Application']['final_report'])
-            ) {
+             } 
+           // elseif (
+            //     isset($this->request->data['Application']['trial_status_id']) ||
+            //     isset($this->request->data['Application']['final_report'])
+            // ) {
                 // first check if stopped/suspended by admin 
-                $app = $this->Application->find('first', array(
-                    'conditions' => array('Application.id' => $id),
-                ));
-                if ($app['Application']['admin_stopped']) {
-                    $this->request->data['Application']['trial_status_id'] = $app['Application']['trial_status_id'];
-                }
-            } elseif (empty($this->request->data)) {
+                // $app = $this->Application->find('first', array(
+                //     'conditions' => array('Application.id' => $id),
+                // ));
+                // if ($app['Application']['admin_stopped']) {
+                //     $this->request->data['Application']['trial_status_id'] = $app['Application']['trial_status_id'];
+                // }
+            //} 
+            elseif (empty($this->request->data)) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file you provided could not be saved. Kindly ensure that the file is less than
                     20 MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>'));
             } elseif (!$this->Application->saveAll($this->request->data, array(
@@ -1838,6 +1840,9 @@ class ApplicationsController extends AppController
             } else {
                 if ($this->Auth->password($this->request->data['Application']['password']) === $this->Auth->User('confirm_password')) {
                     $this->Application->create();
+                    // $this->request->data['Application']['approved_date']= date('Y-m-d');
+                    // debug($this->request->data);
+                    // exit;
                     if ($this->Application->save($this->request->data, true, array('id', 'approved', 'approved_reason', 'approval_date'))) {
                         $data = array(
                             'application_id' => $this->Application->id,
@@ -2410,7 +2415,7 @@ class ApplicationsController extends AppController
                     $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
                     $this->request->data['ApplicationStage'][0]['status'] = 'Current';
                 }
-                //
+                // 
 
                 if (empty($response['Application']['protocol_no'])) {
                     $count = $this->Application->find('count',  array('conditions' => array(
