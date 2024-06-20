@@ -142,8 +142,21 @@ class ReportsController extends AppController
       'having' => array('COUNT(*) >' => 0),
     ));
 
+
+    
+    $criteria = array_merge($criteria, array('Deviation.deviation_type_dev IS NOT NULL'));
+    $data1 = $this->Deviation->find('all', array(
+      'fields' => array('Deviation.deviation_type_dev ', 'Application.protocol_no', 'COUNT(*) as cnt'),
+      'contain' => array('Application'),
+      'conditions' => $criteria,
+      'group' => array('Deviation.deviation_type_dev', 'Deviation.id', 'Application.protocol_no'),
+      'having' => array('COUNT(*) >' => 0),
+    ));
+    // debug($data1);
+    // exit;
     $this->set(compact('data'));
-    $this->set('_serialize', 'data');
+    $this->set(compact('data1'));
+    $this->set('_serialize', 'data','data1');
     $this->render('dev_by_study');
   }
   public function inspector_dev_by_study()

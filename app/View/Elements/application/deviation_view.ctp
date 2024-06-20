@@ -14,7 +14,7 @@
       </tr>
       <tr>
         <th class="my-well">Type of Deviation.</th>
-        <td><?php echo $deviation['deviation_type'];?></td>
+        <td><?php echo $deviation['deviation_type'];?> : <?php echo $deviation['deviation_type_dev'];?></td>
       </tr>
       <tr>
         <th class="my-well">PI Name</th>

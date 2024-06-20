@@ -67,13 +67,50 @@ echo $this->Form->create('Application', array(
         foreach ($data as $key => $value) {
             echo "<tr>";
             echo "<th>" . $value['Application']['protocol_no'] . "</th>"; 
-            echo "<td>" . (($value['Deviation']['deviation_type'] == 'Deviation') ? $value[0]['cnt'] : 0) . "</td>";
+            echo "<td>" . (($value['Deviation']['deviation_type'] == 'Deviation') ? $value[0]['cnt'] : 0);
+ 
+            
+            echo "</td>";
             echo "<td>" . (($value['Deviation']['deviation_type'] == 'Violation') ? $value[0]['cnt'] : 0) . "</td>";
             echo "</tr>";
         }
         ?>
     </tbody>
 </table>
+
+<hr>
+
+<!-- Start of Categorization -->
+
+
+<div id="dev-by-study-status"></div>
+
+<hr>
+<h4>Raw Deviation Type Data</h4>
+<table class="table table-condensed table-bordered" id="datatable_dev_type">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Major</th>
+            <th>Minor</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        foreach ($data1 as $key => $value) {
+            echo "<tr>";
+            echo "<th>" . $value['Application']['protocol_no'] . "</th>"; 
+            echo "<td>" . (($value['Deviation']['deviation_type_dev'] == 'Major') ? $value[0]['cnt'] : 0);            
+            echo "</td>";
+            echo "<td>" . (($value['Deviation']['deviation_type_dev'] == 'Minor') ? $value[0]['cnt'] : 0) . "</td>";
+            echo "</tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
+
+<!-- End of Categorization -->
 
 
 <script type="text/javascript">
@@ -86,6 +123,32 @@ echo $this->Form->create('Application', array(
         },
         title: {
             text: 'Deviations Reported per study'
+        },
+        yAxis: {
+            allowDecimals: false,
+            title: {
+                text: 'Values'
+            }
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    this.point.y + ' ' + this.point.name.toLowerCase();
+            }
+        }
+    });
+
+    // Next Chat
+
+    Highcharts.chart('dev-by-study-status', {
+        data: {
+            table: 'datatable_dev_type'
+        },
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''//'Deviations Reported per study'
         },
         yAxis: {
             allowDecimals: false,
