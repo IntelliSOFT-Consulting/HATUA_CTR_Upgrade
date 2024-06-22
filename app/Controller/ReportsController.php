@@ -369,7 +369,7 @@ class ReportsController extends AppController
                                       when Application.trial_therapeutic_use then "Phase IV" 
                                       else "Unk" end)) AS TrialPhase', 'COUNT(*) as cnt'),
       'contain' => array(),
-      'conditions' => $criteria,
+      'conditions' => $criteria, 
       'group' => array('((case when Application.trial_human_pharmacology then "Phase I" 
                                       when Application.trial_therapeutic_exploratory then "Phase II" 
                                       when Application.trial_therapeutic_confirmatory then "Phase III" 

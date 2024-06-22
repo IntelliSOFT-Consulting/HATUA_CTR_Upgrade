@@ -67,7 +67,7 @@ if (($this->Session->read('Auth.User.group_id') == '5' || $this->Session->read('
             'class' => 'deviation_type_dev',
             'before' => '<div class="control-group">
                 <div class="controls">
-                <input type="hidden" value="" id="ApplicationDesignControlled_" name="data[Application][deviation_type]"> <label class="radio inline">',
+                <input type="hidden" value="" id="ApplicationDesignControlled_" name="data[Application][deviation_type_dev]"> <label class="radio inline">',
             'after' => '</label>',
             'options' => array('Major' => 'Major'),
           ));
@@ -76,7 +76,9 @@ if (($this->Session->read('Auth.User.group_id') == '5' || $this->Session->read('
              'class' => 'deviation_type_dev',
             'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
             'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
-            'before' => '<label class="radio inline">',
+            'before' => '<label class="radio inline">
+                 <input type="hidden" value="" id="ApplicationDesignControlled_" name="data[Application][deviation_type_Dev]"> <label class="radio inline">',
+           
             'after' => '</label>
                     <span class="help-inline" style="padding-top: 5px;"><a class="tooltipper" data-original-title="Clear selection"
                     onclick="$(\'.deviation_type_dev\').removeAttr(\'checked\')">
