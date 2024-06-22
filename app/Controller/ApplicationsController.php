@@ -541,12 +541,19 @@ class ApplicationsController extends AppController
 
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
+        $limit = isset($this->paginate['limit']) ? $this->paginate['limit'] : 1000;
+
 
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
             $applications = $this->Application->find(
                 'all',
-                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => array())
+                array(
+                    'conditions' => $this->paginate['conditions'], 
+                    'order' => $this->paginate['order'], 
+                    'limit' => $limit, 
+                    'contain' => array()
+                    )
             );
             $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
             $this->set(compact('applications'));
@@ -561,7 +568,11 @@ class ApplicationsController extends AppController
 
             $applications = $this->Application->find(
                 'all',
-                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+                array(
+                    'conditions' => $this->paginate['conditions'], 
+                    'order' => $this->paginate['order'],                     
+                    'limit' => $limit, 
+                    'contain' => $this->a_contain)
             );
             $this->set(compact('applications'));
             // $this->layout = false;
