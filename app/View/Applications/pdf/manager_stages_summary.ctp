@@ -21,6 +21,7 @@
                         <th style="width:3%">#</th>
                         <th style="width: 27%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
                         <th style="width: 60%">Application Stages </th>
+                        <th style="width: 10%">Date Submitted</th>
                         <th style="width: 10%">Date Approved</th>
                     </tr>
                 </thead>
@@ -83,6 +84,7 @@
                                     </tbody>
                                 </table>
                             </td>
+                            <td> <?php echo $application['Application']['date_submitted']; ?></td>
                             <td> <?php echo $application['Application']['approval_date']; ?></td>
                         </tr>
                     <?php } ?>

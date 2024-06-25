@@ -156,16 +156,17 @@ class ApplicationsController extends AppController
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id));
     }
 
-    public function applicant_assign_other_protocol($id=null) {
+    public function applicant_assign_other_protocol($id = null)
+    {
         $this->loadModel('OutsourceRequest');
         $this->loadModel('User');
-        if (!isset($this->request->data['Attachment']) || empty($this->request->data['Attachment'])) { 
+        if (!isset($this->request->data['Attachment']) || empty($this->request->data['Attachment'])) {
             $this->Session->setFlash(__('Please upload at least one file.'), 'alerts/flash_error');
             $this->redirect($this->referer());
-        }      
-        
+        }
+
         if ($this->request->is('post')) {
-        }      
+        }
         $this->OutsourceRequest->Create();
         // if ($this->Outsoerererrrurce->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
         if ($this->OutsourceRequest->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
@@ -174,8 +175,7 @@ class ApplicationsController extends AppController
 
         $this->Session->setFlash(__('Request submitted for further processing'), 'alerts/flash_success');
         $this->redirect($this->referer());
-       
-	}
+    }
     public function applicant_assign_protocol($id)
     {
         $this->loadModel('Outsource');
@@ -188,10 +188,10 @@ class ApplicationsController extends AppController
                 $this->request->data['Outsource']['username'] = $parts[0];
             }
 
-            if (!isset($this->request->data['Attachment']) || empty($this->request->data['Attachment'])) { 
+            if (!isset($this->request->data['Attachment']) || empty($this->request->data['Attachment'])) {
                 $this->Session->setFlash(__('Please upload at least one file.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
-            }      
+            }
             $this->Outsource->Create();
             // if ($this->Outsoerererrrurce->save($this->request->data['Outsource'], array('validate' => true, 'deep' => true))) {
             if ($this->Outsource->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
@@ -549,11 +549,11 @@ class ApplicationsController extends AppController
             $applications = $this->Application->find(
                 'all',
                 array(
-                    'conditions' => $this->paginate['conditions'], 
-                    'order' => $this->paginate['order'], 
-                    'limit' => $limit, 
+                    'conditions' => $this->paginate['conditions'],
+                    'order' => $this->paginate['order'],
+                    'limit' => $limit,
                     'contain' => array()
-                    )
+                )
             );
             $this->response->download('applications_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
             $this->set(compact('applications'));
@@ -569,10 +569,11 @@ class ApplicationsController extends AppController
             $applications = $this->Application->find(
                 'all',
                 array(
-                    'conditions' => $this->paginate['conditions'], 
-                    'order' => $this->paginate['order'],                     
-                    'limit' => $limit, 
-                    'contain' => $this->a_contain)
+                    'conditions' => $this->paginate['conditions'],
+                    'order' => $this->paginate['order'],
+                    'limit' => $limit,
+                    'contain' => $this->a_contain
+                )
             );
             $this->set(compact('applications'));
             // $this->layout = false;
@@ -1132,7 +1133,7 @@ class ApplicationsController extends AppController
     public function manager_index()
     {
         $this->Prg->commonProcess();
-       
+
         $page_options = array('5' => '5', '10' => '10', '50' => '50', '100' => '100', '500' => '500', '1000' => '1000');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
@@ -1411,18 +1412,18 @@ class ApplicationsController extends AppController
             if (!isset($this->request->data['Application']['id']) || empty($this->request->data['Application']['id'])) {
                 $this->Session->setFlash(__('No Protocol with given ID.'), 'alerts/flash_error');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
-             } 
-           // elseif (
+            }
+            // elseif (
             //     isset($this->request->data['Application']['trial_status_id']) ||
             //     isset($this->request->data['Application']['final_report'])
             // ) {
-                // first check if stopped/suspended by admin 
-                // $app = $this->Application->find('first', array(
-                //     'conditions' => array('Application.id' => $id),
-                // ));
-                // if ($app['Application']['admin_stopped']) {
-                //     $this->request->data['Application']['trial_status_id'] = $app['Application']['trial_status_id'];
-                // }
+            // first check if stopped/suspended by admin 
+            // $app = $this->Application->find('first', array(
+            //     'conditions' => array('Application.id' => $id),
+            // ));
+            // if ($app['Application']['admin_stopped']) {
+            //     $this->request->data['Application']['trial_status_id'] = $app['Application']['trial_status_id'];
+            // }
             //} 
             elseif (empty($this->request->data)) {
                 $this->set('response', array('message' => 'Failure', 'errors' => 'The file you provided could not be saved. Kindly ensure that the file is less than
@@ -2389,13 +2390,11 @@ class ApplicationsController extends AppController
 
         $response = $this->_isApplicant($id);
 
-        // debug($this->request->data);
-        // return;
         if ($response['Application']['deactivated']) {
             $this->redirect(array('action' => 'view', $id));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
-            // debug($this->request->data);
+
             if (isset($this->request->data['cancelReport'])) {
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
@@ -2403,8 +2402,12 @@ class ApplicationsController extends AppController
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
                 $validate = 'first';
+
+                // Check if previously unsubmitted
+                if (!$response['Application']['unsubmitted']) {
+                    $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
+                }
                 $this->request->data['Application']['submitted'] = 1;
-                $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
                 //Start application stage 
                 if ($response['Application']['unsubmitted']) {
                     $stages = $this->Application->ApplicationStage->find('all', array(
@@ -2444,10 +2447,6 @@ class ApplicationsController extends AppController
                     $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
                     $this->redirect($this->referer());
                 }
-
-                // debug($response['Application']['total_sites']);
-                // debug(count($this->request->data['SiteDetail']));
-                // exit;
             }
 
             $filedata = $this->request->data;

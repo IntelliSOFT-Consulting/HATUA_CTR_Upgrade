@@ -1,6 +1,6 @@
 <?php
 
-$header = array('id' => '#', 'protocol_no' => 'Protocol No.', 'stages' => 'Stages','approval_date'=>'Date Approved');
+$header = array('id' => '#', 'protocol_no' => 'Protocol No.', 'stages' => 'Stages','date_submitted'=>'Date Submitted','approval_date'=>'Date Approved');
 echo implode(',', $header) . "\n";
 foreach ($applications as $application) :
     $content = '';
