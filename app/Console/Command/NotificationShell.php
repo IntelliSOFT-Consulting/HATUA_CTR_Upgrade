@@ -126,7 +126,7 @@ class NotificationShell extends Shell
       $multiArray = $application['InvestigatorContact'];
       $firstEntry = reset($multiArray);
       $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
-      $billDesc = $name . "\n" . $application['Application']['short_title'];
+      $billDesc = "Principal Investigator: ".$name . "<br>Study Title: " . $application['Application']['short_title'];
       // $this->log('initiated report',$user, 'e-citizen-initiate-user');
       // //Request Access Token
       // $initiate = $HttpSocket->get('https://invoices.pharmacyboardkenya.org/token', false, $header_options);
