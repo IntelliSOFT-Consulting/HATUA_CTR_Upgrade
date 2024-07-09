@@ -139,7 +139,7 @@ class AmendmentApprovalsController extends AppController
 						}
 						$variables = array(
 							'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
-							'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
+							'letter_date' => date('jS F Y'),
 							'qualification' => $qualification,
 							'names' => $names,
 							'professional_address' => $professional_address,
