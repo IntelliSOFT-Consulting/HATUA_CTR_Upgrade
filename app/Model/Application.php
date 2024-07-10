@@ -274,6 +274,13 @@ class Application extends AppModel
             'dependent' => false,
         ),
 
+        'AmendmentApprovalSummary' => array(
+            'className' => 'AmendmentApproval',
+            'foreignKey' => 'application_id',
+            'dependent' => false,            
+            'conditions' => array('AmendmentApprovalSummary.status' => 'summary'),
+        ),
+
         'Organization' => array(
             'className' => 'Organization',
             'foreignKey' => 'application_id',

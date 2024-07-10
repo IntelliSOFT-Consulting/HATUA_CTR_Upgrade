@@ -153,7 +153,7 @@ if ($redir === 'applicant') {
                                                     ));
                                                     ?>
 
-                                                    <div class="row-fluid">
+                                                    <!-- <div class="row-fluid">
                                                         <div class="span11">
                                                             <div class="uploadsTable">
                                                                 <h6 class="muted"><b>Attach File(s) </b>
@@ -162,7 +162,7 @@ if ($redir === 'applicant') {
                                                                 <hr>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="controls">
                                                         <?php
                                                         echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
@@ -182,11 +182,64 @@ if ($redir === 'applicant') {
                                         <div class="tab-pane" id="amendment_summary">
                                             <div class="row-fluid">
                                                 <div class="span12">
+
+
+                                                    <!-- Start of the Form -->
                                                     <?php
-                                                    foreach ($application['AmendmentApproval'] as $key => $comment) { ?>
+                                                    echo $this->Form->create('AmendmentApproval', array(
+                                                        'url' => array('action' => 'approve_amendment', $application['Application']['id']),
+                                                        'type' => 'file',
+                                                        'class' => 'form-horizontal',
+                                                        'inputDefaults' => array(
+                                                            'div' => array('class' => 'control-group'),
+                                                            'label' => array('class' => 'control-label'),
+                                                            'between' => '<div class="controls">',
+                                                            'after' => '</div>',
+                                                            'class' => '',
+                                                            'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                                                            'error' => array('attributes' => array('class' => 'controls help-block')),
+                                                        ),
+                                                    ));
+                                                    echo $this->Form->input('application_id', array('value' => $application['Application']['id'], 'type' => 'hidden'));
+                                                    echo $this->Form->input('approval_date', array('value' => date('d-m-Y'), 'type' => 'hidden'));
+                                                    echo $this->Form->input('amendment', array('value' =>  $year, 'type' => 'hidden'));
+                                                    echo $this->Form->input('status', array('value' =>  'summary', 'type' => 'hidden'));
+                                                    echo $this->Form->input('password', array('value' =>    $this->Session->read('Auth.User.confirm_password'), 'type' => 'hidden'));
+                                                    ?>
+
+                                                  <div class="row-fluid">
+                                                        <div class="span11">
+                                                            <div class="uploadsTable">
+                                                                <h6 class="muted"><b>Attach File(s) </b>
+                                                                    <button type="button" class="btn btn-primary btn-small addUploadAmendmentApproval">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
+                                                                </h6>
+                                                                <hr>
+                                                            </div>
+                                                        </div>
+                                                    </div> 
+                                                    <div class="controls">
+                                                        <?php
+                                                        echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+                                                            'name' => 'submit',
+                                                            'class' => 'btn btn-primary',
+                                                            'id' => 'ApproveProtocol',
+                                                        ));
+                                                        ?>
+                                                    </div>
+                                                    <?php
+                                                    echo $this->Form->end();
+
+                                                    ?>
+                                                    <!-- End of the Form -->
+
+                                                    <hr>
+
+                                                    <?php
+                                                    foreach ($application['AmendmentApprovalSummary'] as $key => $comment) { ?>
                                                         <table class="table table-condensed">
                                                             <tbody>
-                                                                <tr>
+                                                           
+                                                                <!-- <tr>
                                                                     <th>
                                                                         <p><strong>Message</strong></p>
                                                                     </th>
@@ -194,6 +247,8 @@ if ($redir === 'applicant') {
                                                                         <div>
                                                                             <p class="form-control-static">
                                                                                 <?php
+                                                                                debug($comment);
+                                                                                // exit;
                                                                                 echo $comment['content']
                                                                                 ?>
                                                                             </p>
@@ -213,14 +268,14 @@ if ($redir === 'applicant') {
                                                                             </p>
                                                                         </div>
                                                                     </td>
-                                                                </tr>
+                                                                </tr> -->
                                                                 <tr>
                                                                     <th>
-                                                                        <p> <strong> File(s) </strong> </p>
+                                                                        <p> <strong>Attached File(s) </strong> </p>
                                                                     </th>
                                                                     <td>
                                                                         <?php
-                                                                       
+
                                                                         if (isset($comment['Attachment'])) {
                                                                             foreach ($comment['Attachment'] as $key => $value) {
                                                                                 echo '<p>';
@@ -249,7 +304,7 @@ if ($redir === 'applicant') {
                                     </div>
                                 </div>
                             </div>
-                          
+
                     <?php  }
                     }
 

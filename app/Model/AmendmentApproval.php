@@ -30,7 +30,7 @@ class AmendmentApproval extends AppModel {
             'className' => 'Attachment',
             'foreignKey' => 'foreign_key',
             'dependent' => true,
-            'conditions' => array('Attachment.model' => 'Comments'),
+            'conditions' => array('Attachment.model' => 'AmendmentApproval'),
         )
     );
 

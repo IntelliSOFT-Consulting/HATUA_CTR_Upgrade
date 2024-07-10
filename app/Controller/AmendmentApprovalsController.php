@@ -26,7 +26,7 @@ class AmendmentApprovalsController extends AppController
 	public function beforeFilter()
 	{
 		parent::beforeFilter();
-		$this->Auth->allow('manager_approve','genereateQRCode','file_download');
+		$this->Auth->allow('genereateQRCode','file_download');
 	}
 	public function genereateQRCode($id = null)
     {
@@ -70,6 +70,41 @@ class AmendmentApprovalsController extends AppController
             $body = $initiate->body;
         }
     }
+
+	public function manager_approve_amendment($application_id){
+		if ($this->request->data['AmendmentApproval']['status'] == null) {
+			$this->Session->setFlash(__('Please select if approved or not.'), 'alerts/flash_error');
+			$this->redirect($this->referer());
+		} else {
+			// $id=$this->request->data['AmendmentApproval']['amendment'];
+			$this->AmendmentApproval->create();
+			if ($this->AmendmentApproval->saveAssociated($this->request->data, array('deep' => true))) {
+
+				$application = $this->Application->find('first', array('conditions' => array('Application.id' => $application_id)));
+				$this->loadModel('AuditTrail');
+				$audit = array(
+					'AuditTrail' => array(
+						'foreign_key' => $application['Application']['id'] ,
+						'model' => 'Application',
+						'message' => 'Amendment Summary Report for the report with protocol number ' .  $application['Application']['protocol_no'] . ' has been successfully submiited by ' . $this->Auth->user('username'),
+						'ip' =>  $application['Application']['protocol_no']
+					)
+				);
+				$this->AuditTrail->Create();
+				if ($this->AuditTrail->save($audit)) {
+					$this->log($this->args[0], 'audit_success');
+				} else {
+					$this->log('Error creating an audit trail', 'notifications_error');
+					$this->log($this->args[0], 'notifications_error');
+				} 
+				$this->Session->setFlash(__('Successfully approved the protocol. '), 'alerts/flash_success');
+				$this->redirect($this->referer());
+			}else{
+				$this->Session->setFlash(__('The Approval Summary Report could not be saved. Please, try again.'), 'alerts/flash_error');
+					$this->redirect($this->referer());
+			}
+		}
+	}
 
 	public function manager_approve($application_id)
 	{
@@ -226,8 +261,8 @@ class AmendmentApprovalsController extends AppController
 					}
 				} else {
 					$errors = $this->AmendmentApproval->validationErrors;
-					debug($errors);
-					exit;
+					// debug($errors);
+					// exit;
 
 					$this->Session->setFlash(__('The Approval could not be saved. Please, try again.'), 'alerts/flash_error');
 					$this->redirect($this->referer());
