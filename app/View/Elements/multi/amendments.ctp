@@ -7,7 +7,7 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
 $this->Html->script('summary/sum', array('inline' => false));
 if ($redir === 'applicant') {
     // $this->Html->script('multi/amendment_checklist', array('inline' => false));
-    $this->Html->script('multi/extras', array('inline' => false));
+    $this->Html->script('multi/extrask', array('inline' => false));
 }
 ?>
 
@@ -207,7 +207,7 @@ if ($redir === 'applicant') {
                                                     echo $this->Form->input('password', array('value' =>    $this->Session->read('Auth.User.confirm_password'), 'type' => 'hidden'));
                                                     ?>
 
-                                                  <div class="row-fluid">
+                                                    <div class="row-fluid">
                                                         <div class="span11">
                                                             <div class="uploadsTable">
                                                                 <h6 class="muted"><b>Attach File(s) </b>
@@ -216,7 +216,7 @@ if ($redir === 'applicant') {
                                                                 <hr>
                                                             </div>
                                                         </div>
-                                                    </div> 
+                                                    </div>
                                                     <div class="controls">
                                                         <?php
                                                         echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
@@ -238,7 +238,7 @@ if ($redir === 'applicant') {
                                                     foreach ($application['AmendmentApprovalSummary'] as $key => $comment) { ?>
                                                         <table class="table table-condensed">
                                                             <tbody>
-                                                           
+
                                                                 <!-- <tr>
                                                                     <th>
                                                                         <p><strong>Message</strong></p>
@@ -610,14 +610,26 @@ if ($redir == 'applicant') {
         echo $this->Html->link(
             __('<i class="icon-thumbs-up"></i> Submit All'),
             array('action' => 'submitall', $application['Application']['id']),
-            array('escape' => false, 'class' => 'btn btn-info')
+            array(
+                'escape' => false,
+                'class' => 'btn btn-info',
+                'id' => 'submit-all-button',
+                'onclick' => 'return confirm("Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file");'
+            )
         );
-
         ?>
     </div>
 
 <?php }  ?>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('submit-all-button').addEventListener('click', function(event) {
+            if (!confirm('Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file?')) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
 
 <script text="type/javascript">
     $.expander.defaults.slicePoint = 170;

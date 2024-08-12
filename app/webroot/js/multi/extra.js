@@ -80,12 +80,14 @@ $(function () {
     });
     function constructATr(intId) {
       var intId2 = intId + 1;
+      var otherPValue = $(document).find('p.selected-year-name').text();
       var trWrapper = '\
           <tr class="fieldwrapper" id="field{i}">\
           <td>{i2}</td>\
           <td><div class="control-group">\
               <input type="hidden" id="AmendmentChecklist{i}Model" name="data[AmendmentChecklist][{i}][model]" value="AmendmentChecklist">\
               <input type="hidden" id="AmendmentChecklist{i}Group" name="data[AmendmentChecklist][{i}][group]" value="amendment">\
+              <input type="text" id="AmendmentChecklist{i}Year" name="data[AmendmentChecklist][{i}][year]" value="{year}">\
               <input type="hidden" id="AmendmentChecklist{i}Dirname" name="data[AmendmentChecklist][{i}][dirname]">\
               <input type="hidden" id="AmendmentChecklist{i}Basename" name="data[AmendmentChecklist][{i}][basename]">\
               <input type="hidden" id="AmendmentChecklist{i}Checksum" name="data[AmendmentChecklist][{i}][checksum]">\
@@ -102,7 +104,7 @@ $(function () {
                         &nbsp;<i class="icon-save"></i>&nbsp;</button></td>';
   
       $('.tiptip').tooltip();
-      return trWrapper.replace(/{i}/g, intId).replace(/{i2}/g, intId2);
+      return trWrapper.replace(/{i}/g, intId).replace(/{i2}/g, intId2).replace(/{year}/g, otherPValue);
     }
   
     function update_description() {
@@ -112,7 +114,7 @@ $(function () {
         return;
       }
       if (tr.find('#buildamendmentform .otherdescription').val().trim() === '') {
-        alert('Please provide description');
+        alert('Please provide description'); 
         return;
       }
       if (tr.find('#buildamendmentform .version_no').val().trim() === '') {

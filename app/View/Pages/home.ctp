@@ -27,7 +27,7 @@
                     <div class="info animate-in">
                       <h2>EDCTP</h2>
                       <br>
-                      <h3>CTR Upgrade project (HATUA)</h3>
+                      <h3>CTR Upgrade project (HATUA) .....</h3>
                       <p>
                         HATUA KENYA project with the support from EDCTP were funded to update the Clinical Trial Record Information System and Pharmacovigilance Electronic Records System
                       </p>

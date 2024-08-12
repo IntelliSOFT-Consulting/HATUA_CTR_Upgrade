@@ -2402,7 +2402,8 @@ class ApplicationsController extends AppController
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
                 $validate = 'first';
-
+                $filedata = $this->request->data;
+                unset($filedata['Checklist']);
                 // Check if previously unsubmitted
                 if (!$response['Application']['unsubmitted']) {
                     $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
@@ -2450,6 +2451,10 @@ class ApplicationsController extends AppController
             }
 
             $filedata = $this->request->data;
+            if (isset($this->request->data['saveChanges'])) {
+                unset($filedata['Checklist']);
+                
+            }
             unset($filedata['Application']);
             if (empty($this->request->data)) {
                 $message = 'The file you provided could not be saved. Kindly ensure that the file is less than
