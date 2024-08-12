@@ -50,9 +50,9 @@ class ApplicationsController extends AppController
                     $parentId = $this->Application->id;
 
                     // Attach the parent ID to the associated data
-                    foreach ($associatedData as $model => &$modelData) {
+                    foreach ($associatedData as $model => $modelData) {
                         if (!empty($modelData)) {
-                            foreach ($modelData as &$data) {
+                            foreach ($modelData as $data) {
                                 $data['application_id'] = $parentId; // Assuming the foreign key is 'application_id'
                             }
                         }
@@ -91,7 +91,7 @@ class ApplicationsController extends AppController
 
                             // Generate Invoice in the Background
 
-                            $data = array(
+                            $invoice = array(
                                 'function' => 'ppbNewApplication',
                                 'Application' => array(
                                     'id' => $this->Application->id,
@@ -100,7 +100,7 @@ class ApplicationsController extends AppController
                                     'protocol_no' =>  $this->Application->protocol_no
                                 )
                             );
-                            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $data));
+                            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
 
 
                             $this->Session->setFlash(__('The application has been created, An Invoice has been sent to your email with the invoice details'), 'alerts/flash_success');
@@ -2443,10 +2443,10 @@ class ApplicationsController extends AppController
 
                 // Check number of Sites
 
-                if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
-                    $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
-                    $this->redirect($this->referer());
-                }
+                // if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
+                //     $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
+                //     $this->redirect($this->referer());
+                // }
             }
 
             $filedata = $this->request->data;

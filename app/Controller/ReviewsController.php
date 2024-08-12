@@ -87,7 +87,8 @@ class ReviewsController extends AppController
                     //   'Reviews' => $this->request->data
                     // );
                     // $client->doBackground('sendnotification', serialize($data));
-                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data));
+                    $doer = $this->Auth->user('name');
+                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data,$doer));
 
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
@@ -374,8 +375,8 @@ class ReviewsController extends AppController
                         );
                     }
                     //end stages
-
-                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data));
+                    $doer = $this->Auth->user('name');
+                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data,$doer));
 
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));

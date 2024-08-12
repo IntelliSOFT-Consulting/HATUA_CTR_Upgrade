@@ -7,7 +7,7 @@ $this->Html->script('multi/amendment_attachment', array('inline' => false));
 $this->Html->script('summary/sum', array('inline' => false));
 if ($redir === 'applicant') {
     // $this->Html->script('multi/amendment_checklist', array('inline' => false));
-    $this->Html->script('multi/extras', array('inline' => false));
+    $this->Html->script('multi/extrask', array('inline' => false));
 }
 ?>
 
