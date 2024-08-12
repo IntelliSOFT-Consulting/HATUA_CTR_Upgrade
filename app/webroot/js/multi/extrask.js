@@ -1,6 +1,25 @@
 $(function () {
     $(document).on('click', '.remove-row-amendment', remove_row);
     $(document).on('click', '.update-row-amendment', update_description);
+
+    yeardataset();
+    $('.amendmentyear').change(function () {
+      // Get the selected value
+      var selectedYear = $(this).val(); 
+      console.log("Selected year " +selectedYear); 
+      $('.selected-year-name').text(selectedYear);
+      yeardataset();
+    });
+  
+    function yeardataset() {
+      $('.selected-year-name').text($('.amendmentyear').val().trim());
+      if ($('.checklistyearyear').val() != $('.amendmentyear').val()) {
+        $('.amendmentyear').closest('table').find('input[name*="year"]').each(function () {
+          $(this).val($('.amendmentyear').val().trim());
+          
+        });
+      }
+    }
   
   
     if ($("#buildamendmentform tr").length == 1) { $("#amendmentsTableHeader").hide(); }
@@ -80,12 +99,14 @@ $(function () {
     });
     function constructATr(intId) {
       var intId2 = intId + 1;
+      var otherPValue = $(document).find('p.selected-year-name').text();
       var trWrapper = '\
           <tr class="fieldwrapper" id="field{i}">\
           <td>{i2}</td>\
           <td><div class="control-group">\
               <input type="hidden" id="AmendmentChecklist{i}Model" name="data[AmendmentChecklist][{i}][model]" value="AmendmentChecklist">\
               <input type="hidden" id="AmendmentChecklist{i}Group" name="data[AmendmentChecklist][{i}][group]" value="amendment">\
+              <input type="hidden" id="AmendmentChecklist{i}Year" name="data[AmendmentChecklist][{i}][year]" value="{year}">\
               <input type="hidden" id="AmendmentChecklist{i}Dirname" name="data[AmendmentChecklist][{i}][dirname]">\
               <input type="hidden" id="AmendmentChecklist{i}Basename" name="data[AmendmentChecklist][{i}][basename]">\
               <input type="hidden" id="AmendmentChecklist{i}Checksum" name="data[AmendmentChecklist][{i}][checksum]">\
@@ -98,28 +119,28 @@ $(function () {
                  name="data[AmendmentChecklist][{i}][description]" class="span11 otherdescription"></textarea></div></td>\
                  <td width="10%"><input type="text" class="version_no" id="AmendmentChecklist{i}Version" name="data[AmendmentChecklist][{i}][version_no]"></td>\
                  <td><input type="date" class="amendment_date" id="AmendmentChecklist{i}File" name="data[AmendmentChecklist][{i}][file_date]"></td>\
-          <td><button  type="button" class="btn-primary update-row-amendment tiptip" data-original-title="Remove file">\
+          <td><button  type="button" class="btn-primary update-row-amendment tiptip" data-original-title="Save File">\
                         &nbsp;<i class="icon-save"></i>&nbsp;</button></td>';
   
       $('.tiptip').tooltip();
-      return trWrapper.replace(/{i}/g, intId).replace(/{i2}/g, intId2);
+      return trWrapper.replace(/{i}/g, intId).replace(/{i2}/g, intId2).replace(/{year}/g, otherPValue);
     }
   
     function update_description() {
       var tr = $(this).closest('.fieldwrapper');
-      if (tr.find('#buildamendmentform .morefiles').length && tr.find('.morefiles').val() === '') {
+      if (tr.find('.morefiles').length && tr.find('.morefiles').val() === '') {
         alert('Please upload the current file before adding another one');
         return;
       }
-      if (tr.find('#buildamendmentform .otherdescription').val().trim() === '') {
+      if (tr.find('.otherdescription').val().trim() === '') {
         alert('Please provide description');
         return;
       }
-      if (tr.find('#buildamendmentform .version_no').val().trim() === '') {
+      if (tr.find('.version_no').val().trim() === '') {
         alert('Please select version');
         return;
       }
-      if (tr.find('#buildamendmentform .amendment_date').val().trim() === '') {
+      if (tr.find('.amendment_date').val().trim() === '') {
         alert('Please enter date');
         return;
       }
@@ -135,9 +156,9 @@ $(function () {
   
       //upload this throug ahax api call
   
-      var description = tr.find('#buildamendmentform .otherdescription').val().trim();
-      var version = tr.find('#buildamendmentform .version_no').val().trim();
-      var date = tr.find('#buildamendmentform .amendment_date').val().trim();
+      var description = tr.find('.otherdescription').val().trim();
+      var version = tr.find('.version_no').val().trim();
+      var date = tr.find('.amendment_date').val().trim();
   
       // Block the UI
       $.blockUI({
