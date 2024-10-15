@@ -37,6 +37,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
                                                                   elseif ($application['Application']['approved'] == 1) echo 'Rejected';
                                                                   ?>)</small></a></li>
     <li><a href="#status" data-toggle="tab">Application Status <small></small></a></li>
+    <li><a href="#invoice" data-toggle="tab">Additional Invoice <small></small></a></li>
   </ul>
   <div class="tab-content my-tab-content">
     <div class="tab-pane active" id="tab1">
@@ -331,6 +332,79 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
         </div>
       </div>
     </div>
+
+    <!-- Invoice Details -->
+
+    <div class="tab-pane" id="invoice">
+      <div class="marketing">
+        <div class="row-fluid">
+          <div class="span12">
+             <h4 class="text-info">
+            Invoice Generation : (
+            <span class="xeditable iseditable" id="data[Application][protocol_no]" data-type="text" data-pk="<?php echo $application['Application']['id']; ?>" data-original-title="Update protocol no">
+              <?php echo $application['Application']['protocol_no']; ?></span>
+            ) &mdash;
+            <small>Additional sites</small>
+          </h4>
+          </div>
+        </div>
+        <hr class="soften" style="margin: 10px 0px;">
+      </div>
+
+      <div class="row-fluid">
+        <div class="span4">
+          <?php
+
+
+          echo $this->Form->create('Application', array(
+            'url' => array('controller' => 'applications', 'action' => 'extra',$application['Application']['id']),
+            'type' => 'file',
+            'class' => 'form-horizontal',
+            'inputDefaults' => array(
+              'div' => array('class' => 'control-group'),
+              'label' => array('class' => 'control-label'),
+              'between' => '<div class="controls">',
+              'after' => '</div>',
+              'class' => '',
+              'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+              'error' => array('attributes' => array('class' => 'controls help-block')),
+            ),
+          ));
+          echo $this->Form->input('id');
+         
+          echo $this->Form->input('total_sites', array(
+            'type' => 'number', 
+            'min'=>1,
+            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Extra Site  <span class="sterix">*</span></h5>'),
+            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
+            'escape' => false,
+          ));
+          echo $this->Form->input('admin_stopped_reason', array(
+            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Reason <span class="sterix">*</span></h5>'),
+            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
+            'escape' => false,
+          ));
+
+          echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+            'name' => 'submitReport',
+            'formnovalidate' => 'formnovalidate',
+            'onclick' => "return confirm('Are you sure you wish to generate an extra invoice to this protocol?');",
+            'class' => 'btn btn-info btn-block mapop',
+            'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
+            'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+            'div' => false,
+          ));
+
+          ?>
+          <hr>
+          <?php
+          echo $this->Form->end();
+          ?>
+        </div>
+      </div>
+    </div>
+
+    <!-- End of Invoice -->
 
     <div class="tab-pane" id="tab5">
       <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>

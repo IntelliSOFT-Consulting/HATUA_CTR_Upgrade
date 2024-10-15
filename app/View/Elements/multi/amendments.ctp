@@ -607,16 +607,16 @@ if ($redir == 'applicant') {
 
         <?php
 
-        echo $this->Html->link(
-            __('<i class="icon-thumbs-up"></i> Submit All'),
-            array('action' => 'submitall', $application['Application']['id']),
-            array(
-                'escape' => false,
-                'class' => 'btn btn-info',
-                'id' => 'submit-all-button',
-                'onclick' => 'return confirm("Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file");'
-            )
-        );
+        // echo $this->Html->link(
+        //     __('<i class="icon-thumbs-up"></i> Submit All'),
+        //     array('action' => 'submitall', $application['Application']['id']),
+        //     array(
+        //         'escape' => false,
+        //         'class' => 'btn btn-info',
+        //         'id' => 'submit-all-button',
+        //         'onclick' => 'return confirm("Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file");'
+        //     )
+        // );
         ?>
     </div>
 

@@ -26,7 +26,7 @@ class AmendmentApprovalsController extends AppController
 	public function beforeFilter()
 	{
 		parent::beforeFilter();
-		$this->Auth->allow('genereateQRCode','file_download');
+		$this->Auth->allow('genereateQRCode','ensure_valid_date','file_download');
 	}
 	public function genereateQRCode($id = null)
     {
@@ -106,6 +106,17 @@ class AmendmentApprovalsController extends AppController
 		}
 	}
 
+	public function ensure_valid_date($date){ 
+	  // Check if the date is not null, empty, or invalid
+	  if (!empty($date) && strtotime($date) !== false) {
+        // Convert the valid date to your desired format
+        return date('jS F Y', strtotime($date));
+    } else {
+        // Handle invalid or empty dates (you can return a default value or an error message)
+        return '';
+    }
+
+	}
 	public function manager_approve($application_id)
 	{
 		if ($this->request->data['AmendmentApproval']['status'] == null) {
@@ -136,8 +147,8 @@ class AmendmentApprovalsController extends AppController
 				
 								$file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false, 'full_base' => true));
 								(isset($checklist[$formdata['pocket_name']])) ?
-									$checklist[$pocket_name] .= $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>' :
-									$checklist[$pocket_name] = $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>';
+									$checklist[$pocket_name] .= $file_link . ' dated ' . $this->ensure_valid_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>' :
+									$checklist[$pocket_name] = $file_link . ' dated ' . $this->ensure_valid_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>';
 							}
 						}
 						$deeds = $this->Pocket->find('list', array(

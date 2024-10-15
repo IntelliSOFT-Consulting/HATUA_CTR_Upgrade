@@ -233,7 +233,8 @@ class ReviewsController extends AppController
 
                     $data = array(
                         'application_id' => $this->request->data['Review']['application_id'],
-                        'manager' => $this->Auth->User('id')
+                        'manager' => $this->Auth->User('id'),
+                        'approver' => $this->Auth->User('username')
                     );
                     CakeResque::enqueue('default', 'NotificationShell', array('managerCommentNotifyApplicant', $data));
                     $this->Session->setFlash(

@@ -24,10 +24,223 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+    }
+    public function admin_extra($id = null)
+    {
+
+        $data = $this->request->data['Application'];
+        $total_sites = $data['total_sites'];
+         
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+            // debug($application);
+            $invoice = array(
+                'function' => 'ppbNewApplication',
+                'Application' => array(
+                    'id' => $application['Application']['id'],
+                    'name' => $application['User']['name'],
+                    'email' => $application['User']['email'],
+                    'total_sites' => $total_sites,
+                    'protocol_no' =>  $application['Application']['protocol_no']
+                )
+            );
+            
+            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_missed_invoice', $invoice));
+            
+        } 
+        $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
+        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
     }
 
+    public function generateMissedInvoice($id)
+    {
 
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+            // debug($application);
+            $invoice = array(
+                'function' => 'ppbNewApplication',
+                'Application' => array(
+                    'id' => $application['Application']['id'],
+                    'name' => $application['User']['name'],
+                    'email' => $application['User']['email'],
+                    'protocol_no' =>  $application['Application']['protocol_no']
+                )
+            );
+           
+            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
+            
+        }
+        $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
+        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+    }
+
+    public function report_invoice($id = null)
+    {
+        // $id = 1434;//  
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+            $options = array('ssl_verify_peer' => false);
+            $HttpSocket = new HttpSocket($options);
+
+            $user = $application['User'];
+            //PRINCIPAL INVESTIGATOR
+            $multiArray = $application['InvestigatorContact'];
+            $firstEntry = reset($multiArray);
+            $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
+            $billDesc = "Principal Investigator: " . $name . "<br>Study Title: " . $application['Application']['short_title'];
+            $this->log('initiated report', $user, 'e-citizen-initiate-user');
+
+
+
+            $header_options = array(
+                'header' => array(
+                    'Content-Type' => 'application/x-www-form-urlencoded'
+                )
+            );
+            $postDataToken = array(
+                'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
+                'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
+            );
+
+            $formDataToken = http_build_query($postDataToken);
+            // //Request Access Token
+            $initiate = $HttpSocket->post(
+                'https://invoices.pharmacyboardkenya.org/token',
+                $formDataToken,
+                $header_options
+            );
+            $this->log('process initiation' . $initiate, 'e-citizen-initiate-token');
+            if ($initiate->isOk()) {
+                $body = $initiate->body;
+                $resp = json_decode($body, true);
+                $this->log($resp, 'e-citizen-token-success');
+                $session_token = $resp['session_token'];
+                // $total_sites= $application['Application']['total_sites']; 
+
+                $total_sites = isset($application['Application']['total_sites']) && $application['Application']['total_sites'] !== null
+                    ? $application['Application']['total_sites']
+                    : 1; // Default to 1 if total_sites is null
+                $invoice_total = 1000 *  $total_sites; /// calculated based on the number of sites::::
+                $postData = array(
+                    'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
+                    'session_token' => $session_token, // from above  $application['Application']['short_title']
+                    'billDesc' => $billDesc,
+                    'currency' => 'USD',
+                    'clientMSISDN' => $user['phone_no'],
+                    'clientName' => $user['name'],
+                    'clientIDNumber' => $user['national_id_number'],
+                    'clientEmail' => $user['email'],
+                    'amountExpected' => $invoice_total
+                );
+                $header_options = array(
+                    'header' => array(
+                        'Content-Type' => 'application/x-www-form-urlencoded'
+                    )
+                );
+                $formData = http_build_query($postData);
+
+                // $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
+
+
+                $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
+
+                if ($next->isOk()) {
+                    $body1 = $next->body;
+                    $resp1 = json_decode($body1, true);
+                    $invoice_id = $resp1['invoice_id']; //[0]; //Default test:::: 285251
+                    // debug($invoice_id);
+                    // exit;
+                    $payment_code = $resp1['ppb_reference_code']; //[1];
+                    $this->Application->id = $id;
+                    if ($this->Application->saveField('ecitizen_invoice', $invoice_id)) {
+                        $raw_id = base64_encode($invoice_id);
+                        $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
+
+
+                        // debug($prims);
+                        // exit;
+                        if ($prims->isOk()) {
+                            $body2 = $prims->body;
+                            $resp2 = json_decode($body2, true);
+                            $data = array(
+                                'secureHash' => $resp2["secureHash"],
+                                'apiClientID' => 42,
+                                'serviceID' => $resp2["serviceID"],
+                                'notificationURL' => 'https://practice.pharmacyboardkenya.org/ipn?id=' . $raw_id,
+                                'callBackURLOnSuccess' => 'https://practice.pharmacyboardkenya.org/callback?id=' . $raw_id,
+                                'billRefNumber' => $resp2["billRefNumber"],
+                                'currency' => $resp2["currency"],
+                                'amountExpected' => $resp2["amountExpected"],
+                                'billDesc' => $resp2["billDesc"],
+                                'pictureURL' => '', //$resp2["pictureURL"],
+                                'clientName' => $resp2["clientName"],
+                                'clientEmail' => $resp2["clientEmail"],
+                                'clientMSISDN' => $resp2["clientMSISDN"],
+                                'clientIDNumber' => $resp2["clientIDNumber"],
+                            );
+
+                            $payload = http_build_query($data);
+                            $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);
+                            //   debug($ecitizen);
+                            // exit;
+                            if ($ecitizen->isOk()) {
+                            }
+                        }
+
+                        //<!-- Send email to applicant -->
+                        debug($raw_id);
+                        exit;
+                        $variables = array(
+                            'protocol_link' => '<a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Click here to view invoice</a>',
+                            'protocol_no' => $application['Application']['protocol_no'],
+                            'name' => $user['name']
+                        );
+
+                        // $messages = $this->Message->find('list', array(
+                        //     'conditions' => array('Message.name' => array(
+                        //         'applicant_invoice_email',
+                        //         'applicant_invoice_email_subject'
+                        //     )),
+                        //     'fields' => array('Message.name', 'Message.content')
+                        // ));
+                        // $message = String::insert($messages['applicant_invoice_email'], $variables);
+                        // $email = new CakeEmail();
+                        // $email->config('gmail');
+                        // $email->template('default');
+                        // $email->emailFormat('html');
+                        // $email->to($user['email']);
+                        // $email->bcc(array('itsjkiprotich@gmail.com'));
+                        // $email->subject(Sanitize::html(String::insert($messages['applicant_invoice_email_subject'], $variables), array('remove' => true)));
+                        // $email->viewVars(array('message' => $message));
+                        //   if (!$email->send()) {
+                        //     $this->log($email, 'submit_email');
+                        //   }
+                        debug('success');
+                        exit;
+                    } else {
+                        $this->log('saved application', 'e-citizen-error_saved');
+                    }
+                } else {
+                    $this->log('Failed to generate invoice', 'e-citizen-error');
+                }
+            } else {
+                $this->log('Failed to retrive token', 'e-citizen-error');
+            }
+        } else {
+            $this->log('sample application', 'test-app-error');
+        }
+    }
 
     public function applicant_create()
     {
@@ -37,6 +250,7 @@ class ApplicationsController extends AppController
             if (!empty($user['User']['sponsor_email'])) {
                 $this->request->data['Application']['user_id'] = $this->Auth->User('id');
 
+               
                 // Extract the parent data
                 $parentData = $this->request->data['Application'];
 
@@ -90,6 +304,11 @@ class ApplicationsController extends AppController
                         if ($success) {
 
                             // Generate Invoice in the Background
+                            // if(empty($this->request->data['Application']['total_sites']))
+                            // {
+                            //     $this->Session->setFlash(__('Please enter number of sites. Please, correct the errors.'), 'alerts/flash_warning');
+                              
+                            // }
 
                             $invoice = array(
                                 'function' => 'ppbNewApplication',
@@ -281,9 +500,7 @@ class ApplicationsController extends AppController
             $this->redirect($this->referer());
         }
     }
-    public function download_invoice($id)
-    {
-    }
+    public function download_invoice($id) {}
 
     public function applicant_submitall($id)
     {
@@ -318,14 +535,20 @@ class ApplicationsController extends AppController
                     'name' => $user['User']['name'],
                     'protocol_no' => $this->Application->field('protocol_no'),
                     'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
-                        'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
+                        'controller' => 'applications',
+                        'action' => 'view',
+                        $this->Application->id,
+                        $user['Group']['redir'] => true,
                         'full_base' => true
                     ), array('escape' => false)),
                     'approval_date' => $this->Application->field('approval_date')
                 );
                 $datum = array(
                     'email' => $user['User']['email'],
-                    'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'amendment_submission', 'model' => 'AnnaulLetter',
+                    'id' => $id,
+                    'user_id' => $user['User']['id'],
+                    'type' => 'amendment_submission',
+                    'model' => 'AnnaulLetter',
                     'subject' => String::insert($message['Message']['subject'], $variables),
                     'message' => String::insert($message['Message']['content'], $variables)
                 );
@@ -609,7 +832,12 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist', 'AmendmentApproval', 'SiteDetail' => array('County')
+            'TrialStatus',
+            'InvestigatorContact',
+            'Sponsor',
+            'AmendmentChecklist',
+            'AmendmentApproval',
+            'SiteDetail' => array('County')
         );
 
         $limit = isset($this->paginate['limit']) ? $this->paginate['limit'] : 1000;
@@ -1149,7 +1377,9 @@ class ApplicationsController extends AppController
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
             'TrialStatus',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -1193,8 +1423,11 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus', 'ApplicationStage',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'TrialStatus',
+            'ApplicationStage',
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -1248,7 +1481,9 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
 
         $this->set('page_options', $page_options);
@@ -1327,7 +1562,9 @@ class ApplicationsController extends AppController
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
             'TrialStatus',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -1571,8 +1808,16 @@ class ApplicationsController extends AppController
         //     throw new MethodNotAllowedException();
         // } else {
         if ($this->Application->save($this->request->data, true, array(
-            'id', 'final_report', 'laymans_summary', 'implication_results',
-            'quantity_imported', 'quantity_dispensed', 'quantity_destroyed', 'quantity_exported', 'balance_site', 'final_date'
+            'id',
+            'final_report',
+            'laymans_summary',
+            'implication_results',
+            'quantity_imported',
+            'quantity_dispensed',
+            'quantity_destroyed',
+            'quantity_exported',
+            'balance_site',
+            'final_date'
         ))) {
             $this->Session->setFlash(__('Final report successfully submitted.'), 'alerts/flash_success');
             $this->redirect(array('action' => 'view', $id));
@@ -1797,10 +2042,41 @@ class ApplicationsController extends AppController
         $this->set('application', $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array(
-                'Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Review' => array('ReviewAnswer')
+                'Amendment',
+                'EthicalCommittee',
+                'InvestigatorContact',
+                'Pharmacist',
+                'Sponsor',
+                'SiteDetail',
+                'Organization',
+                'Placebo',
+                'Attachment',
+                'CoverLetter',
+                'Protocol',
+                'PatientLeaflet',
+                'Brochure',
+                'GmpCertificate',
+                'Cv',
+                'Finance',
+                'Declaration',
+                'IndemnityCover',
+                'OpinionLetter',
+                'ApprovalLetter',
+                'Statement',
+                'ParticipatingStudy',
+                'Addendum',
+                'Registration',
+                'Fee',
+                'Checklist',
+                'AnnualLetter',
+                'StudyRoute',
+                'Manufacturer',
+                'AnnualApproval',
+                'ParticipantFlow',
+                'Budget',
+                'Deviation',
+                'Document',
+                'Review' => array('ReviewAnswer')
             )
         )));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -1906,7 +2182,8 @@ class ApplicationsController extends AppController
                             $telephone = $application['InvestigatorContact'][0]['telephone'];
                         }
                         $variables = array(
-                            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
+                            'approval_no' => $approval_no,
+                            'protocol_no' => $application['Application']['protocol_no'],
                             'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
                             'qualification' => $qualification,
                             'names' => $names,
@@ -1948,7 +2225,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->save(
                                 array(
                                     'ApplicationStage' => array(
-                                        'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                                        'application_id' => $id,
+                                        'stage' => 'Screening',
+                                        'status' => 'Complete',
+                                        'comment' => 'Manager final decision',
+                                        'start_date' => date('Y-m-d'),
+                                        'end_date' => date('Y-m-d')
                                     )
                                 )
                             );
@@ -1970,7 +2252,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'ScreeningSubmission',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -1991,7 +2278,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'Assign',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2012,7 +2304,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'Review',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2033,7 +2330,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'ReviewSubmission',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2055,7 +2357,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'FinalDecision',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2078,7 +2385,12 @@ class ApplicationsController extends AppController
                                 $this->Application->ApplicationStage->create();
                                 $this->Application->ApplicationStage->save(
                                     array('ApplicationStage' => array(
-                                        'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                                        'application_id' => $id,
+                                        'stage' => 'AnnualApproval',
+                                        'status' => 'Current',
+                                        'comment' => 'Manager approve',
+                                        'start_date' => date('Y-m-d'),
+                                        'end_date' => date('Y-m-d', strtotime('+1 year')),
                                     ))
                                 );
                             }
@@ -2111,16 +2423,24 @@ class ApplicationsController extends AppController
                         ));
                         foreach ($users as $user) {
                             $variables = array(
-                                'name' => $user['User']['name'], 'approval_no' => $approval_no, 'protocol_no' => $this->Application->field('protocol_no'),
+                                'name' => $user['User']['name'],
+                                'approval_no' => $approval_no,
+                                'protocol_no' => $this->Application->field('protocol_no'),
                                 'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
-                                    'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
+                                    'controller' => 'applications',
+                                    'action' => 'view',
+                                    $this->Application->id,
+                                    $user['Group']['redir'] => true,
                                     'full_base' => true
                                 ), array('escape' => false)),
                                 'approval_date' => $this->Application->field('approval_date')
                             );
                             $datum = array(
                                 'email' => $user['User']['email'],
-                                'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'manager_approve_letter', 'model' => 'AnnaulLetter',
+                                'id' => $id,
+                                'user_id' => $user['User']['id'],
+                                'type' => 'manager_approve_letter',
+                                'model' => 'AnnaulLetter',
                                 'subject' => String::insert($message['Message']['subject'], $variables),
                                 'message' => String::insert($message['Message']['content'], $variables)
                             );
@@ -2136,7 +2456,7 @@ class ApplicationsController extends AppController
                             'AuditTrail' => array(
                                 'foreign_key' => $this->Application->field('id'),
                                 'model' => 'Application',
-                                'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully approved by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+                                'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully approved by ' .  $this->Auth->user('username'),
                                 'ip' =>  $this->Application->field('protocol_no')
                             )
                         );
@@ -2291,7 +2611,8 @@ class ApplicationsController extends AppController
         $approval_no = 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
         $variables = array(
-            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
+            'approval_no' => $approval_no,
+            'protocol_no' => $application['Application']['protocol_no'],
             'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
             'qualification' => $application['InvestigatorContact'][0]['qualification'],
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
@@ -2453,7 +2774,6 @@ class ApplicationsController extends AppController
             $filedata = $this->request->data;
             if (isset($this->request->data['saveChanges'])) {
                 unset($filedata['Checklist']);
-                
             }
             unset($filedata['Application']);
             if (empty($this->request->data)) {
@@ -2788,9 +3108,36 @@ class ApplicationsController extends AppController
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array(
-                'Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Budget',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist'
+                'Amendment',
+                'EthicalCommittee',
+                'InvestigatorContact',
+                'Pharmacist',
+                'Sponsor',
+                'SiteDetail',
+                'Organization',
+                'Placebo',
+                'Budget',
+                'Attachment',
+                'CoverLetter',
+                'Protocol',
+                'PatientLeaflet',
+                'Brochure',
+                'GmpCertificate',
+                'Cv',
+                'Finance',
+                'Declaration',
+                'AnnualLetter',
+                'StudyRoute',
+                'Manufacturer',
+                'IndemnityCover',
+                'OpinionLetter',
+                'ApprovalLetter',
+                'Statement',
+                'ParticipatingStudy',
+                'Addendum',
+                'Registration',
+                'Fee',
+                'Checklist'
             )
         ));
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
