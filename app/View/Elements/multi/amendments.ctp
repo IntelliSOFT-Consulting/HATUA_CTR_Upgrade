@@ -122,7 +122,12 @@ if ($redir === 'applicant') {
                                                     echo $this->Form->input('approval_date', array('value' => date('d-m-Y'), 'type' => 'hidden'));
                                                     echo $this->Form->input('amendment', array('value' =>  $year, 'type' => 'hidden'));
                                                     echo $this->Form->input('status', array(
-                                                        'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'error' => false,
+                                                        'type' => 'radio',
+                                                        'label' => false,
+                                                        'legend' => false,
+                                                        'div' => false,
+                                                        'hiddenField' => false,
+                                                        'error' => false,
                                                         'class' => 'approved',
                                                         'before' => '<div class="control-group">   <label class="control-label required">
                         Approve? <span class="sterix">*</span></label>  <div class="controls">
@@ -131,7 +136,12 @@ if ($redir === 'applicant') {
                                                         'options' => array('approved' => 'Yes'),
                                                     ));
                                                     echo $this->Form->input('status', array(
-                                                        'type' => 'radio',  'label' => false, 'legend' => false, 'div' => false, 'hiddenField' => false, 'class' => 'approved',
+                                                        'type' => 'radio',
+                                                        'label' => false,
+                                                        'legend' => false,
+                                                        'div' => false,
+                                                        'hiddenField' => false,
+                                                        'class' => 'approved',
                                                         'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
                                                         'error' => array('attributes' => array('wrap' => 'p', 'class' => 'controls required error')),
                                                         'before' => '<label class="radio inline">',
@@ -145,11 +155,14 @@ if ($redir === 'applicant') {
 
                                                     echo $this->Form->input('content', array(
                                                         'label' => array('class' => 'control-label', 'text' => 'Message'),
-                                                        'placeholder' => ' ', 'class' => 'input-xlarge',  'rows' => '3'
+                                                        'placeholder' => ' ',
+                                                        'class' => 'input-xlarge',
+                                                        'rows' => '3'
                                                     ));
                                                     echo $this->Form->input('password', array(
                                                         'label' => array('class' => 'control-label', 'text' => 'Your Password <span class="sterix">*</span>'),
-                                                        'placeholder' => 'password', 'class' => 'input-large',
+                                                        'placeholder' => 'password',
+                                                        'class' => 'input-large',
                                                     ));
                                                     ?>
 
@@ -276,13 +289,15 @@ if ($redir === 'applicant') {
                                                                     <td>
                                                                         <?php
 
-                                                                        if (isset($comment['Attachment'])) {
-                                                                            foreach ($comment['Attachment'] as $key => $value) {
+                                                                        if (isset($comment['AmendmentChecklist'])) {
+                                                                            foreach ($comment['AmendmentChecklist'] as $key => $value) {
                                                                                 echo '<p>';
                                                                                 echo $this->Html->link(
                                                                                     __($value['basename']),
                                                                                     array(
-                                                                                        'controller' => 'amendment_approvals',  'action' => 'file_download', $value['id'],
+                                                                                        'controller' => 'amendment_approvals',
+                                                                                        'action' => 'file_download',
+                                                                                        $value['id'],
                                                                                         'admin' => false
                                                                                     ),
                                                                                     array('class' => 'btn btn-link')
@@ -422,8 +437,10 @@ if (isset($this->params['named']['ame'])) {
             echo $this->Form->input('id', array('type' => 'hidden', 'value' => $annual_letter['id']));
             echo $this->Form->input('submitted', array('type' => 'hidden', 'value' => '1'));
             echo $this->Form->input('content', array(
-                'label' => false, 'value' => $annual_letter['content'],
-                'between' => '<div class="controle">',  'class' => 'input-large',
+                'label' => false,
+                'value' => $annual_letter['content'],
+                'between' => '<div class="controle">',
+                'class' => 'input-large',
             ));
             ?>
         </fieldset>
@@ -521,8 +538,13 @@ if ($redir == 'applicant') {
                                     echo $this->Form->input('AmendmentChecklist.' . $key . '.checksum', array('type' => 'hidden'));
 
                                     echo $this->Form->input('AmendmentChecklist.' . $key . '.year', array(
-                                        'type' => 'text', 'label' => false, 'between' => false, 'after' => false, 'div' => false,
-                                        'readonly' => 'readonly', 'class' => 'span11 approvalyear'
+                                        'type' => 'text',
+                                        'label' => false,
+                                        'between' => false,
+                                        'after' => false,
+                                        'div' => false,
+                                        'readonly' => 'readonly',
+                                        'class' => 'span11 approvalyear'
                                     ));
                                     ?>
 
@@ -536,7 +558,11 @@ if ($redir == 'applicant') {
                                 </td>
                                 <td class="files"><?php
                                                     echo $this->Form->input('AmendmentChecklist.' . $key . '.file', array(
-                                                        'label' => false, 'between' => false, 'after' => false, 'div' => false, 'class' => 'span12 input-file',
+                                                        'label' => false,
+                                                        'between' => false,
+                                                        'after' => false,
+                                                        'div' => false,
+                                                        'class' => 'span12 input-file',
                                                         'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
                                                         'type' => 'file',
                                                     ));
@@ -545,7 +571,12 @@ if ($redir == 'applicant') {
                                 <td>
                                     <?php
                                     if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AmendmentChecklist.' . $key . '.version_no', array(
-                                        'label' => false, 'between' => false, 'after' => false, 'div' => false, 'placeholder' => 'Version', 'class' => 'span12 input-file',
+                                        'label' => false,
+                                        'between' => false,
+                                        'after' => false,
+                                        'div' => false,
+                                        'placeholder' => 'Version',
+                                        'class' => 'span12 input-file',
                                         'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
                                     ));
                                     ?>
@@ -553,7 +584,13 @@ if ($redir == 'applicant') {
                                 <td>
                                     <?php
                                     if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AmendmentChecklist.' . $key . '.file_date', array(
-                                        'type' => 'text', 'label' => false, 'between' => false, 'after' => false, 'div' => false, 'placeholder' => 'dd-mm-yyyy', 'class' => 'span12 input-file pickadate',
+                                        'type' => 'text',
+                                        'label' => false,
+                                        'between' => false,
+                                        'after' => false,
+                                        'div' => false,
+                                        'placeholder' => 'dd-mm-yyyy',
+                                        'class' => 'span12 input-file pickadate',
                                         'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
                                     ));
                                     ?>
@@ -596,6 +633,96 @@ if ($redir == 'applicant') {
                         </tr>
                     </thead>
                     <tbody>
+                        <?php
+                        if (!empty($this->request->data['AmendmentChecklist'])) {
+                            for ($i = 0; $i <= count($this->request->data['AmendmentChecklist']) - 1; $i++) {
+                        ?>
+                                <tr>
+                                    <td><?php echo $i + 1; ?></td>
+                                    <td>
+                                        <div class="control-group"><?php
+                                                                    echo $this->Form->input('AmendmentChecklist.' . $i . '.id');
+                                                                    echo $this->Form->input('AmendmentChecklist.' . $i . '.model', array('type' => 'hidden', 'value' => 'Application'));
+                                                                    echo $this->Form->input('AmendmentChecklist.' . $i . '.group', array('type' => 'hidden', 'value' => 'attachment'));
+                                                                    echo $this->Form->input('AmendmentChecklist.' . $i . '.filesize', array('type' => 'hidden'));
+                                                                    echo $this->Form->input('AmendmentChecklist.' . $i . '.basename', array('type' => 'hidden'));
+                                                                    echo $this->Form->input('AmendmentChecklist.' . $i . '.checksum', array('type' => 'hidden'));
+                                                                    if (
+                                                                        !empty($this->request->data['AmendmentChecklist'][$i]['id']) &&
+                                                                        !empty($this->request->data['AmendmentChecklist'][$i]['basename'])
+                                                                    ) {
+                                                                        echo $this->Html->link(
+                                                                            __($this->request->data['AmendmentChecklist'][$i]['basename']),
+                                                                            array(
+                                                                                'controller' => 'attachments',
+                                                                                'action' => 'download',
+                                                                                $this->request->data['AmendmentChecklist'][$i]['id'],
+                                                                                'full_base' => true
+                                                                            ),
+                                                                            array('class' => 'btn btn-info')
+                                                                        );
+                                                                        // echo $this->Form->input('AmendmentChecklist.'.$i.'.filename', array('type' => 'hidden'));
+                                                                    } else {
+                                                                        echo $this->Form->input('AmendmentChecklist.' . $i . '.file', array(
+                                                                            'label' => false,
+                                                                            'between' => false,
+                                                                            'after' => false,
+                                                                            'class' => 'span12 input-file',
+                                                                            'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
+                                                                            'type' => 'file',
+                                                                        ));
+                                                                    }
+                                                                    ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if (
+                                            !empty($this->request->data['AmendmentChecklist'][$i]['id']) &&
+                                            !empty($this->request->data['AmendmentChecklist'][$i]['basename'])
+                                        ) {
+                                            echo $this->request->data['AmendmentChecklist'][$i]['description'];
+                                            echo $this->Form->input('AmendmentChecklist.' . $i . '.description', array('type' => 'hidden'));
+                                        } else {
+                                            echo $this->Form->input('AmendmentChecklist.' . $i . '.description', array(
+                                                'label' => false,
+                                                'between' => false,
+                                                'rows' => '1',
+                                                'after' => false,
+                                                'class' => 'span11',
+                                            ));
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $this->Form->input('AmendmentChecklist.' . $i . '.version_no', array(
+                                            'label' => false,
+                                            'between' => false,
+                                            'rows' => '1',
+                                            'after' => false,
+                                            'class' => 'span11',
+                                        )); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $this->Form->input('AmendmentChecklist.' . $i . '.file_date', array(
+                                            'label' => false,
+                                            'between' => false,
+                                            'rows' => '1',
+                                            'after' => false,
+                                            'class' => 'span11',
+                                        )); ?>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn-mini remove-row" value="<?php if (isset($this->request->data['AmendmentChecklist'][$i]['id'])) {
+                                                                                                        echo $this->request->data['AmendmentChecklist'][$i]['id'];
+                                                                                                    } ?>">
+                                            &nbsp;<i class="icon-minus"></i>&nbsp;
+                                        </button>
+                                    </td>
+                                </tr>
+                        <?php }
+                        }; ?>
+
 
                     </tbody>
                 </table>
@@ -609,19 +736,20 @@ if ($redir == 'applicant') {
 
         echo $this->Html->link(
             __('<i class="icon-thumbs-up"></i> Submit All'),
-            array('action' => 'submitall', $application['Application']['id']),
+            '#', // Temporary placeholder URL
             array(
                 'escape' => false,
                 'class' => 'btn btn-info',
-                'id' => 'submit-all-button',
-                'onclick' => 'return confirm("Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file");'
+                'id' => 'submit-all-button'
             )
         );
+
+
         ?>
     </div>
 
 <?php }  ?>
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('submit-all-button').addEventListener('click', function(event) {
             if (!confirm('Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file?')) {
@@ -629,7 +757,7 @@ if ($redir == 'applicant') {
             }
         });
     });
-</script>
+</script> -->
 
 <script text="type/javascript">
     $.expander.defaults.slicePoint = 170;
@@ -654,5 +782,37 @@ if ($redir == 'applicant') {
         var hashTab = $('#amendment_tab a[href="' + location.hash + '"]');
         hashTab && hashTab.tab('show');
         //end mcaz
+    });
+</script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the button element
+        var submitButton = document.getElementById('submit-all-button');
+        
+        // Attach a click event listener to the button
+        submitButton.addEventListener('click', function(event) {
+            // Prevent the default action (stopping the link from navigating immediately)
+            event.preventDefault();
+
+            // Get the protocol ID (this value comes from PHP)
+            var protocolId = '<?php echo $application['Application']['id']; ?>'; // Example: '77'
+            
+            // Get the value from the <p> element (the selected year)
+            var selectedYear = document.querySelector('.selected-year-name').textContent.trim();
+
+            // Confirm the submission
+            var confirmation = confirm("Are you sure you want to submit all?\nPlease be sure to have uploaded the individual file");
+
+            // Ensure both protocolId and selectedYear are present and confirmed by the user
+            if (confirmation && selectedYear) {
+                // Construct the correct URL format: /submitall/{protocolId}/{selectedYear}
+                var newHref = '/applicant/applications/submitall/' + protocolId + '/' + encodeURIComponent(selectedYear);
+                
+                // Navigate to the constructed URL
+                window.location.href = newHref;
+            } else if (!selectedYear) {
+                alert('Please select a year before submitting.');
+            }
+        });
     });
 </script>

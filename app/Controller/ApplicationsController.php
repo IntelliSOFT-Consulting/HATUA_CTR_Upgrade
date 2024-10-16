@@ -37,6 +37,15 @@ class ApplicationsController extends AppController
             if (!empty($user['User']['sponsor_email'])) {
                 $this->request->data['Application']['user_id'] = $this->Auth->User('id');
 
+
+                if (!isset($this->request->data['Application']['total_sites']) || empty($this->request->data['Application']['total_sites'])) {
+                    $this->Session->setFlash(__('Please provide  number of sites.'), 'alerts/flash_error');
+                    $this->redirect($this->referer());
+                }
+                if (!isset($this->request->data['Application']['short_title']) || empty($this->request->data['Application']['short_title'])) {
+                    $this->Session->setFlash(__('Please provide  short title for the study.'), 'alerts/flash_error');
+                    $this->redirect($this->referer());
+                }
                 // Extract the parent data
                 $parentData = $this->request->data['Application'];
 
@@ -281,12 +290,12 @@ class ApplicationsController extends AppController
             $this->redirect($this->referer());
         }
     }
-    public function download_invoice($id)
-    {
-    }
+    public function download_invoice($id) {}
 
-    public function applicant_submitall($id)
+    public function applicant_submitall($id, $year)
     {
+        // debug($year);
+        // exit;
 
         $this->Application->id = $id;
         if (!$this->Application->exists()) {
@@ -297,12 +306,71 @@ class ApplicationsController extends AppController
         // get latest AmendmentChecklist
 
         $this->loadModel('Attachment');
-        $latest = $this->Attachment->find('list', array(
-            'fields' => array('Attachment.year', 'Attachment.foreign_key'),
-            'conditions' => array('Attachment.foreign_key' => $id, 'Attachment.model' => 'AmendmentChecklist'),
+        $latest = $this->Attachment->find('all', array(
+            'fields' => array('Attachment.year', 'Attachment.foreign_key', 'Attachment.version_no', 'Attachment.file_date'),
+            'conditions' => array('Attachment.foreign_key' => $id, 'Attachment.model' => 'AmendmentChecklist', 'Attachment.year' => $year),
             'recursive' => 0
         ));
-        if ($latest) {
+
+        // debug($latest);
+        // exit;
+        if (!empty($latest)) {
+            $allFilesHaveDate = true;
+            foreach ($latest as $attachment) {
+                // If any attachment has an empty file_date, set the flag to false
+                if (empty($attachment['Attachment']['file_date'])) {
+                    $allFilesHaveDate = false;
+                    break; // No need to continue if one is empty
+                }
+            }
+
+            if (!$allFilesHaveDate) {
+                $response = $this->Application->find('first', array(
+                    'conditions' => array('Application.id' => $id),
+                    'contain' => array(
+                        'Amendment',
+                        'EthicalCommittee',
+                        'AmendmentChecklist' => array(
+                            'conditions' => array('AmendmentChecklist.year' => $year) // Filter by year here
+                        ),
+                        'InvestigatorContact',
+                        'Pharmacist',
+                        'Sponsor',
+                        'SiteDetail',
+                        'Organization',
+                        'Placebo',
+                        'Budget',
+                        'Attachment',
+                        'CoverLetter',
+                        'Protocol',
+                        'PatientLeaflet',
+                        'Brochure',
+                        'GmpCertificate',
+                        'Cv',
+                        'Finance',
+                        'Declaration',
+                        'AnnualLetter',
+                        'StudyRoute',
+                        'Manufacturer',
+                        'IndemnityCover',
+                        'OpinionLetter',
+                        'ApprovalLetter',
+                        'Statement',
+                        'ParticipatingStudy',
+                        'Addendum',
+                        'Registration',
+                        'Fee',
+                        'Checklist'
+                    )
+                ));
+                $this->request->data = $response;
+                debug($response);
+                exit;
+                $this->Session->setFlash(__('Please provide file date for each amendment attached. '), 'alerts/flash_error');
+                $this->redirect(array('action' => 'view', $this->Application->id));
+            }
+
+
             $this->loadModel('Message');
             $this->loadModel('User');
             $html = new HtmlHelper(new ThemeView());
@@ -318,14 +386,20 @@ class ApplicationsController extends AppController
                     'name' => $user['User']['name'],
                     'protocol_no' => $this->Application->field('protocol_no'),
                     'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
-                        'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
+                        'controller' => 'applications',
+                        'action' => 'view',
+                        $this->Application->id,
+                        $user['Group']['redir'] => true,
                         'full_base' => true
                     ), array('escape' => false)),
                     'approval_date' => $this->Application->field('approval_date')
                 );
                 $datum = array(
                     'email' => $user['User']['email'],
-                    'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'amendment_submission', 'model' => 'AnnaulLetter',
+                    'id' => $id,
+                    'user_id' => $user['User']['id'],
+                    'type' => 'amendment_submission',
+                    'model' => 'AnnaulLetter',
                     'subject' => String::insert($message['Message']['subject'], $variables),
                     'message' => String::insert($message['Message']['content'], $variables)
                 );
@@ -609,7 +683,12 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus', 'InvestigatorContact', 'Sponsor', 'AmendmentChecklist', 'AmendmentApproval', 'SiteDetail' => array('County')
+            'TrialStatus',
+            'InvestigatorContact',
+            'Sponsor',
+            'AmendmentChecklist',
+            'AmendmentApproval',
+            'SiteDetail' => array('County')
         );
 
         $limit = isset($this->paginate['limit']) ? $this->paginate['limit'] : 1000;
@@ -1149,7 +1228,9 @@ class ApplicationsController extends AppController
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
             'TrialStatus',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -1193,8 +1274,11 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
-            'TrialStatus', 'ApplicationStage',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'TrialStatus',
+            'ApplicationStage',
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
 
         //in case of csv export
@@ -1248,7 +1332,9 @@ class ApplicationsController extends AppController
 
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted')),
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
 
         $this->set('page_options', $page_options);
@@ -1327,7 +1413,9 @@ class ApplicationsController extends AppController
         $this->paginate['contain'] = array(
             'Review' => array('conditions' => array('Review.type' => 'request', 'Review.accepted' => 'accepted'), 'User'),
             'TrialStatus',
-            'InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County')
+            'InvestigatorContact',
+            'Sponsor',
+            'SiteDetail' => array('County')
         );
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -1571,8 +1659,16 @@ class ApplicationsController extends AppController
         //     throw new MethodNotAllowedException();
         // } else {
         if ($this->Application->save($this->request->data, true, array(
-            'id', 'final_report', 'laymans_summary', 'implication_results',
-            'quantity_imported', 'quantity_dispensed', 'quantity_destroyed', 'quantity_exported', 'balance_site', 'final_date'
+            'id',
+            'final_report',
+            'laymans_summary',
+            'implication_results',
+            'quantity_imported',
+            'quantity_dispensed',
+            'quantity_destroyed',
+            'quantity_exported',
+            'balance_site',
+            'final_date'
         ))) {
             $this->Session->setFlash(__('Final report successfully submitted.'), 'alerts/flash_success');
             $this->redirect(array('action' => 'view', $id));
@@ -1797,10 +1893,41 @@ class ApplicationsController extends AppController
         $this->set('application', $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array(
-                'Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'AnnualApproval', 'ParticipantFlow', 'Budget', 'Deviation', 'Document', 'Review' => array('ReviewAnswer')
+                'Amendment',
+                'EthicalCommittee',
+                'InvestigatorContact',
+                'Pharmacist',
+                'Sponsor',
+                'SiteDetail',
+                'Organization',
+                'Placebo',
+                'Attachment',
+                'CoverLetter',
+                'Protocol',
+                'PatientLeaflet',
+                'Brochure',
+                'GmpCertificate',
+                'Cv',
+                'Finance',
+                'Declaration',
+                'IndemnityCover',
+                'OpinionLetter',
+                'ApprovalLetter',
+                'Statement',
+                'ParticipatingStudy',
+                'Addendum',
+                'Registration',
+                'Fee',
+                'Checklist',
+                'AnnualLetter',
+                'StudyRoute',
+                'Manufacturer',
+                'AnnualApproval',
+                'ParticipantFlow',
+                'Budget',
+                'Deviation',
+                'Document',
+                'Review' => array('ReviewAnswer')
             )
         )));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
@@ -1906,7 +2033,8 @@ class ApplicationsController extends AppController
                             $telephone = $application['InvestigatorContact'][0]['telephone'];
                         }
                         $variables = array(
-                            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
+                            'approval_no' => $approval_no,
+                            'protocol_no' => $application['Application']['protocol_no'],
                             'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
                             'qualification' => $qualification,
                             'names' => $names,
@@ -1948,7 +2076,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->save(
                                 array(
                                     'ApplicationStage' => array(
-                                        'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                                        'application_id' => $id,
+                                        'stage' => 'Screening',
+                                        'status' => 'Complete',
+                                        'comment' => 'Manager final decision',
+                                        'start_date' => date('Y-m-d'),
+                                        'end_date' => date('Y-m-d')
                                     )
                                 )
                             );
@@ -1970,7 +2103,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'ScreeningSubmission',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -1991,7 +2129,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'Assign',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2012,7 +2155,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'Review',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2033,7 +2181,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'ReviewSubmission',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2055,7 +2208,12 @@ class ApplicationsController extends AppController
                             $this->Application->ApplicationStage->create();
                             $this->Application->ApplicationStage->save(
                                 array('ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                    'application_id' => $id,
+                                    'stage' => 'FinalDecision',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager final decision',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d'),
                                 ))
                             );
                         } else {
@@ -2078,7 +2236,12 @@ class ApplicationsController extends AppController
                                 $this->Application->ApplicationStage->create();
                                 $this->Application->ApplicationStage->save(
                                     array('ApplicationStage' => array(
-                                        'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                                        'application_id' => $id,
+                                        'stage' => 'AnnualApproval',
+                                        'status' => 'Current',
+                                        'comment' => 'Manager approve',
+                                        'start_date' => date('Y-m-d'),
+                                        'end_date' => date('Y-m-d', strtotime('+1 year')),
                                     ))
                                 );
                             }
@@ -2111,16 +2274,24 @@ class ApplicationsController extends AppController
                         ));
                         foreach ($users as $user) {
                             $variables = array(
-                                'name' => $user['User']['name'], 'approval_no' => $approval_no, 'protocol_no' => $this->Application->field('protocol_no'),
+                                'name' => $user['User']['name'],
+                                'approval_no' => $approval_no,
+                                'protocol_no' => $this->Application->field('protocol_no'),
                                 'protocol_link' => $html->link($this->Application->field('protocol_no'), array(
-                                    'controller' => 'applications', 'action' => 'view', $this->Application->id, $user['Group']['redir'] => true,
+                                    'controller' => 'applications',
+                                    'action' => 'view',
+                                    $this->Application->id,
+                                    $user['Group']['redir'] => true,
                                     'full_base' => true
                                 ), array('escape' => false)),
                                 'approval_date' => $this->Application->field('approval_date')
                             );
                             $datum = array(
                                 'email' => $user['User']['email'],
-                                'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'manager_approve_letter', 'model' => 'AnnaulLetter',
+                                'id' => $id,
+                                'user_id' => $user['User']['id'],
+                                'type' => 'manager_approve_letter',
+                                'model' => 'AnnaulLetter',
                                 'subject' => String::insert($message['Message']['subject'], $variables),
                                 'message' => String::insert($message['Message']['content'], $variables)
                             );
@@ -2291,7 +2462,8 @@ class ApplicationsController extends AppController
         $approval_no = 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
         $variables = array(
-            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
+            'approval_no' => $approval_no,
+            'protocol_no' => $application['Application']['protocol_no'],
             'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
             'qualification' => $application['InvestigatorContact'][0]['qualification'],
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
@@ -2453,7 +2625,6 @@ class ApplicationsController extends AppController
             $filedata = $this->request->data;
             if (isset($this->request->data['saveChanges'])) {
                 unset($filedata['Checklist']);
-                
             }
             unset($filedata['Application']);
             if (empty($this->request->data)) {
@@ -2788,9 +2959,36 @@ class ApplicationsController extends AppController
         $response = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array(
-                'Amendment', 'EthicalCommittee', 'InvestigatorContact', 'Pharmacist', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Budget',
-                'Attachment', 'CoverLetter', 'Protocol', 'PatientLeaflet', 'Brochure', 'GmpCertificate', 'Cv', 'Finance', 'Declaration', 'AnnualLetter', 'StudyRoute', 'Manufacturer',
-                'IndemnityCover', 'OpinionLetter', 'ApprovalLetter', 'Statement', 'ParticipatingStudy', 'Addendum', 'Registration', 'Fee', 'Checklist'
+                'Amendment',
+                'EthicalCommittee',
+                'InvestigatorContact',
+                'Pharmacist',
+                'Sponsor',
+                'SiteDetail',
+                'Organization',
+                'Placebo',
+                'Budget',
+                'Attachment',
+                'CoverLetter',
+                'Protocol',
+                'PatientLeaflet',
+                'Brochure',
+                'GmpCertificate',
+                'Cv',
+                'Finance',
+                'Declaration',
+                'AnnualLetter',
+                'StudyRoute',
+                'Manufacturer',
+                'IndemnityCover',
+                'OpinionLetter',
+                'ApprovalLetter',
+                'Statement',
+                'ParticipatingStudy',
+                'Addendum',
+                'Registration',
+                'Fee',
+                'Checklist'
             )
         ));
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
