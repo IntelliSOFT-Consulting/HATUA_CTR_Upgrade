@@ -429,6 +429,7 @@ class NotificationShell extends Shell
   public function  newAppNotifyReviewer()
   {
     $reviews = $this->args[0];
+    $doer = $this->args[1];
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array('reviewer_new_application_subject', 'reviewer_new_application')),
       'fields' => array('Message.name', 'Message.content')
@@ -460,7 +461,7 @@ class NotificationShell extends Shell
           'AuditTrail' => array(
             'foreign_key' => $review['Review']['application_id'],
             'model' => 'Application',
-            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review by ' . $this->Auth->User('username'),
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review by ' . $doer,
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
           )
         );
