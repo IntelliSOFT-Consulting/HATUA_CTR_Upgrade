@@ -27,7 +27,8 @@ $this->assign('Applications', 'active');
 
                         <?php
 
-                        echo $this->Form->input('total_sites', array('type' => 'number','min'=>1, 'label' => 'Total Sites'));
+                        echo $this->Form->input('total_sites', array('type' => 'number','min'=>1, 'label' => array('class' => 'control-label required', 'text' => 'Total Sites <span class="sterix">*</span>'),
+                    ));
                         ?>
                     </div>
                     <div class="span4">

@@ -24,10 +24,223 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+    }
+    public function admin_extra($id = null)
+    {
+
+        $data = $this->request->data['Application'];
+        $total_sites = $data['total_sites'];
+         
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+            // debug($application);
+            $invoice = array(
+                'function' => 'ppbNewApplication',
+                'Application' => array(
+                    'id' => $application['Application']['id'],
+                    'name' => $application['User']['name'],
+                    'email' => $application['User']['email'],
+                    'total_sites' => $total_sites,
+                    'protocol_no' =>  $application['Application']['protocol_no']
+                )
+            );
+            
+            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_missed_invoice', $invoice));
+            
+        } 
+        $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
+        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
     }
 
+    public function generateMissedInvoice($id)
+    {
 
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+            // debug($application);
+            $invoice = array(
+                'function' => 'ppbNewApplication',
+                'Application' => array(
+                    'id' => $application['Application']['id'],
+                    'name' => $application['User']['name'],
+                    'email' => $application['User']['email'],
+                    'protocol_no' =>  $application['Application']['protocol_no']
+                )
+            );
+           
+            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
+            
+        }
+        $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
+        $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+    }
+
+    public function report_invoice($id = null)
+    {
+        // $id = 1434;//  
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+            $options = array('ssl_verify_peer' => false);
+            $HttpSocket = new HttpSocket($options);
+
+            $user = $application['User'];
+            //PRINCIPAL INVESTIGATOR
+            $multiArray = $application['InvestigatorContact'];
+            $firstEntry = reset($multiArray);
+            $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
+            $billDesc = "Principal Investigator: " . $name . "<br>Study Title: " . $application['Application']['short_title'];
+            $this->log('initiated report', $user, 'e-citizen-initiate-user');
+
+
+
+            $header_options = array(
+                'header' => array(
+                    'Content-Type' => 'application/x-www-form-urlencoded'
+                )
+            );
+            $postDataToken = array(
+                'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
+                'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
+            );
+
+            $formDataToken = http_build_query($postDataToken);
+            // //Request Access Token
+            $initiate = $HttpSocket->post(
+                'https://invoices.pharmacyboardkenya.org/token',
+                $formDataToken,
+                $header_options
+            );
+            $this->log('process initiation' . $initiate, 'e-citizen-initiate-token');
+            if ($initiate->isOk()) {
+                $body = $initiate->body;
+                $resp = json_decode($body, true);
+                $this->log($resp, 'e-citizen-token-success');
+                $session_token = $resp['session_token'];
+                // $total_sites= $application['Application']['total_sites']; 
+
+                $total_sites = isset($application['Application']['total_sites']) && $application['Application']['total_sites'] !== null
+                    ? $application['Application']['total_sites']
+                    : 1; // Default to 1 if total_sites is null
+                $invoice_total = 1000 *  $total_sites; /// calculated based on the number of sites::::
+                $postData = array(
+                    'payment_type' => 'Clinical_Trials', // Types are issued e.g. Clinical_Trials  
+                    'session_token' => $session_token, // from above  $application['Application']['short_title']
+                    'billDesc' => $billDesc,
+                    'currency' => 'USD',
+                    'clientMSISDN' => $user['phone_no'],
+                    'clientName' => $user['name'],
+                    'clientIDNumber' => $user['national_id_number'],
+                    'clientEmail' => $user['email'],
+                    'amountExpected' => $invoice_total
+                );
+                $header_options = array(
+                    'header' => array(
+                        'Content-Type' => 'application/x-www-form-urlencoded'
+                    )
+                );
+                $formData = http_build_query($postData);
+
+                // $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ct_invoice/generate', $formData, $header_options);
+
+
+                $next = $HttpSocket->post('https://invoices.pharmacyboardkenya.org/ecitizen_invoice/generate', $formData, $header_options);
+
+                if ($next->isOk()) {
+                    $body1 = $next->body;
+                    $resp1 = json_decode($body1, true);
+                    $invoice_id = $resp1['invoice_id']; //[0]; //Default test:::: 285251
+                    // debug($invoice_id);
+                    // exit;
+                    $payment_code = $resp1['ppb_reference_code']; //[1];
+                    $this->Application->id = $id;
+                    if ($this->Application->saveField('ecitizen_invoice', $invoice_id)) {
+                        $raw_id = base64_encode($invoice_id);
+                        $prims = $HttpSocket->get('https://prims.pharmacyboardkenya.org/scripts/get_status?invoice=' . $invoice_id, false, $options);
+
+
+                        // debug($prims);
+                        // exit;
+                        if ($prims->isOk()) {
+                            $body2 = $prims->body;
+                            $resp2 = json_decode($body2, true);
+                            $data = array(
+                                'secureHash' => $resp2["secureHash"],
+                                'apiClientID' => 42,
+                                'serviceID' => $resp2["serviceID"],
+                                'notificationURL' => 'https://practice.pharmacyboardkenya.org/ipn?id=' . $raw_id,
+                                'callBackURLOnSuccess' => 'https://practice.pharmacyboardkenya.org/callback?id=' . $raw_id,
+                                'billRefNumber' => $resp2["billRefNumber"],
+                                'currency' => $resp2["currency"],
+                                'amountExpected' => $resp2["amountExpected"],
+                                'billDesc' => $resp2["billDesc"],
+                                'pictureURL' => '', //$resp2["pictureURL"],
+                                'clientName' => $resp2["clientName"],
+                                'clientEmail' => $resp2["clientEmail"],
+                                'clientMSISDN' => $resp2["clientMSISDN"],
+                                'clientIDNumber' => $resp2["clientIDNumber"],
+                            );
+
+                            $payload = http_build_query($data);
+                            $ecitizen = $HttpSocket->post('https://payments.ecitizen.go.ke/PaymentAPI/iframev2.1.php', $payload, $header_options);
+                            //   debug($ecitizen);
+                            // exit;
+                            if ($ecitizen->isOk()) {
+                            }
+                        }
+
+                        //<!-- Send email to applicant -->
+                        debug($raw_id);
+                        exit;
+                        $variables = array(
+                            'protocol_link' => '<a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Click here to view invoice</a>',
+                            'protocol_no' => $application['Application']['protocol_no'],
+                            'name' => $user['name']
+                        );
+
+                        // $messages = $this->Message->find('list', array(
+                        //     'conditions' => array('Message.name' => array(
+                        //         'applicant_invoice_email',
+                        //         'applicant_invoice_email_subject'
+                        //     )),
+                        //     'fields' => array('Message.name', 'Message.content')
+                        // ));
+                        // $message = String::insert($messages['applicant_invoice_email'], $variables);
+                        // $email = new CakeEmail();
+                        // $email->config('gmail');
+                        // $email->template('default');
+                        // $email->emailFormat('html');
+                        // $email->to($user['email']);
+                        // $email->bcc(array('itsjkiprotich@gmail.com'));
+                        // $email->subject(Sanitize::html(String::insert($messages['applicant_invoice_email_subject'], $variables), array('remove' => true)));
+                        // $email->viewVars(array('message' => $message));
+                        //   if (!$email->send()) {
+                        //     $this->log($email, 'submit_email');
+                        //   }
+                        debug('success');
+                        exit;
+                    } else {
+                        $this->log('saved application', 'e-citizen-error_saved');
+                    }
+                } else {
+                    $this->log('Failed to generate invoice', 'e-citizen-error');
+                }
+            } else {
+                $this->log('Failed to retrive token', 'e-citizen-error');
+            }
+        } else {
+            $this->log('sample application', 'test-app-error');
+        }
+    }
 
     public function applicant_create()
     {
@@ -59,9 +272,9 @@ class ApplicationsController extends AppController
                     $parentId = $this->Application->id;
 
                     // Attach the parent ID to the associated data
-                    foreach ($associatedData as $model => &$modelData) {
+                    foreach ($associatedData as $model => $modelData) {
                         if (!empty($modelData)) {
-                            foreach ($modelData as &$data) {
+                            foreach ($modelData as $data) {
                                 $data['application_id'] = $parentId; // Assuming the foreign key is 'application_id'
                             }
                         }
@@ -99,8 +312,13 @@ class ApplicationsController extends AppController
                         if ($success) {
 
                             // Generate Invoice in the Background
+                            // if(empty($this->request->data['Application']['total_sites']))
+                            // {
+                            //     $this->Session->setFlash(__('Please enter number of sites. Please, correct the errors.'), 'alerts/flash_warning');
+                              
+                            // }
 
-                            $data = array(
+                            $invoice = array(
                                 'function' => 'ppbNewApplication',
                                 'Application' => array(
                                     'id' => $this->Application->id,
@@ -109,7 +327,7 @@ class ApplicationsController extends AppController
                                     'protocol_no' =>  $this->Application->protocol_no
                                 )
                             );
-                            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $data));
+                            CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
 
 
                             $this->Session->setFlash(__('The application has been created, An Invoice has been sent to your email with the invoice details'), 'alerts/flash_success');
@@ -2307,7 +2525,7 @@ class ApplicationsController extends AppController
                             'AuditTrail' => array(
                                 'foreign_key' => $this->Application->field('id'),
                                 'model' => 'Application',
-                                'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully approved by ' . $this->User->field('username', array('id' => $this->Application->field('user_id'))),
+                                'message' => 'Report with protocol number ' .  $this->Application->field('protocol_no') . ' has been successfully approved by ' .  $this->Auth->user('username'),
                                 'ip' =>  $this->Application->field('protocol_no')
                             )
                         );
@@ -2616,10 +2834,10 @@ class ApplicationsController extends AppController
 
                 // Check number of Sites
 
-                if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
-                    $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
-                    $this->redirect($this->referer());
-                }
+                // if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
+                //     $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
+                //     $this->redirect($this->referer());
+                // }
             }
 
             $filedata = $this->request->data;

@@ -20,8 +20,8 @@ class NotificationShell extends Shell
 
   public function sendEmail()
   {
-    $messages=array();
-    $message=array();
+    $messages = array();
+    $message = array();
     $email = new CakeEmail();
     $email->config('gmail');
     $email->template('default');
@@ -109,47 +109,45 @@ class NotificationShell extends Shell
 
   public function generate_report_invoice()
   {
-    $id = $this->args[0]['Application']['id'];
-
-    // $this->log('initiated report'.$id, 'e-citizen-initiate');
+    // $id = 1434;//
+    $id=$this->args[0]['Application']['id'];
+    $this->log('initiated report' . $id, 'e-citizen-initiate');
     $application = $this->Application->find('first', array(
       'conditions' => array('Application.id' => $id),
       'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
     ));
-    // $this->log($application, 'e-citizen-initiate');
+    $this->log($application, 'e-citizen-initiate');
     if ($application) {
       $options = array('ssl_verify_peer' => false);
       $HttpSocket = new HttpSocket($options);
-    
+
       $user = $application['User'];
       //PRINCIPAL INVESTIGATOR
       $multiArray = $application['InvestigatorContact'];
       $firstEntry = reset($multiArray);
       $name = $firstEntry['given_name'] . ' ' . $firstEntry['family_name'];
-      $billDesc = "Principal Investigator: ".$name . "<br>Study Title: " . $application['Application']['short_title'];
-      // $this->log('initiated report',$user, 'e-citizen-initiate-user');
-      // //Request Access Token
-      // $initiate = $HttpSocket->get('https://invoices.pharmacyboardkenya.org/token', false, $header_options);
+      $billDesc = "Principal Investigator: " . $name . "<br>Study Title: " . $application['Application']['short_title'];
+      $this->log('initiated report', $user, 'e-citizen-initiate-user');
 
 
-      
+
       $header_options = array(
         'header' => array(
-            'Content-Type' => 'application/x-www-form-urlencoded'
+          'Content-Type' => 'application/x-www-form-urlencoded'
         )
-    );
-    $postDataToken = array(
+      );
+      $postDataToken = array(
         'APPID' => 'e4da3b7fbbce2345d7772b0674a318d5',
         'APIKEY' => 'MjU0Yjg5ZmRiYzkyNTMwN2UyZWIyZjI3ZTI0NmRiMmU1NmU4NmMzYQ==',
-    );
+      );
 
-    $formDataToken = http_build_query($postDataToken);
-    // //Request Access Token
-    $initiate = $HttpSocket->post(
+      $formDataToken = http_build_query($postDataToken);
+      // //Request Access Token
+      $initiate = $HttpSocket->post(
         'https://invoices.pharmacyboardkenya.org/token',
         $formDataToken,
         $header_options
-    );
+      );
       $this->log('process initiation' . $initiate, 'e-citizen-initiate-token');
       if ($initiate->isOk()) {
         $body = $initiate->body;
@@ -320,8 +318,8 @@ class NotificationShell extends Shell
   {
     $managers = $this->User->find('all', array('conditions' => array('id' => $this->args[0]['Application']['user_id'], 'is_active' => 1), 'contain' => array()));
     $messages = $this->Message->find('list', array(
-      'conditions' => array('Message.name' => array( 
-        'outsource_user_receive_email_subject', 'outsource_user_receive_email','outsource_user_receive_credentials_email'
+      'conditions' => array('Message.name' => array(
+        'outsource_user_receive_email_subject', 'outsource_user_receive_email', 'outsource_user_receive_credentials_email'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
@@ -333,7 +331,7 @@ class NotificationShell extends Shell
         'protocol_link' => Router::url(array(
           'controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
           'outsource' => true
-        ), true), 
+        ), true),
         'protocol_no' => $this->args[0]['Application']['protocol_no'],
         'password' => $this->args[0]['Application']['password'],
         'username' => $this->args[0]['Application']['username'],
@@ -350,7 +348,7 @@ class NotificationShell extends Shell
         ),
       );
       //<!-- Send email to admin -->
-      $bodymessages=$this->args[0]['Application']['new_user']? $messages['outsource_user_receive_credentials_email'] : $messages['outsource_user_receive_email'];
+      $bodymessages = $this->args[0]['Application']['new_user'] ? $messages['outsource_user_receive_credentials_email'] : $messages['outsource_user_receive_email'];
       $message = String::insert($bodymessages, $variables);
       $email = new CakeEmail();
       $email->config('gmail');
@@ -376,7 +374,7 @@ class NotificationShell extends Shell
   {
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 1, 'is_active' => 1), 'contain' => array()));
     $messages = $this->Message->find('list', array(
-      'conditions' => array('Message.name' => array( 
+      'conditions' => array('Message.name' => array(
         'outsource_email_subject', 'outsource_email'
       )),
       'fields' => array('Message.name', 'Message.content')
@@ -461,7 +459,7 @@ class NotificationShell extends Shell
           'AuditTrail' => array(
             'foreign_key' => $review['Review']['application_id'],
             'model' => 'Application',
-            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review by ' . $doer,
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review  by '.$doer,
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
           )
         );
@@ -536,7 +534,7 @@ class NotificationShell extends Shell
           'AuditTrail' => array(
             'foreign_key' => $review['ActiveInspector']['application_id'],
             'model' => 'Application',
-            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['ActiveInspector']['user_id'])) . ' for a site inspection by ' . $this->Auth->User('username'),
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['ActiveInspector']['user_id'])) . ' for a site inspection ' ,
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id']))
           )
         );
@@ -850,7 +848,7 @@ class NotificationShell extends Shell
     ));
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 2, 'is_active' => 1), 'contain' => array()));
 
-    $variables=array();
+    $variables = array();
     foreach ($managers as $manager) {
       $save_data[] = array(
         'Notification' => array(
