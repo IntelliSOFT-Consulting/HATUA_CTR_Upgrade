@@ -61,9 +61,12 @@ echo $this->Session->flash();
             <?php
             if ($anl['status'] == 'submitted') {
               echo $this->Html->link('<span class="label label-success"> Edit </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape' => false));
+           
             } else {
               echo $this->Html->link('<span class="label label-info"> View </span>', array('action' => 'view', $application['Application']['id'], 'anl' => $anl['id']), array('escape' => false));
-            }
+              echo "&nbsp;";
+              echo $this->Html->link('<span class="label label-success"> Edit </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape' => false));
+           }
 
             echo "&nbsp;";
             if ($anl['status'] == 'submitted')
@@ -173,29 +176,29 @@ if (isset($this->params['named']['anl'])) {
                 </div>
               </div>
               <div class="amend-form">
-              <div class="row-fluid">
-                <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
                 <div class="row-fluid">
-                  <div class="span8">
-                    <?php echo $this->element('comments/list_expandable', ['comments' => $anl['ExternalComment'], 'category' => false]) ?>
+                  <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
+                  <div class="row-fluid">
+                    <div class="span8">
+                      <?php echo $this->element('comments/list_expandable', ['comments' => $anl['ExternalComment'], 'category' => false]) ?>
 
-                  </div>
-                  <div class="span4">
-                    <?php
-                    echo $this->element('comments/add', [
-                      'model' => [
-                        'model_id' => $application['Application']['id'],
-                        'foreign_key' => $anl['id'],
-                        'model' => 'AnnualLetter',
-                        'type' => 0,
-                        'category' => 'annual',
-                        'url' => 'add_annual_letter'
-                      ]
-                    ])
-                    ?>
+                    </div>
+                    <div class="span4">
+                      <?php
+                      echo $this->element('comments/add', [
+                        'model' => [
+                          'model_id' => $application['Application']['id'],
+                          'foreign_key' => $anl['id'],
+                          'model' => 'AnnualLetter',
+                          'type' => 0,
+                          'category' => 'annual',
+                          'url' => 'add_annual_letter'
+                        ]
+                      ])
+                      ?>
+                    </div>
                   </div>
                 </div>
-              </div>
               </div>
             <?php } ?>
             </div>
@@ -233,32 +236,71 @@ if (isset($this->params['named']['anl'])) {
             echo $this->Form->input('id', array('type' => 'hidden', 'value' => $annual_letter['id']));
             echo $this->Form->input('status', array('type' => 'hidden', 'value' => 'approved'));
             echo $this->Form->input('approval_date', array(
-              'div' => array('class' => 'control-group'), 'type' => 'text', 'value' => $annual_letter['approval_date'], 'class' => 'datepickers',
+              'div' => array('class' => 'control-group'),
+              'type' => 'text',
+              'value' => $annual_letter['approval_date'],
+              'class' => 'datepickers',
               'label' => array('class' => 'control-label required', 'text' => 'Approval date <span class="sterix">*</span>'),
               'after' => '<span class="help-inline">  Date format (dd-mm-yyyy) </span></div>',
             ));
             echo $this->Form->input('expiry_date', array(
-              'div' => array('class' => 'control-group'), 'type' => 'text', 'value' => $annual_letter['expiry_date'], 'class' => 'datepickers',
+              'div' => array('class' => 'control-group'),
+              'type' => 'text',
+              'value' => $annual_letter['expiry_date'],
+              'class' => 'datepickers',
               'label' => array('class' => 'control-label required', 'text' => 'Expiry date <span class="sterix">*</span>'),
               'after' => '<span class="help-inline">  Date format (dd-mm-yyyy) </span></div>',
             ));
             echo $this->Form->input('content', array(
-              'label' => false, 'value' => $annual_letter['content'],
-              'between' => '<div class="controle">',  'class' => 'input-large',
+              'label' => false,
+              'value' => $annual_letter['content'],
+              'between' => '<div class="controle">',
+              'class' => 'input-large',
             ));
             ?>
           </fieldset>
+
+
+
+          <div class="well controls">
+            <?php
+            echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+              'name' => 'saveChanges',
+              'class' => 'btn btn-primary mapop',
+              'id' => 'rreviewSaveChanges',
+              'title' => 'Save & continue editing',
+              'data-content' => 'Save changes to form without submitting it.
+                                          The form will still be available for further editing.',
+              'div' => false,
+            ));
+            ?>
+            <?php
+            echo $this->Form->button('<i class="icon-rocket"></i> Paste Signature and Approve', array(
+              'name' => 'submitReport',
+              'onclick' => "return confirm('Are you sure you wish to submit the letter?');",
+              'class' => 'btn btn-success mapop',
+              'id' => 'rreviewSubmitReport',
+              'title' => 'Paste Signature and Approve',
+              'data-content' => 'Paste Signature and Approve report for peer review and approval.',
+              'div' => false,
+            ));
+            echo $this->Form->end();
+            ?>
+          </div>
+
           <?php
-          
-          echo  $this->Form->end(array(
-            'label' => 'Paste Signature and Approve',
-            'value' => 'Approve',
-            'class' => 'btn btn-success',
-            'div' => array(
-              'class' => 'form-actions',
-            )
-          ));
+
+
+          // echo  $this->Form->end(array(
+          //   'label' => 'Paste Signature and Approve',
+          //   'value' => 'Approve',
+          //   'class' => 'btn btn-success',
+          //   'div' => array(
+          //     'class' => 'form-actions',
+          //   )
+          // ));
           ?>
+
           <script type="text/javascript">
             (function($) {
 
