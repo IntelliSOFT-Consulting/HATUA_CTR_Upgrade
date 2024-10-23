@@ -1,6 +1,6 @@
 <?php
 
- 
+
 App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
@@ -16,20 +16,17 @@ App::uses('HttpSocket', 'Network/Http');
 class AnnualLettersController extends AppController
 {
     public $uses = array('User', 'Application', 'Message', 'Pocket', 'AnnualLetter');
-     
+
 
 
     public function beforeFilter()
     {
         parent::beforeFilter();
         // $this->Auth->allow();
-        $this->Auth->allow('verify','genereateQRCode','manager_download');
+        $this->Auth->allow('verify', 'genereateQRCode', 'manager_download');
     }
 
-    public function manager_download($id=null)
-    {
-        
-    }
+    public function manager_download($id = null) {}
     /**
      * index method
      *
@@ -89,7 +86,7 @@ class AnnualLettersController extends AppController
     }
     public function verify($id = null)
     {
-    //    $id =base64_decode($id);
+        //    $id =base64_decode($id);
         $this->AnnualLetter->id = $id;
         if (!$this->AnnualLetter->exists()) {
             throw new NotFoundException(__('Invalid annual approval letter'));
@@ -123,31 +120,19 @@ class AnnualLettersController extends AppController
                 'filename' => 'ApprovalLetter_' . $id,
                 'orientation' => 'portrait',
             );
-        } 
+        }
 
-        $data = $this->AnnualLetter->find('first',array(
+        $data = $this->AnnualLetter->find(
+            'first',
+            array(
                 'contain' => array(),
                 'conditions' => array('AnnualLetter.id' => $id)
             )
-        ); 
+        );
         $this->set('AnnualLetter', $data);
         $this->render('download');
     }
-    private function removeAddressLenanaSection($htmlContent)
-    {
-        $patterns = [
-            '/<h3[^>]*>.*?<\/h3>/s', // Remove <h3> section
-            '/<p style="text-align: center;">.*?<\/p>/s', // Remove additional section
-            '/<address>.*?<\/address>/s',
-        ];
 
-        // Remove both specified sections using regular expressions
-        foreach ($patterns as $pattern) {
-            $htmlContent = preg_replace($pattern, '', $htmlContent);
-        }
-
-        return $htmlContent;
-    }
 
     public function applicant_view($id = null)
     {
@@ -206,16 +191,19 @@ class AnnualLettersController extends AppController
         $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $application_id)));
         $cnt++;
         $year = date('Y', strtotime($application['Application']['approval_date']));
-        $approval_no = 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
+        $approval_no = 'ECCT/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
+        $today_date = date('j M Y');
         $variables = array(
-            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
-            'letter_date' => date('j M Y', strtotime($application['Application']['approval_date'])),
+            'approval_no' => $approval_no,
+            'protocol_no' => $application['Application']['protocol_no'],
+            'letter_date' => $today_date, //date('j M Y', strtotime($application['Application']['approval_date'])),
             'qualification' => $application['InvestigatorContact'][0]['qualification'],
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
             'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
-            'study_title' => $application['Application']['short_title'],
+            'study_title' => $application['Application']['study_title'],
+            'short_title' => $application['Application']['short_title'],
             'checklist' => $checkstring,
             'status' => $application['TrialStatus']['name'],
             'expiry_date' => $expiry_date
@@ -250,7 +238,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->save(
                     array(
                         'ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                            'application_id' => $id,
+                            'stage' => 'Screening',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d')
                         )
                     )
                 );
@@ -272,7 +265,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'ScreeningSubmission',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -293,7 +291,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'Assign',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -314,7 +317,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'Review',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -335,7 +343,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'ReviewSubmission',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -357,7 +370,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'FinalDecision',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -380,7 +398,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                            'application_id' => $id,
+                            'stage' => 'AnnualApproval',
+                            'status' => 'Current',
+                            'comment' => 'Manager approve',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d', strtotime('+1 year')),
                         ))
                     );
                 }
@@ -401,24 +424,24 @@ class AnnualLettersController extends AppController
             //end stages
             //**********************        end
 
-               // Create a Audit Trail
-               $this->loadModel('Application');
-               $this->loadModel('AuditTrail');
-               $audit = array(
-                   'AuditTrail' => array(
-                       'foreign_key' => $application_id,
-                       'model' => 'Application',
-                       'message' => 'An initial annual approval letter for the report with protocol number ' .  $this->Application->field('protocol_no',array('id'=>$application_id)) . ' has been  generated by ' . $this->Session->read('Auth.User.username'),
-                       'ip' =>  $this->Application->field('protocol_no',array('id'=>$application_id))
-                   )
-               );
-               $this->AuditTrail->Create();
-               if ($this->AuditTrail->save($audit)) {
-                   $this->log($this->args[0], 'audit_success');
-               } else {
-                   $this->log('Error creating an audit trail', 'notifications_error');
-                   $this->log($this->args[0], 'notifications_error');
-               }
+            // Create a Audit Trail
+            $this->loadModel('Application');
+            $this->loadModel('AuditTrail');
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $application_id,
+                    'model' => 'Application',
+                    'message' => 'An initial annual approval letter for the report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $application_id)) . ' has been  generated by ' . $this->Session->read('Auth.User.username'),
+                    'ip' =>  $this->Application->field('protocol_no', array('id' => $application_id))
+                )
+            );
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($this->args[0], 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'notifications_error');
+                $this->log($this->args[0], 'notifications_error');
+            }
 
             $this->genereateQRCode($this->AnnualLetter->id);
 
@@ -482,18 +505,21 @@ class AnnualLettersController extends AppController
         $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $application['Application']['id'])));
         $cnt++;
         $year = date('Y', strtotime($application['Application']['approval_date']));
-        $approval_no = 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
+        $approval_no = 'ECCT/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
         // $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
         $expiry_date = date('jS F Y', strtotime('+1 year'));
+        $today_date = date('j M Y');
+
         $variables = array(
-            'approval_no' => $approval_no, 
+            'approval_no' => $approval_no,
             'protocol_no' => $application['Application']['protocol_no'],
-            'letter_date' => date('j M Y', strtotime($application['Application']['approval_date'])),
+            'letter_date' => $today_date, //date('j M Y', strtotime($application['Application']['approval_date'])),
             'qualification' => $application['InvestigatorContact'][0]['qualification'],
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
             'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
-            'study_title' => $application['Application']['short_title'],
+            'study_title' => $application['Application']['study_title'],
+            'short_title' => $application['Application']['short_title'],
             'checklist' => $checkstring,
             'status' => $application['TrialStatus']['name'],
             'expiry_date' => $expiry_date
@@ -520,16 +546,24 @@ class AnnualLettersController extends AppController
         foreach ($users as $user) {
             if (isset($application['AnnualLetter'][0])) {
                 $variables = array(
-                    'name' => $user['User']['name'], 'protocol_no' => $application['Application']['protocol_no'],
+                    'name' => $user['User']['name'],
+                    'protocol_no' => $application['Application']['protocol_no'],
                     'protocol_link' => $html->link($application['Application']['protocol_no'], array(
-                        'controller' => 'applications', 'action' => 'view', $application['Application']['id'], $user['Group']['redir'] => true,
+                        'controller' => 'applications',
+                        'action' => 'view',
+                        $application['Application']['id'],
+                        $user['Group']['redir'] => true,
                         'full_base' => true
                     ), array('escape' => false)),
-                    'approval_date' => $application['Application']['approval_date'], 'expiry_date' => $application['AnnualLetter'][0]['expiry_date']
+                    'approval_date' => $application['Application']['approval_date'],
+                    'expiry_date' => $application['AnnualLetter'][0]['expiry_date']
                 );
                 $datum = array(
                     'email' => $user['User']['email'],
-                    'id' => $application['Application']['id'], 'user_id' => $user['User']['id'], 'type' => $type, 'model' => 'AnnaulLetter',
+                    'id' => $application['Application']['id'],
+                    'user_id' => $user['User']['id'],
+                    'type' => $type,
+                    'model' => 'AnnaulLetter',
                     'subject' => String::insert($message['Message']['subject'], $variables),
                     'message' => String::insert($message['Message']['content'], $variables)
                 );
@@ -559,7 +593,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->save(
                     array(
                         'ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                            'application_id' => $id,
+                            'stage' => 'Screening',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d')
                         )
                     )
                 );
@@ -581,7 +620,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'ScreeningSubmission',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -602,7 +646,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'Assign',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -623,7 +672,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'Review',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -644,7 +698,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'ReviewSubmission',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -666,7 +725,12 @@ class AnnualLettersController extends AppController
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
                     array('ApplicationStage' => array(
-                        'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                        'application_id' => $id,
+                        'stage' => 'FinalDecision',
+                        'status' => 'Complete',
+                        'comment' => 'Manager final decision',
+                        'start_date' => date('Y-m-d'),
+                        'end_date' => date('Y-m-d'),
                     ))
                 );
             } else {
@@ -689,7 +753,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                            'application_id' => $id,
+                            'stage' => 'AnnualApproval',
+                            'status' => 'Current',
+                            'comment' => 'Manager approve',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d', strtotime('+1 year')),
                         ))
                     );
                 }
@@ -714,8 +783,8 @@ class AnnualLettersController extends AppController
                 'AuditTrail' => array(
                     'foreign_key' => $application_id,
                     'model' => 'Application',
-                    'message' => 'An annual approval letter for the report with protocol number ' .  $this->Application->field('protocol_no',array('id'=>$application_id)) . ' has been  generated by ' . $this->Session->read('Auth.User.username'),
-                    'ip' =>  $this->Application->field('protocol_no',array('id'=>$application_id))
+                    'message' => 'An annual approval letter for the report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $application_id)) . ' has been  generated by ' . $this->Session->read('Auth.User.username'),
+                    'ip' =>  $this->Application->field('protocol_no', array('id' => $application_id))
                 )
             );
             $this->AuditTrail->Create();
@@ -768,7 +837,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->save(
                         array(
                             'ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                                'application_id' => $id,
+                                'stage' => 'Screening',
+                                'status' => 'Complete',
+                                'comment' => 'Manager final decision',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d')
                             )
                         )
                     );
@@ -790,7 +864,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                            'application_id' => $id,
+                            'stage' => 'ScreeningSubmission',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d'),
                         ))
                     );
                 } else {
@@ -811,7 +890,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                            'application_id' => $id,
+                            'stage' => 'Assign',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d'),
                         ))
                     );
                 } else {
@@ -832,7 +916,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                            'application_id' => $id,
+                            'stage' => 'Review',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d'),
                         ))
                     );
                 } else {
@@ -853,7 +942,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                            'application_id' => $id,
+                            'stage' => 'ReviewSubmission',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d'),
                         ))
                     );
                 } else {
@@ -875,7 +969,12 @@ class AnnualLettersController extends AppController
                     $this->Application->ApplicationStage->create();
                     $this->Application->ApplicationStage->save(
                         array('ApplicationStage' => array(
-                            'application_id' => $id, 'stage' => 'FinalDecision', 'status' => 'Complete', 'comment' => 'Manager final decision', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                            'application_id' => $id,
+                            'stage' => 'FinalDecision',
+                            'status' => 'Complete',
+                            'comment' => 'Manager final decision',
+                            'start_date' => date('Y-m-d'),
+                            'end_date' => date('Y-m-d'),
                         ))
                     );
                 } else {
@@ -898,7 +997,12 @@ class AnnualLettersController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                                'application_id' => $id,
+                                'stage' => 'AnnualApproval',
+                                'status' => 'Current',
+                                'comment' => 'Manager approve',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d', strtotime('+1 year')),
                             ))
                         );
                     }
@@ -976,7 +1080,8 @@ class AnnualLettersController extends AppController
         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
         $expiry_date_s = date('Y-m-d', strtotime($application['Application']['approval_date'] . " +1 year"));
         $variables = array(
-            'approval_no' => $approval_no, 'protocol_no' => $application['Application']['protocol_no'],
+            'approval_no' => $approval_no,
+            'protocol_no' => $application['Application']['protocol_no'],
             'letter_date' => date('j M Y', strtotime($application['Application']['approval_date'])),
             'qualification' => $application['InvestigatorContact'][0]['qualification'],
             'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
@@ -1054,9 +1159,14 @@ class AnnualLettersController extends AppController
                 ));
                 foreach ($users as $user) {
                     $variables = array(
-                        'name' => $user['User']['name'], 'approval_no' => $anl['AnnualLetter']['approval_no'], 'protocol_no' => $anl['Application']['protocol_no'],
+                        'name' => $user['User']['name'],
+                        'approval_no' => $anl['AnnualLetter']['approval_no'],
+                        'protocol_no' => $anl['Application']['protocol_no'],
                         'protocol_link' => $html->link($anl['Application']['protocol_no'], array(
-                            'controller' => 'applications', 'action' => 'view', $anl['Application']['id'], $user['Group']['redir'] => true,
+                            'controller' => 'applications',
+                            'action' => 'view',
+                            $anl['Application']['id'],
+                            $user['Group']['redir'] => true,
                             'full_base' => true
                         ), array('escape' => false)),
                         'expiry_date' => $anl['AnnualLetter']['expiry_date'],
@@ -1064,7 +1174,10 @@ class AnnualLettersController extends AppController
                     );
                     $datum = array(
                         'email' => $user['User']['email'],
-                        'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'annual_approval_letter', 'model' => 'AnnaulLetter',
+                        'id' => $id,
+                        'user_id' => $user['User']['id'],
+                        'type' => 'annual_approval_letter',
+                        'model' => 'AnnaulLetter',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                     );
@@ -1085,7 +1198,12 @@ class AnnualLettersController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $anl['Application']['id'], 'stage' => 'AnnualApproval', 'status' => 'Current', 'comment' => 'Manager approve', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d', strtotime('+1 year')),
+                                'application_id' => $anl['Application']['id'],
+                                'stage' => 'AnnualApproval',
+                                'status' => 'Current',
+                                'comment' => 'Manager approve',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d', strtotime('+1 year')),
                             ))
                         );
                     }
@@ -1110,8 +1228,8 @@ class AnnualLettersController extends AppController
                     'AuditTrail' => array(
                         'foreign_key' => $anl['Application']['id'],
                         'model' => 'Application',
-                        'message' => 'An annual approval letter for the report with protocol number ' .  $this->Application->field('protocol_no',array('id'=>$anl['Application']['id'])) . ' has been  approved by ' . $this->Session->read('Auth.User.username'),
-                        'ip' =>  $this->Application->field('protocol_no',array('id'=>$anl['Application']['id']))
+                        'message' => 'An annual approval letter for the report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $anl['Application']['id'])) . ' has been  approved by ' . $this->Session->read('Auth.User.username'),
+                        'ip' =>  $this->Application->field('protocol_no', array('id' => $anl['Application']['id']))
                     )
                 );
                 $this->AuditTrail->Create();

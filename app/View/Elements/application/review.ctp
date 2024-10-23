@@ -14,7 +14,7 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
 </div>
 
 <div class="row-fluid">
-  <div class="span3">
+  <div class="span3"> 
     <?php
     echo $this->Html->link(
       __('<i class="icon-stethoscope"></i> Add Clinical Assessment'),

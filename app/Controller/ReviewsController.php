@@ -294,7 +294,7 @@ class ReviewsController extends AppController
     }
     public function manager_add($application_id = null, $review_type = null)
     {
-        $this->add($application_id, $review_type);
+        $this->add($application_id, $review_type); 
     }
     public function reviewer_add($application_id = null, $review_type = null)
     {
@@ -407,7 +407,10 @@ class ReviewsController extends AppController
         if (!$this->Review->exists()) {
             throw new NotFoundException(__('Invalid review id'));
         }
+
         if ($this->request->is('post') || $this->request->is('put')) {
+            // debug($this->request->data);
+            // exit;
             if ($this->Review->saveMany($this->request->data['Review'], array('deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Review->saveField('status', 'Submitted');

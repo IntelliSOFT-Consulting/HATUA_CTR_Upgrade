@@ -31,7 +31,7 @@ class ApplicationsController extends AppController
 
         $data = $this->request->data['Application'];
         $total_sites = $data['total_sites'];
-         
+
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
@@ -48,10 +48,9 @@ class ApplicationsController extends AppController
                     'protocol_no' =>  $application['Application']['protocol_no']
                 )
             );
-            
+
             CakeResque::enqueue('default', 'NotificationShell', array('generate_report_missed_invoice', $invoice));
-            
-        } 
+        }
         $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
     }
@@ -74,9 +73,8 @@ class ApplicationsController extends AppController
                     'protocol_no' =>  $application['Application']['protocol_no']
                 )
             );
-           
+
             CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
-            
         }
         $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
@@ -315,7 +313,7 @@ class ApplicationsController extends AppController
                             // if(empty($this->request->data['Application']['total_sites']))
                             // {
                             //     $this->Session->setFlash(__('Please enter number of sites. Please, correct the errors.'), 'alerts/flash_warning');
-                              
+
                             // }
 
                             $invoice = array(
@@ -2258,7 +2256,8 @@ class ApplicationsController extends AppController
                             'names' => $names,
                             'professional_address' => $professional_address,
                             'telephone' => $telephone,
-                            'study_title' => $application['Application']['short_title'],
+                            'study_title' => $application['Application']['study_title'],
+                            'short_title' => $application['Application']['short_title'],
                             'checklist' => $checkstring,
                             'status' => $application['TrialStatus']['name'],
                             'expiry_date' => $expiry_date
@@ -2877,14 +2876,14 @@ class ApplicationsController extends AppController
                             )
                         );
                         CakeResque::enqueue('default', 'NotificationShell', array('ppbNewApplication', $data));
-
+                        $protocol_no =  (!empty($response['Application']['protocol_no'])) ?  $response['Application']['protocol_no'] : $this->request->data['Application']['protocol_no'];
                         // Create a Audit Trail
                         $audit = array(
                             'AuditTrail' => array(
                                 'foreign_key' => $response['Application']['id'],
                                 'model' => 'Application',
-                                'message' => 'New Report with protocol number ' . $response['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
-                                'ip' => $response['Application']['protocol_no']
+                                'message' => 'New Report with protocol number ' . $protocol_no . ' has been submitted by ' . $this->Auth->user('username'),
+                                'ip' => $protocol_no
                             )
                         );
                         $this->loadModel('AuditTrail');

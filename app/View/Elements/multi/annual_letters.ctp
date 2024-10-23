@@ -248,7 +248,9 @@ if (isset($this->params['named']['anl'])) {
             ));
             ?>
           </fieldset>
-          <?php echo  $this->Form->end(array(
+          <?php
+          
+          echo  $this->Form->end(array(
             'label' => 'Paste Signature and Approve',
             'value' => 'Approve',
             'class' => 'btn btn-success',
