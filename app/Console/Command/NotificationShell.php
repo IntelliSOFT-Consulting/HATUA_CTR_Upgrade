@@ -39,8 +39,10 @@ class NotificationShell extends Shell
   {
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array(
-        'registration_email_subject', 'registration_email',
-        'registration_welcome_subject', 'registration_welcome_message'
+        'registration_email_subject',
+        'registration_email',
+        'registration_welcome_subject',
+        'registration_welcome_message'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
@@ -110,7 +112,7 @@ class NotificationShell extends Shell
   public function generate_report_invoice()
   {
     // $id = 1434;//
-    $id=$this->args[0]['Application']['id'];
+    $id = $this->args[0]['Application']['id'];
     $this->log('initiated report' . $id, 'e-citizen-initiate');
     $application = $this->Application->find('first', array(
       'conditions' => array('Application.id' => $id),
@@ -223,7 +225,8 @@ class NotificationShell extends Shell
 
             $messages = $this->Message->find('list', array(
               'conditions' => array('Message.name' => array(
-                'applicant_invoice_email', 'applicant_invoice_email_subject'
+                'applicant_invoice_email',
+                'applicant_invoice_email_subject'
               )),
               'fields' => array('Message.name', 'Message.content')
             ));
@@ -258,15 +261,19 @@ class NotificationShell extends Shell
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 2, 'is_active' => 1), 'contain' => array()));
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array(
-        'manager_new_application_subject', 'manager_new_application',
-        'applicant_submit_email', 'applicant_submit_email_subject'
+        'manager_new_application_subject',
+        'manager_new_application',
+        'applicant_submit_email',
+        'applicant_submit_email_subject'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
     $save_data = array();
     $variables = array(
       'protocol_link' => Router::url(array(
-        'controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
+        'controller' => 'applications',
+        'action' => 'view',
+        $this->args[0]['Application']['id'],
         'manager' => true
       ), true),
       'protocol_no' => $this->args[0]['Application']['protocol_no'],
@@ -306,7 +313,7 @@ class NotificationShell extends Shell
     $email->emailFormat('html');
     $email->to($this->args[0]['Application']['email']);
     // $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org'));
-    $email->bcc(array('kiprotich.japheth19@gmail.com'));
+    $email->bcc(array('itsjkiprotich@gmail.com'));
     $email->subject(Sanitize::html(String::insert($messages['applicant_submit_email_subject'], $variables), array('remove' => true)));
     $email->viewVars(array('message' => $message));
     if (!$email->send()) {
@@ -319,7 +326,9 @@ class NotificationShell extends Shell
     $managers = $this->User->find('all', array('conditions' => array('id' => $this->args[0]['Application']['user_id'], 'is_active' => 1), 'contain' => array()));
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array(
-        'outsource_user_receive_email_subject', 'outsource_user_receive_email', 'outsource_user_receive_credentials_email'
+        'outsource_user_receive_email_subject',
+        'outsource_user_receive_email',
+        'outsource_user_receive_credentials_email'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
@@ -329,7 +338,9 @@ class NotificationShell extends Shell
 
       $variables = array(
         'protocol_link' => Router::url(array(
-          'controller' => 'applications', 'action' => 'view', $this->args[0]['Application']['id'],
+          'controller' => 'applications',
+          'action' => 'view',
+          $this->args[0]['Application']['id'],
           'outsource' => true
         ), true),
         'protocol_no' => $this->args[0]['Application']['protocol_no'],
@@ -375,7 +386,8 @@ class NotificationShell extends Shell
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 1, 'is_active' => 1), 'contain' => array()));
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array(
-        'outsource_email_subject', 'outsource_email'
+        'outsource_email_subject',
+        'outsource_email'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
@@ -385,7 +397,9 @@ class NotificationShell extends Shell
 
       $variables = array(
         'protocol_link' => Router::url(array(
-          'controller' => 'outsources', 'action' => 'view', $this->args[0]['Application']['id'],
+          'controller' => 'outsources',
+          'action' => 'view',
+          $this->args[0]['Application']['id'],
           'admin' => true
         ), true),
         'protocol_no' => $this->args[0]['Application']['protocol_no'],
@@ -438,7 +452,9 @@ class NotificationShell extends Shell
       foreach ($reviews as $review) {
         $variables = array(
           'protocol_link' => Router::url(array(
-            'controller' => 'applications', 'action' => 'view', $review['Review']['application_id'],
+            'controller' => 'applications',
+            'action' => 'view',
+            $review['Review']['application_id'],
             'reviewer' => true
           ), true),
           'protocol_no' => $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
@@ -459,7 +475,7 @@ class NotificationShell extends Shell
           'AuditTrail' => array(
             'foreign_key' => $review['Review']['application_id'],
             'model' => 'Application',
-            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review  by '.$doer,
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review  by ' . $doer,
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
           )
         );
@@ -470,17 +486,30 @@ class NotificationShell extends Shell
           $this->log('Error creating an audit trail', 'notifications_error');
           $this->log($this->args[0], 'notifications_error');
         }
-        //<!-- Send email to reviewers -->
-        $revs = $this->User->find('all', array('conditions' => array('id' => $review['Review']['user_id'], 'is_active' => 1, 'group_id' => 3), 'contain' => array()));
 
-        foreach ($revs as $manager) {
-          $message = String::insert($messages['reviewer_new_application_subject'], $variables);
+        // Send email to this user here
+
+
+        //<!-- Send email to reviewers -->
+        // $revs = $this->User->find('all', array('conditions' => array('id' => $review['Review']['user_id'], 'is_active' => 1, 'group_id' => 3), 'contain' => array()));
+        $userAccount = $this->User->find('first', array(
+          'conditions' => array(
+            'id' => $review['Review']['user_id'],
+            'is_active' => 1
+          ),
+          'contain' => array()
+        ));
+
+        if ($userAccount) {
+
+          $user_email = $userAccount['User']['email'];
+          $message = String::insert($messages['reviewer_new_application'], $variables);
           $email = new CakeEmail();
           $email->config('gmail');
           $email->template('default');
           $email->emailFormat('html');
-          $email->to($manager->email);
-          $email->bcc(array('kiprotich.japheth19@gmail.com'));
+          $email->to($user_email);
+          $email->bcc(array('itsjkiprotich@gmail.com'));
           $email->subject(Sanitize::html(String::insert($messages['reviewer_new_application_subject'], $variables), array('remove' => true)));
           $email->viewVars(array('message' => $message));
           if (!$email->send()) {
@@ -513,7 +542,9 @@ class NotificationShell extends Shell
       foreach ($reviews as $review) {
         $variables = array(
           'protocol_link' => Router::url(array(
-            'controller' => 'applications', 'action' => 'view', $review['ActiveInspector']['application_id'],
+            'controller' => 'applications',
+            'action' => 'view',
+            $review['ActiveInspector']['application_id'],
             'reviewer' => true
           ), true),
           'protocol_no' => $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id']))
@@ -534,7 +565,7 @@ class NotificationShell extends Shell
           'AuditTrail' => array(
             'foreign_key' => $review['ActiveInspector']['application_id'],
             'model' => 'Application',
-            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['ActiveInspector']['user_id'])) . ' for a site inspection ' ,
+            'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['ActiveInspector']['user_id'])) . ' for a site inspection ',
             'ip' =>  $this->Application->field('protocol_no', array('id' => $review['ActiveInspector']['application_id']))
           )
         );
@@ -666,7 +697,9 @@ class NotificationShell extends Shell
     // $save_data = array();
     $variables = array(
       'protocol_link' => Router::url(array(
-        'controller' => 'applications', 'action' => 'view', $this->args[0]['application_id'],
+        'controller' => 'applications',
+        'action' => 'view',
+        $this->args[0]['application_id'],
         'applicant' => true
       ), true),
       'protocol_no' => $this->Application->field('protocol_no', array('id' => $this->args[0]['application_id']))
@@ -709,15 +742,18 @@ class NotificationShell extends Shell
   {
     $messages = $this->Message->find('list', array(
       'conditions' => array('Message.name' => array(
-        'approve_message_subject', 'applicant_approve_message',
-        'reviewers_approve_message', 'managers_approve_message'
+        'approve_message_subject',
+        'applicant_approve_message',
+        'reviewers_approve_message',
+        'managers_approve_message'
       )),
       'fields' => array('Message.name', 'Message.content')
     ));
 
     $my_reviewers = $this->Review->find('list', array(
       'conditions' => array(
-        'Review.application_id' => $this->args[0]['application_id'], 'Review.type' => 'request',
+        'Review.application_id' => $this->args[0]['application_id'],
+        'Review.type' => 'request',
         'Review.accepted' => 'accepted'
       ),
       'fields' => array('Review.user_id'),
@@ -742,7 +778,9 @@ class NotificationShell extends Shell
       'approved' => ($this->Application->field('approved', array('id' => $this->args[0]['application_id'])) == 2) ? 'Approved' : 'Rejected',
     );
     $variables['protocol_link'] = Router::url(array(
-      'controller' => 'applications', 'action' => 'view', $this->args[0]['application_id'],
+      'controller' => 'applications',
+      'action' => 'view',
+      $this->args[0]['application_id'],
       'applicant' => true
     ), true);
     $save_data[] = array(
@@ -759,7 +797,9 @@ class NotificationShell extends Shell
 
     //Notify reviewers
     $variables['protocol_link'] = Router::url(array(
-      'controller' => 'applications', 'action' => 'view', $this->args[0]['application_id'],
+      'controller' => 'applications',
+      'action' => 'view',
+      $this->args[0]['application_id'],
       'reviewer' => true
     ), true);
     foreach ($reviewers as $reviewer) {
@@ -778,7 +818,9 @@ class NotificationShell extends Shell
 
     //Notify managers
     $variables['protocol_link'] = Router::url(array(
-      'controller' => 'applications', 'action' => 'view', $this->args[0]['application_id'],
+      'controller' => 'applications',
+      'action' => 'view',
+      $this->args[0]['application_id'],
       'manager' => true
     ), true);
     $variables['name'] = $this->User->field('name', array('id' => $this->args[0]['manager']));
@@ -813,11 +855,15 @@ class NotificationShell extends Shell
     $save_data = array();
     $variables = array(
       'amendment_link' => Router::url(array(
-        'controller' => 'amendments', 'action' => 'edit', $this->args[0]['id'],
+        'controller' => 'amendments',
+        'action' => 'edit',
+        $this->args[0]['id'],
         'applicant' => true
       ), true),
       'protocol_link' => Router::url(array(
-        'controller' => 'applications', 'action' => 'view', $this->args[0]['application_id'],
+        'controller' => 'applications',
+        'action' => 'view',
+        $this->args[0]['application_id'],
         'applicant' => true
       ), true),
       'protocol_no' => $this->args[0]['protocol_no']
@@ -865,11 +911,15 @@ class NotificationShell extends Shell
     $save_data = array();
     $variables = array(
       'amendment_link' => Router::url(array(
-        'controller' => 'amendments', 'action' => 'edit', $this->args[0]['id'],
+        'controller' => 'amendments',
+        'action' => 'edit',
+        $this->args[0]['id'],
         'applicant' => true
       ), true),
       'protocol_link' => Router::url(array(
-        'controller' => 'applications', 'action' => 'view', $this->args[0]['application_id'],
+        'controller' => 'applications',
+        'action' => 'view',
+        $this->args[0]['application_id'],
         'applicant' => true
       ), true),
       'protocol_no' => $this->args[0]['protocol_no']

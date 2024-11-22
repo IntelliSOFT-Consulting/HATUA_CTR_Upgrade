@@ -1453,7 +1453,12 @@ class ApplicationsController extends AppController
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
             $this->csv_export($this->Application->find(
                 'all',
-                array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->a_contain)
+                array(
+                    'conditions' => $this->paginate['conditions'], 
+                    'order' => $this->paginate['order'], 
+                    'contain' => $this->a_contain,
+                    'limit' => $this->paginate['limit'], 
+                    )
             ));
         }
         //end csv export
@@ -1692,7 +1697,8 @@ class ApplicationsController extends AppController
         }
 
         $response = $this->_isOwnedBy($id);
-
+// debug($response);
+// exit;
         $this->set('application', $response);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
         $countries = $this->Country->find('list', array('order' => 'Country.name ASC'));
@@ -3227,7 +3233,17 @@ class ApplicationsController extends AppController
         $contains['SiteInspection']['conditions'] = array('SiteInspection.summary_approved' => 2);
         $contains['Deviation']['conditions'] = array('Deviation.user_id' => $this->Auth->user('id'));
         $contains['Review']['conditions'] = array('Review.type' => 'ppb_comment');
-
+        // $contains['ApplicationStage']['ExternalComment']['conditions'] = array('ExternalComment.submitted' => '2');
+        $contains['ApplicationStage'] = array(
+            'conditions' => array(), // No filtering on ApplicationStage
+            'Comment' => array(
+                'conditions' => array(
+                    'Comment.submitted' => 2
+                )
+            )
+        );
+        
+        
         // debug($contains);
         $response = $this->Application->find(
             'first',

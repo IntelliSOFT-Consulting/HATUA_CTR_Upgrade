@@ -248,7 +248,10 @@ class ReviewsController extends AppController
             } else {
                 $this->Session->setFlash(__('The password you have entered is not correct! Please enter the correct password
                     and try again.'), 'alerts/flash_error');
-                $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
+                    // debug($this->request->data);
+                    // exit;
+                    $this->redirect($this->referer());
+                // $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
             }
 
             // if ($this->Review->saveMany($this->request->data)) {
@@ -375,8 +378,10 @@ class ReviewsController extends AppController
                             ))
                         );
                     }
+                    // debug($this->request->data);
+                    // exit;
                     //end stages
-                    $doer = $this->Auth->user('name');
+                    $doer = $this->Auth->user('name'); 
                     CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data,$doer));
 
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');

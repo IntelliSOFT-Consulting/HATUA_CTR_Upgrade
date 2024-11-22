@@ -1,6 +1,8 @@
 <?php
 $this->Html->css('comments', null, array('inline' => false));
 $this->Html->script('comments/comments', array('inline' => false));
+$this->Html->script('ckeditor/ckeditor', array('inline' => false));
+$this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 ?>
 
 <div class="bs-example">
@@ -28,6 +30,7 @@ $this->Html->script('comments/comments', array('inline' => false));
             echo $this->Form->input('model_id', ['type' => 'hidden', 'value' => $model['model_id'], 'escape' => false]);
             echo $this->Form->input('foreign_key', ['type' => 'hidden', 'value' => $model['foreign_key']]);
             echo $this->Form->input('model', ['type' => 'hidden', 'value' => $model['model']]);
+            echo $this->Form->input('message_type', ['type' => 'hidden', 'value' => $model['message_type']]);
             echo $this->Form->input('category', ['type' => 'hidden', 'value' => $model['category']]);
             echo $this->Form->input('user_id', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')]);
             if (strpos($model['url'], 'committee') !== false) {
@@ -38,7 +41,8 @@ $this->Html->script('comments/comments', array('inline' => false));
             echo $this->Form->input('subject', ['label' => array('class' => 'required')]);
             echo $this->Form->input('content', array(
                 'label' => false, 'value' => $content['Pocket']['content'],
-                'between' => '<div class="span12">',  'class' => 'input-large',
+                'between' => '<div class="span12">', 
+                 'class' => 'input-large editor',
             ));
             ?>
         </div>
@@ -55,14 +59,33 @@ $this->Html->script('comments/comments', array('inline' => false));
     </div>
     <div class="form-group">
         <div class="span12">
-            <button type="submit" class="btn btn-success active"><i class="fa fa-save" aria-hidden="true"></i> Submit</button>
+        <?php
+          echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+              'name' => 'saveChanges',
+              'class' => 'btn btn-success mapop',
+              'id' => 'rreviewSaveChanges', 
+              'title'=>'Save & continue editing',
+              'data-content' => 'Save changes to form without submitting it.
+                                          The form will still be available for further editing.',
+              'div' => false,
+          ));
+        ?>
+        <?php
+          echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
+              'name' => 'submitReport',
+              'onclick'=>"return confirm('Are you sure you wish to submit the query to this report?');",
+              'class' => 'btn btn-primary mapop',
+              'id' => 'rreviewSubmitReport', 'title'=>'Save and Submit Report',
+              'data-content' => 'Submit report for peer review and approval.',
+              'div' => false,
+            ));
+
+        ?>
+            <!-- <button type="submit" class="btn btn-success active"><i class="fa fa-save" aria-hidden="true"></i> Submit</button> -->
         </div>
     </div>
     <?php echo $this->Form->end() ?>
     <script type="text/javascript">
-    $('#CommentContent').ckeditor();
-        (function($) {
-            $('#CommentContent').ckeditor();
-        });
+    $('.editor').ckeditor(); 
     </script>
 </div>

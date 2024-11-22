@@ -1,7 +1,7 @@
 <?php
 echo $this->Session->flash();
 ?>
-<h3>Annual Approval Letters</h3>
+<h3>Approval Letters</h3>
 <?php if ($redir == 'manager') { ?>
   <br>
   <div class="row-fluid">
@@ -74,7 +74,10 @@ echo $this->Session->flash();
             echo "&nbsp;";
             // if($anl['status'] == 'submitted') 
             echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'annual_letters', 'action' => 'view', $anl['id'], 'ext' => 'pdf',), array('escape' => false));
-            ?>
+            echo "&nbsp;";
+            // if ($anl['status'] == 'approved')
+             echo $this->Html->link('<span class="label label-important"> Delete </span>', array('controller' => 'annual_letters', 'action' => 'delete', $anl['id'],), array('escape' => false,'confirm'=>'Are you sure to want to delete this Letter?'));
+           ?>
           </td>
         </tr>
       <?php } ?>
@@ -140,13 +143,14 @@ if (isset($this->params['named']['anl'])) {
                             <div class="row-fluid">
                               <div class="span12">
                                 <?php
-                                echo $this->element('comments/add', [
+                                echo $this->element('comments/add_editor', [
                                   'model' => [
                                     'model_id' => $application['Application']['id'],
                                     'foreign_key' => $anl['id'],
                                     'model' => 'AnnualLetter',
-                                    'type' => 0,
+                                    'type' => 68,
                                     'category' => 'annual',
+                                    'message_type'=>'review_response',
                                     'url' => 'add_annual_letter'
                                   ]
                                 ])
@@ -192,6 +196,7 @@ if (isset($this->params['named']['anl'])) {
                           'model' => 'AnnualLetter',
                           'type' => 0,
                           'category' => 'annual',
+                          'message_type'=>'review_response',
                           'url' => 'add_annual_letter'
                         ]
                       ])
@@ -211,7 +216,7 @@ if (isset($this->params['named']['anl'])) {
   <?php
   if (isset($this->params['named']['ane'])) {
     foreach ($application['AnnualLetter'] as $akey => $annual_letter) {
-      if ($annual_letter['id'] == $this->params['named']['ane'] && $annual_letter['status'] != 'approved') {
+      if ($annual_letter['id'] == $this->params['named']['ane']){// && $annual_letter['status'] != 'approved') {
         // debug($annual_letter['status'] == 'submitted');         
   ?>
         <div class="ctr-groups">

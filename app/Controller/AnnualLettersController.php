@@ -37,7 +37,48 @@ class AnnualLettersController extends AppController
         $this->AnnualLetter->recursive = 0;
         $this->set('AnnualLetters', $this->paginate());
     }
+    public function manager_delete($id = null)
+    {
 
+
+        $this->AnnualLetter->id = $id;
+        if (!$this->AnnualLetter->exists()) {
+            throw new NotFoundException(__('Invalid annual approval letter'));
+        }
+        $letter = $this->AnnualLetter->find('first', array('conditions' => array('AnnualLetter.id' => $id)));
+        // debug($letter);
+        // exit;
+        // Perform a soft delete by setting deleted to true and updating deleted_date
+        if ($this->AnnualLetter->save([
+            'deleted' => true,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ])) {
+
+            // generate Audit trail
+
+            
+            $audit = array(
+                'AuditTrail' => array(
+                    'foreign_key' => $letter['AnnualLetter']['id'],
+                    'model' => 'Annual Letter',
+                    'message' => 'Annual Letter with approval number ' . $letter['AnnualLetter']['approval_no'] . ' has been deleted by ' . $this->Auth->user('username'),
+                    'ip' => $letter['AnnualLetter']['approval_no']
+                )
+            );
+            $this->loadModel('AuditTrail');
+            $this->AuditTrail->Create();
+            if ($this->AuditTrail->save($audit)) {
+                $this->log($this->request->data, 'audit_success');
+            } else {
+                $this->log('Error creating an audit trail', 'notifications_error');
+                $this->log($this->request->data, 'notifications_error');
+            }
+            $this->Session->setFlash(__('The approval letter has been deleted successfully.'), 'alerts/flash_success');
+        } else {
+            $this->Session->setFlash(__('The approval letter could not be deleted. Please, try again.'), 'alerts/flash_error');
+        }
+        $this->redirect($this->referer());
+    }
     public function genereateQRCode($id = null)
     {
 
@@ -1249,7 +1290,6 @@ class AnnualLettersController extends AppController
                     }
                     $this->Session->setFlash(__('The annual approval letter has been submitted and sent to the PI'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], 'anl' => $id, 'manager' => true));
-               
                 }
 
                 $this->Session->setFlash(__('The annual approval letter has been saved'), 'alerts/flash_success');

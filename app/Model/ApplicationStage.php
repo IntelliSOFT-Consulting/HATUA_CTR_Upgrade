@@ -49,5 +49,6 @@ class ApplicationStage extends AppModel {
             'dependent' => true,
             'conditions' => array('Comment.model' => 'ApplicationStage', 'Comment.category' => 'external' ),
         ),
+	 
     );
 }

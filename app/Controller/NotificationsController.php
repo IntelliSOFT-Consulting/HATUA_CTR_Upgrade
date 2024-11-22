@@ -3,6 +3,7 @@ App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('Sanitize', 'Utility');
 App::uses('Router', 'Routing');
+App::uses('CakeEmail', 'Network/Email');
 config('routes');
 /**
  * Notifications Controller
@@ -153,6 +154,7 @@ class NotificationsController extends AppController {
 			throw new NotFoundException(__('Invalid review'));
 		}
 		$review = $this->Review->read(null, $id);
+       
 		$messages = $this->Message->find('list', array(
                                     'conditions' => array('Message.name' => array('reviewer_new_application_subject', 'reviewer_new_application')),
                                     'fields' => array('Message.name', 'Message.content')));
@@ -172,6 +174,39 @@ class NotificationsController extends AppController {
 			'user_message' => $review['Review']['text'],
 			),
 		);
+
+
+        /*Sending Email to the Reviewer*/
+
+        $userAccount = $this->User->find('first', array(
+            'conditions' => array(
+              'id' => $review['Review']['user_id'],
+              'is_active' => 1
+            ),
+            'contain' => array()
+          )); 
+        //   debug($userAccount);
+        //   exit;
+          if ($userAccount) {
+            
+  
+            $user_email = $userAccount['User']['email'];
+            $message = String::insert($messages['reviewer_new_application'], $variables);
+            $email = new CakeEmail();
+            $email->config('gmail');
+            $email->template('default');
+            $email->emailFormat('html');
+            $email->to($user_email);
+            $email->bcc(array('itsjkiprotich@gmail.com'));
+            $email->subject(Sanitize::html(String::insert($messages['reviewer_new_application_subject'], $variables), array('remove' => true)));
+            $email->viewVars(array('message' => $message));
+            if (!$email->send()) {
+              $this->log($email, 'submit_email');
+            }
+          }
+
+
+        /*End of resend*/ 
 
 		$this->Notification->Create();
 		if ($this->Notification->saveMany($save_data)) {

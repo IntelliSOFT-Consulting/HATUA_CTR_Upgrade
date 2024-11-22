@@ -6,13 +6,7 @@
 <!-- <div class="row"> -->
   <!-- <div class="col-xs-12"> -->
     <div class="bs-example">
-      <?php 
-        // echo $this->Form->create(null, ['type' => 'file','url' => ['controller' => 'Comments', 'action' => $model['url']]]); 
-        // echo $this->Form->create('Comment', array(
-        //     'url' => array('controller' => 'comments','action' => $model['url']),
-        //     'type' => 'file',
-        //     'class' => false,
-        // ));
+      <?php  
       echo $this->Form->create('Comment', array(
             'url' => array('controller' => 'comments','action' => $model['url'], (isset($model['param'])) ? $model['param'] : ''),
             'type' => 'file',
@@ -32,6 +26,8 @@
                         echo $this->Form->input('model_id', ['type' => 'hidden', 'value' => $model['model_id'], 'escape' => false]);
                         echo $this->Form->input('foreign_key', ['type' => 'hidden', 'value' => $model['foreign_key']]);
                         echo $this->Form->input('model', ['type' => 'hidden', 'value' => $model['model']]);
+                        echo $this->Form->input('message_type', ['type' => 'hidden', 'value' => $model['message_type']]);                        
+                        echo $this->Form->input('submitted', ['type' => 'hidden', 'value' => 2]);
                         echo $this->Form->input('category', ['type' => 'hidden', 'value' => $model['category']]);
                         echo $this->Form->input('user_id', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')]);
                         if(strpos($model['url'], 'committee') !== false) {

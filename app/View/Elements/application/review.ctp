@@ -62,7 +62,7 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
         <tr>
           <th style="width:3%">ID</th>
           <th style="width:3%">Recommendation</th>
-          <th style="width: 40%;">Comments</th>
+          <!-- <th style="width: 40%;">Comments</th> -->
           <th style="width:3%">Status &amp; Type</th>
           <th style="width:3%">User</th>
           <th style="width:3%">Created</th>
@@ -82,6 +82,7 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
               }
               // echo $rreview['summary'] . '<br/>';
               echo $rreview['recommendation'];
+              echo "<br>";
               if (!empty($rreview['summary'])) {
               ?>
 
@@ -89,46 +90,11 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
                   View Summary
                 </button>
 
-                <!-- Start -->
-                <div class="modal fade" id="myModal_<?php echo $rreview['id']; ?>">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-
-                      <!-- Modal Header -->
-                      <div class="modal-header">
-                        <h4 class="modal-title">Clinical Summary</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      </div>
-
-                      <!-- Modal Body -->
-                      <div class="modal-body">
-                        <?php 
-                        
-                        echo $rreview['summary'];
-                        ?>
-
-                      </div>
-
-                      <!-- Modal Footer -->
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-
+              
+            
                 <!-- End -->
               <?php } ?>
-            </td>
-            <td><?php
-                foreach ($rreview['InternalComment'] as $iComment) {
-                  echo   $iComment['subject'] . "<br>";
-                  echo   $iComment['content'] . "<br>";
-                  echo   $iComment['sender'] . "<br>";
-                  echo "<br>";
-                }
-                ?></td>
+            </td> 
             <td><?php echo $rreview['status'] . "<br>" . $rreview['type'] ?></td>
             <td><?php echo $rreview['User']['name']; ?></td>
             <td><?php echo $rreview['created'] ?></td>
@@ -159,12 +125,45 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
 
               ?>
             </td>
+
+
+              <!-- Start -->
+              <div class="modal fade" id="myModal_<?php echo $rreview['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h4 class="modal-title">Clinical Summary</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      </div>
+
+                      <!-- Modal Body -->
+                      <div class="modal-body">
+                        <?php 
+                        
+                        echo $rreview['summary'];
+                        ?>
+
+                      </div>
+
+                      <!-- Modal Footer -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
           </tr>
         <?php } ?>
       </tbody>
     </table>
   </div>
 </div>
+
+
+
 
 <br>
 <hr>
@@ -236,10 +235,13 @@ if (isset($this->params['named']['rreview_view'])) {
                     <div class="row-fluid">
                       <div class="span12">
                         <?php
-                        echo $this->element('comments/add', [
+                        echo $this->element('comments/add_editor', [
                           'model' => [
                             'model_id' => $application['Application']['id'], 'foreign_key' => $rreview['id'],
-                            'model' => 'Review', 'type' => 51, 'category' => 'internal', 'url' => 'add_review_internal'
+                            'model' => 'Review', 'type' => 51, 
+                            'category' => 'internal',
+                            'message_type'=>'internal_review_comment',
+                             'url' => 'add_review_internal'
                           ]
                         ])
                         ?>
@@ -250,8 +252,7 @@ if (isset($this->params['named']['rreview_view'])) {
               </div>
             </div><!--/span-->
           </div><!--/row-->
-        </div>
-
+        </div> 
       </div>
 
 <?php

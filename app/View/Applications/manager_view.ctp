@@ -56,7 +56,7 @@ echo $this->Session->flash();
     <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
     <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
     <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li>
-    <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Annual Approval Letter</a></li>
+    <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Approval Letters</a></li>
     <?php if ($application['Application']['approved'] == 2) { ?>
       <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
     <?php } ?>
@@ -232,6 +232,7 @@ echo $this->Session->flash();
                         'foreign_key' => $eid['id'],
                         'model' => 'ApplicationStage',
                         'category' => 'external',
+                    'message_type' => 'screening_feedback',
                         'url' => 'add_screening_query',
                         'type' => 50
                       ]
@@ -255,7 +256,7 @@ echo $this->Session->flash();
         <div class="span12">
           <?php
           echo $this->Form->create(
-            'Review',
+            'Review', 
             array('url' => array('controller' => 'reviews', 'action' => 'assign', $application['Application']['id']))
           );
           $counter = 0;
@@ -446,7 +447,9 @@ echo $this->Session->flash();
                     if (!empty($rid))  echo $this->element('comments/add', [
                       'model' => [
                         'model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],
-                        'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response'
+                        'model' => 'Review', 'category' => 'external',                         
+                        'message_type'=>'review_response',
+                        'url' => 'add_review_response'
                       ]
                     ])
                     ?>
@@ -486,7 +489,9 @@ echo $this->Session->flash();
                     if (!empty($rid))  echo $this->element('comments/add', [
                       'model' => [
                         'model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],
-                        'model' => 'Review', 'category' => 'internal', 'url' => 'add_internal_review_response'
+                        'model' => 'Review', 'category' => 'internal',                                               
+                        'message_type'=>'review_response',
+                        'url' => 'add_internal_review_response'
                       ]
                     ])
                     ?>

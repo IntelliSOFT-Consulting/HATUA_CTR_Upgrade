@@ -9,6 +9,8 @@
         <th><?php echo $this->Paginator->sort('id'); ?></th>
         <th><?php echo $this->Paginator->sort('name'); ?></th>
         <th><?php echo $this->Paginator->sort('required'); ?></th>
+        <th><?php echo $this->Paginator->sort('version_required'); ?></th>
+        <th><?php echo $this->Paginator->sort('date_required'); ?></th>
         <th><?php echo $this->Paginator->sort('item_number'); ?></th>
            <th><?php echo $this->Paginator->sort('content'); ?></th>
          <th class="actions"><?php echo __('Actions'); ?></th>
@@ -19,6 +21,8 @@
         <td><?php echo h($pocket['Pocket']['id']); ?>&nbsp;</td>
         <td><?php echo h($pocket['Pocket']['name']); ?>&nbsp;</td>  
         <td><?php echo ($pocket['Pocket']['required']) ? '<i class="icon-check-sign"></i>' : '<i class="icon-check-minus"></i>'; ?>&nbsp;</td>
+        <td><?php echo ($pocket['Pocket']['version_required']) ? '<i class="icon-check-sign"></i>' : '<i class="icon-check-minus"></i>'; ?>&nbsp;</td>
+        <td><?php echo ($pocket['Pocket']['date_required']) ? '<i class="icon-check-sign"></i>' : '<i class="icon-check-minus"></i>'; ?>&nbsp;</td>
         <td><?php echo h($pocket['Pocket']['item_number']); ?>&nbsp;</td>  
         <td><?php echo $pocket['Pocket']['content']; ?>&nbsp;</td>
         <td class="actions">

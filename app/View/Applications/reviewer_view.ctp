@@ -172,7 +172,7 @@
                         <div class="span8">    
                           <?php                       
                             // debug($rid);
-                            if(!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'],'show'=>false]);
+                            if(!empty($rid)) echo $this->element('comments/list_expandable', ['comments' => $rid['ExternalComment'],'show'=>false]);
                           ?> 
                         </div>
                         <div class="span4 lefty">
@@ -215,9 +215,13 @@
                         </div>
                         <div class="span4 lefty">
                         <?php  
-                            if(!empty($rid))  echo $this->element('comments/add', [
-                                         'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],   
-                                                     'model' => 'Review', 'category' => 'internal', 'url' => 'add_internal_review_response']]) 
+                            if(!empty($rid))  echo $this->element('comments/add_editor', [
+                                         'model' => ['model_id' => $application['Application']['id'], 
+                                         'foreign_key' => $rid['id'],   
+                                                     'model' => 'Review',
+                                                      'category' => 'internal',
+                                                      'message_type'=>'review_response',
+                                                       'url' => 'add_internal_review_response']]) 
                         ?>
                         </div>
                       </div>

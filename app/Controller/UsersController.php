@@ -857,6 +857,7 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/Cioms');
         $this->Acl->allow($group, 'controllers/Reports');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_generate');
+        $this->Acl->allow($group, 'controllers/AnnualLetters/manager_delete');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_initial');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_approve');
         $this->Acl->allow($group, 'controllers/AnnualLetters/manager_view');
