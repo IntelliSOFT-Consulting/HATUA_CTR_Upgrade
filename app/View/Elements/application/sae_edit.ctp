@@ -49,6 +49,16 @@
                 echo $this->Form->input('administration_date', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Date of initial administration of investigational product </small> <span class="sterix">*</span>')
                 ));
+
+                /**Add multiple dates
+                 * 
+                 * 
+                 * 
+                 * **/
+
+                 echo $this->element('multi/intitial_administration');
+
+
                 echo $this->Form->input('latest_date', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Date of the latest administration of the investigational product </small> <span class="sterix">*</span>')
                 ));

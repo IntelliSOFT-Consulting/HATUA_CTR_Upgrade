@@ -145,9 +145,11 @@
                     );
                     $version_no = $anc['version_no'];
                     $file_date = $anc['file_date'];
+                    $date_uploaded = $anc['created'];
                     echo "</span>&nbsp;
                           <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>
                           <span id='fileDate$id' style='margin-left:10px;'>Dated: $file_date</span>
+                            <span id='dateUploaded$id' style='margin-left:10px;'>Date Uploaded: $date_uploaded</span>
                           <span id='AnnualApproval$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>
                           <br>";
                   }

@@ -56,7 +56,7 @@ class AnnualLettersController extends AppController
 
             // generate Audit trail
 
-            
+
             $audit = array(
                 'AuditTrail' => array(
                     'foreign_key' => $letter['AnnualLetter']['id'],
@@ -235,6 +235,23 @@ class AnnualLettersController extends AppController
         $approval_no = 'ECCT/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
         $today_date = date('j M Y');
+
+
+        $data = $application['Review'];
+
+
+        $names = Hash::extract($data, '{n}.summary');
+        // Filter out null values
+        $names = array_filter($names, function ($value) {
+            return $value !== null;
+        });
+        $cnt = 0;
+        $reviewer_summary_comments = '';
+        foreach ($names as $name) {
+            $cnt++;
+            $reviewer_summary_comments .= $name;
+        }
+
         $variables = array(
             'approval_no' => $approval_no,
             'protocol_no' => $application['Application']['protocol_no'],
@@ -247,7 +264,8 @@ class AnnualLettersController extends AppController
             'short_title' => $application['Application']['short_title'],
             'checklist' => $checkstring,
             'status' => $application['TrialStatus']['name'],
-            'expiry_date' => $expiry_date
+            'expiry_date' => $expiry_date,
+            'reviewer_summary_comments' => $reviewer_summary_comments
         );
 
         $save_data = array(
@@ -551,6 +569,30 @@ class AnnualLettersController extends AppController
         $expiry_date = date('jS F Y', strtotime('+1 year'));
         $today_date = date('j M Y');
 
+     
+
+        $data = $application['Review'];
+
+
+        $names = Hash::extract($data, '{n}.summary');
+        // Filter out null values
+        $names = array_filter($names, function ($value) {
+            return $value !== null;
+        });
+        $cnt = 0;
+        $reviewer_summary_comments = '';
+        foreach ($names as $name) {
+            $cnt++;
+            $reviewer_summary_comments .= $name;
+        }
+
+        // Trim the trailing comma and space
+        // $reviewer_summary_comments = trim($resultString, ', ');
+
+ 
+        // debug($reviewer_summary_comments);
+        // exit;
+
         $variables = array(
             'approval_no' => $approval_no,
             'protocol_no' => $application['Application']['protocol_no'],
@@ -563,8 +605,11 @@ class AnnualLettersController extends AppController
             'short_title' => $application['Application']['short_title'],
             'checklist' => $checkstring,
             'status' => $application['TrialStatus']['name'],
-            'expiry_date' => $expiry_date
+            'expiry_date' => $expiry_date,
+            'reviewer_summary_comments' => $reviewer_summary_comments
         );
+        // debug($variables);
+        // exit;
         $save_data = array(
             'AnnualLetter' => array(
                 'application_id' => $application['Application']['id'],
@@ -858,8 +903,9 @@ class AnnualLettersController extends AppController
             $cnt = $this->AnnualLetter->find('count', array('conditions' => array('AnnualLetter.application_id' => $application['Application']['id'])));
             $cnt++;
             $year = date('Y', strtotime($application['Application']['approval_date']));
+            $approval_no = 'ECCT/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
 
-            $this->request->data['AnnualLetter']['approval_no'] = 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
+            $this->request->data['AnnualLetter']['approval_no'] = $approval_no; // 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
             $this->request->data['AnnualLetter']['application_id'] = $application['Application']['id'];
             // debug($this->request->data);
             // exit;
@@ -1113,7 +1159,12 @@ class AnnualLettersController extends AppController
             $num++;
             $checkstring .= $num . '. ' . $deeds[$kech] . '<br>' . $check;
         }
-
+        $reviewer_comments = '';
+        $num = 0;
+        // foreach ($checklist as $kech => $check) {
+        //     $num++;
+        //     $reviewer_comments .= $num . '. ' . $deeds[$kech] . '<br>' . $check;
+        // }
         $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('date_format(AnnualLetter.created, "%Y")' => date("Y"))));
         $cnt++;
         $year = date('Y', strtotime($this->Application->field('approval_date')));
@@ -1130,7 +1181,8 @@ class AnnualLettersController extends AppController
             'telephone' => $application['InvestigatorContact'][0]['telephone'],
             'study_title' => $application['Application']['short_title'],
             'checklist' => $checkstring,
-            'expiry_date' => $expiry_date
+            'expiry_date' => $expiry_date,
+            'reviewer_summary_comments' => $reviewer_comments,
         );
 
         $save_data = array(

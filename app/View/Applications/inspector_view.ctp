@@ -30,7 +30,7 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
     ?>
     <?php
     echo  '<li><a href="#tab6" data-toggle="tab">Site Inspections (' . count($application['SiteInspection']) . ')</a></li>';
-    echo  '<li><a href="#tab7" data-toggle="tab">SAE/SUSAR (' . count($application['Sae']) . ')</a></li>';
+    echo  '<li><a href="#tab7" data-toggle="tab">Safety Reports  (' . count($application['Sae']) . ')</a></li>';
     echo '<li><a href="#tab13" data-toggle="tab">Protocol Deviations (' . count($application['Deviation']) . ')</a></li>';
     ?>
   </ul>

@@ -62,6 +62,8 @@
         <tr>
           <td class="table-label required"><p>Date of initial administration of investigational product</p></td>
           <td><?php  echo $sae['Sae']['administration_date']; ?></td>
+
+          
           <td class="table-label required"><p>Other</p></td>
           <td><?php  echo ($sae['Sae']['reaction_other']) ? $checked : $nChecked; ?></td>
         </tr>

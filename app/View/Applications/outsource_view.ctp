@@ -53,7 +53,7 @@ echo $this->Session->flash();
     if (!empty($result)) {
       if ($result[0]['model_sae'] == '1') {
       ?>
-        <li><a href="#tab7" data-toggle="tab">SAE/SUSAR (<?php echo count($application['Sae']) ?>)</a></li>
+        <li><a href="#tab7" data-toggle="tab">Safety Reports  (<?php echo count($application['Sae']) ?>)</a></li>
       <?php }
       if ($result[0]['model_ciom'] == '1') {
       ?>
