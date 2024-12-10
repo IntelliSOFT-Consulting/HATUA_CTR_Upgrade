@@ -61,7 +61,18 @@
         </tr>
         <tr>
           <td class="table-label required"><p>Date of initial administration of investigational product</p></td>
-          <td><?php  echo $sae['Sae']['administration_date']; ?></td>
+          <td><?php  echo $sae['Sae']['administration_date'];
+          
+          // Include other dates here:
+
+          // debusg($sae['SaeDate']);
+
+          foreach($sae['SaeDate'] as $dates){
+
+            echo "<br>".$dates['date'] ."";
+
+          }
+          ?></td>
 
           
           <td class="table-label required"><p>Other</p></td>

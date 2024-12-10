@@ -1,5 +1,5 @@
 <?php
-$this->Html->script('multi/multidates', array('inline' => false));
+$this->Html->script('multi/multi_date', array('inline' => false));
 ?>
 <h5> Initial Dates(<small>where necessary, Click button to add more -
         <button type="button" class="btn btn-small btn-primary" id="addDate">Add</button></small>) </h5>
@@ -8,8 +8,8 @@ $this->Html->script('multi/multidates', array('inline' => false));
 
     <div id="suspected-drug-date">
         <?php
-        if (!empty($sae['SuspectedDrug'])) {
-            for ($i = 0; $i <= count($sae['SuspectedDrug']) - 1; $i++) {
+        if (!empty($sae['SaeDate'])) {
+            for ($i = 0; $i <= count($sae['SaeDate']) - 1; $i++) {
         ?>
                 <div class="suspected-group">
                     <div class="row-fluid">
@@ -17,7 +17,7 @@ $this->Html->script('multi/multidates', array('inline' => false));
                         <div class="span6">
                             <?php
                             echo $this->Form->input(
-                                'SuspectedDrug.' . $i . '.date_from',
+                                'SaeDate.' . $i . '.date',
                                 array('type' => 'text', 'class' => 'datepickers',  'label' => array('class' => 'control-label required', 'text' => 'Date of initial administration of investigational product  <small class="muted">(from)</small>  <span class="sterix">*</span>'),)
                             );
                             ?>

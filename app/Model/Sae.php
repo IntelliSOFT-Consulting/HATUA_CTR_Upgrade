@@ -189,6 +189,11 @@ class Sae extends AppModel {
             'dependent' => true,
             'conditions' => array('Comment.model' => 'Sae', 'Comment.category' => 'external' ),
         ),
+        'SaeDate' => array(
+            'className' => 'SaeDate',
+            'foreignKey' => 'sae_id',
+            'dependent' => true
+        ),
     );
 
     public $validate = array(

@@ -242,6 +242,8 @@ class SaesController extends AppController
             throw new NotFoundException(__('Invalid sae'));
         }
         $sae = $this->Sae->read(null, $id);
+
+        
         if ($sae['Sae']['approved'] < 1) {
             $this->Session->setFlash(__('The sae has not been submitted'), 'alerts/flash_info');
             $this->redirect(array('action' => 'edit', $this->Sae->id));
@@ -250,13 +252,17 @@ class SaesController extends AppController
             $this->Session->setFlash(__('You don\'t have permission to access!!'), 'alerts/flash_error');
             $this->redirect('/');
         }
-        $this->set('sae', $this->Sae->find(
+
+        $sae=$this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application','SaeDate', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
-        ));
+            );
+        // debug($sae);
+        // exit;
+        $this->set('sae', $sae);
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'SAE_' . $id,  'orientation' => 'portrait');
         }
@@ -280,7 +286,7 @@ class SaesController extends AppController
         $this->set('sae', $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate','Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -307,7 +313,7 @@ class SaesController extends AppController
         $this->set('sae', $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate','Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -329,7 +335,7 @@ class SaesController extends AppController
         $this->set('sae', $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate','Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -627,6 +633,13 @@ class SaesController extends AppController
             throw new NotFoundException(__('Invalid sae'));
         }
         $sae = $this->Sae->read(null, $id);
+        $sae = $this->Sae->find('first', [
+            'conditions' => ['Sae.id' => $id],
+            'contain' => ['SaeDate','Application'] // Replace with your related models
+        ]);
+
+        // debug($sae);
+        // exit;
         if ($sae['Sae']['approved'] > 0) {
             $this->Session->setFlash(__('The sae has been submitted'), 'alerts/flash_info');
             $this->redirect(array('action' => 'view', $this->Sae->id));
@@ -640,17 +653,25 @@ class SaesController extends AppController
             if (isset($this->request->data['submitReport'])) {
                 $validate = 'first';
             }
+
+            // debug($this->request->data);
+            // exit;
             if ($this->Sae->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Sae->saveField('approved', 1);
                     $sae = $this->Sae->read(null, $id);
-
+                    $sae = $this->Sae->find('first', [
+                        'conditions' => ['Sae.id' => $id],
+                        'contain' => ['SaeDate','Application'] // Replace with your related models
+                    ]);
                     //******************       Send Email and Notifications to Applicant and Managers          *****************************
                     $this->loadModel('Message');
                     $html = new HtmlHelper(new ThemeView());
                     $message = $this->Message->find('first', array('conditions' => array('name' => 'applicant_sae_submit')));
                     $variables = array(
-                        'name' => $this->Auth->User('name'), 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                        'name' => $this->Auth->User('name'), 
+                        'reference_no' => $sae['Sae']['reference_no'], 
+                        'protocol_no' => $sae['Application']['protocol_no'],
                         'reference_link' => $html->link(
                             $sae['Sae']['reference_no'],
                             array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'applicant' => true, 'full_base' => true),
@@ -717,7 +738,11 @@ class SaesController extends AppController
                 $this->Session->setFlash(__('The sae could not be saved. Please, try again.'), 'alerts/flash_error');
             }
         } else {
-            $this->request->data = $this->Sae->read(null, $id);
+            $sae = $this->Sae->find('first', [
+                'conditions' => ['Sae.id' => $id],
+                'contain' => ['SaeDate','Application'] // Replace with your related models
+            ]);
+            $this->request->data = $sae;
         }
 
         //$sae = $this->request->data;
