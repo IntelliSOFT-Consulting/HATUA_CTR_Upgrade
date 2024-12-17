@@ -24,8 +24,86 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'manager_generate_safety_report', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
+
+    public function manager_generate_safety_report($id = null)
+    {
+
+        $this->loadModel('SafetyReport');
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+
+            $safety_type=$this->request->data['SafetyReport']['safety_type'];
+            $count = $this->SafetyReport->find('count',  array('conditions' => array(
+                'SafetyReport.safety_type' => $safety_type,
+                'SafetyReport.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
+            )));
+            $count++;
+            $count = ($count < 10) ? "0$count" : $count; 
+            $reference_no=$safety_type.'/' . date('Y') . '/' . $count;
+            $this->request->data['SafetyReport']['reference_no']=$reference_no;
+            $this->SafetyReport->create();
+            if ($this->SafetyReport->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
+
+                // Notify the Admins
+
+                $app = $this->Application->read(null, $id);
+                $data = array(
+                    'function' => 'safetyReport',
+                    'Application' => array(
+                        'id' => $this->SafetyReport->id,
+                        'protocol_no' => $app['Application']['protocol_no'],
+
+                    )
+                );
+                CakeResque::enqueue('default', 'NotificationShell', array('safetyReport', $data));
+
+                // Create a Audit Trail
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $id,
+                        'model' => 'Application',
+                        'message' => 'New '.$safety_type.' report for the Protocol with protocol number ' . $app['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
+                        'ip' => $app['Application']['protocol_no']
+                    )
+                );
+                $this->loadModel('AuditTrail');
+                $this->AuditTrail->Create();
+                if ($this->AuditTrail->save($audit)) {
+                    $this->log($this->request->data, 'audit_success');
+                } else {
+                    $this->log('Error creating an audit trail', 'notifications_error');
+                    $this->log($this->request->data, 'notifications_error');
+                }
+             
+            $this->Session->setFlash(__('The '.$safety_type.' has been created'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+            }else{
+                $validationErrors = $this->SafetyReport->validationErrors;
+
+                // Concatenate validation errors into a single string
+                $errorMessage = 'Failed to submit the request. Please correct the following errors: <br>';
+                foreach ($validationErrors as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $errorMessage .= $error . ' <br>';
+                    }
+                }
+
+                // Set flash message with validation errors
+                $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
+                $this->redirect($this->referer()); 
+            }
+        } else {
+            $this->Session->setFlash(__('Can\'t trace the protocol, please try again later'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+        }
+    }
+
     public function admin_extra($id = null)
     {
 
@@ -580,8 +658,8 @@ class ApplicationsController extends AppController
                     )
                 ));
                 $this->request->data = $response;
-                debug($response);
-                exit;
+                // debug($response);
+                // exit;
                 $this->Session->setFlash(__('Please provide file date for each amendment attached. '), 'alerts/flash_error');
                 $this->redirect(array('action' => 'view', $this->Application->id));
             }
@@ -1454,11 +1532,11 @@ class ApplicationsController extends AppController
             $this->csv_export($this->Application->find(
                 'all',
                 array(
-                    'conditions' => $this->paginate['conditions'], 
-                    'order' => $this->paginate['order'], 
+                    'conditions' => $this->paginate['conditions'],
+                    'order' => $this->paginate['order'],
                     'contain' => $this->a_contain,
-                    'limit' => $this->paginate['limit'], 
-                    )
+                    'limit' => $this->paginate['limit'],
+                )
             ));
         }
         //end csv export
@@ -1697,8 +1775,8 @@ class ApplicationsController extends AppController
         }
 
         $response = $this->_isOwnedBy($id);
-// debug($response);
-// exit;
+        // debug($response);
+        // exit;
         $this->set('application', $response);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
         $countries = $this->Country->find('list', array('order' => 'Country.name ASC'));
@@ -3242,8 +3320,8 @@ class ApplicationsController extends AppController
                 )
             )
         );
-        
-        
+
+
         // debug($contains);
         $response = $this->Application->find(
             'first',

@@ -88,7 +88,7 @@ class ReviewsController extends AppController
                     // );
                     // $client->doBackground('sendnotification', serialize($data));
                     $doer = $this->Auth->user('name');
-                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data,$doer));
+                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data, $doer));
 
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
@@ -127,7 +127,12 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->save(
                             array(
                                 'ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                                    'application_id' => $id,
+                                    'stage' => 'Screening',
+                                    'status' => 'Complete',
+                                    'comment' => 'Manager review comment',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d')
                                 )
                             )
                         );
@@ -149,7 +154,12 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                'application_id' => $id,
+                                'stage' => 'ScreeningSubmission',
+                                'status' => 'Complete',
+                                'comment' => 'Manager review comment',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d'),
                             ))
                         );
                     } else {
@@ -170,7 +180,12 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'Assign', 'status' => 'Complete', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                'application_id' => $id,
+                                'stage' => 'Assign',
+                                'status' => 'Complete',
+                                'comment' => 'Manager review comment',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d'),
                             ))
                         );
                     } else {
@@ -191,7 +206,12 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'Review', 'status' => 'Complete', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                'application_id' => $id,
+                                'stage' => 'Review',
+                                'status' => 'Complete',
+                                'comment' => 'Manager review comment',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d'),
                             ))
                         );
                     } else {
@@ -212,7 +232,11 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'ReviewSubmission', 'status' => 'Current', 'comment' => 'Manager review comment', 'start_date' => date('Y-m-d')
+                                'application_id' => $id,
+                                'stage' => 'ReviewSubmission',
+                                'status' => 'Current',
+                                'comment' => 'Manager review comment',
+                                'start_date' => date('Y-m-d')
                             ))
                         );
                     } else {
@@ -248,9 +272,9 @@ class ReviewsController extends AppController
             } else {
                 $this->Session->setFlash(__('The password you have entered is not correct! Please enter the correct password
                     and try again.'), 'alerts/flash_error');
-                    // debug($this->request->data);
-                    // exit;
-                    $this->redirect($this->referer());
+                // debug($this->request->data);
+                // exit;
+                return $this->redirect($this->referer());
                 // $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
             }
 
@@ -278,14 +302,18 @@ class ReviewsController extends AppController
         $answers = [];
         foreach ($all_questions as $question) {
             $dpoint = [
-                'question_type' => $question['ReviewQuestion']['question_type'], 'question_number' => $question['ReviewQuestion']['question_number'],
-                'review_type' => $question['ReviewQuestion']['review_type'], 'question' => $question['ReviewQuestion']['question']
+                'question_type' => $question['ReviewQuestion']['question_type'],
+                'question_number' => $question['ReviewQuestion']['question_number'],
+                'review_type' => $question['ReviewQuestion']['review_type'],
+                'question' => $question['ReviewQuestion']['question']
             ];
             $answers[] = $dpoint;
         }
 
         $data = array(
-            'application_id' => $application_id, 'user_id' => $this->Auth->User('id'), 'type' => 'reviewer_comment',
+            'application_id' => $application_id,
+            'user_id' => $this->Auth->User('id'),
+            'type' => 'reviewer_comment',
             'assessment_type' => $review_type
         );
         if ($this->Review->saveAssociated(array('Review' => $data, 'ReviewAnswer' => $answers))) {
@@ -297,7 +325,7 @@ class ReviewsController extends AppController
     }
     public function manager_add($application_id = null, $review_type = null)
     {
-        $this->add($application_id, $review_type); 
+        $this->add($application_id, $review_type);
     }
     public function reviewer_add($application_id = null, $review_type = null)
     {
@@ -331,7 +359,12 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->save(
                             array(
                                 'ApplicationStage' => array(
-                                    'application_id' => $id, 'stage' => 'Screening', 'status' => 'Complete', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')
+                                    'application_id' => $id,
+                                    'stage' => 'Screening',
+                                    'status' => 'Complete',
+                                    'comment' => 'From Manager assign',
+                                    'start_date' => date('Y-m-d'),
+                                    'end_date' => date('Y-m-d')
                                 )
                             )
                         );
@@ -353,7 +386,12 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'ScreeningSubmission', 'status' => 'Complete', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d'),
+                                'application_id' => $id,
+                                'stage' => 'ScreeningSubmission',
+                                'status' => 'Complete',
+                                'comment' => 'From Manager assign',
+                                'start_date' => date('Y-m-d'),
+                                'end_date' => date('Y-m-d'),
                             ))
                         );
                     } else {
@@ -374,15 +412,19 @@ class ReviewsController extends AppController
                         $this->Application->ApplicationStage->create();
                         $this->Application->ApplicationStage->save(
                             array('ApplicationStage' => array(
-                                'application_id' => $id, 'stage' => 'Assign', 'status' => 'Current', 'comment' => 'From Manager assign', 'start_date' => date('Y-m-d')
+                                'application_id' => $id,
+                                'stage' => 'Assign',
+                                'status' => 'Current',
+                                'comment' => 'From Manager assign',
+                                'start_date' => date('Y-m-d')
                             ))
                         );
                     }
                     // debug($this->request->data);
                     // exit;
                     //end stages
-                    $doer = $this->Auth->user('name'); 
-                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data,$doer));
+                    $doer = $this->Auth->user('name');
+                    CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data, $doer));
 
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
@@ -515,7 +557,8 @@ class ReviewsController extends AppController
                     // Set job to notify managers
                     CakeResque::enqueue('default', 'NotificationShell', array(
                         'reviewerCommentNotifyManagers',
-                        $this->request->data['Review']['application_id'], $this->Auth->User('id')
+                        $this->request->data['Review']['application_id'],
+                        $this->Auth->User('id')
                     ));
                     $this->Session->setFlash(
                         __('Thank you. Your review comments have been sent to PPB'),
@@ -528,7 +571,8 @@ class ReviewsController extends AppController
             } else {
                 $this->Session->setFlash(__('The password you have entered is not correct! Please enter the correct password
                     and try again.'), 'alerts/flash_error');
-                $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
+                // $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
+                return $this->redirect($this->referer());
             }
         }
         $users = $this->Review->User->find('list');
@@ -587,7 +631,11 @@ class ReviewsController extends AppController
                             $this->Application->ApplicationStage->save(
                                 array(
                                     'ApplicationStage' => array(
-                                        'application_id' => $this->request->data['Review']['application_id'], 'stage' => 'Review', 'status' => 'Current', 'comment' => 'From Reviewer accept', 'start_date' => date('Y-m-d')
+                                        'application_id' => $this->request->data['Review']['application_id'],
+                                        'stage' => 'Review',
+                                        'status' => 'Current',
+                                        'comment' => 'From Reviewer accept',
+                                        'start_date' => date('Y-m-d')
                                     )
                                 )
                             );
@@ -630,7 +678,9 @@ class ReviewsController extends AppController
                 } else {
                     $this->Session->setFlash(__('The password you have entered is not correct! Please enter your correct password
                         and try again.'), 'alerts/flash_error');
-                    $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
+
+                    return $this->redirect($this->referer());
+                    // $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
                 }
             } else {
                 $this->Session->setFlash(__('Seems the request review is empty!'), 'alerts/flash_error');

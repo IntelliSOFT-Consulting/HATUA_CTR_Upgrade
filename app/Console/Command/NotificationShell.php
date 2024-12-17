@@ -381,6 +381,62 @@ class NotificationShell extends Shell
       $this->log($this->args[0], 'notifications_error');
     }
   }
+  public function safetyReport()
+  {
+    $managers = $this->User->find('all', array('conditions' => array('group_id' => 2, 'is_active' => 1), 'contain' => array()));
+    $messages = $this->Message->find('list', array(
+      'conditions' => array('Message.name' => array(
+        'safety_email_subject',
+        'safety_email'
+      )),
+      'fields' => array('Message.name', 'Message.content')
+    ));
+    $save_data = array();
+
+    foreach ($managers as $manager) {
+
+      $variables = array(
+        'protocol_link' => Router::url(array(
+          'controller' => 'outsources',
+          'action' => 'view',
+          $this->args[0]['Application']['id'],
+          'admin' => true
+        ), true),
+        'protocol_no' => $this->args[0]['Application']['protocol_no'],
+        'name' => $manager['User']['name']
+      );
+      $save_data[] = array(
+        'Notification' => array(
+          'user_id' => $manager['User']['id'],
+          'type' => 'safety_email',
+          'model' => 'Application',
+          'foreign_key' => $this->args[0]['Application']['id'],
+          'title' => $messages['safety_email_subject'],
+          'system_message' => String::insert($messages['safety_email'], $variables),
+        ),
+      );
+      //<!-- Send email to admin -->
+      $message = String::insert($messages['safety_email'], $variables);
+      $email = new CakeEmail();
+      $email->config('gmail');
+      $email->template('default');
+      $email->emailFormat('html');
+      $email->to($manager['User']['email']);
+      $email->bcc(array('itsjkiprotich@gmail.com'));
+      $email->subject(Sanitize::html(String::insert($messages['safety_email_subject'], $variables), array('remove' => true)));
+      $email->viewVars(array('message' => $message));
+      if (!$email->send()) {
+        $this->log($email, 'submit_email');
+      }
+    }
+    $this->Notification->Create();
+    if ($this->Notification->saveMany($save_data)) {
+      $this->log($this->args[0], 'notifications_success');
+    } else {
+      $this->log('The Notifications were not sent at ppbNewApplication.', 'notifications_error');
+      $this->log($this->args[0], 'notifications_error');
+    }
+  }
   public function outsourceApplication()
   {
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 1, 'is_active' => 1), 'contain' => array()));

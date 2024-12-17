@@ -494,6 +494,33 @@ class Application extends AppModel
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'SafetyReportGen' => array(
+            'className' => 'SafetyReport',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+            'conditions' => array('SafetyReportGen.safety_type' => 'GEN'),
+        ),
+
+        'SafetyReportDSMB' => array(
+            'className' => 'SafetyReport',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+            'conditions' => array('SafetyReportDSMB.safety_type' => 'DSMB'),
+        ),
+        'SafetyReportDSUR' => array(
+            'className' => 'SafetyReport',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+            'conditions' => array('SafetyReportDSUR.safety_type' => 'DSUR'),
+        ),
+        'SafetyReportLINE' => array(
+            'className' => 'SafetyReport',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+            'conditions' => array('SafetyReportLINE.safety_type' => 'LINE'),
+        ),
+        
+
     );
 
     public $validate = array(

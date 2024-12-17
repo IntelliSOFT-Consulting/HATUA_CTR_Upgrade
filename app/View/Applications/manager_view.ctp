@@ -19,7 +19,7 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
-    <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
+    <li><a href="#amendments" data-toggle="tab">Amendments</a></li> 
     <?php
     $count_reviews = 0;
     $count_inspectors = 0;
@@ -394,16 +394,19 @@ echo $this->Session->flash();
           echo $this->Form->create('Review', array('url' => array(
             'controller' => 'reviews',
             'action' => 'comment', $application['Application']['id']
-          )));
-
+          ))); 
 
           echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
           echo $this->Form->input('text', array(
-            'type' => 'textarea', 'rows' => 3,
+            'type' => 'textarea', 
+            'rows' => 3,
+            'value' => !empty($this->request->data['Review']['text']) ? $this->request->data['Review']['text'] : '',
             'label' => array('class' => 'required', 'text' => '3. Manager\'s Comment(s)')
           ));
           echo $this->Form->input('recommendation', array(
-            'type' => 'textarea', 'rows' => 3,
+            'type' => 'textarea',
+             'rows' => 3, 
+             'value' => !empty($this->request->data['Review']['recommendation']) ? $this->request->data['Review']['recommendation'] : '',   
             'label' => array('class' => 'required', 'text' => '4. Manager\'s recommendation(s)')
           ));
           echo $this->Form->input('password', array('type' => 'password', 'label' => 'Your Password *'));
@@ -570,58 +573,8 @@ echo $this->Session->flash();
 
     <div class="tab-pane" id="tab7">
       <div class="row-fluid">
-        <div class="span12">
-
-          <table class="table  table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Reference No.</th>
-                <th>Report Type</th>
-                <th>Patient Initials</th>
-                <th>Created</th>
-                <th class="actions"><?php echo __('Actions'); ?></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              foreach ($application['Sae'] as $sae) : ?>
-                <tr class="">
-                  <td><?php echo h($sae['id']); ?>&nbsp;</td>
-                  <td><?php echo h($sae['reference_no']); ?>&nbsp;</td>
-                  <td><?php echo h($sae['report_type']);
-                      if ($sae['report_type'] == 'Followup') {
-                        echo "<br> Initial: ";
-                        echo $this->Html->link(
-                          '<label class="label label-info">' . substr($sae['reference_no'], 0, strpos($sae['reference_no'], '-')) . '</label>',
-                          array('controller' => 'saes', 'action' => 'view', $sae['sae_id']),
-                          array('escape' => false)
-                        );
-                      }
-                      ?>&nbsp;
-                  </td>
-                  <td><?php echo h($sae['patient_initials']); ?>&nbsp;</td>
-                  <td><?php echo h($sae['created']); ?>&nbsp;</td>
-                  <td class="actions">
-                    <?php if ($sae['approved'] > 0) echo $this->Html->link(
-                      __('<label class="label label-info">View</label>'),
-                      array('controller' => 'saes', 'action' => 'view', $sae['id']),
-                      array('target' => '_blank', 'escape' => false)
-                    ); ?>
-                    <?php if ($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('escape' => false)); ?>
-                    <?php
-                    if ($sae['approved'] < 1) {
-                      echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
-                    }
-                    if ($redir === 'applicant' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
-                    ?>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-
-        </div>
+       
+      <?php echo $this->element('application/safety');?>
       </div>
     </div>
 
