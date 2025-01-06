@@ -467,20 +467,38 @@ class ReviewsController extends AppController
                     $this->Review->saveField('status', 'Submitted');
                     // $results = Hash::extract($this->request->data['Review'], '{n}.ReviewAnswer.{n}.comment');
                     $results = '';
-                    $nyabola = $this->Review->ReviewAnswer->find('list', array('conditions' => array('review_id' => $this->Review->id), 'fields' => array('question', 'comment')));
-                    foreach ($nyabola as $lenny => $timko) {
-                        if (!empty($timko)) {
-                            $results .= $lenny . "\n";
-                            $results .= $timko . "\n\n";
+                    $nyabola = $this->Review->ReviewAnswer->find(
+                        'all',
+                        array(
+                            'conditions' => array(
+                                'review_id' => $this->Review->id,
+                                'OR' => array(
+                                    'answer' => '',         // Check for empty string
+                                    'answer IS NULL'        // Check for NULL value
+                                )
+                            ),
+                            'fields' => array('question', 'workspace', 'comment')
+                        )
+                    );
+                    foreach ($nyabola as $rev) {
+                        $quiz = $rev['ReviewAnswer']['question'];
+                        $workspace = $rev['ReviewAnswer']['workspace'];
+                        $comment = $rev['ReviewAnswer']['comment'];
+                        // Prepare HTML-friendly formatting
+                        if (!empty($workspace) || !empty($comment)) {
+                            $results .= "<strong>$quiz</strong><br>";  // Bold question for emphasis
+
+                            if (!empty($workspace)) {
+                                $results .= nl2br(htmlspecialchars($workspace)) . "<br><br>";
+                            }
+                            if (!empty($comment)) {
+                                $results .= nl2br(htmlspecialchars($comment)) . "<br><br>";
+                            }
                         }
                     }
-                    // foreach ($this->request->data['Review'] as $ansa) {
-                    //     foreach ($ansa as $key => $value) {
-                    //         $results .= $value['question']."\n";
-                    //         $results .= $value['comment']."\n\n";
-                    //     }
-                    // }
-                    // $this->Review->saveField('summary', implode("\n\n",$results));
+                    if (!empty($results)) {
+                    $this->Review->saveField('summary', $results);
+                    }
                     // Create a Audit Trail
                     $audit = array(
                         'AuditTrail' => array(
@@ -497,7 +515,7 @@ class ReviewsController extends AppController
                         $this->log('Error creating an audit trail', 'notifications_error');
                         $this->log($this->args[0], 'notifications_error');
                     }
-                    $this->Review->saveField('summary', $results);
+
                     $this->Session->setFlash(__('The review has been submitted'), 'alerts/flash_success');
                 } else {
                     $this->Session->setFlash(__('The review has been saved'), 'alerts/flash_success');

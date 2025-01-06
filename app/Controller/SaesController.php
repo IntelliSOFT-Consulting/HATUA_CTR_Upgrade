@@ -98,11 +98,11 @@ class SaesController extends AppController
         $criteria = $this->Sae->parseCriteria($this->passedArgs);
         $sars = $this->Application->ProtocolOutsource->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('ProtocolOutsource.user_id' => $this->Auth->User('id'))));
         $criteria['Sae.application_id'] = $sars;
-        $criteria['Sae.user_id']=$this->Auth->User('id');
+        $criteria['Sae.user_id'] = $this->Auth->User('id');
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Sae.created' => 'desc');
         $this->paginate['contain'] = array('Application', 'Country', 'SuspectedDrug', 'ConcomittantDrug');
-        
+
 
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
@@ -137,10 +137,13 @@ class SaesController extends AppController
         $this->paginate['contain'] = array('Application', 'Country', 'SuspectedDrug', 'ConcomittantDrug');
         //in case of csv export
         if (isset($this->request->params['ext']) && $this->request->params['ext'] == 'csv') {
-            $this->csv_export($this->Sae->find(
+
+            $data = $this->Sae->find(
                 'all',
                 array('conditions' => $this->paginate['conditions'], 'order' => $this->paginate['order'], 'contain' => $this->paginate['contain'])
-            ));
+            );
+           
+            $this->csv_export($data);
         }
         //end pdf export
 
@@ -171,6 +174,8 @@ class SaesController extends AppController
     }*/
     private function csv_export($csaes = '')
     {
+        // debug($csaes);
+        // exit;
         $this->response->download('SAEs_' . date('Ymd_Hi') . '.csv'); // <= setting the file name
         $this->set(compact('csaes'));
         $this->layout = false;
@@ -243,7 +248,7 @@ class SaesController extends AppController
         }
         $sae = $this->Sae->read(null, $id);
 
-        
+
         if ($sae['Sae']['approved'] < 1) {
             $this->Session->setFlash(__('The sae has not been submitted'), 'alerts/flash_info');
             $this->redirect(array('action' => 'edit', $this->Sae->id));
@@ -253,13 +258,13 @@ class SaesController extends AppController
             $this->redirect('/');
         }
 
-        $sae=$this->Sae->find(
+        $sae = $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application','SaeDate', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
-            );
+        );
         // debug($sae);
         // exit;
         $this->set('sae', $sae);
@@ -286,7 +291,7 @@ class SaesController extends AppController
         $this->set('sae', $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'SaeDate','Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -313,7 +318,7 @@ class SaesController extends AppController
         $this->set('sae', $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'SaeDate','Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -335,7 +340,7 @@ class SaesController extends AppController
         $this->set('sae', $this->Sae->find(
             'first',
             array(
-                'contain' => array('Application', 'SaeDate','Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
+                'contain' => array('Application', 'SaeDate', 'Country', 'SuspectedDrug' => array('Route'), 'ConcomittantDrug' => array('Route'), 'Comment' => array('Attachment')),
                 'conditions' => array('Sae.id' => $id)
             )
         ));
@@ -482,7 +487,10 @@ class SaesController extends AppController
             // $this->Sae->saveField('form_type', 'SUSAR');
             $this->Sae->create();
             $this->Sae->save(['Sae' => [
-                'application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SUSAR/' . date('Y') . '/' . $count,
+                'application_id' => $id,
+                'user_id' => $this->Auth->User('id'),
+                'reporter_email' => $this->Auth->User('email'),
+                'reference_no' => 'SUSAR/' . date('Y') . '/' . $count,
                 'form_type' => 'SUSAR'
             ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
@@ -635,7 +643,7 @@ class SaesController extends AppController
         $sae = $this->Sae->read(null, $id);
         $sae = $this->Sae->find('first', [
             'conditions' => ['Sae.id' => $id],
-            'contain' => ['SaeDate','Application'] // Replace with your related models
+            'contain' => ['SaeDate', 'Application'] // Replace with your related models
         ]);
 
         // debug($sae);
@@ -662,15 +670,15 @@ class SaesController extends AppController
                     $sae = $this->Sae->read(null, $id);
                     $sae = $this->Sae->find('first', [
                         'conditions' => ['Sae.id' => $id],
-                        'contain' => ['SaeDate','Application'] // Replace with your related models
+                        'contain' => ['SaeDate', 'Application'] // Replace with your related models
                     ]);
                     //******************       Send Email and Notifications to Applicant and Managers          *****************************
                     $this->loadModel('Message');
                     $html = new HtmlHelper(new ThemeView());
                     $message = $this->Message->find('first', array('conditions' => array('name' => 'applicant_sae_submit')));
                     $variables = array(
-                        'name' => $this->Auth->User('name'), 
-                        'reference_no' => $sae['Sae']['reference_no'], 
+                        'name' => $this->Auth->User('name'),
+                        'reference_no' => $sae['Sae']['reference_no'],
                         'protocol_no' => $sae['Application']['protocol_no'],
                         'reference_link' => $html->link(
                             $sae['Sae']['reference_no'],
@@ -680,7 +688,10 @@ class SaesController extends AppController
                         'protocol_link' => $html->link(
                             $sae['Application']['protocol_no'],
                             array(
-                                'controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'applicant' => true,
+                                'controller' => 'applications',
+                                'action' => 'view',
+                                $sae['Application']['id'],
+                                'applicant' => true,
                                 'full_base' => true
                             ),
                             array('escape' => false)
@@ -689,7 +700,10 @@ class SaesController extends AppController
                     );
                     $datum = array(
                         'email' => $sae['Sae']['reporter_email'],
-                        'id' => $id, 'user_id' => $this->Auth->User('id'), 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                        'id' => $id,
+                        'user_id' => $this->Auth->User('id'),
+                        'type' => 'applicant_sae_submit',
+                        'model' => 'Sae',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                     );
@@ -701,7 +715,9 @@ class SaesController extends AppController
                     ));
                     foreach ($users as $user) {
                         $variables = array(
-                            'name' => $user['User']['name'], 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                            'name' => $user['User']['name'],
+                            'reference_no' => $sae['Sae']['reference_no'],
+                            'protocol_no' => $sae['Application']['protocol_no'],
                             'reference_link' => $html->link(
                                 $sae['Sae']['reference_no'],
                                 array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'manager' => true, 'full_base' => true),
@@ -710,7 +726,10 @@ class SaesController extends AppController
                             'protocol_link' => $html->link(
                                 $sae['Application']['protocol_no'],
                                 array(
-                                    'controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'manager' => true,
+                                    'controller' => 'applications',
+                                    'action' => 'view',
+                                    $sae['Application']['id'],
+                                    'manager' => true,
                                     'full_base' => true
                                 ),
                                 array('escape' => false)
@@ -719,7 +738,10 @@ class SaesController extends AppController
                         );
                         $datum = array(
                             'email' => $user['User']['email'],
-                            'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                            'id' => $id,
+                            'user_id' => $user['User']['id'],
+                            'type' => 'applicant_sae_submit',
+                            'model' => 'Sae',
                             'subject' => String::insert($message['Message']['subject'], $variables),
                             'message' => String::insert($message['Message']['content'], $variables)
                         );
@@ -740,7 +762,7 @@ class SaesController extends AppController
         } else {
             $sae = $this->Sae->find('first', [
                 'conditions' => ['Sae.id' => $id],
-                'contain' => ['SaeDate','Application'] // Replace with your related models
+                'contain' => ['SaeDate', 'Application'] // Replace with your related models
             ]);
             $this->request->data = $sae;
         }
@@ -786,7 +808,9 @@ class SaesController extends AppController
                     $html = new HtmlHelper(new ThemeView());
                     $message = $this->Message->find('first', array('conditions' => array('name' => 'applicant_sae_submit')));
                     $variables = array(
-                        'name' => $this->Auth->User('name'), 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                        'name' => $this->Auth->User('name'),
+                        'reference_no' => $sae['Sae']['reference_no'],
+                        'protocol_no' => $sae['Application']['protocol_no'],
                         'reference_link' => $html->link(
                             $sae['Sae']['reference_no'],
                             array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'applicant' => true, 'full_base' => true),
@@ -795,7 +819,10 @@ class SaesController extends AppController
                         'protocol_link' => $html->link(
                             $sae['Application']['protocol_no'],
                             array(
-                                'controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'applicant' => true,
+                                'controller' => 'applications',
+                                'action' => 'view',
+                                $sae['Application']['id'],
+                                'applicant' => true,
                                 'full_base' => true
                             ),
                             array('escape' => false)
@@ -804,7 +831,10 @@ class SaesController extends AppController
                     );
                     $datum = array(
                         'email' => $sae['Sae']['reporter_email'],
-                        'id' => $id, 'user_id' => $this->Auth->User('id'), 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                        'id' => $id,
+                        'user_id' => $this->Auth->User('id'),
+                        'type' => 'applicant_sae_submit',
+                        'model' => 'Sae',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                     );
@@ -816,7 +846,9 @@ class SaesController extends AppController
                     ));
                     foreach ($users as $user) {
                         $variables = array(
-                            'name' => $user['User']['name'], 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                            'name' => $user['User']['name'],
+                            'reference_no' => $sae['Sae']['reference_no'],
+                            'protocol_no' => $sae['Application']['protocol_no'],
                             'reference_link' => $html->link(
                                 $sae['Sae']['reference_no'],
                                 array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'manager' => true, 'full_base' => true),
@@ -825,7 +857,10 @@ class SaesController extends AppController
                             'protocol_link' => $html->link(
                                 $sae['Application']['protocol_no'],
                                 array(
-                                    'controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'manager' => true,
+                                    'controller' => 'applications',
+                                    'action' => 'view',
+                                    $sae['Application']['id'],
+                                    'manager' => true,
                                     'full_base' => true
                                 ),
                                 array('escape' => false)
@@ -834,7 +869,10 @@ class SaesController extends AppController
                         );
                         $datum = array(
                             'email' => $user['User']['email'],
-                            'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                            'id' => $id,
+                            'user_id' => $user['User']['id'],
+                            'type' => 'applicant_sae_submit',
+                            'model' => 'Sae',
                             'subject' => String::insert($message['Message']['subject'], $variables),
                             'message' => String::insert($message['Message']['content'], $variables)
                         );
@@ -896,7 +934,9 @@ class SaesController extends AppController
                     $html = new HtmlHelper(new ThemeView());
                     $message = $this->Message->find('first', array('conditions' => array('name' => 'applicant_sae_submit')));
                     $variables = array(
-                        'name' => $this->Auth->User('name'), 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                        'name' => $this->Auth->User('name'),
+                        'reference_no' => $sae['Sae']['reference_no'],
+                        'protocol_no' => $sae['Application']['protocol_no'],
                         'reference_link' => $html->link(
                             $sae['Sae']['reference_no'],
                             array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'applicant' => true, 'full_base' => true),
@@ -905,7 +945,10 @@ class SaesController extends AppController
                         'protocol_link' => $html->link(
                             $sae['Application']['protocol_no'],
                             array(
-                                'controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'applicant' => true,
+                                'controller' => 'applications',
+                                'action' => 'view',
+                                $sae['Application']['id'],
+                                'applicant' => true,
                                 'full_base' => true
                             ),
                             array('escape' => false)
@@ -914,7 +957,10 @@ class SaesController extends AppController
                     );
                     $datum = array(
                         'email' => $sae['Sae']['reporter_email'],
-                        'id' => $id, 'user_id' => $this->Auth->User('id'), 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                        'id' => $id,
+                        'user_id' => $this->Auth->User('id'),
+                        'type' => 'applicant_sae_submit',
+                        'model' => 'Sae',
                         'subject' => String::insert($message['Message']['subject'], $variables),
                         'message' => String::insert($message['Message']['content'], $variables)
                     );
@@ -926,7 +972,9 @@ class SaesController extends AppController
                     ));
                     foreach ($users as $user) {
                         $variables = array(
-                            'name' => $user['User']['name'], 'reference_no' => $sae['Sae']['reference_no'], 'protocol_no' => $sae['Application']['protocol_no'],
+                            'name' => $user['User']['name'],
+                            'reference_no' => $sae['Sae']['reference_no'],
+                            'protocol_no' => $sae['Application']['protocol_no'],
                             'reference_link' => $html->link(
                                 $sae['Sae']['reference_no'],
                                 array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], 'manager' => true, 'full_base' => true),
@@ -935,7 +983,10 @@ class SaesController extends AppController
                             'protocol_link' => $html->link(
                                 $sae['Application']['protocol_no'],
                                 array(
-                                    'controller' => 'applications', 'action' => 'view', $sae['Application']['id'], 'manager' => true,
+                                    'controller' => 'applications',
+                                    'action' => 'view',
+                                    $sae['Application']['id'],
+                                    'manager' => true,
                                     'full_base' => true
                                 ),
                                 array('escape' => false)
@@ -944,7 +995,10 @@ class SaesController extends AppController
                         );
                         $datum = array(
                             'email' => $user['User']['email'],
-                            'id' => $id, 'user_id' => $user['User']['id'], 'type' => 'applicant_sae_submit', 'model' => 'Sae',
+                            'id' => $id,
+                            'user_id' => $user['User']['id'],
+                            'type' => 'applicant_sae_submit',
+                            'model' => 'Sae',
                             'subject' => String::insert($message['Message']['subject'], $variables),
                             'message' => String::insert($message['Message']['content'], $variables)
                         );

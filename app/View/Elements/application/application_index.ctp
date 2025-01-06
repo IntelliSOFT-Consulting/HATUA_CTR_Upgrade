@@ -288,17 +288,7 @@
                         'div' => false,
                         'class' => 'span12',
                         'empty' => true,
-                        'options' => array(
-                          '1' => 'Recruiting',
-                          '2' => 'Not yet recruiting',
-                          '3' => 'Suspended',
-                          '4' => 'Stopped',
-                          '5' => 'Completed',
-                          '6' => 'In follow-up',
-                          '7' => 'Analysing',
-                          '8' => 'Writing-up',
-                          '9' => 'Application withdrawn'
-                        ),
+                        'options' =>$trial_statuses, 
                         'label' => array('class' => 'required', 'text' => 'Trial Status'),
                       ));
                     }
