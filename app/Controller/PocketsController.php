@@ -5,39 +5,46 @@ App::uses('AppController', 'Controller');
  *
  * @property Pocket $Pocket
  */
-class PocketsController extends AppController {
+class PocketsController extends AppController
+{
 
-    public function beforeFilter() {
+    public function beforeFilter()
+    {
         parent::beforeFilter();
         // $this->Auth->allow('*');
-        $this->Auth->allow('view', 'checklist', 'lchecklist');
+        $this->Auth->allow('view', 'checklist', 'lchecklist', 'groupchecklist');
     }
-/**
- * index method
- *
- * @return void
- */
-    public function admin_index() {
+    /**
+     * index method
+     *
+     * @return void
+     */
+    public function admin_index()
+    {
         $this->Pocket->recursive = 0;
         $this->paginate = array('conditions' => array('Pocket.type' => 'content'));
         $this->set('pockets', $this->paginate());
     }
-    public function admin_aindex() {
+    public function admin_aindex()
+    {
         $this->Pocket->recursive = 0;
         $this->paginate = array('conditions' => array('Pocket.type' => 'annual'), 'order' => array('Pocket.item_number' => 'ASC'));
         $this->set('pockets', $this->paginate());
     }
-    public function admin_cindex() {
+    public function admin_cindex()
+    {
         $this->Pocket->recursive = 0;
         $this->paginate = array('conditions' => array('Pocket.type' => 'annual'), 'order' => array('Pocket.item_number' => 'ASC'));
         $this->set('pockets', $this->paginate());
     }
-    public function admin_lindex() {
+    public function admin_lindex()
+    {
         $this->Pocket->recursive = 0;
         $this->paginate = array('conditions' => array('Pocket.type' => 'protocol'), 'order' => array('Pocket.item_number' => 'ASC'));
         $this->set('pockets', $this->paginate());
     }
-    public function checklist($type = null) {
+    public function checklist($type = null)
+    {
         $formdata = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.content'),
             'conditions' => array('Pocket.type' => $type),
@@ -48,7 +55,8 @@ class PocketsController extends AppController {
             return $formdata;
         }
     }
-    public function lchecklist($type = null) {
+    public function lchecklist($type = null)
+    {
         $formdata = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.required'),
             'conditions' => array('Pocket.type' => $type),
@@ -58,15 +66,36 @@ class PocketsController extends AppController {
             return $formdata;
         }
     }
-/**
- * view method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-    
-    public function view($id = null) {
+   
+   
+    public function groupchecklist($type = null)
+    {
+        $formdata = $this->Pocket->find('first', array(
+            'fields' => array('Pocket.version_required', 'Pocket.date_required'),
+            'conditions' => array('Pocket.name' => $type),
+            'recursive' => 0
+        ));
+        // Set the response type to JSON
+        $this->layout = 'ajax'; // Optional: Sets an AJAX layout
+        $this->autoRender = false; // Prevents the view from being rendered
+
+        // Set the response header to indicate JSON content
+        $this->response->type('json');
+
+        // Return the data as a JSON response
+        echo json_encode($formdata);
+        return;
+    }
+    /**
+     * view method
+     *
+     * @throws NotFoundException
+     * @param string $id
+     * @return void
+     */
+
+    public function view($id = null)
+    {
         $this->Pocket->id = $id;
         if (!$this->Pocket->exists()) {
             throw new NotFoundException(__('Invalid pocket'));
@@ -78,12 +107,13 @@ class PocketsController extends AppController {
         }
     }
 
-/**
- * add method
- *
- * @return void
- */
-    public function admin_add() {
+    /**
+     * add method
+     *
+     * @return void
+     */
+    public function admin_add()
+    {
         if ($this->request->is('post')) {
             $this->Pocket->create();
             if ($this->Pocket->save($this->request->data)) {
@@ -94,7 +124,8 @@ class PocketsController extends AppController {
             }
         }
     }
-    public function admin_aadd() {
+    public function admin_aadd()
+    {
         if ($this->request->is('post')) {
             $this->Pocket->create();
             if ($this->Pocket->save($this->request->data)) {
@@ -106,7 +137,8 @@ class PocketsController extends AppController {
         }
     }
 
-    public function admin_cadd() {
+    public function admin_cadd()
+    {
         if ($this->request->is('post')) {
             $this->Pocket->create();
             if ($this->Pocket->save($this->request->data)) {
@@ -117,7 +149,8 @@ class PocketsController extends AppController {
             }
         }
     }
-    public function admin_ladd() {
+    public function admin_ladd()
+    {
         if ($this->request->is('post')) {
             $this->Pocket->create();
             if ($this->Pocket->save($this->request->data)) {
@@ -129,14 +162,15 @@ class PocketsController extends AppController {
         }
     }
 
-/**
- * edit method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-    public function admin_edit($id = null) {
+    /**
+     * edit method
+     *
+     * @throws NotFoundException
+     * @param string $id
+     * @return void
+     */
+    public function admin_edit($id = null)
+    {
         $this->Pocket->id = $id;
         if (!$this->Pocket->exists()) {
             throw new NotFoundException(__('Invalid pocket'));
@@ -153,7 +187,8 @@ class PocketsController extends AppController {
             $this->request->data = $this->Pocket->read(null, $id);
         }
     }
-    public function admin_aedit($id = null) {
+    public function admin_aedit($id = null)
+    {
         $this->Pocket->id = $id;
         if (!$this->Pocket->exists()) {
             throw new NotFoundException(__('Invalid pocket'));
@@ -169,7 +204,8 @@ class PocketsController extends AppController {
             $this->request->data = $this->Pocket->read(null, $id);
         }
     }
-    public function admin_cedit($id = null) {
+    public function admin_cedit($id = null)
+    {
         $this->Pocket->id = $id;
         if (!$this->Pocket->exists()) {
             throw new NotFoundException(__('Invalid pocket'));
@@ -185,7 +221,8 @@ class PocketsController extends AppController {
             $this->request->data = $this->Pocket->read(null, $id);
         }
     }
-    public function admin_ledit($id = null) {
+    public function admin_ledit($id = null)
+    {
         $this->Pocket->id = $id;
         // $this->Pocket->id = $this->Pocket->field('id', array('name' => $name), 'created DESC');
         if (!$this->Pocket->exists()) {
@@ -203,15 +240,16 @@ class PocketsController extends AppController {
         }
     }
 
-/**
- * delete method
- *
- * @throws MethodNotAllowedException
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-    public function admin_delete($id = null) {
+    /**
+     * delete method
+     *
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     * @param string $id
+     * @return void
+     */
+    public function admin_delete($id = null)
+    {
         if (!$this->request->is('post')) {
             throw new MethodNotAllowedException();
         }

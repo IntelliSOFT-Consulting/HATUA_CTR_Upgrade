@@ -1,6 +1,6 @@
-$(function () { 
-  $(".sample").on("click", function(){
-    
+$(function () {
+  $(".sample").on("click", function () {
+
     if ($(this).closest('div.checkcontrols').next().children().length == 0) {
       $(this).closest('.control-group').find('.add-checklist').click();
     }
@@ -88,9 +88,9 @@ $(function () {
       }
     }
   }
-  
+
   function add_checklist() {
-   
+
     if ($(this).closest('.control-group').find('input:checkbox').is(':not(:checked)')) {
       $(this).closest('.control-group').find('input:checkbox').prop('checked', 'checked')
     };
@@ -128,16 +128,7 @@ $(function () {
         fileInput: $(this),
         add: function (e, data) {
           data.context = $(this).closest('div');
-          /*console.log(data.context);
-          upld_btn = '\
-                <button id="{n}{i}btn" class="btn btn-mini btn-primary up_btn" type="button">&nbsp;<i class="icon-upload-alt"></i>&nbsp;Upload</button>\
-                <button class="btn btn-mini btn-danger remove_file" type="button">&nbsp;<i class="icon-remove"></i>&nbsp;Delete</button>';
-          if(!data.context.find('.progress').length) {                    
-            name = data.context.parent().find('div.checkcontrols').next().attr('id');
-            intId = data.context.parent().find('div.checkcontrols').next().children().length;
-            data.context.append(upld_btn.replace(/{n}/g, name).replace(/{i}/g, intId)
-            );
-          }*/
+
           if (!data.context.find('.progress').length) {
             data.context.append('\
                           <div class="progress progress-striped active" style="width: 45%; margin-right: 45px; margin-top: 10px; margin-bottom: 5px;"> \
@@ -154,11 +145,56 @@ $(function () {
           $(this).hide();
           // console.log(data.context);
           data.context.find('button.up_btn').off('click').on('click', function () {
-            if (!data.context.find('[name*="version_no"]').val() || !data.context.find('[name*="file_date"]').val()) {
-              alert('Please enter the document version and date.');
-            } else {
-              data.submit();
-            }
+            
+            const groupName = data.context.find('[id*="Group"]').val().trim(); // Fetch group name dynamically
+
+            /***
+             * 
+             * Start the dynamic search by group name
+             * 
+             * ***/
+            // Make an API call to get additional details
+            fetch(`/pockets/groupchecklist/${encodeURIComponent(groupName)}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+              .then(response => response.json())
+              .then(jambo => {
+                const version = jambo.Pocket.version_required;
+                const date = jambo.Pocket.date_required;
+
+                if (version === '1') { 
+                  if (!data.context.find('[name*="version_no"]').val()) {
+                    alert('Please enter the document version.');
+                    return;
+                  }
+                }
+                if (date === '1') { 
+                  if (!data.context.find('[name*="file_date"]').val()) {
+                    alert('Please enter the document date.');
+                    return
+                  }
+                }
+                data.submit();
+
+              })
+              .catch(error => {
+                console.error('Error fetching data:', error);
+                alert('There was an error fetching group details.');
+              });
+
+            /***
+             * End of search
+             * 
+             * **/
+
+            // if (!data.context.find('[name*="version_no"]').val() || !data.context.find('[name*="file_date"]').val()) {
+            //   alert('Please enter the document version and date.');
+            // } else {
+            //   data.submit();
+            // }
           });
         },
         submit: function (e, data) {

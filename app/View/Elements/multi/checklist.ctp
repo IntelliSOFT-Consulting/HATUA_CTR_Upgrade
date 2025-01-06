@@ -1,5 +1,5 @@
 <?php
-$this->Html->script('multi/checklists?v=2', array('inline' => false));
+$this->Html->script('multi/check_list', array('inline' => false));
 $add_checklist = '<p><button class="btn btn-mini tiptip add-checklist" data-original-title="Add a file"
                                 style="margin-left:10px;" type="button">&nbsp;<i class="icon-plus-sign"></i>&nbsp; </button>';
 $num = 0;
@@ -10,11 +10,14 @@ $num = 0;
 <hr>
 <?php
 $medals = $this->requestAction('/pockets/checklist/protocol');
-$reqs = $this->requestAction('/pockets/lchecklist/protocol');
+$reqs = $this->requestAction('/pockets/lchecklist/protocol'); 
+
+// debug($dchecklist);
 $group_data = array();
 foreach ($medals as $lad => $medal) {
     $num++;
     ($reqs[$lad]) ? $req = '<span class="sterix">*</span>' : $req = '';
+     
     echo $this->Form->input($lad, array(
         'label' => array('class' => 'control-checklabel', 'text' => $num . '.'),
         'error' => array('attributes' => array('class' => 'checkcontrols help-block')),
@@ -24,6 +27,8 @@ foreach ($medals as $lad => $medal) {
                                             <label class="checkbox required pull-left">',
         'after' => $medal . ' ' . $req . ' </label>' . $add_checklist,
     ));
+ 
+    
 ?>
     <div id="Checklist" class="checkcontrols" title="<?php echo $lad ?>">
         <?php

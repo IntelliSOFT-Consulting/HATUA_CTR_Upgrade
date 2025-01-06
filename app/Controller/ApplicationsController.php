@@ -1097,27 +1097,14 @@ class ApplicationsController extends AppController
             ];
 
             //Submisssion
+            $stages['Submission'] = ['label' => 'Application <br> Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+           
             if ($application['Application']['submitted']) {
                 $csd = new DateTime($application['Application']['date_submitted']);
                 $ccolor = 'success';
                 $creation = $stages['Creation'];
                 $scr_s = new DateTime($creation['start_date']);
-                $csd_s = $csd->format('d-M-Y');
-                //    $end_date= $scr_s->format('d-M-Y');
-                //     debug($end_date);
-                //     debug($csd_s);
-                //     $date1 = new DateTime('29-Nov-2024');
-                //     $date2 = new DateTime('17-Dec-2024');
-
-                //     // Calculate the difference
-                //     $interval = $date2->diff($date1);
-
-                // Display the result
-                //                 echo "Difference: " . $interval->days . " days";
-
-                // echo "Number of weekdays: " . diff_wdays($date2, $date1);
-                //                 debug($this->diff_wdays($csd, $scr_s));
-                //                 exit;
+                $csd_s = $csd->format('d-M-Y'); 
                 $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
                 $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
 
@@ -1128,6 +1115,7 @@ class ApplicationsController extends AppController
                     'start_date' => $csd->format('d-M-Y'),
                     'color' => $ccolor
                 ];
+                
             }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];

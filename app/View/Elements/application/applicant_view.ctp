@@ -2431,7 +2431,7 @@
                         ),
                         array('class' => 'btn btn-info')
                       );
-                      echo '</p>';
+                      echo ' <b>Uploaded on:</b> '.$value['created'].'</p>';
                     }
                   }
                 }
