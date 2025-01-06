@@ -91,7 +91,8 @@
         <?php
         echo $this->Form->create('Application', array(
           'url' => array_merge(array('action' => 'index'), $this->params['pass']),
-          'class' => 'ctr-groups', 'style' => array('padding:9px;', 'background-color: #F5F5F5'),
+          'class' => 'ctr-groups',
+          'style' => array('padding:9px;', 'background-color: #F5F5F5'),
         ));
         ?>
         <div class="row-fluid">
@@ -117,13 +118,14 @@
                   <th>
                     <?php
                     echo $this->Form->input('filter', array(
-                      'div' => false, 'class' => 'span12 unauthorized_index',
+                      'div' => false,
+                      'class' => 'span12 unauthorized_index',
                       'label' => array('class' => 'required', 'text' => 'Study Title'),
                       'type' => 'text',
                     ));
 
                     // 
-                    if ($this->fetch('is-applicant') == 'true' || $redir == 'reviewer' ) {
+                    if ($this->fetch('is-applicant') == 'true' || $redir == 'reviewer') {
                       echo $this->Form->input('stages', array('type' => 'hidden'));
                       echo $this->Form->input('phase', array('type' => 'hidden'));
                       echo $this->Form->input('disease_condition', array('type' => 'hidden'));
@@ -135,7 +137,8 @@
                   <th>
                     <?php
                     echo $this->Form->input('investigator', array(
-                      'div' => false, 'class' => 'span12 unauthorized_index',
+                      'div' => false,
+                      'class' => 'span12 unauthorized_index',
                       'label' => array('class' => 'required', 'text' => 'Principal Investigator(s)'),
                       'type' => 'text',
                     ));
@@ -144,7 +147,8 @@
                   <th>
                     <?php
                     echo $this->Form->input('sites', array(
-                      'div' => false, 'class' => 'span12 unauthorized_index',
+                      'div' => false,
+                      'class' => 'span12 unauthorized_index',
                       'label' => array('class' => 'required', 'text' => 'Name of Site / County'),
                       'type' => 'text',
                     ));
@@ -153,7 +157,10 @@
                   <th>
                     <?php
                     echo $this->Form->input('pages', array(
-                      'type' => 'select', 'div' => false, 'class' => 'span12', 'selected' => $this->request->params['paging']['Application']['limit'],
+                      'type' => 'select',
+                      'div' => false,
+                      'class' => 'span12',
+                      'selected' => $this->request->params['paging']['Application']['limit'],
                       'empty' => true,
                       'options' => $page_options,
                       'label' => array('class' => 'required', 'text' => 'Pages'),
@@ -163,7 +170,9 @@
                   <th rowspan="2" style="width: 14%;">
                     <?php
                     echo $this->Form->button('<i class="icon-search icon-white"></i> Search', array(
-                      'class' => 'btn btn-inverse', 'div' => 'control-group', 'div' => false,
+                      'class' => 'btn btn-inverse',
+                      'div' => 'control-group',
+                      'div' => false,
                       'style' => array('margin-bottom: 5px')
                     ));
 
@@ -182,17 +191,24 @@
                     echo $this->Form->input(
                       'start_date',
                       array(
-                        'div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index', 'after' => '-to-',
-                        'label' => array('class' => 'required', 'text' => 'Application Submission Dates'), 'placeHolder' => 'Start Date'
+                        'div' => false,
+                        'type' => 'text',
+                        'class' => 'input-small unauthorized_index',
+                        'after' => '-to-',
+                        'label' => array('class' => 'required', 'text' => 'Application Submission Dates'),
+                        'placeHolder' => 'Start Date'
                       )
                     );
                     echo $this->Form->input(
                       'end_date',
                       array(
-                        'div' => false, 'type' => 'text', 'class' => 'input-small unauthorized_index',
+                        'div' => false,
+                        'type' => 'text',
+                        'class' => 'input-small unauthorized_index',
                         'after' => '<a style="font-weight:normal" onclick="$(\'.unauthorized_index\').val(\'\');" >
                             <em class="accordion-toggle">clear!</em></a>',
-                        'label' => false, 'placeHolder' => 'End Date'
+                        'label' => false,
+                        'placeHolder' => 'End Date'
                       )
                     );
                     ?>
@@ -202,7 +218,9 @@
                     //pr($this->request->params); //REMEMBER to limit this for administrators, managers and inspector only
                     if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Form->input('users', array(
-                        'type' => 'select', 'div' => false, 'class' => 'span12',
+                        'type' => 'select',
+                        'div' => false,
+                        'class' => 'span12',
                         'empty' => true,
                         'options' => $users,
                         'label' => array('class' => 'required', 'text' => 'Reviewers'),
@@ -215,7 +233,9 @@
                     //pr($this->request->params); //REMEMBER to limit this for administrators, managers and inspector only
                     if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Form->input('ercs', array(
-                        'type' => 'select', 'div' => false, 'class' => 'span12',
+                        'type' => 'select',
+                        'div' => false,
+                        'class' => 'span12',
                         'empty' => true,
                         'options' => $ercs,
                         'label' => array('class' => 'required', 'text' => 'ERCs'),
@@ -233,7 +253,9 @@
                         array('div' => false, 'class' => 'span12 unauthorized_index', 'label' => array('class' => 'required', 'text' => 'Disease Condition'))
                       );
                       echo $this->Form->input('phase', array(
-                        'type' => 'select', 'div' => false, 'class' => 'span12',
+                        'type' => 'select',
+                        'div' => false,
+                        'class' => 'span12',
                         'empty' => true,
                         'options' => array(
                           '1' => 'Phase I',
@@ -250,7 +272,9 @@
                     <?php
                     if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Form->input('approved', array(
-                        'type' => 'select', 'div' => false, 'class' => 'span12',
+                        'type' => 'select',
+                        'div' => false,
+                        'class' => 'span12',
                         'empty' => true,
                         'options' => array(
                           '2' => 'Approved',
@@ -258,6 +282,24 @@
                           '1' => 'On Hold'
                         ),
                         'label' => array('class' => 'required', 'text' => 'Status'),
+                      ));
+                      echo $this->Form->input('trial_status_id', array(
+                        'type' => 'select',
+                        'div' => false,
+                        'class' => 'span12',
+                        'empty' => true,
+                        'options' => array(
+                          '1' => 'Recruiting',
+                          '2' => 'Not yet recruiting',
+                          '3' => 'Suspended',
+                          '4' => 'Stopped',
+                          '5' => 'Completed',
+                          '6' => 'In follow-up',
+                          '7' => 'Analysing',
+                          '8' => 'Writing-up',
+                          '9' => 'Application withdrawn'
+                        ),
+                        'label' => array('class' => 'required', 'text' => 'Trial Status'),
                       ));
                     }
                     ?>

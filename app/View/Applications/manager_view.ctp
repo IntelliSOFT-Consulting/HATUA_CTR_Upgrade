@@ -55,7 +55,7 @@ echo $this->Session->flash();
     <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
     <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
     <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
-    <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li>
+    <!-- <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li> -->
     <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Approval Letters</a></li>
     <?php if ($application['Application']['approved'] == 2) { ?>
       <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li>
@@ -400,13 +400,13 @@ echo $this->Session->flash();
           echo $this->Form->input('text', array(
             'type' => 'textarea', 
             'rows' => 3,
-            'value' => !empty($this->request->data['Review']['text']) ? $this->request->data['Review']['text'] : '',
+            'value' =>$this->Session->read('text'), 
             'label' => array('class' => 'required', 'text' => '3. Manager\'s Comment(s)')
           ));
           echo $this->Form->input('recommendation', array(
             'type' => 'textarea',
              'rows' => 3, 
-             'value' => !empty($this->request->data['Review']['recommendation']) ? $this->request->data['Review']['recommendation'] : '',   
+             'value' =>$this->Session->read('recommendation'),  
             'label' => array('class' => 'required', 'text' => '4. Manager\'s recommendation(s)')
           ));
           echo $this->Form->input('password', array('type' => 'password', 'label' => 'Your Password *'));

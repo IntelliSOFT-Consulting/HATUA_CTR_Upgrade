@@ -113,9 +113,13 @@ class ReviewsController extends AppController
             $this->request->data['Review']['user_id'] = $this->Auth->User('id');
             $this->request->data['Review']['type'] = 'ppb_comment';
 
+            $this->Session->write('text', $this->request->data['Review']['text']);
+            $this->Session->write('recommendation', $this->request->data['Review']['recommendation']);
+
             if ($this->Auth->password($this->request->data['Review']['password']) === $this->Auth->User('confirm_password')) {
                 if ($this->Review->save($this->request->data)) {
-
+                    $this->Session->delete('text');
+                    $this->Session->delete('recommendation');
                     //Create new Screening,ScreeningSubmission,Assign,Review,ReviewSubmission stages if not exists
                     $stages = $this->Application->ApplicationStage->find('all', array(
                         'contain' => array(),

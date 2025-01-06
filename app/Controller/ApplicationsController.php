@@ -38,15 +38,15 @@ class ApplicationsController extends AppController
         ));
         if ($application) {
 
-            $safety_type=$this->request->data['SafetyReport']['safety_type'];
+            $safety_type = $this->request->data['SafetyReport']['safety_type'];
             $count = $this->SafetyReport->find('count',  array('conditions' => array(
                 'SafetyReport.safety_type' => $safety_type,
                 'SafetyReport.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
             )));
             $count++;
-            $count = ($count < 10) ? "0$count" : $count; 
-            $reference_no=$safety_type.'/' . date('Y') . '/' . $count;
-            $this->request->data['SafetyReport']['reference_no']=$reference_no;
+            $count = ($count < 10) ? "0$count" : $count;
+            $reference_no = $safety_type . '/' . date('Y') . '/' . $count;
+            $this->request->data['SafetyReport']['reference_no'] = $reference_no;
             $this->SafetyReport->create();
             if ($this->SafetyReport->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
 
@@ -68,7 +68,7 @@ class ApplicationsController extends AppController
                     'AuditTrail' => array(
                         'foreign_key' => $id,
                         'model' => 'Application',
-                        'message' => 'New '.$safety_type.' report for the Protocol with protocol number ' . $app['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
+                        'message' => 'New ' . $safety_type . ' report for the Protocol with protocol number ' . $app['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
                         'ip' => $app['Application']['protocol_no']
                     )
                 );
@@ -80,10 +80,10 @@ class ApplicationsController extends AppController
                     $this->log('Error creating an audit trail', 'notifications_error');
                     $this->log($this->request->data, 'notifications_error');
                 }
-             
-            $this->Session->setFlash(__('The '.$safety_type.' has been created'), 'alerts/flash_success');
-            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
-            }else{
+
+                $this->Session->setFlash(__('The ' . $safety_type . ' has been created'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+            } else {
                 $validationErrors = $this->SafetyReport->validationErrors;
 
                 // Concatenate validation errors into a single string
@@ -96,7 +96,7 @@ class ApplicationsController extends AppController
 
                 // Set flash message with validation errors
                 $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
-                $this->redirect($this->referer()); 
+                $this->redirect($this->referer());
             }
         } else {
             $this->Session->setFlash(__('Can\'t trace the protocol, please try again later'), 'alerts/flash_success');
@@ -1088,23 +1088,56 @@ class ApplicationsController extends AppController
             //creation
             $csd = new DateTime($application['Application']['created']);
             $ccolor = 'success';
-            $stages['Creation'] = ['application_name' => $application_name, 'label' => 'Application <br>Creation', 'days' => '0', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
+            $stages['Creation'] = [
+                'application_name' => $application_name,
+                'label' => 'Application <br>Creation',
+                'days' => '0',
+                'start_date' => $csd->format('d-M-Y'),
+                'color' => $ccolor
+            ];
 
             //Submisssion
-            // if ($application['Application']['submitted']) {
-            //     $csd = new DateTime($application['Application']['date_submited']);
-            //     $ccolor = 'success';
-            //     $stages['Submission'] = ['application_name' => $application_name, 'label' => 'Application <br>Submission', 'days' => '', 'start_date' => $csd->format('d-M-Y'), 'color' => $ccolor];
-            // }
+            if ($application['Application']['submitted']) {
+                $csd = new DateTime($application['Application']['date_submitted']);
+                $ccolor = 'success';
+                $creation = $stages['Creation'];
+                $scr_s = new DateTime($creation['start_date']);
+                $csd_s = $csd->format('d-M-Y');
+                //    $end_date= $scr_s->format('d-M-Y');
+                //     debug($end_date);
+                //     debug($csd_s);
+                //     $date1 = new DateTime('29-Nov-2024');
+                //     $date2 = new DateTime('17-Dec-2024');
+
+                //     // Calculate the difference
+                //     $interval = $date2->diff($date1);
+
+                // Display the result
+                //                 echo "Difference: " . $interval->days . " days";
+
+                // echo "Number of weekdays: " . diff_wdays($date2, $date1);
+                //                 debug($this->diff_wdays($csd, $scr_s));
+                //                 exit;
+                $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
+                $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
+
+                $stages['Submission'] = [
+                    'application_name' => $application_name,
+                    'label' => 'Application <br>Submission',
+                    'days' => '',
+                    'start_date' => $csd->format('d-M-Y'),
+                    'color' => $ccolor
+                ];
+            }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if (Hash::check($application['ApplicationStage'], '{n}[stage=Screening].id')) {
                 $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Screening]'));
                 $scr_s = new DateTime($scr['start_date']);
                 $scr_e = new DateTime($scr['end_date']);
-                $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
+                $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
                 // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
-                $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
+                $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
 
                 $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');
                 // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
@@ -1508,7 +1541,15 @@ class ApplicationsController extends AppController
         $this->Prg->commonProcess();
 
         $page_options = array('5' => '5', '10' => '10', '50' => '50', '100' => '100', '500' => '500', '1000' => '1000');
-        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
+        if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) {
+            if (!empty($this->passedArgs['approved']) && $this->passedArgs['approved'] == '2') {
+                $this->passedArgs['approvedrange'] = true;
+            } else {
+                $this->passedArgs['range'] = true;
+            }
+        }
+
+
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
         else $this->paginate['limit'] = reset($page_options);
@@ -2321,7 +2362,7 @@ class ApplicationsController extends AppController
                         $cnt = $this->Application->AnnualLetter->find('count', array('conditions' => array('date_format(AnnualLetter.created, "%Y")' => date("Y"))));
                         $cnt++;
                         $year = date('Y', strtotime($this->Application->field('approval_date')));
-                        $approval_no = 'PPB/' . $application['Application']['protocol_no'] . "/$year" . "($cnt)";
+                        $approval_no =  $application['Application']['protocol_no'] . "/$year" . "($cnt)";
                         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
                         $expiry_date_s = date('Y-m-d', strtotime($application['Application']['approval_date'] . " +1 year"));
 
