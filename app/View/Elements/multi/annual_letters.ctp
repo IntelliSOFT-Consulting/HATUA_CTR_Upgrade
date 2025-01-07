@@ -60,13 +60,15 @@ echo $this->Session->flash();
           <td class="actions">
             <?php
             if ($anl['status'] == 'submitted') {
+              if ($redir == 'manager') {
               echo $this->Html->link('<span class="label label-success"> Edit </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape' => false));
-           
+              }
             } else {
               echo $this->Html->link('<span class="label label-info"> View </span>', array('action' => 'view', $application['Application']['id'], 'anl' => $anl['id']), array('escape' => false));
               echo "&nbsp;";
+              if ($redir == 'manager') {
               echo $this->Html->link('<span class="label label-success"> Edit </span>', array('action' => 'view', $application['Application']['id'], 'ane' => $anl['id']), array('escape' => false));
-           }
+           }}
 
             echo "&nbsp;";
             if ($anl['status'] == 'submitted')
@@ -75,9 +77,9 @@ echo $this->Session->flash();
             // if($anl['status'] == 'submitted') 
             echo $this->Html->link('<span class="label label-inverse"> Download PDF </span>', array('controller' => 'annual_letters', 'action' => 'view', $anl['id'], 'ext' => 'pdf',), array('escape' => false));
             echo "&nbsp;";
-            // if ($anl['status'] == 'approved')
+            if ($redir == 'manager') {
              echo $this->Html->link('<span class="label label-important"> Delete </span>', array('controller' => 'annual_letters', 'action' => 'delete', $anl['id'],), array('escape' => false,'confirm'=>'Are you sure to want to delete this Letter?'));
-           ?>
+             } ?>
           </td>
         </tr>
       <?php } ?>

@@ -1098,13 +1098,13 @@ class ApplicationsController extends AppController
 
             //Submisssion
             $stages['Submission'] = ['label' => 'Application <br> Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
-           
+
             if ($application['Application']['submitted']) {
                 $csd = new DateTime($application['Application']['date_submitted']);
                 $ccolor = 'success';
                 $creation = $stages['Creation'];
                 $scr_s = new DateTime($creation['start_date']);
-                $csd_s = $csd->format('d-M-Y'); 
+                $csd_s = $csd->format('d-M-Y');
                 $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
                 $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
 
@@ -1115,7 +1115,6 @@ class ApplicationsController extends AppController
                     'start_date' => $csd->format('d-M-Y'),
                     'color' => $ccolor
                 ];
-                
             }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
@@ -2338,11 +2337,22 @@ class ApplicationsController extends AppController
                         $deeds = $this->Pocket->find('list', array(
                             'fields' => array('Pocket.name', 'Pocket.content'),
                             'conditions' => array('Pocket.type' => 'protocol'),
+                            'order' => array('Pocket.item_number' => 'ASC'),
                             'recursive' => 0
                         ));
                         $checkstring = '';
                         $num = 0;
-                        foreach ($checklist as $kech => $check) {
+
+                        /*Load the checklist as expected*/
+                        foreach ($deeds as $key => $value) {
+                            if (array_key_exists($key, $checklist)) {
+                                $orderedArray2[$key] = $checklist[$key];
+                            }
+                        }
+                        // debug($deeds);
+                        // debug($orderedArray2);
+                        // exit;
+                        foreach ($orderedArray2 as $kech => $check) {
                             $num++;
                             $checkstring .= $num . '. ' . $deeds[$kech] . '<br>' . $check;
                         }
@@ -2361,6 +2371,25 @@ class ApplicationsController extends AppController
                             $professional_address = $application['InvestigatorContact'][0]['professional_address'];
                             $telephone = $application['InvestigatorContact'][0]['telephone'];
                         }
+
+
+
+                        $data = $application['Review'];
+
+
+                        $names = Hash::extract($data, '{n}.summary');
+                        // Filter out null values
+                        $names = array_filter($names, function ($value) {
+                            return $value !== null;
+                        });
+                        $cnt = 0;
+                        $reviewer_summary_comments = '';
+                        foreach ($names as $name) {
+                            $cnt++;
+                            $reviewer_summary_comments .= $name;
+                        }
+
+
                         $variables = array(
                             'approval_no' => $approval_no,
                             'protocol_no' => $application['Application']['protocol_no'],
@@ -2373,7 +2402,8 @@ class ApplicationsController extends AppController
                             'short_title' => $application['Application']['short_title'],
                             'checklist' => $checkstring,
                             'status' => $application['TrialStatus']['name'],
-                            'expiry_date' => $expiry_date
+                            'expiry_date' => $expiry_date,
+                            'reviewer_summary_comments' => $reviewer_summary_comments
                         );
 
                         $save_data = array(

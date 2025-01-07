@@ -100,10 +100,13 @@ class AnnualLettersController extends AppController
         //Request Access Token
         $initiate = $HttpSocket->post(
             'https://smp.imeja.co.ke/api/qr/generate',
-            array('url' => $currentUrl),
-            array('header' => array())
+            json_encode(array('url' => $currentUrl)),
+            array('header' => array(
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ))
         );
-
+        // debug($currentUrl);
         // debug($initiate);
         // exit;
         if ($initiate->isOk()) {
@@ -195,6 +198,25 @@ class AnnualLettersController extends AppController
      *
      * @return void
      */
+
+    public function confirm_file_date($date = null)
+    {
+
+        // Check if date is null, empty, or blank
+        if ($date === null || empty(trim($date))) {
+            return "";
+        }
+
+        // Attempt to parse the date
+        $formattedDate = date('jS F Y', strtotime($date));
+
+        // Check for invalid date (strtotime returns false for invalid dates)
+        if (!$formattedDate || strtotime($date) === false) {
+            return $date;
+        }
+
+        return $formattedDate;
+    }
     public function manager_initial($application_id = null)
     {
         //Create  annual approval letter
@@ -213,18 +235,24 @@ class AnnualLettersController extends AppController
         foreach ($application['Checklist'] as $formdata) {
             $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
             (isset($checklist[$formdata['pocket_name']])) ?
-                $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>' :
-                $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>';
+                $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>' :
+                $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>';
         }
         $deeds = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.content'),
             'conditions' => array('Pocket.type' => 'protocol'),
+            'order' => array('Pocket.item_number' => 'ASC'),
             'recursive' => 0
         ));
-        // debug($deeds);
+        
+        foreach ($deeds as $key => $value) {
+            if (array_key_exists($key, $checklist)) {
+                $orderedArray2[$key] = $checklist[$key];
+            }
+        }
         $checkstring = '';
         $cnt = 0;
-        foreach ($checklist as $kech => $check) {
+        foreach ($orderedArray2 as $kech => $check) {
             $cnt++;
             $checkstring .= $cnt . '. ' . $deeds[$kech] . '<br>' . $check;
         }
@@ -544,19 +572,25 @@ class AnnualLettersController extends AppController
             if ($formdata['year'] == date('Y')) {
                 $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
                 (isset($checklist[$formdata['pocket_name']])) ?
-                    $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>' :
-                    $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>';
+                    $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>' :
+                    $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>';
             }
         }
         $deeds = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.content'),
             'conditions' => array('Pocket.type' => 'annual'),
+            'order' => array('Pocket.item_number' => 'ASC'),
             'recursive' => 0
         ));
-        // debug($deeds);
+        $orderedArray2=array();
+        foreach ($deeds as $key => $value) {
+            if (array_key_exists($key, $checklist)) {
+                $orderedArray2[$key] = $checklist[$key];
+            }
+        }
         $checkstring = '';
         $cnt = 0;
-        foreach ($checklist as $kech => $check) {
+        foreach ($orderedArray2 as $kech => $check) {
             $cnt++;
             $checkstring .= $cnt . '. ' . $deeds[$kech] . '<br>' . $check;
         }
@@ -569,7 +603,7 @@ class AnnualLettersController extends AppController
         $expiry_date = date('jS F Y', strtotime('+1 year'));
         $today_date = date('j M Y');
 
-     
+
 
         $data = $application['Review'];
 
@@ -589,7 +623,7 @@ class AnnualLettersController extends AppController
         // Trim the trailing comma and space
         // $reviewer_summary_comments = trim($resultString, ', ');
 
- 
+
         // debug($reviewer_summary_comments);
         // exit;
 
