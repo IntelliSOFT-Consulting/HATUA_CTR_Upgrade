@@ -23,11 +23,39 @@ $(function () {
                 $(this).after('<label class="btn pull-left" style="background-color: #99C0DD" for="' + $(this).attr('id') + '">' + data.files[0].name + '</label>&nbsp;');
                 $(this).hide();
                 data.context.find('button.add-approval').off('click').on('click', function () {
-                    if (!data.context.find('[name*="version_no"]').val() || !data.context.find('[name*="file_date"]').val()) {
-                        alert('Please enter the document version and date.');
-                    } else {
-                        data.submit();
-                    }
+
+                    const groupName = data.context.find('[id*="Group"]').val().trim(); // Fetch group name dynamically
+                    fetch(`/pockets/groupchecklist/${encodeURIComponent(groupName)}`, {
+                        method: 'GET',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                      })
+                        .then(response => response.json())
+                        .then(jambo => {
+                          const version = jambo.Pocket.version_required;
+                          const date = jambo.Pocket.date_required;
+          
+                          if (version === '1') { 
+                            if (!data.context.find('[name*="version_no"]').val()) {
+                              alert('Please enter the document version.');
+                              return;
+                            }
+                          }
+                          if (date === '1') { 
+                            if (!data.context.find('[name*="file_date"]').val()) {
+                              alert('Please enter the document date.');
+                              return
+                            }
+                          }
+                          data.submit();
+          
+                        })
+                        .catch(error => {
+                          console.error('Error fetching data:', error);
+                          alert('There was an error fetching group details.');
+                        });
+ 
                 });
             },
             formData: function (form) {
@@ -100,7 +128,7 @@ $(function () {
     //Set the date
     lastDate = new Date();
     var currentMonth = lastDate.getMonth() + 1; // JavaScript months are zero-based
-    
+
     // Check if the current month is December
     if (currentMonth === 12) {
         lastDate.setFullYear(lastDate.getFullYear() + 1); // Add one year if it's December
@@ -185,7 +213,7 @@ $(function () {
         buttonImageOnly: true,
         showAnim: 'show',
         showOn: 'both',
-        endDate:maxDate,
+        endDate: maxDate,
         buttonImage: '/img/calendar.gif'
     });
 
