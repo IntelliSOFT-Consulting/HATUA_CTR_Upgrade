@@ -18,7 +18,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
 $this->Html->script('multi/amendmentchecklist', array('inline' => false));
 $this->Html->script('multi/approval_year', array('inline' => false));
 $this->Html->script('multi/documents', array('inline' => false));
-$this->Html->script('multi/afro_attachments', array('inline' => false)); 
+$this->Html->script('multi/afro_attachments', array('inline' => false));
 
 $reviewers_comments = 0;
 foreach ($application['Review'] as $review) {
@@ -39,25 +39,26 @@ echo $this->Session->flash();
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
       <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
-    <li><a href="#tab17" data-toggle="tab">Screening</a></li>
-    <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
-    <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
-    <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
+      <li><a href="#tab17" data-toggle="tab">Screening</a></li>
+      <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
+      <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
+      <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
     <?php } ?>
     <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php echo count($application['Sae']) ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
     <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
       <!-- <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li> -->
-    <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
-    <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
-    <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
-    <!-- <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li> -->
-    <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Approval Letters</a></li>
-    <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
-    <?php if ($application['Application']['approved'] == 2) { ?>
-      <li><a href="#tab9" data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
-    <?php } } ?>
+      <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
+      <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
+      <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
+      <!-- <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li> -->
+      <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Approval Letters</a></li>
+      <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
+      <?php if ($application['Application']['approved'] == 2) { ?>
+        <li><a href="#tab9" data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
+    <?php }
+    } ?>
   </ul>
   <div class="tab-content my-tab-content">
     <div class="tab-pane active" id="tab1">
@@ -162,7 +163,7 @@ echo $this->Session->flash();
               array('escape' => false, 'class' => 'btn pull-right btn-success save-attachment')
             );
           } else {
-            $invoice=base64_encode($application['Application']['ecitizen_invoice']);
+            $invoice = base64_encode($application['Application']['ecitizen_invoice']);
             echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $invoice . '"><i class="icon-download"></i> Download Invoice</a></button>';
           }
           echo $this->Html->link(
@@ -215,32 +216,45 @@ echo $this->Session->flash();
         <div class="span12">
           <br>
           <div class="amend-form">
-            <h5 class="text-center"><u>FEEDBACK/QUERIES</u></h5>
-            <div class="row-fluid">
-              <div class="span8">
-                <?php
-                // debug(min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]')));
-                // $eid = min(Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]'));
-                $var = Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]');
-                $eid = null;
-                if (!empty($var)) $eid = min($var);
-                // debug($eid);
-                if (!empty($eid)) echo $this->element('comments/list', ['comments' => $eid['Comment'], 'show' => true]);
-                ?>
+            <!-- Tab Navigation -->
+            <?php
+
+            $var = Hash::extract($application, 'ApplicationStage.{n}[stage=Screening]');
+            $eid = null;
+            if (!empty($var)) $eid = min($var);
+            ?>
+            <ul class="nav nav-tabs" id="myTabs">
+              <li class="active"><a href="#home" data-toggle="tab">FEEDBACK/QUERIES</a></li>
+              <li><a href="#about" data-toggle="tab">Add Comment</a></li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+              <div class="tab-pane active" id="home">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <?php if (!empty($eid)) echo $this->element('comments/list_expandable', ['comments' => $eid['Comment'], 'category' => true]) ?>
+                  </div>
+                </div>
               </div>
-              <div class="span4 lefty">
-                <?php
-                if (!empty($eid) && !empty($eid['Comment']))  echo $this->element('comments/add', [
-                  'model' => [
-                    'model_id' => $application['Application']['id'],
-                    'foreign_key' => $eid['id'],
-                    'model' => 'ApplicationStage', 
-                    'category' => 'external',
-                    'message_type' => 'screening_feedback',
-                    'url' => 'add_screening_query'
-                  ]
-                ])
-                ?>
+              <div class="tab-pane" id="about">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <?php
+                    if (!empty($eid))   echo $this->element('comments/add_plain', [
+                      'model' => [
+                        'model_id' => $application['Application']['id'],
+                        'foreign_key' => $eid['id'],
+                        'model' => 'ApplicationStage',
+                        'category' => 'external',
+                        'message_type' => 'screening_feedback',
+                        'url' => 'add_screening_query',
+                        'type' => 50
+                      ]
+                    ])
+                    ?>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -311,8 +325,11 @@ echo $this->Session->flash();
                 <?php
                 if (!empty($rid))  echo $this->element('comments/add', [
                   'model' => [
-                    'model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],
-                    'model' => 'Review', 'category' => 'external', 'url' => 'add_review_response'
+                    'model_id' => $application['Application']['id'],
+                    'foreign_key' => $rid['id'],
+                    'model' => 'Review',
+                    'category' => 'external',
+                    'url' => 'add_review_response'
                   ]
                 ])
                 ?>
@@ -339,8 +356,8 @@ echo $this->Session->flash();
     <div class="tab-pane" id="tab7">
       <div class="row-fluid">
 
-      <?php echo $this->element('application/safety');?>
-       
+        <?php echo $this->element('application/safety'); ?>
+
       </div>
     </div>
 
@@ -355,7 +372,7 @@ echo $this->Session->flash();
     <div class="tab-pane" id="tab13">
       <div class="row-fluid">
         <div class="span12">
-       
+
           <?php echo $this->element('application/deviation'); ?>
         </div>
       </div>

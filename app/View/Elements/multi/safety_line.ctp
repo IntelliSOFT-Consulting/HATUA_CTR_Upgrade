@@ -1,5 +1,5 @@
 <?php
-$this->Html->script('multi/safety_dsmb', array('inline' => false));
+$this->Html->script('multi/safety_line', array('inline' => false));
 ?>
 <div class="row-fluid">
     <div class="span12">
@@ -7,9 +7,9 @@ $this->Html->script('multi/safety_dsmb', array('inline' => false));
         <hr>
 
         <h5><i class="icon-file"></i> Click on the button to add the files:
-            <button type="button" class="btn-mini" id="addDsbm">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
+            <button type="button" class="btn-mini" id="addLine">&nbsp;<i class="icon-plus"></i>&nbsp;</button>
         </h5>
-        <table id="builddsmbform" class="table table-bordered  table-condensed table-striped">
+        <table id="lineform" class="table table-bordered  table-condensed table-striped">
             <thead>
                 <tr id="attachmentsTableHeader">
                     <th>#</th>

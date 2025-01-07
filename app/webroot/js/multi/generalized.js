@@ -1,14 +1,14 @@
 $(function() {
-    $(document).on('click', '#outsourcing .remove-row', remove_row);
+    $(document).on('click', '.remove-row', remove_row);
 
-    if ($("#buildoutsourceform tr").length == 1 ) { $("#attachmentsTableHeader").hide(); }
+    if ($("#generalizedform tr").length == 1 ) { $("#attachmentsTableHeader").hide(); }
     
     // incremental development
-    $("#addSupporting").click(function() {
+    $("#addGeneralized").click(function() {
         $("#attachmentsTableHeader").show();
-        var intId = $("#buildoutsourceform tr").length - 1;
-        if ($('#buildoutsourceform :input[type="file"]').length < 4) {
-            $("#buildoutsourceform").append(constructATr(intId));
+        var intId = $("#generalizedform tr").length - 1;
+        if ($('#generalizedform :input[type="file"]').length < 4) {
+            $("#generalizedform").append(constructATr(intId));
             setAttachmentUpload();
         } else {
             alert("Sorry, cant save more than Four Attachments at a time!");

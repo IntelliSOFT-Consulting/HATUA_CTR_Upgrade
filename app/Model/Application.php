@@ -499,26 +499,30 @@ class Application extends AppModel
             'className' => 'SafetyReport',
             'foreignKey' => 'application_id',
             'dependent' => true,
-            'conditions' => array('SafetyReportGen.safety_type' => 'GEN'),
+            'conditions' => array('SafetyReportGen.safety_type' => 'GEN',
+            'SafetyReportGen.deleted IS NULL' ),
         ),
 
         'SafetyReportDSMB' => array(
             'className' => 'SafetyReport',
             'foreignKey' => 'application_id',
             'dependent' => true,
-            'conditions' => array('SafetyReportDSMB.safety_type' => 'DSMB'),
+            'conditions' => array(
+                'SafetyReportDSMB.safety_type' => 'DSMB',
+                'SafetyReportDSMB.deleted IS NULL' 
+            ),
         ),
         'SafetyReportDSUR' => array(
             'className' => 'SafetyReport',
             'foreignKey' => 'application_id',
             'dependent' => true,
-            'conditions' => array('SafetyReportDSUR.safety_type' => 'DSUR'),
+            'conditions' => array('SafetyReportDSUR.safety_type' => 'DSUR', 'SafetyReportDSUR.deleted IS NULL' ),
         ),
         'SafetyReportLINE' => array(
             'className' => 'SafetyReport',
             'foreignKey' => 'application_id',
             'dependent' => true,
-            'conditions' => array('SafetyReportLINE.safety_type' => 'LINE'),
+            'conditions' => array('SafetyReportLINE.safety_type' => 'LINE', 'SafetyReportLINE.deleted IS NULL' ),
         ),
         
 

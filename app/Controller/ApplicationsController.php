@@ -24,10 +24,41 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'admin_extra', 'manager_generate_safety_report', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
 
-    public function manager_generate_safety_report($id = null)
+    public function safety_delete($id = null)
+    {
+        $this->loadModel('SafetyReport');
+        $this->SafetyReport->id = $id;
+        if (!$this->SafetyReport->exists()) {
+            throw new NotFoundException(__('Invalid Safety Report'));
+        }
+        $report = $this->SafetyReport->find('first', array('conditions' => array('SafetyReport.id' => $id)));
+        // debug($report);
+        // exit;
+        // Perform a soft delete by setting deleted to true and updating deleted_date
+        if ($this->SafetyReport->save([
+            'deleted' => true,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ])) {
+
+            $safety_type = $report['SafetyReport']['safety_type'] . "  Safety report ";
+            $this->Session->setFlash(__('The ' . $safety_type . ' has been deleted'), 'alerts/flash_success');
+        } else {
+            $this->Session->setFlash(__('The safety report could not be deleted. Please, try again.'), 'alerts/flash_error');
+        }
+        $this->redirect($this->referer());
+    }
+    public function manager_safety_delete($id=null) {
+        $this->safety_delete($id);
+
+	}
+    public function applicant_safety_delete($id=null) {
+        $this->safety_delete($id);
+	}
+
+    public function generate_safety_report($id = null)
     {
 
         $this->loadModel('SafetyReport');
@@ -102,6 +133,14 @@ class ApplicationsController extends AppController
             $this->Session->setFlash(__('Can\'t trace the protocol, please try again later'), 'alerts/flash_success');
             $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
         }
+    }
+    public function manager_generate_safety_report($id = null)
+    {
+        $this->generate_safety_report($id);
+    }
+    public function applicant_generate_safety_report($id = null)
+    {
+        $this->generate_safety_report($id);
     }
 
     public function admin_extra($id = null)

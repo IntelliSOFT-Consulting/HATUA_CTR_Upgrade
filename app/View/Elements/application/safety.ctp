@@ -8,13 +8,16 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 <br>
 <div class="row-fluid">
     <div class="span12">
-        <ul id="rreview_tab" class="nav nav-tabs">
-            <li class="active"><a href="#tabs-susar">SAE/SUSAR</a></li>
-            <li><a href="#tabs-generalized">Generalized safety report</a></li>
-            <li><a href="#tabs-line">Line Listings</a></li>
-            <li><a href="#tabs-dsurs">DSURs</a></li>
-            <li><a href="#tabs-dsmbs">DSMB</a></li>
+
+        <ul class="nav nav-tabs" id="myTabs">
+            <li class="active"><a href="#tabs-susar" data-toggle="tab">SAE/SUSAR</a></li>
+            <li><a href="#tabs-generalized" data-toggle="tab">Generalized safety report</a></li>
+            <li><a href="#tabs-line" data-toggle="tab">Line Listings</a></li>
+            <li><a href="#tabs-dsurs" data-toggle="tab">DSURs</a></li>
+            <li><a href="#tabs-dsmbs" data-toggle="tab">DSMB</a></li>
         </ul>
+
+
         <div class="tab-content">
             <div class="tab-pane active" id="tabs-susar">
                 <div class="row-fluid">
@@ -142,9 +145,9 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                                 'label' => array('class' => 'control-nolabel required', 'text' => 'Summary <span class="sterix">*</span>'),
                                                 'between' => '<div class="nocontrols">',
                                                 'placeholder' => 'summary',
-                                                'class' => 'input-large span10', 
+                                                'class' => 'input-large span10',
                                             ));
-                                            echo $this->element('multi/safety');
+                                            echo $this->element('multi/generalized');
                                             ?>
 
                                         </div>
@@ -195,8 +198,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
+                                        $cc=0;
                                             foreach ($data['Attachment'] as $i => $file) {
-                                                echo $this->Html->link(
+                                                $cc++;
+                                                echo $cc.". ".$this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -205,17 +210,11 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                             &nbsp;</td>
                                         <td><?php echo h($data['created']); ?>&nbsp;</td>
                                         <td class="actions">
-                                            <?php
-                                            echo $this->Html->link(
-                                                __('<label class="label label-info">View</label>'),
-                                                array('controller' => 'datas', 'action' => 'view', $data['id']),
-                                                array('target' => '_blank', 'escape' => false)
-                                            ); ?>
-                                            <?php
+                                            <?php 
 
                                             //ensure they own 
-                                            if ($sae['user_id'] == $this->Session->read('Auth.User.id')) {
-                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
+                                            if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
+                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'applications', 'action' => 'safety_delete', $data['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $data['id']));
                                             }
 
                                             ?>
@@ -269,9 +268,9 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                                 'label' => array('class' => 'control-nolabel required', 'text' => 'Summary <span class="sterix">*</span>'),
                                                 'between' => '<div class="nocontrols">',
                                                 'placeholder' => 'summary',
-                                                'class' => 'input-large span10', 
+                                                'class' => 'input-large span10',
                                             ));
-                                            echo $this->element('multi/safety');
+                                            echo $this->element('multi/safety_line');
                                             ?>
 
                                         </div>
@@ -322,8 +321,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
+                                        $k=0;
                                             foreach ($data['Attachment'] as $i => $file) {
-                                                echo $this->Html->link(
+                                                $k++;
+                                                echo $k.". ". $this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -333,16 +334,16 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['created']); ?>&nbsp;</td>
                                         <td class="actions">
                                             <?php
-                                            echo $this->Html->link(
-                                                __('<label class="label label-info">View</label>'),
-                                                array('controller' => 'datas', 'action' => 'view', $data['id']),
-                                                array('target' => '_blank', 'escape' => false)
-                                            ); ?>
-                                            <?php
+                                            // echo $this->Html->link(
+                                            //     __('<label class="label label-info">View</label>'),
+                                            //     array('controller' => 'datas', 'action' => 'view', $data['id']),
+                                            //     array('target' => '_blank', 'escape' => false)
+                                            // ); ?>
+                                             <?php
 
                                             //ensure they own 
-                                            if ($sae['user_id'] == $this->Session->read('Auth.User.id')) {
-                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
+                                            if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
+                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'applications', 'action' => 'safety_delete', $data['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $data['id']));
                                             }
 
                                             ?>
@@ -396,9 +397,9 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                                 'label' => array('class' => 'control-nolabel required', 'text' => 'Summary <span class="sterix">*</span>'),
                                                 'between' => '<div class="nocontrols">',
                                                 'placeholder' => 'summary',
-                                                'class' => 'input-large span10', 
+                                                'class' => 'input-large span10',
                                             ));
-                                            echo $this->element('multi/safety');
+                                            echo $this->element('multi/safety_dsurs');
                                             ?>
 
                                         </div>
@@ -449,8 +450,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
+                                        $d=0;
                                             foreach ($data['Attachment'] as $i => $file) {
-                                                echo $this->Html->link(
+                                                $d++;
+                                                echo $d.". ". $this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -460,16 +463,16 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['created']); ?>&nbsp;</td>
                                         <td class="actions">
                                             <?php
-                                            echo $this->Html->link(
-                                                __('<label class="label label-info">View</label>'),
-                                                array('controller' => 'datas', 'action' => 'view', $data['id']),
-                                                array('target' => '_blank', 'escape' => false)
-                                            ); ?>
+                                            // echo $this->Html->link(
+                                            //     __('<label class="label label-info">View</label>'),
+                                            //     array('controller' => 'datas', 'action' => 'view', $data['id']),
+                                            //     array('target' => '_blank', 'escape' => false)
+                                            // ); ?>
                                             <?php
 
                                             //ensure they own 
-                                            if ($sae['user_id'] == $this->Session->read('Auth.User.id')) {
-                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
+                                            if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
+                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'applications', 'action' => 'safety_delete', $data['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $data['id']));
                                             }
 
                                             ?>
@@ -523,7 +526,7 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                                 'label' => array('class' => 'control-nolabel required', 'text' => 'Summary <span class="sterix">*</span>'),
                                                 'between' => '<div class="nocontrols">',
                                                 'placeholder' => 'summary',
-                                                'class' => 'input-large span10', 
+                                                'class' => 'input-large span10',
                                             ));
                                             echo $this->element('multi/safety');
                                             ?>
@@ -576,8 +579,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
+                                        $ck=0;
                                             foreach ($data['Attachment'] as $i => $file) {
-                                                echo $this->Html->link(
+                                                $ck++;
+                                                echo $ck.". ".$this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -587,16 +592,16 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['created']); ?>&nbsp;</td>
                                         <td class="actions">
                                             <?php
-                                            echo $this->Html->link(
-                                                __('<label class="label label-info">View</label>'),
-                                                array('controller' => 'datas', 'action' => 'view', $data['id']),
-                                                array('target' => '_blank', 'escape' => false)
-                                            ); ?>
-                                            <?php
+                                            // echo $this->Html->link(
+                                            //     __('<label class="label label-info">View</label>'),
+                                            //     array('controller' => 'datas', 'action' => 'view', $data['id']),
+                                            //     array('target' => '_blank', 'escape' => false)
+                                            // ); ?>
+                                             <?php
 
                                             //ensure they own 
-                                            if ($sae['user_id'] == $this->Session->read('Auth.User.id')) {
-                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
+                                            if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
+                                                echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'applications', 'action' => 'safety_delete', $data['id']), array('escape' => false), __('Are you sure you want to delete # %s?', $data['id']));
                                             }
 
                                             ?>
@@ -614,5 +619,3 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
     </div>
 </div>
 <hr>
-
- 

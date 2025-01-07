@@ -8,15 +8,9 @@ App::uses('AppModel', 'Model');
  */
 class SafetyReport extends AppModel
 {
-
-	/**
-	 * Use table
-	 *
-	 * @var mixed False or table name
-	 */
-	public $useTable = 'safety_report';
-
-
+ 
+	public $actsAs = array('Containable', 'SoftDelete');
+	
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 	/**

@@ -836,6 +836,7 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/Applications/manager_delete');
         $this->Acl->allow($group, 'controllers/Applications/manager_deactivate');
         $this->Acl->allow($group, 'controllers/Applications/manager_generate_safety_report');
+        $this->Acl->allow($group, 'controllers/Applications/manager_safety_delete');
         $this->Acl->allow($group, 'controllers/Applications/stages');
         $this->Acl->allow($group, 'controllers/Attachments/manager_download');
         $this->Acl->allow($group, 'controllers/Attachments/download');
@@ -941,6 +942,8 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/Amendments/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_index');
         $this->Acl->allow($group, 'controllers/Applications/applicant_create');
+        $this->Acl->allow($group, 'controllers/Applications/applicant_generate_safety_report');
+        $this->Acl->allow($group, 'controllers/Applications/applicant_safety_delete');
         // $this->Acl->allow($group, 'controllers/Applications/applicant_add');  //why?
         $this->Acl->allow($group, 'controllers/Applications/applicant_view');
         $this->Acl->allow($group, 'controllers/Applications/applicant_invoice');
