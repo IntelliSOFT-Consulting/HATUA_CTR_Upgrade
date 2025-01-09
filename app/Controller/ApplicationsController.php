@@ -35,9 +35,23 @@ class ApplicationsController extends AppController
                 $this->Session->setFlash(__('The multi center has been saved'), 'alerts/flash_success');
                 $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
             } else {
-                $this->Session->setFlash(__('The multi center could not be saved. Please, try again.'), 'alerts/flash_error');
+           
+                $validationErrors = $this->MultiCenter->validationErrors;
+
+                // Concatenate validation errors into a single string
+                $errorMessage = 'Failed to submit the request. Please correct the following errors: <br>';
+                foreach ($validationErrors as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $errorMessage .= $error . ' <br>';
+                    }
+                }
+
+                // Set flash message with validation errors
+                $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
+                $this->redirect($this->referer());
             }
         }
+        $this->redirect($this->referer());
     }
     public function safety_delete($id = null)
     {

@@ -85,6 +85,7 @@ class AppController extends Controller
     'SafetyReportDSMB' => array('Attachment'),
     'SafetyReportDSUR' => array('Attachment'),
     'SafetyReportLINE' => array('Attachment'),
+    'MultiCenter'=> array('Owner','CoPI'),
   );
   public $components = array(
     'Acl',

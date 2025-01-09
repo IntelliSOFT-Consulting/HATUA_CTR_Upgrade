@@ -30,12 +30,12 @@ class UsersController extends AppController
           
       
          $users = $this->User->find('all', array(
-             'conditions' => array('User.email LIKE' => "%$query%"),
+             'conditions' => array(
+                'User.email LIKE' => "%$query%",
+                'User.group_id' => 5
+            ),
              'fields' => array('id', 'email', 'name')
-         ));
-        //  debug($query);
-        //  debug($users);
-        //  exit;
+         )); 
          $this->response->body(json_encode($users));
        
     }

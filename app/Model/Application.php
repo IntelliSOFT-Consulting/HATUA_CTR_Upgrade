@@ -524,6 +524,11 @@ class Application extends AppModel
             'dependent' => true,
             'conditions' => array('SafetyReportLINE.safety_type' => 'LINE', 'SafetyReportLINE.deleted'=>'0' ),
         ),
+        'MultiCenter' => array(
+            'className' => 'MultiCenter',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+        ),
         
 
     );

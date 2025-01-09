@@ -22,6 +22,45 @@ $this->Html->script('multicenter', array('inline' => false));
                     <div class="tab-pane active" id="ccenters">
                         <div class="row-fluid">
                             <div class="span12">
+
+                                <table class="table table-striped table-bordered table-condensed table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Center Name</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $i = 0;
+                                        foreach ($application['MultiCenter'] as $center) {
+                                            $i++;
+
+                                        ?>
+                                            <tr>
+                                                <td><?php echo $i; ?></td>
+                                                <td><?php echo $center['CoPI']['name']; ?></td>
+                                                <td><?php echo $center['CoPI']['email']; ?></td>
+                                                <td><?php echo $center['site_name']; ?></td>
+                                                <td><?php echo $center['status']; ?></td>
+                                                <td>
+                                                    <a href="#" class="btn btn-mini btn-info" title="Edit" data-toggle="modal" data-target="#editCenter<?php echo $center['id']; ?>"><i class="icon-edit">Edit</i></a>
+                                                    <a href="#" class="btn btn-mini btn-danger" title="Delete" data-toggle="modal" data-target="#deleteCenter<?php echo $center['id']; ?>"><i class="icon-trash">Delete</i></a>
+                                                </td>
+                                            </tr>
+
+
+                                    </tbody>
+                                <?php
+                                        }
+                                ?>
+                                </table>
+
+
                             </div>
                         </div>
                     </div>
@@ -30,9 +69,9 @@ $this->Html->script('multicenter', array('inline' => false));
 
                             <div class="span12">
 
-                               <!-- start of the form -->
+                                <!-- start of the form -->
 
-                               <?php
+                                <?php
                                 echo $this->Form->create('MultiCenter', array(
                                     'url' => array('controller' => 'applications', 'action' => 'create_multi_center', $application['Application']['id']),
                                     'type' => 'file',
@@ -40,7 +79,7 @@ $this->Html->script('multicenter', array('inline' => false));
                                     'inputDefaults' => array(
                                         'div' => array('class' => 'control-group'),
                                         'label' => array('class' => 'control-label'),
-                                        
+
                                         'class' => '',
                                         'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
                                         'error' => array('attributes' => array('class' => 'controls')),
@@ -50,6 +89,11 @@ $this->Html->script('multicenter', array('inline' => false));
                                 echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
                                 ?>
                                 <?php
+
+                                echo $this->Form->input('site_name', array(
+                                    'label' => array('class' => 'control-label', 'text' => 'Site Name'),
+
+                                ));
                                 echo $this->Form->input('name', array(
                                     'label' => array('class' => 'control-label', 'text' => 'Name'),
                                     'id' => 'name',
@@ -91,7 +135,7 @@ $this->Html->script('multicenter', array('inline' => false));
                                 echo $this->Form->end();
                                 ?>
 
-                               <!-- end of the form -->
+                                <!-- end of the form -->
                             </div>
                         </div>
                     </div>
@@ -100,5 +144,3 @@ $this->Html->script('multicenter', array('inline' => false));
         </div>
     </div>
 </div>
-
- 

@@ -28,7 +28,7 @@ class MultiCenter extends AppModel {
 		'user_id' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-				//'message' => 'Your custom message here',
+				'message' => 'Please select a Co-PI',
 				//'allowEmpty' => false,
 				//'required' => false,
 				//'last' => false, // Stop validation after this rule
@@ -45,6 +45,15 @@ class MultiCenter extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		'site_name' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Please enter the site name',
+				'allowEmpty' => false,
+				'required' => true,
+				'on' => 'create',
+			),
+		),
 	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
@@ -56,13 +65,13 @@ class MultiCenter extends AppModel {
  */
 	public $belongsTo = array(
 		'Owner' => array(
-			'className' => 'Owner',
+			'className' => 'User',
 			'foreignKey' => 'owner_id',
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
 		),
-		'User' => array(
+		'CoPI' => array(
 			'className' => 'User',
 			'foreignKey' => 'user_id',
 			'conditions' => '',
