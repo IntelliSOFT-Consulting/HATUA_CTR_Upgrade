@@ -26,7 +26,19 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
-
+    public function applicant_create_multi_center($id = null)
+    {
+        $this->loadModel('MultiCenter');
+        if ($this->request->is('post')) {
+            $this->MultiCenter->create();
+            if ($this->MultiCenter->save($this->request->data)) {
+                $this->Session->setFlash(__('The multi center has been saved'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+            } else {
+                $this->Session->setFlash(__('The multi center could not be saved. Please, try again.'), 'alerts/flash_error');
+            }
+        }
+    }
     public function safety_delete($id = null)
     {
         $this->loadModel('SafetyReport');
@@ -50,13 +62,14 @@ class ApplicationsController extends AppController
         }
         $this->redirect($this->referer());
     }
-    public function manager_safety_delete($id=null) {
+    public function manager_safety_delete($id = null)
+    {
         $this->safety_delete($id);
-
-	}
-    public function applicant_safety_delete($id=null) {
+    }
+    public function applicant_safety_delete($id = null)
+    {
         $this->safety_delete($id);
-	}
+    }
 
     public function generate_safety_report($id = null)
     {

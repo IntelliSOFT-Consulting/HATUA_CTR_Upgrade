@@ -20,9 +20,25 @@ class UsersController extends AppController
     {
         parent::beforeFilter();
         // $this->Auth->allow();
-        $this->Auth->allow('register', 'login', 'activate_account', 'forgotPassword', 'resetPassword', 'logout', 'initDB');
+        $this->Auth->allow('register', 'multi', 'login', 'activate_account', 'forgotPassword', 'resetPassword', 'logout', 'initDB');
     }
-
+    public function multi($query = null) {
+        
+         $this->autoRender = false;
+         $this->response->type('json');
+         $this->User->recursive = -1;
+          
+      
+         $users = $this->User->find('all', array(
+             'conditions' => array('User.email LIKE' => "%$query%"),
+             'fields' => array('id', 'email', 'name')
+         ));
+        //  debug($query);
+        //  debug($users);
+        //  exit;
+         $this->response->body(json_encode($users));
+       
+    }
     public function forgotPassword()
     {
         if ($this->Session->read('Auth.User')) {
@@ -78,8 +94,15 @@ class UsersController extends AppController
         $applications = $this->Application->find('all', array(
             'limit' => 20,
             'fields' => array(
-                'Application.id', 'Application.user_id', 'Application.created', 'Application.protocol_no',
-                'Application.study_drug', 'Application.submitted', 'Application.trial_status_id', 'Application.admin_stopped', 'Application.admin_stopped_reason'
+                'Application.id',
+                'Application.user_id',
+                'Application.created',
+                'Application.protocol_no',
+                'Application.study_drug',
+                'Application.submitted',
+                'Application.trial_status_id',
+                'Application.admin_stopped',
+                'Application.admin_stopped_reason'
             ),
             'order' => array('Application.created' => 'desc'),
             'contain' => array('Review'),
@@ -108,16 +131,20 @@ class UsersController extends AppController
         }
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')),
+            'order' => 'Notification.created DESC',
+            'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('saes', $this->Sae->find('all', array(
             'limit' => 5,
-            'conditions' => array('Sae.user_id' => $this->Auth->User('id')), 'order' => 'Sae.created DESC'
+            'conditions' => array('Sae.user_id' => $this->Auth->User('id')),
+            'order' => 'Sae.created DESC'
         )));
         $this->set('meetingDates', $this->MeetingDate->find('all', array(
             'limit' => 5,
-            'conditions' => array('MeetingDate.user_id' => $this->Auth->User('id')), 'order' => 'MeetingDate.created DESC'
+            'conditions' => array('MeetingDate.user_id' => $this->Auth->User('id')),
+            'order' => 'MeetingDate.created DESC'
         )));
     }
 
@@ -133,8 +160,13 @@ class UsersController extends AppController
         $applications = $this->Application->find('all', array(
             'limit' => 20,
             'fields' => array(
-                'Application.id', 'Application.user_id', 'Application.created', 'Application.protocol_no',
-                'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'
+                'Application.id',
+                'Application.user_id',
+                'Application.created',
+                'Application.protocol_no',
+                'Application.study_drug',
+                'Application.submitted',
+                'Application.trial_status_id'
             ),
             'order' => array('Application.created' => 'desc'),
             'contain' => array('Review'),
@@ -143,13 +175,16 @@ class UsersController extends AppController
         $this->set('applications', $applications);
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')),
+            'order' => 'Notification.created DESC',
+            'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $aids = $this->Application->StudyMonitor->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('StudyMonitor.user_id' => $this->Auth->User('id'))));
         $this->set('saes', $this->Sae->find('all', array(
             'limit' => 20,
-            'conditions' => array('Sae.application_id' => $aids), 'order' => 'Sae.created DESC'
+            'conditions' => array('Sae.application_id' => $aids),
+            'order' => 'Sae.created DESC'
         )));
     }
     public function outsource_dashboard()
@@ -164,11 +199,16 @@ class UsersController extends AppController
         $applications = $this->Application->find('all', array(
             'limit' => 20,
             'fields' => array(
-                'Application.id', 'Application.user_id', 'Application.created', 'Application.protocol_no',
-                'Application.study_drug', 'Application.submitted', 'Application.trial_status_id'
+                'Application.id',
+                'Application.user_id',
+                'Application.created',
+                'Application.protocol_no',
+                'Application.study_drug',
+                'Application.submitted',
+                'Application.trial_status_id'
             ),
             'order' => array('Application.created' => 'desc'),
-            'contain' => array('Review','Outsource'=>array('User')),
+            'contain' => array('Review', 'Outsource' => array('User')),
             'conditions' => array('Application.id' => Hash::extract($user['ProtocolOutsource'], '{n}.application_id'), 'Application.submitted' => 1),
         ));
 
@@ -177,13 +217,16 @@ class UsersController extends AppController
         $this->set('applications', $applications);
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')),
+            'order' => 'Notification.created DESC',
+            'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $aids = $this->Application->ProtocolOutsource->find('list', array('fields' => array('application_id', 'application_id'), 'conditions' => array('ProtocolOutsource.user_id' => $this->Auth->User('id'))));
         $this->set('saes', $this->Sae->find('all', array(
             'limit' => 20,
-            'conditions' => array('Sae.application_id' => $aids,'Sae.user_id'=>$this->Auth->User('id')), 'order' => 'Sae.created DESC'
+            'conditions' => array('Sae.application_id' => $aids, 'Sae.user_id' => $this->Auth->User('id')),
+            'order' => 'Sae.created DESC'
         )));
     }
 
@@ -199,7 +242,9 @@ class UsersController extends AppController
         $this->set('applications', $applications);
         $this->User->Notification->recursive = -1;
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')),
+            'order' => 'Notification.created DESC',
+            'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -208,7 +253,8 @@ class UsersController extends AppController
         //     )));
         $this->set('meetingDates', $this->MeetingDate->find('all', array(
             'limit' => 5,
-            'conditions' => array('MeetingDate.approved >' => 0), 'order' => 'MeetingDate.created DESC'
+            'conditions' => array('MeetingDate.approved >' => 0),
+            'order' => 'MeetingDate.created DESC'
         )));
     }
 
@@ -222,14 +268,17 @@ class UsersController extends AppController
         ));
         // pr($my_applications);
         $this->set('applications', $this->Application->find('all', array(
-            'limit' => 5, 'fields' => array('id', 'study_drug', 'created'),
+            'limit' => 5,
+            'fields' => array('id', 'study_drug', 'created'),
             'order' => array('Application.created' => 'desc'),
             'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
             'contain' => array('ActiveInspector'),
         )));
         $this->User->Notification->recursive = -1;
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')),
+            'order' => 'Notification.created DESC',
+            'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('users', $this->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
@@ -248,19 +297,23 @@ class UsersController extends AppController
         ));
         // pr($my_applications);
         $this->set('applications', $this->Application->find('all', array(
-            'limit' => 5, 'fields' => array('id', 'study_drug', 'created'),
+            'limit' => 5,
+            'fields' => array('id', 'study_drug', 'created'),
             'order' => array('Application.created' => 'desc'),
             'conditions' => array('submitted' => 1, 'Application.id' => array_values($my_applications)),
             'contain' => array('Review'),
         )));
 
         $this->set('notifications', $this->User->Notification->find('all', array(
-            'conditions' => array('Notification.user_id' => $this->Auth->User('id')), 'order' => 'Notification.created DESC', 'limit' => 5
+            'conditions' => array('Notification.user_id' => $this->Auth->User('id')),
+            'order' => 'Notification.created DESC',
+            'limit' => 5
         )));
         $this->set('messages', $this->Message->find('list', array('fields' => array('name', 'style'))));
         $this->set('meetingDates', $this->MeetingDate->find('all', array(
             'limit' => 5,
-            'conditions' => array('MeetingDate.approved >' => 0), 'order' => 'MeetingDate.created DESC'
+            'conditions' => array('MeetingDate.approved >' => 0),
+            'order' => 'MeetingDate.created DESC'
         )));
     }
 
@@ -299,9 +352,10 @@ class UsersController extends AppController
         $this->User->Feedback->recursive = -1;
         $this->set('previous_messages', $this->User->Feedback->find('all', array('limit' => 3, 'order' => array('id' => 'desc'))));
         $this->set('outsources', $this->Outsource->find('all', array(
-            'limit' => 3, 
-            'conditions'=>array('Outsource.approved'=>0),
-            'order' => array('Outsource.id' => 'desc'))));
+            'limit' => 3,
+            'conditions' => array('Outsource.approved' => 0),
+            'order' => array('Outsource.id' => 'desc')
+        )));
     }
 
     public function login()
@@ -630,8 +684,17 @@ class UsersController extends AppController
     {
         if ($this->request->is('post') || $this->request->is('put')) {
             $fieldlist = array(
-                'name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address',
-                'institution_contact', 'county_id', 'country_id', 'sponsor_email', 'qualification'
+                'name',
+                'email',
+                'phone_no',
+                'name_of_institution',
+                'institution_physical',
+                'institution_address',
+                'institution_contact',
+                'county_id',
+                'country_id',
+                'sponsor_email',
+                'qualification'
             );
             if ($this->User->save($this->request->data, true, $fieldlist)) {
                 $this->Session->setFlash(__('Your registration details have been updated.'), 'alerts/flash_success');
@@ -665,8 +728,18 @@ class UsersController extends AppController
             $this->redirect($this->referer());
         }
         $fieldlist = array(
-            'name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address', 'sponsor_email',
-            'institution_contact', 'county_id', 'country_id', 'group_id', 'is_active'
+            'name',
+            'email',
+            'phone_no',
+            'name_of_institution',
+            'institution_physical',
+            'institution_address',
+            'sponsor_email',
+            'institution_contact',
+            'county_id',
+            'country_id',
+            'group_id',
+            'is_active'
         );
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->User->save($this->request->data)) {
@@ -681,7 +754,8 @@ class UsersController extends AppController
             $fieldlist[] = 'group_id';
             $fieldlist[] = 'username';
             $this->request->data = $this->User->find('first', array(
-                'conditions' => array('User.id' => $id), 'fields' => $fieldlist,
+                'conditions' => array('User.id' => $id),
+                'fields' => $fieldlist,
                 'contain' => array('County', 'Country')
             ));
         }
@@ -699,8 +773,17 @@ class UsersController extends AppController
             $this->redirect($this->referer());
         }
         $fieldlist = array(
-            'name', 'email', 'phone_no', 'name_of_institution', 'institution_physical', 'institution_address',
-            'institution_contact', 'county_id', 'country_id', 'group_id', 'is_active'
+            'name',
+            'email',
+            'phone_no',
+            'name_of_institution',
+            'institution_physical',
+            'institution_address',
+            'institution_contact',
+            'county_id',
+            'country_id',
+            'group_id',
+            'is_active'
         );
         if ($this->request->is('post') || $this->request->is('put')) {
             if ($this->User->save($this->request->data)) {
@@ -715,7 +798,8 @@ class UsersController extends AppController
             $fieldlist[] = 'group_id';
             $fieldlist[] = 'username';
             $this->request->data = $this->User->find('first', array(
-                'conditions' => array('User.id' => $id), 'fields' => $fieldlist,
+                'conditions' => array('User.id' => $id),
+                'fields' => $fieldlist,
                 'contain' => array('County', 'Country')
             ));
         }
@@ -800,14 +884,37 @@ class UsersController extends AppController
         //todo: check if data exists in $users
         $_serialize = 'cusers';
         $_header = array(
-            'Id', 'Username', 'Name', 'Phone No', 'Email', 'Sponsor\'s Email', 'Qualification', 'Role', 'Name of institution',
-            'Physical Address', 'Institution Address', 'Institution Contact', 'County', 'Country',
+            'Id',
+            'Username',
+            'Name',
+            'Phone No',
+            'Email',
+            'Sponsor\'s Email',
+            'Qualification',
+            'Role',
+            'Name of institution',
+            'Physical Address',
+            'Institution Address',
+            'Institution Contact',
+            'County',
+            'Country',
             'Created',
         );
         $_extract = array(
-            'User.id', 'User.username', 'User.name', 'User.phone_no', 'User.email', 'User.sponsor_email', 'User.qualification',
-            'Group.name', 'User.name_of_institution', 'User.institution_physical', 'User.institution_address', 'User.institution_contact',
-            'County.county_name', 'Country.name',
+            'User.id',
+            'User.username',
+            'User.name',
+            'User.phone_no',
+            'User.email',
+            'User.sponsor_email',
+            'User.qualification',
+            'Group.name',
+            'User.name_of_institution',
+            'User.institution_physical',
+            'User.institution_address',
+            'User.institution_contact',
+            'County.county_name',
+            'Country.name',
             'User.created'
         );
 
@@ -872,7 +979,7 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/ApplicationStages/manager_complete_screening');
         $this->Acl->allow($group, 'controllers/MeetingDates');
         $this->Acl->allow($group, 'controllers/Feedbacks');
-        $this->Acl->allow($group, 'controllers/AmendmentApprovals/manager_approve');        
+        $this->Acl->allow($group, 'controllers/AmendmentApprovals/manager_approve');
         $this->Acl->allow($group, 'controllers/AmendmentApprovals/manager_approve_amendment');
 
         //Allow Inpectors
@@ -942,6 +1049,7 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/Amendments/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_index');
         $this->Acl->allow($group, 'controllers/Applications/applicant_create');
+        $this->Acl->allow($group, 'controllers/Applications/applicant_create_multi_center');
         $this->Acl->allow($group, 'controllers/Applications/applicant_generate_safety_report');
         $this->Acl->allow($group, 'controllers/Applications/applicant_safety_delete');
         // $this->Acl->allow($group, 'controllers/Applications/applicant_add');  //why?

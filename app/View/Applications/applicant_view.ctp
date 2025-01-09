@@ -38,17 +38,26 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+      <li><a href="#multicenter" data-toggle="tab">Multi Center(s)</a></li>
       <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
       <li><a href="#tab17" data-toggle="tab">Screening</a></li>
       <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
       <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
       <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
-    <?php } ?>
-    <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php echo count($application['Sae']) ?>)</a></li>
+    <?php }
+
+    $sae = count($application['Sae']);
+    $gen = count($application['SafetyReportGen']);
+    $dsmb = count($application['SafetyReportDSMB']);
+    $dsur = count($application['SafetyReportDSUR']);
+    $line = count($application['SafetyReportLINE']);
+    $safety = $sae + $gen + $dsmb + $dsur + $line;
+ 
+    ?>
+    <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php echo $safety ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
     <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
-      <!-- <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li> -->
       <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
       <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
       <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
@@ -269,6 +278,16 @@ echo $this->Session->flash();
         </div>
       </div>
     </div>
+
+
+    <div class="tab-pane" id="multicenter">
+      <div class="row-fluid">
+        <div class="span12">
+          <?php echo $this->element('application/multicenter'); ?>
+        </div>
+      </div>
+    </div>
+
     <div class="tab-pane" id="tab2">
       <div class="marketing">
         <div class="row-fluid">

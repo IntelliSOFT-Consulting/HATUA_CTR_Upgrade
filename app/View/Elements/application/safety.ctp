@@ -24,22 +24,24 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 
                     <div class="span12">
                         <?php
-                        if ($application['Application']['submitted']) {
+                        if ($this->fetch('is-applicant') == 'true') {
                             if ($application['Application']['submitted']) {
-                                echo "<br>";
-                                echo $this->Html->link(
-                                    '<i class="icon-list-alt"></i> Create SAE',
-                                    array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'),
-                                    array('escape' => false, 'class' => 'btn btn-success btn-mini')
-                                );
-                                echo "&nbsp;";
-                                echo $this->Html->link(
-                                    '<i class="icon-credit-card"></i> Create SUSAR',
-                                    array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'),
-                                    array('escape' => false, 'class' => 'btn btn-primary btn-mini')
-                                );
-                                echo "<br>";
-                                echo "<br>";
+                                if ($application['Application']['submitted']) {
+                                    echo "<br>";
+                                    echo $this->Html->link(
+                                        '<i class="icon-list-alt"></i> Create SAE',
+                                        array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'),
+                                        array('escape' => false, 'class' => 'btn btn-success btn-mini')
+                                    );
+                                    echo "&nbsp;";
+                                    echo $this->Html->link(
+                                        '<i class="icon-credit-card"></i> Create SUSAR',
+                                        array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'susar'),
+                                        array('escape' => false, 'class' => 'btn btn-primary btn-mini')
+                                    );
+                                    echo "<br>";
+                                    echo "<br>";
+                                }
                             }
                         }
                         ?>
@@ -198,10 +200,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
-                                        $cc=0;
+                                            $cc = 0;
                                             foreach ($data['Attachment'] as $i => $file) {
                                                 $cc++;
-                                                echo $cc.". ".$this->Html->link(
+                                                echo $cc . ". " . $this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -210,7 +212,7 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                             &nbsp;</td>
                                         <td><?php echo h($data['created']); ?>&nbsp;</td>
                                         <td class="actions">
-                                            <?php 
+                                            <?php
 
                                             //ensure they own 
                                             if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
@@ -321,10 +323,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
-                                        $k=0;
+                                            $k = 0;
                                             foreach ($data['Attachment'] as $i => $file) {
                                                 $k++;
-                                                echo $k.". ". $this->Html->link(
+                                                echo $k . ". " . $this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -338,8 +340,9 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                             //     __('<label class="label label-info">View</label>'),
                                             //     array('controller' => 'datas', 'action' => 'view', $data['id']),
                                             //     array('target' => '_blank', 'escape' => false)
-                                            // ); ?>
-                                             <?php
+                                            // ); 
+                                            ?>
+                                            <?php
 
                                             //ensure they own 
                                             if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
@@ -450,10 +453,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
-                                        $d=0;
+                                            $d = 0;
                                             foreach ($data['Attachment'] as $i => $file) {
                                                 $d++;
-                                                echo $d.". ". $this->Html->link(
+                                                echo $d . ". " . $this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -467,7 +470,8 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                             //     __('<label class="label label-info">View</label>'),
                                             //     array('controller' => 'datas', 'action' => 'view', $data['id']),
                                             //     array('target' => '_blank', 'escape' => false)
-                                            // ); ?>
+                                            // ); 
+                                            ?>
                                             <?php
 
                                             //ensure they own 
@@ -579,10 +583,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                         <td><?php echo h($data['reference_no']); ?>&nbsp;</td>
                                         <td><?php echo h($data['title']); ?>&nbsp; </td>
                                         <td><?php
-                                        $ck=0;
+                                            $ck = 0;
                                             foreach ($data['Attachment'] as $i => $file) {
                                                 $ck++;
-                                                echo $ck.". ".$this->Html->link(
+                                                echo $ck . ". " . $this->Html->link(
                                                     __($file['basename']),
                                                     array('controller' => 'attachments', 'action' => 'download', $file['id'], 'full_base' => true),
                                                     array('class' => '')
@@ -596,8 +600,9 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                             //     __('<label class="label label-info">View</label>'),
                                             //     array('controller' => 'datas', 'action' => 'view', $data['id']),
                                             //     array('target' => '_blank', 'escape' => false)
-                                            // ); ?>
-                                             <?php
+                                            // ); 
+                                            ?>
+                                            <?php
 
                                             //ensure they own 
                                             if ($data['user_id'] == $this->Session->read('Auth.User.id')) {
