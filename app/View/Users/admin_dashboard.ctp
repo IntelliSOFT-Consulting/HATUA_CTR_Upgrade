@@ -75,7 +75,7 @@ $this->assign('Dashboard', 'active');
         foreach ($outsources as $os) { ?>
           <li>
             <?php echo $this->Html->link(
-              '<i class="icon-ok"></i>' . $os['Application']['protocol_no'] . ' ' . $os['Outsource']['name'],
+              '<i class="icon-ok"></i>' . $os['Application']['protocol_no'] . '  ' . $os['Outsource']['name'],
               array('controller' => 'outsources', 'action' => 'view', $os['Outsource']['id']),
               array('escape' => false, 'class' =>  'text-success')
             );   ?>
@@ -97,6 +97,34 @@ $this->assign('Dashboard', 'active');
         echo $this->Html->link(
           '<i class="icon-table"></i> All requests',
           array('controller' => 'outsources', 'action' => 'index'),
+          array('escape' => false)
+        );
+        ?>
+      </li>
+    </ul>
+
+    <hr>
+
+    <h5>CoPI <small class="muted">(requests)</small> </h5>
+    <ul class="nav nav-tabs nav-stacked">
+      <?php if (count($multicenters) > 0) {
+        foreach ($multicenters as $os) { ?>
+          <li>
+            <?php echo $this->Html->link(
+              '<i class="icon-ok"></i>' . $os['Application']['protocol_no'] . ' ' . $os['MultiCenter']['site_name'].' ' . $os['CoPI']['name'],
+              array('controller' => 'multi_centers', 'action' => 'index', $os['MultiCenter']['id']),
+              array('escape' => false, 'class' =>  'text-success')
+            );   ?>
+          </li>
+
+      <?php }
+      } ?>
+     
+      <li>
+        <?php
+        echo $this->Html->link(
+          '<i class="icon-table"></i> All requests',
+          array('controller' => 'multi_centers', 'action' => 'index'),
           array('escape' => false)
         );
         ?>

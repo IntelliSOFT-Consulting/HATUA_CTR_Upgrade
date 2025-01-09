@@ -29,13 +29,47 @@ class ApplicationsController extends AppController
     public function applicant_create_multi_center($id = null)
     {
         $this->loadModel('MultiCenter');
+        $this->loadModel('Application');        
+        $this->loadModel('AuditTrail');
         if ($this->request->is('post')) {
+
+            //before creating, ensure not user_id and application_id  matches to ensure you can't multiple records same user
+            $this->MultiCenter->recursive = -1;
+            $center = $this->MultiCenter->find('first', array('conditions' => array('MultiCenter.user_id' => $this->request->data['MultiCenter']['user_id'], 'MultiCenter.application_id' => $this->request->data['MultiCenter']['application_id'])));
+            if ($center) {
+                $this->Session->setFlash(__('The user has already been assigned to the application'), 'alerts/flash_error');
+                return $this->redirect($this->referer());
+            }
+
             $this->MultiCenter->create();
             if ($this->MultiCenter->save($this->request->data)) {
+                // pull the application details by application_id
+                $application = $this->Application->find('first', array(
+                    'conditions' => array('Application.id' => $this->request->data['MultiCenter']['application_id']),
+                    'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+                ));
+
+                //create and audit trail
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $id,
+                        'model' => 'Application',
+                        'message' => 'Multi Center request for the protocol with reference number ' . $application['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('name'),
+                        'ip' => $application['Application']['protocol_no']
+                    )
+                );
+                $this->AuditTrail->Create();
+                if ($this->AuditTrail->save($audit)) {
+                    $this->log($this->request->data, 'audit_success');
+                } else {
+                    $this->log('Error creating an audit trail', 'audit_error');
+                    $this->log($this->request->data, 'audit_error');
+                }
                 $this->Session->setFlash(__('The multi center has been saved'), 'alerts/flash_success');
-                $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+                // $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+                $this->redirect($this->referer());
             } else {
-           
+
                 $validationErrors = $this->MultiCenter->validationErrors;
 
                 // Concatenate validation errors into a single string
@@ -1610,6 +1644,7 @@ class ApplicationsController extends AppController
         $criteria = $this->Application->parseCriteria($this->passedArgs);
         if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
 
+        $criteria['Application.is_child'] = 0;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
 

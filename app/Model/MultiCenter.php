@@ -9,6 +9,7 @@ App::uses('AppModel', 'Model');
  */
 class MultiCenter extends AppModel {
 
+	public $actsAs = array('Containable', 'SoftDelete');
 /**
  * Validation rules
  *

@@ -348,6 +348,7 @@ class UsersController extends AppController
     public function admin_dashboard()
     {
         $this->loadModel('Outsource');
+        $this->loadModel('MultiCenter');
         $this->request->data['Feedback']['user_id'] = $this->Auth->User('id');
         $this->User->Feedback->recursive = -1;
         $this->set('previous_messages', $this->User->Feedback->find('all', array('limit' => 3, 'order' => array('id' => 'desc'))));
@@ -355,6 +356,12 @@ class UsersController extends AppController
             'limit' => 3,
             'conditions' => array('Outsource.approved' => 0),
             'order' => array('Outsource.id' => 'desc')
+        )));
+        $this->set('multicenters', $this->MultiCenter->find('all', array(
+            'limit' => 3, 
+            'conditions' => array('MultiCenter.status' => 'Pending'),
+            'contain' => array('Owner','CoPI','Application'),
+            'order' => array('MultiCenter.id' => 'desc')
         )));
     }
 
