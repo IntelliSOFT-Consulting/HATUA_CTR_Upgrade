@@ -13,7 +13,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
     $apps[$value['Application']['id']] = ($value['Application']['protocol_no']) ? $value['Application']['protocol_no'] : $value['Application']['created'];
   }
   $stages = $this->requestAction( 
-    'applications/stages/' . key($apps)   //get first element of array
+    'applications/stages_applicant/' . key($apps)   //get first element of array
   );
   // debug(key($apps));
   //    debug($stages);

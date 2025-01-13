@@ -288,7 +288,7 @@
                         'div' => false,
                         'class' => 'span12',
                         'empty' => true,
-                        'options' =>$trial_statuses, 
+                        'options' => $trial_statuses,
                         'label' => array('class' => 'required', 'text' => 'Trial Status'),
                       ));
                     }
@@ -562,10 +562,14 @@
                   <tr style="background-color: azure;">
                     <td colspan="5">
                       <?php
-                      $stages = $this->requestAction('applications/stages/' . $application['Application']['id']);
+                      if ($this->fetch('is-applicant') == 'true') {
+                        $stages = $this->requestAction('applications/stages_applicant/' . $application['Application']['id']);
+                      } else {
+                        $stages = $this->requestAction('applications/stages/' . $application['Application']['id']);
+                      }
                       foreach ($stages as $sk => $stage) {
                         $color = ($stage['color'] == 'danger') ? 'important' : $stage['color'];
-                        echo '<span class="label label-' . $color . '">' . $stage['label'] . '<br><small style="color: #f9ef9c;">' . $stage['start_date'] . '</small>' . '</span><span class="badge">' . $stage['days'] . '<small>' . (($sk == 'AnnualApproval') ? ' (to expiry)' : '') . '</small>' . '</span>';
+                        echo '<span class="label label-' . $color . '">' . $stage['label'] . '<br><small style="color: #f9ef9c;">' . $stage['start_date'] . '</small>' . '</span><span class="badge">' . $stage['days'] . '<small>' . (($sk == 'FinalDecision') ? ' (to expiry)' : '') . '</small>' . '</span>';
                       }
                       ?>
                     </td>

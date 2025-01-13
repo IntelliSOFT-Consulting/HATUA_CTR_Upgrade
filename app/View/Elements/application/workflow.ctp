@@ -278,7 +278,7 @@
                         foreach ($stages as $sk => $stage) {
                           $cound++;
                           echo "<tr>";
-                            echo "<td>".$cound.'. '.strip_tags($stage['label']).(($sk == 'AnnualApproval') ? ' (to expiry)' : '');
+                            echo "<td>".$cound.'. '.strip_tags($stage['label']).(($sk == 'FinalDecision') ? ' (to expiry)' : '');
                             echo "</td>";
                             echo "<td>".$stage['start_date'];
                             echo "</td>";

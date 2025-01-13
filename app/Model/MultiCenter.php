@@ -29,7 +29,7 @@ class MultiCenter extends AppModel {
 		'user_id' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-				'message' => 'Please select a Co-PI',
+				'message' => 'Please select a Co-PI using their registered email address, if they are not registered please ask them to register first',
 				//'allowEmpty' => false,
 				//'required' => false,
 				//'last' => false, // Stop validation after this rule

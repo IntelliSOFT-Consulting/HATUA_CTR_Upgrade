@@ -29,7 +29,7 @@ class ApplicationsController extends AppController
     public function applicant_create_multi_center($id = null)
     {
         $this->loadModel('MultiCenter');
-        $this->loadModel('Application');        
+        $this->loadModel('Application');
         $this->loadModel('AuditTrail');
         if ($this->request->is('post')) {
 
@@ -1168,8 +1168,303 @@ class ApplicationsController extends AppController
         }
         return $total_days;
     }
-
     public function stages($id = null)
+    {
+        $stages = [];
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('ApplicationStage', 'Review')
+        ));
+        if ($application) {
+            if ($application['Application']['submitted']) {
+                if ($application['Application']['protocol_no']) {
+                    $application_name = $application['Application']['protocol_no'];
+                } elseif ($application['Application']['short_title']) {
+                    $application_name = $application['Application']['short_title'];
+                } else {
+                    $application_name = $application['Application']['created'];
+                }
+
+                //Submission Stage
+                $stages['Submission'] = ['label' => 'Application <br>Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                $csd = new DateTime($application['Application']['date_submitted']);
+                $ccolor = 'success';
+                $stages['Submission'] = [
+                    'application_name' => $application_name,
+                    'label' => 'Application <br>Submission',
+                    'days' => '0',
+                    'start_date' => $csd->format('d-M-Y'),
+                    'color' => $ccolor
+                ];
+                //Screening for Completeness
+                $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=Screening].id')) {
+                    $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Screening]'));
+                    $scr_s = new DateTime($scr['start_date']);
+                    $scr_e = new DateTime($scr['end_date']);
+                    $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
+                    // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                    $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
+
+                    $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');
+                    // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
+                    $stages['Screening']['days'] = $this->diff_wdays($scr_s, $scr_e);
+                    $stages['Screening']['end_date'] = $scr_e->format('d-M-Y');
+
+                    if ($scr['status'] == 'Current' && $stages['Screening']['days'] > 0 && $stages['Screening']['days'] <= 5) {
+                        $stages['Screening']['color'] = 'warning';
+                    } elseif ($scr['status'] == 'Current' && $stages['Screening']['days'] > 5) {
+                        $stages['Screening']['color'] = 'danger';
+                    } else {
+                        $stages['Screening']['color'] = 'success';
+                    }
+                }
+                // Incase It was unsubmitted Unsubmitted
+                if ($application['Application']['unsubmitted']) {
+                    $stages['Unsubmitted'] = ['label' => 'Unsubmitted', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                    if (Hash::check($application['ApplicationStage'], '{n}[stage=Unsubmitted].id')) {
+                        $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
+                        $scr_s = new DateTime($scr['start_date']);
+                        $scr_e = new DateTime($scr['end_date']);
+                        $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
+                        $stages['Submission']['end_date'] = $scr_e->format('d-M-Y');
+                        // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
+                        $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
+
+                        $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
+                        $stages['Unsubmitted']['end_date'] = $scr_e->format('d-M-Y');
+                        // $stages['Unsubmitted']['days'] = $scr_s->diff($scr_e)->format('%a');                
+                        $stages['Unsubmitted']['days'] = $this->diff_wdays($scr_s, $scr_e);
+
+                        if ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 0 && $stages['Unsubmitted']['days'] <= 5) {
+                            $stages['Unsubmitted']['color'] = 'warning';
+                        } elseif ($scr['status'] == 'Current' && $stages['Unsubmitted']['days'] > 5) {
+                            $stages['Unsubmitted']['color'] = 'danger';
+                        } else {
+                            $stages['Unsubmitted']['color'] = 'success';
+                        }
+                    }
+                }
+                //Submission by sponsor
+                $stages['ScreeningSubmission'] = ['label' => 'Response to <br>Queries', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=ScreeningSubmission].id')) {
+                    $ssb = min(Hash::extract($application['ApplicationStage'], '{n}[stage=ScreeningSubmission]'));
+                    $ssb_s = new DateTime($ssb['start_date']);
+                    $ssb_e = new DateTime($ssb['end_date']);
+
+                    $stages['ScreeningSubmission']['start_date'] = $ssb_s->format('d-M-Y');
+                    $stages['ScreeningSubmission']['end_date'] = $ssb_e->format('d-M-Y');
+                    // $stages['ScreeningSubmission']['days'] = $ssb_s->diff($ssb_e)->format('%a');  
+                    $stages['ScreeningSubmission']['days'] = $this->diff_wdays($ssb_s, $ssb_e);
+
+                    if ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 0 && $stages['ScreeningSubmission']['days'] <= 10) {
+                        $stages['ScreeningSubmission']['color'] = 'warning';
+                    } elseif ($ssb['status'] == 'Current' && $stages['ScreeningSubmission']['days'] > 10) {
+                        $stages['ScreeningSubmission']['color'] = 'danger';
+                    } else {
+                        $stages['ScreeningSubmission']['color'] = 'success';
+                    }
+                }
+
+                //Assign reviewers
+                $stages['Assign'] = ['label' => 'Assigned to <br>Reviewers', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=Assign].id')) {
+                    $asn = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Assign]'));
+                    $asn_s = new DateTime($asn['start_date']);
+                    $asn_e = new DateTime($asn['end_date']);
+
+                    $stages['Assign']['start_date'] = $asn_s->format('d-M-Y');
+                    $stages['Assign']['end_date'] = $asn_e->format('d-M-Y');
+                    // $stages['Assign']['days'] = $asn_s->diff($asn_e)->format('%a'); 
+                    $stages['Assign']['days'] = $this->diff_wdays($asn_s, $asn_e);
+
+                    if ($asn['status'] == 'Current' && $stages['Assign']['days'] > 0 && $stages['Assign']['days'] <= 5) {
+                        $stages['Assign']['color'] = 'warning';
+                    } elseif ($asn['status'] == 'Current' && $stages['Assign']['days'] > 5) {
+                        $stages['Assign']['color'] = 'danger';
+                    } else {
+                        $stages['Assign']['color'] = 'success';
+                    }
+                }
+
+                //PPB Review
+                $stages['Review'] = ['label' => 'Review <br>Comments', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=Review].id')) {
+                    $rev = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Review]'));
+                    $rev_s = new DateTime($rev['start_date']);
+                    $rev_e = new DateTime($rev['end_date']);
+
+                    $stages['Review']['start_date'] = $rev_s->format('d-M-Y');
+                    $stages['Review']['end_date'] = $rev_e->format('d-M-Y');
+                    // $stages['Review']['days'] = $rev_s->diff($rev_e)->format('%a');  
+                    $stages['Review']['days'] = $this->diff_wdays($rev_s, $rev_e);
+
+                    if ($rev['status'] == 'Current' && $stages['Review']['days'] > 0 && $stages['Review']['days'] <= 30) {
+                        $stages['Review']['color'] = 'warning';
+                    } elseif ($rev['status'] == 'Current' && $stages['Review']['days'] > 30) {
+                        $stages['Review']['color'] = 'danger';
+                    } else {
+                        $stages['Review']['color'] = 'success';
+                    }
+                }
+
+                //Review submission
+                $stages['ReviewSubmission'] = ['label' => 'Sponsor <br>Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=ReviewSubmission].id')) {
+                    $rsb = min(Hash::extract($application['ApplicationStage'], '{n}[stage=ReviewSubmission]'));
+                    $rsb_s = new DateTime($rsb['start_date']);
+                    $rsb_e = new DateTime($rsb['end_date']);
+
+                    $stages['ReviewSubmission']['start_date'] = $rsb_s->format('d-M-Y');
+                    $stages['ReviewSubmission']['end_date'] = $rsb_e->format('d-M-Y');
+                    // $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a'); 
+                    $stages['ReviewSubmission']['days'] = $this->diff_wdays($rsb_s, $rsb_e);
+
+                    if ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 0 && $stages['ReviewSubmission']['days'] <= 90) {
+                        $stages['ReviewSubmission']['color'] = 'warning';
+                    } elseif ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 90) {
+                        $stages['ReviewSubmission']['color'] = 'danger';
+                    } else {
+                        $stages['ReviewSubmission']['color'] = 'success';
+                    }
+                }
+
+                //Final Decision
+                $stages['FinalDecision'] = ['label' => 'Final <br>Decision', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                if (Hash::check($application['ApplicationStage'], '{n}[stage=FinalDecision].id')) {
+                    $fin = min(Hash::extract($application['ApplicationStage'], '{n}[stage=FinalDecision]'));
+                    $fin_s = new DateTime($fin['start_date']);
+                    $fin_e = new DateTime($fin['end_date']);
+
+                    $stages['FinalDecision']['start_date'] = $fin_s->format('d-M-Y');
+                    $stages['FinalDecision']['end_date'] = $fin_e->format('d-M-Y');
+                    // $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
+                    $stages['FinalDecision']['days'] = $this->diff_wdays($fin_s, $fin_e);
+
+                    // Pull this from the annual approval stage
+                    $stages['FinalDecision']['days'] = $this->calculate_from_annual($application);
+                    if ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 0 && $stages['FinalDecision']['days'] <= 15) {
+                        $stages['FinalDecision']['color'] = 'warning';
+                    } elseif ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 15) {
+                        $stages['FinalDecision']['color'] = 'danger';
+                    } else {
+                        $stages['FinalDecision']['color'] = 'success';
+                    }
+                }
+
+
+                //Annual Approval. Shows remaining days
+                // $stages['AnnualApproval'] = ['label' => 'Annual <br>Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+                // if (Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
+                //     $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
+                //     $ann_s = new DateTime($ann['start_date']);
+                //     $ann_e = new DateTime($ann['end_date']);
+
+                //     $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
+                //     $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
+
+                //     $ann_now = new DateTime();
+
+                //     if ($ann_now > $ann_e) {
+                //         $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
+                //     } else {
+
+                //         $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
+                //     }
+
+                //     if ($ann['status'] == 'Current') {
+                //         $stages['AnnualApproval']['color'] = 'success';
+                //     } elseif ($ann['status'] == 'Pending') {
+                //         $stages['AnnualApproval']['color'] = 'warning';
+                //     } elseif ($ann['status'] == 'Expired') {
+                //         $stages['AnnualApproval']['color'] = 'danger';
+                //     }
+                // }
+            } else {
+                $stages['Submission'] = ['application_name' => '<< protocol no. >>', 'label' => 'Start', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+                $stages['Submit'] = ['label' => 'Submit', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+                $stages['Review'] = ['label' => 'Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+                $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+                $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            }
+
+            //Completion
+
+
+        } else {
+            $stages['Submission'] = ['application_name' => '<< protocol no. >>', 'label' => 'Start', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Submit'] = ['label' => 'Submit', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Review'] = ['label' => 'Review', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Feedback'] = ['label' => 'Feedback', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+            $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
+        }
+
+        $this->set('stages', $stages);
+        $this->set('_serialize', 'stages');
+        if ($this->request->is('requested')) {
+            return $stages;
+        }
+    }
+
+    public function calculate_from_annual($application)
+    {
+        $total_days = 0;
+
+        if (Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
+                $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
+                $ann_s = new DateTime($ann['start_date']);
+                $ann_e = new DateTime($ann['end_date']);
+
+                $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
+                $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
+
+                $ann_now = new DateTime();
+
+                if ($ann_now > $ann_e) {
+                    $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
+                    $total_days = 0;
+                } else {
+
+                    $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
+                    $total_days = $ann_now->diff($ann_e)->format('%a');
+                }
+
+                if ($ann['status'] == 'Current') {
+                    $stages['AnnualApproval']['color'] = 'success';
+                } elseif ($ann['status'] == 'Pending') {
+                    $stages['AnnualApproval']['color'] = 'warning';
+                } elseif ($ann['status'] == 'Expired') {
+                    $stages['AnnualApproval']['color'] = 'danger';
+                }
+            }
+
+            return $total_days;
+    }
+
+    public function diff_weekdays($start_date, $end_date, $holidays = []) {
+        $start = new DateTime($start_date);
+        $end = new DateTime($end_date);
+        $end->modify('+1 day'); // Include end date in the calculation
+     
+        $interval = new DateInterval('P1D');
+        $period = new DatePeriod($start, $interval, $end);
+    
+        $workdays = 0;
+        foreach ($period as $dt) {
+            $curr = $dt->format('D');
+    
+            // Check if it's a weekend
+            if ($curr != 'Sat' && $curr != 'Sun') {
+                // Check if it's a holiday
+                if (!in_array($dt->format('Y-m-d'), $holidays)) {
+                    $workdays++;
+                }
+            }
+        }
+    
+        return $workdays;
+    }
+    public function stages_applicant($id = null)
     {
         $stages = [];
         $application = $this->Application->find('first', array(
@@ -1188,6 +1483,9 @@ class ApplicationsController extends AppController
             //creation
             $csd = new DateTime($application['Application']['created']);
             $ccolor = 'success';
+
+
+
             $stages['Creation'] = [
                 'application_name' => $application_name,
                 'label' => 'Application <br>Creation',
@@ -1204,17 +1502,20 @@ class ApplicationsController extends AppController
                 $ccolor = 'success';
                 $creation = $stages['Creation'];
                 $scr_s = new DateTime($creation['start_date']);
-                $csd_s = $csd->format('d-M-Y');
-                $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
-                $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
+                $creation_end_date = $csd->format('d-M-Y');
+                $creation_start_date = $scr_s->format('d-M-Y');
+                $total_days=$this->diff_weekdays($creation_start_date, $creation_end_date);
+ 
+                $stages['Creation']['end_date'] = $creation_end_date;
+                $stages['Creation']['days'] =$total_days;
 
-                $stages['Submission'] = [
-                    'application_name' => $application_name,
-                    'label' => 'Application <br>Submission',
-                    'days' => '',
-                    'start_date' => $csd->format('d-M-Y'),
-                    'color' => $ccolor
-                ];
+                    $stages['Submission'] = [
+                        'application_name' => $application_name,
+                        'label' => 'Application <br>Submission',
+                        'days' => '',
+                        'start_date' => $csd->format('d-M-Y'),
+                        'color' => $ccolor
+                    ];
             }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
@@ -1372,32 +1673,32 @@ class ApplicationsController extends AppController
 
 
             //Annual Approval. Shows remaining days
-            $stages['AnnualApproval'] = ['label' => 'Annual <br>Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
-            if (Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
-                $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
-                $ann_s = new DateTime($ann['start_date']);
-                $ann_e = new DateTime($ann['end_date']);
+            // $stages['AnnualApproval'] = ['label' => 'Annual <br>Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
+            // if (Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
+            //     $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
+            //     $ann_s = new DateTime($ann['start_date']);
+            //     $ann_e = new DateTime($ann['end_date']);
 
-                $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
-                $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
+            //     $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
+            //     $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
 
-                $ann_now = new DateTime();
+            //     $ann_now = new DateTime();
 
-                if ($ann_now > $ann_e) {
-                    $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
-                } else {
+            //     if ($ann_now > $ann_e) {
+            //         $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
+            //     } else {
 
-                    $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
-                }
+            //         $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
+            //     }
 
-                if ($ann['status'] == 'Current') {
-                    $stages['AnnualApproval']['color'] = 'success';
-                } elseif ($ann['status'] == 'Pending') {
-                    $stages['AnnualApproval']['color'] = 'warning';
-                } elseif ($ann['status'] == 'Expired') {
-                    $stages['AnnualApproval']['color'] = 'danger';
-                }
-            }
+            //     if ($ann['status'] == 'Current') {
+            //         $stages['AnnualApproval']['color'] = 'success';
+            //     } elseif ($ann['status'] == 'Pending') {
+            //         $stages['AnnualApproval']['color'] = 'warning';
+            //     } elseif ($ann['status'] == 'Expired') {
+            //         $stages['AnnualApproval']['color'] = 'danger';
+            //     }
+            // }
 
             //Completion
 
@@ -2399,6 +2700,34 @@ class ApplicationsController extends AppController
         }
     }
 
+    public function confirm_file_date($date = null)
+    {
+
+        // Check if date is null, empty, or blank
+        if ($date === null || empty(trim($date))) {
+            return "";
+        }
+
+        // Attempt to parse the date
+        $formattedDate = date('jS F Y', strtotime($date));
+
+        // Check for invalid date (strtotime returns false for invalid dates)
+        if (!$formattedDate || strtotime($date) === false) {
+            return $date;
+        }
+
+        return " dated: ".$formattedDate;
+    }
+
+    public function confirm_file_version($version = null)
+    {
+        // Check if version is null, empty, or blank
+        if ($version === null || empty(trim($version))) {
+            return "";
+        }
+
+        return " Version " . $version;
+    }
     public function manager_approve($id = null)
     {
         if ($this->request->is('post')) {
@@ -2431,9 +2760,13 @@ class ApplicationsController extends AppController
                         $checklist = array();
                         foreach ($application['Checklist'] as $formdata) {
                             $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false, 'full_base' => true));
+
+                            //check if $formdata['file_date'] is not empty or null
+
+
                             (isset($checklist[$formdata['pocket_name']])) ?
-                                $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>' :
-                                $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . date('jS F Y', strtotime($formdata['file_date'])) . ' Version ' . $formdata['version_no'] . '<br>';
+                                 $checklist[$formdata['pocket_name']] .= $file_link . $this->confirm_file_date($formdata['file_date']) .' '.$this->confirm_file_version($formdata['version_no']) . '<br>' :
+                                $checklist[$formdata['pocket_name']] = $file_link . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>';
                         }
                         $deeds = $this->Pocket->find('list', array(
                             'fields' => array('Pocket.name', 'Pocket.content'),

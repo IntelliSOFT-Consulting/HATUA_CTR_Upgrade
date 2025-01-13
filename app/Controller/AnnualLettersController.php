@@ -199,24 +199,34 @@ class AnnualLettersController extends AppController
      * @return void
      */
 
-    public function confirm_file_date($date = null)
-    {
-
-        // Check if date is null, empty, or blank
-        if ($date === null || empty(trim($date))) {
-            return "";
-        }
-
-        // Attempt to parse the date
-        $formattedDate = date('jS F Y', strtotime($date));
-
-        // Check for invalid date (strtotime returns false for invalid dates)
-        if (!$formattedDate || strtotime($date) === false) {
-            return $date;
-        }
-
-        return $formattedDate;
-    }
+     public function confirm_file_date($date = null)
+     {
+ 
+         // Check if date is null, empty, or blank
+         if ($date === null || empty(trim($date))) {
+             return "";
+         }
+ 
+         // Attempt to parse the date
+         $formattedDate = date('jS F Y', strtotime($date));
+ 
+         // Check for invalid date (strtotime returns false for invalid dates)
+         if (!$formattedDate || strtotime($date) === false) {
+             return $date;
+         }
+ 
+         return " dated: ".$formattedDate;
+     }
+ 
+     public function confirm_file_version($version = null)
+     {
+         // Check if version is null, empty, or blank
+         if ($version === null || empty(trim($version))) {
+             return "";
+         }
+ 
+         return " Version " . $version;
+     }
     public function manager_initial($application_id = null)
     {
         //Create  annual approval letter
@@ -235,8 +245,8 @@ class AnnualLettersController extends AppController
         foreach ($application['Checklist'] as $formdata) {
             $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
             (isset($checklist[$formdata['pocket_name']])) ?
-                $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>' :
-                $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>';
+                $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>' :
+                $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>';
         }
         $deeds = $this->Pocket->find('list', array(
             'fields' => array('Pocket.name', 'Pocket.content'),

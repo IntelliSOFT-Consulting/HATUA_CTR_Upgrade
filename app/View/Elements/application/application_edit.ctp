@@ -74,6 +74,10 @@ $this->Html->script('jUpload/jquery.fileupload.js', array('inline' => false));
           'label' => array('class' => 'control-label required', 'text' => 'Version No: <span class="sterix">*</span>'),
           'placeholder' => ' ', 'class' => 'input-xxlarge',
         ));
+        echo $this->Form->input('reference_no', array(
+          'label' => array('class' => 'control-label required', 'text' => 'Protocl No: <span class="sterix">*</span>'),
+          'placeholder' => ' ', 'class' => 'input-xxlarge',
+        ));
         echo $this->Form->input('date_of_protocol', array(
           'div' => array('class' => 'control-group'), 'type' => 'text', 'class' => 'datepickers',
           'label' => array('class' => 'control-label required', 'text' => 'Date of Protocol <span class="sterix">*</span>'),
@@ -1658,6 +1662,12 @@ $this->Html->script('jUpload/jquery.fileupload.js', array('inline' => false));
           array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $this->Form->value('Application.id')),
           array('escape' => false, 'class' => 'btn', 'style' => 'margin-right: 10px;')
         );
+
+        if (!empty($application['Application']['ecitizen_invoice'])) {
+          $invoice = base64_encode($application['Application']['ecitizen_invoice']);
+          echo '<button class="btn pull-right btn-success save-attachment"><a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $invoice . '"><i class="icon-download"></i> Download Invoice</a></button>';
+        
+        }
         ?>
         <!--<button type="submit" class="btn btn-success btn-block">Save changes</button>
       <button type="submit" class="btn btn-info btn-block">Submit</button>

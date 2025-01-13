@@ -243,6 +243,9 @@ $(function () {
           }
         },
         error: function (e, data) {
+
+          //console log the error message returned
+ 
           alert('Could not upload the file. Please refresh the page to submit.');
         }
       })
