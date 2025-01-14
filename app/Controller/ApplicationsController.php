@@ -1660,7 +1660,7 @@ class ApplicationsController extends AppController
                 $stages['FinalDecision']['start_date'] = $fin_s->format('d-M-Y');
                 $stages['FinalDecision']['end_date'] = $fin_e->format('d-M-Y');
                 // $stages['FinalDecision']['days'] = $fin_s->diff($fin_e)->format('%a');  
-                $stages['FinalDecision']['days'] = $this->diff_wdays($fin_s, $fin_e);
+                $stages['FinalDecision']['days'] = $this->calculate_from_annual($application);
 
                 if ($fin['status'] == 'Current' && $stages['FinalDecision']['days'] > 0 && $stages['FinalDecision']['days'] <= 15) {
                     $stages['FinalDecision']['color'] = 'warning';

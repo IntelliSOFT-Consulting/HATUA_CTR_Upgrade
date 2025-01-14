@@ -1,7 +1,7 @@
 <?php
 $this->Html->script('multi/multi_date', array('inline' => false));
 ?>
-<h5> Initial Dates(<small>where necessary, Click button to add more -
+<h5> Date of subsequent additional administration<br>(<small>where necessary, Click button to add more -
         <button type="button" class="btn btn-small btn-primary" id="addDate">Add</button></small>) </h5>
 
 <div class="ctr-groups sae-group">

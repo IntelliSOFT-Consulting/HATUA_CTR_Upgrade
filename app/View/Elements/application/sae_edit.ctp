@@ -275,7 +275,7 @@
     <h4 style="text-align: center; text-decoration: underline;">CONCOMITANT DRUG(S) AND HISTORY</h4>
     <?php echo $this->element('multi/concomittant_drugs'); ?>
 
-    <h4 style="text-align: center; text-decoration: underline;">MANUFACTURER INFORMATION</h4>
+    <!-- <h4 style="text-align: center; text-decoration: underline;">MANUFACTURER INFORMATION</h4>
     <div class="row-fluid">
         <div class="span6">
             <?php
@@ -293,7 +293,7 @@
                 echo $this->Form->input('source_health_professional', array('label' => array('class' => 'control-label', 'text' => 'Health Professional')));
             ?>
         </div>
-    </div>
+    </div> -->
 
     <h4 style="text-align: center; text-decoration: underline;">REPORTER</h4>
     <div class="row-fluid">

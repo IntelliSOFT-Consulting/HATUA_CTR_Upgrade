@@ -643,7 +643,7 @@ class SaesController extends AppController
         $sae = $this->Sae->read(null, $id);
         $sae = $this->Sae->find('first', [
             'conditions' => ['Sae.id' => $id],
-            'contain' => ['SaeDate', 'Application'] // Replace with your related models
+            'contain' => ['SaeDate', 'Application'] 
         ]);
 
         // debug($sae);
@@ -666,7 +666,9 @@ class SaesController extends AppController
             // exit;
             if ($this->Sae->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
+                    
                     $this->Sae->saveField('approved', 1);
+                    $this->Sae->saveField('date_submitted', date('Y-m-d H:i:s'));
                     $sae = $this->Sae->read(null, $id);
                     $sae = $this->Sae->find('first', [
                         'conditions' => ['Sae.id' => $id],
@@ -762,7 +764,7 @@ class SaesController extends AppController
         } else {
             $sae = $this->Sae->find('first', [
                 'conditions' => ['Sae.id' => $id],
-                'contain' => ['SaeDate', 'Application'] // Replace with your related models
+                'contain' => ['SaeDate', 'Application'] 
             ]);
             $this->request->data = $sae;
         }
@@ -801,6 +803,7 @@ class SaesController extends AppController
             if ($this->Sae->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Sae->saveField('approved', 1);
+                    $this->Sae->saveField('date_submitted', date('Y-m-d H:i:s'));
                     $sae = $this->Sae->read(null, $id);
 
                     //******************       Send Email and Notifications to Applicant and Managers          *****************************
@@ -927,6 +930,7 @@ class SaesController extends AppController
             if ($this->Sae->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
                 if (isset($this->request->data['submitReport'])) {
                     $this->Sae->saveField('approved', 1);
+                    $this->Sae->saveField('date_submitted', date('Y-m-d H:i:s'));
                     $sae = $this->Sae->read(null, $id);
 
                     //******************       Send Email and Notifications to Applicant and Managers          *****************************

@@ -199,34 +199,34 @@ class AnnualLettersController extends AppController
      * @return void
      */
 
-     public function confirm_file_date($date = null)
-     {
- 
-         // Check if date is null, empty, or blank
-         if ($date === null || empty(trim($date))) {
-             return "";
-         }
- 
-         // Attempt to parse the date
-         $formattedDate = date('jS F Y', strtotime($date));
- 
-         // Check for invalid date (strtotime returns false for invalid dates)
-         if (!$formattedDate || strtotime($date) === false) {
-             return $date;
-         }
- 
-         return " dated: ".$formattedDate;
-     }
- 
-     public function confirm_file_version($version = null)
-     {
-         // Check if version is null, empty, or blank
-         if ($version === null || empty(trim($version))) {
-             return "";
-         }
- 
-         return " Version " . $version;
-     }
+    public function confirm_file_date($date = null)
+    {
+
+        // Check if date is null, empty, or blank
+        if ($date === null || empty(trim($date))) {
+            return "";
+        }
+
+        // Attempt to parse the date
+        $formattedDate = date('jS F Y', strtotime($date));
+
+        // Check for invalid date (strtotime returns false for invalid dates)
+        if (!$formattedDate || strtotime($date) === false) {
+            return $date;
+        }
+
+        return " dated: " . $formattedDate;
+    }
+
+    public function confirm_file_version($version = null)
+    {
+        // Check if version is null, empty, or blank
+        if ($version === null || empty(trim($version))) {
+            return "";
+        }
+
+        return " Version " . $version;
+    }
     public function manager_initial($application_id = null)
     {
         //Create  annual approval letter
@@ -254,7 +254,7 @@ class AnnualLettersController extends AppController
             'order' => array('Pocket.item_number' => 'ASC'),
             'recursive' => 0
         ));
-        
+
         foreach ($deeds as $key => $value) {
             if (array_key_exists($key, $checklist)) {
                 $orderedArray2[$key] = $checklist[$key];
@@ -565,6 +565,23 @@ class AnnualLettersController extends AppController
 
         $checklist = array();
 
+        $files =  $application['AnnualApproval'];
+        if (empty($files)) {
+            $this->Session->setFlash(__('No annual approval files uploaded!!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+
+        // If the files are there, check for the current year
+        $current_year = date('Y');
+
+        // extract and check if the group matches the current year
+        $group = Hash::extract($application['AnnualApproval'], '{n}.year');
+        $group = array_unique($group);
+        if (!in_array($current_year, $group)) {
+            $this->Session->setFlash(__('No annual approval files uploaded for the current year!!'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+
         //check if Application is candidate for annual approval automatic generation
         //1. No active annual letter generated
         //2. All required files uploaded
@@ -582,8 +599,8 @@ class AnnualLettersController extends AppController
             if ($formdata['year'] == date('Y')) {
                 $file_link = $html->link(__($formdata['basename']), array('controller' => 'attachments',   'action' => 'download', $formdata['id'], 'admin' => false));
                 (isset($checklist[$formdata['pocket_name']])) ?
-                    $checklist[$formdata['pocket_name']] .= $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>' :
-                    $checklist[$formdata['pocket_name']] = $file_link . ' dated ' . $this->confirm_file_date($formdata['file_date']) . ' Version ' . $formdata['version_no'] . '<br>';
+                    $checklist[$formdata['pocket_name']] .= $file_link . ' ' . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>' :
+                    $checklist[$formdata['pocket_name']] = $file_link . ' ' . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>';
             }
         }
         $deeds = $this->Pocket->find('list', array(
@@ -592,7 +609,7 @@ class AnnualLettersController extends AppController
             'order' => array('Pocket.item_number' => 'ASC'),
             'recursive' => 0
         ));
-        $orderedArray2=array();
+        $orderedArray2 = array();
         foreach ($deeds as $key => $value) {
             if (array_key_exists($key, $checklist)) {
                 $orderedArray2[$key] = $checklist[$key];
