@@ -262,6 +262,7 @@
         <th><?php echo $this->Paginator->sort('application_id'); ?></th>
         <th><?php echo $this->Paginator->sort('patient_initials'); ?></th>
         <th><?php echo $this->Paginator->sort('country_id'); ?></th>
+        <th><?php echo $this->Paginator->sort('submitted_date'); ?></th>
         <th><?php echo $this->Paginator->sort('created'); ?></th>
         <th class="actions"><?php echo __('Actions'); ?></th>
           </tr>
@@ -290,6 +291,7 @@
         ?>&nbsp;</td>
         <td><?php echo h($sae['Sae']['patient_initials']); ?>&nbsp;</td>
         <td><?php echo h($sae['Country']['name']); ?>&nbsp;</td>
+        <td><?php echo h($sae['Sae']['date_submitted']); ?>&nbsp;</td>
         <td><?php echo h($sae['Sae']['created']); ?>&nbsp;</td>
         <td class="actions">
             <?php if($sae['Sae']['approved'] > 0) echo $this->Html->link(__('<label class="label label-info">View</label>'), array('action' => 'view', $sae['Sae']['id']), array('escape' => false)); ?>

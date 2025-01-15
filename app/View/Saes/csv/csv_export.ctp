@@ -26,7 +26,8 @@ $header = array(
 	'report_source' => 'Report source',
 	'reporter_name' => 'Reporter name',
 	'reporter_phone' => 'Reporter phone',
-	'reporter_email' => 'Reporter email'
+	'reporter_email' => 'Reporter email',
+	'date_submitted' => 'Date submitted'
 );
 
 
