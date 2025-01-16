@@ -7,7 +7,7 @@
 
             <div class="row-fluid">
                 <div class="span11">
-                    <a class="btn btn-primary" role="button" data-toggle="collapse" href="#outsourcingModal" aria-controls="outsourcingModal"><i class="icon-user"></i> Outsource Protocol</a>
+                    <a class="btn btn-primary" role="button" data-toggle="collapse" href="#outsourcingModal" aria-controls="outsourcingModal"><i class="icon-user"></i> Grant Access / Rights Protocol</a>
 
                     <div id="outsourcingModal" class="collapse show">
 
@@ -144,7 +144,7 @@
             <div class="row-fluid">
                 <div class="span10">
                     <div class="styled_title">
-                        <h5>Outsourced Investigators</h5>
+                        <h5>Investigators Granted Access</h5>
 
                     </div>
                     <ol>

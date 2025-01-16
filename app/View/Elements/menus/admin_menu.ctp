@@ -58,7 +58,7 @@
             </li>
 
             <li><?php
-                        echo $this->Html->link('<i class="icon-user-md"></i> Outsourced Users',  array('controller' => 'protocol_outsources', 'action'=>'index', 'admin' => true ),
+                        echo $this->Html->link('<i class="icon-user-md"></i> Users Granted Access',  array('controller' => 'protocol_outsources', 'action'=>'index', 'admin' => true ),
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>
             </li>

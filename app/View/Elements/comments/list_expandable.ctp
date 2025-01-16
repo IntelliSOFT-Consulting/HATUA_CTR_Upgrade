@@ -1,8 +1,8 @@
 <!-- <div class="row"> -->
 <!-- <div class="col-xs-12"> -->
 <?php
-   $this->Html->script('ckeditor/ckeditor', array('inline' => false));
-   $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
+$this->Html->script('ckeditor/ckeditor', array('inline' => false));
+$this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 
 foreach ($comments as $key => $comment) {
 ?>
@@ -119,7 +119,7 @@ foreach ($comments as $key => $comment) {
             <?php } ?>
             <!-- Start -->
             <div class="modal fade" id="myModal_<?php echo $comment['id']; ?>">
-                <div class="modal-dialog"> 
+                <div class="modal-dialog">
                     <div class="modal-content">
 
                         <!-- Modal Header -->
@@ -163,12 +163,15 @@ foreach ($comments as $key => $comment) {
                                     echo $this->Form->input('model', ['label' => array('class' => 'required'), 'type' => 'hidden', 'value' => $comment['model']]);
                                     echo $this->Form->input('category', ['label' => array('class' => 'required'), 'type' => 'hidden', 'value' => $comment['category']]);
                                     echo $this->Form->input('sender', ['label' => array('class' => 'required'), 'type' => 'hidden', 'value' => $comment['sender']]);
+
+                                    $uniqueId = isset($uniqueId) ? $uniqueId : 'content_' . uniqid();
                                     echo $this->Form->input('content', array(
                                         'label' => false,
                                         'value' => $comment['content'],
                                         'between' => '<div class="span12">',
-                                        'class' => 'input-large editor1',
-                                        'id' => 'editor1'
+                                        'class' => 'input-large',
+                                        'id' => 'editor1',
+                                        'id' => $uniqueId,
                                     ));
                                     ?>
                                 </div>
@@ -215,10 +218,10 @@ foreach ($comments as $key => $comment) {
                         </div>
                         <?php echo $this->Form->end() ?>
                         <script type="text/javascript">
-                            $('#editor1').ckeditor();
-                            // (function($) {
-                            //     $('#editor1').ckeditor();
-                            // });
+                            // Ensure CKEditor is initialized on the textarea
+                            if (typeof CKEDITOR !== 'undefined') {
+                                CKEDITOR.replace('<?php echo $uniqueId; ?>', {});
+                            }
                         </script>
                     </div>
                 </div>

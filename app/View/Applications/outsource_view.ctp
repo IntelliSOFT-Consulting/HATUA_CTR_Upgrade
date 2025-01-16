@@ -40,7 +40,7 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#application" data-toggle="tab">Application</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
-      <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
+      <li><a href="#outsourcing" data-toggle="tab">Grant Access </a></li>
       <li><a href="#tab17" data-toggle="tab">Screening</a></li>
       <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
       <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
@@ -64,7 +64,7 @@ echo $this->Session->flash();
     <?php }
     } ?>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
-      <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
+      <li><a href="#outsourcing" data-toggle="tab">Grant Access </a></li>
       <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
       <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
       <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>

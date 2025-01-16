@@ -228,6 +228,12 @@ class Application extends AppModel
         //            'dependent' => true,
         //            'conditions' => array('Request.type' => 'response'),
         //  ),
+        'AnnualChecklistReview' => array(
+            'className' => 'Comment',
+            'foreignKey' => 'model_id',
+            'dependent' => true,
+            'conditions' => array('AnnualChecklistReview.model' => 'AnnualChecklistReview'),
+        ),
         'Acceptance' => array(
             'className' => 'Review',
             'foreignKey' => 'application_id',

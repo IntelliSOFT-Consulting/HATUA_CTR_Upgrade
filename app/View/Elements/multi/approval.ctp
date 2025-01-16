@@ -130,7 +130,6 @@
     $former = $this->requestAction('/pockets/checklist/annual');
     $years = array_unique(Hash::extract($application['AnnualApproval'], '{n}.year'));
     rsort($years);
-    // debug(Hash::extract($application['AnnualApproval'], '{n}.year'));
     foreach ($years as $year): ?>
       <tr class="">
         <td><b><?php echo h($year); ?></b></td>
@@ -175,19 +174,53 @@
           }
 
 
-          // echo $this->Html->link(__('<label class="label label-info">View</label>'), array('controller' => 'attachments', 'action' => 'approvals', $year), array('escape' => false)); 
-          /*foreach ($application['AnnualApproval'] as $anc) {
-              if($anc['year'] == $year) {
-                echo '<i class="icon-file-text-alt"></i> ';
-                echo $former[$anc['pocket_name']].': ';
-                echo $this->Html->link(__($anc['basename']),
-                  array('controller' => 'attachments', 'action' => 'download', $anc['id'], 'full_base' => true),
-                  array('class' => '')
-                );
-                echo "<br>";
-              }
-            }*/
           ?>
+
+          <!-- Add the tab here:: -->
+
+          <div class="amend-form">
+            <ul class="nav nav-tabs" id="centerTabs">
+
+              <li class="active"><a href="#quries-<?php echo $year; ?>" data-toggle="tab">Queries</a></li>
+              <li><a href="#nquery-<?php echo $year; ?>" data-toggle="tab">New Query</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="quries-<?php echo $year; ?>">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <?php
+                    $var = Hash::extract($application, "AnnualChecklistReview.{n}[foreign_key={$year}]");
+                    echo $this->element('comments/list_expandable', ['comments' => $var, 'category' => true])
+                    ?>
+
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="nquery-<?php echo $year; ?>">
+                <div class="row-fluid">
+                  <div class="span12">
+
+                    <?php
+                    $comment_page =  ($redir == 'applicant') ? 'comments/add_plain' : 'comments/add_editor';
+                    echo $this->element($comment_page, [
+                      'model' => [
+                        'model_id' => $application['Application']['id'],
+                        'foreign_key' => $year,
+                        'model' => 'AnnualChecklistReview',
+                        'category' => 'external',
+                        'message_type' => 'annual_checklist_feedback',
+                        'url' => 'add_annual_checklist_query',
+                        'type' => 50
+                      ],
+                      'uniqueId' => 'content_' . uniqid()
+                    ]);
+
+                    ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </td>
       </tr>
     <?php endforeach; ?>

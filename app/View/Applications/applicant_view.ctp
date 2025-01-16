@@ -40,10 +40,10 @@ echo $this->Session->flash();
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
 
       <!-- check if the application is not child -->
-      <?php if ($application['Application']['is_child'] == 0) { ?> 
-      <li><a href="#multicenter" data-toggle="tab">Multi Centers (<?php echo count($application['MultiCenter']) ?>)</a></li>
+      <?php if ($application['Application']['is_child'] == 0) { ?>
+        <li><a href="#multicenter" data-toggle="tab">Multi Centers (<?php echo count($application['MultiCenter']) ?>)</a></li>
       <?php } ?>
-      <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
+      <li><a href="#outsourcing" data-toggle="tab">Grant Access </a></li>
       <li><a href="#tab17" data-toggle="tab">Screening</a></li>
       <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
       <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
@@ -56,7 +56,7 @@ echo $this->Session->flash();
     $dsur = count($application['SafetyReportDSUR']);
     $line = count($application['SafetyReportLINE']);
     $safety = $sae + $gen + $dsmb + $dsur + $line;
- 
+
     ?>
     <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php echo $safety ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
@@ -148,11 +148,39 @@ echo $this->Session->flash();
               array('escape' => false, 'class' => 'btn btn-success',  'style' => 'margin-right: 10px;')
             );
           } else {
+
+          ?>
+            <a class="btn btn-primary" role="button" data-toggle="collapse" href="#nModal" aria-controls="nModal">New Amendment</a>
+
+            <div id="nModal" class="collapse show">
+              <div class="row-fluid">
+                <div class="span12">
+                  <?php echo $this->element('multi/amendment_new'); ?>
+                </div>
+              </div>
+
+              <?php 
             echo $this->Html->link(
-              'New Amendment',
+              'Submit',
               array('controller' => 'amendments', 'action' => 'add', $application['Application']['id']),
-              array('escape' => false, 'class' => 'btn btn-primary', 'style' => 'margin-right: 10px;')
-            );
+              array(
+                  'escape' => false, 
+                  'class' => 'btn btn-primary', 
+                  'onclick' => "return confirm('Please ensure you\'ve submitted all the required files.');",
+                  'style' => 'margin-right: 10px;')
+          );
+
+ 
+
+              ?>
+              <hr>
+
+
+              <?php
+              echo $this->Form->end();
+              ?>
+            </div>
+          <?php
           }
           if (isset($this->params['named']['invoice'])) {
 

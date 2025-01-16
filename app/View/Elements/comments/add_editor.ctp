@@ -38,11 +38,13 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
             } else {
                 echo $this->Form->input('sender', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.name')]);
             }
+            $uniqueId = isset($uniqueId) ? $uniqueId : 'content_' . uniqid();
             echo $this->Form->input('subject', ['label' => array('class' => 'required')]);
             echo $this->Form->input('content', array(
                 'label' => false, 'value' => $content['Pocket']['content'],
                 'between' => '<div class="span12">', 
                  'class' => 'input-large editor',
+                'id' => $uniqueId,
             ));
             ?>
         </div>
@@ -86,6 +88,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
     </div>
     <?php echo $this->Form->end() ?>
     <script type="text/javascript">
-    $('.editor').ckeditor(); 
-    </script>
+    // Ensure CKEditor is initialized on the textarea
+    if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.replace('<?php echo $uniqueId; ?>', { 
+        });
+    }
+</script>
 </div>

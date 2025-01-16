@@ -2,7 +2,7 @@
     <?php
     $this->assign('Reports', 'active');
     ?>
-    <h2><?php echo __('Outsource Requests'); ?></h2>
+    <h2><?php echo __('Access Requests'); ?></h2>
     <?php
     echo $this->Form->create('Outsource', array(
         'url' => array_merge(array('action' => 'approved'), $this->params['pass']),
