@@ -7,6 +7,16 @@ echo $this->Session->flash();
   <div class="span12">
     <?php
     if ($redir == 'applicant' or $redir == 'monitor' or $redir == 'outsource') {
+      if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
+        echo $this->Html->link(
+          __('<i class="icon-random"></i> Add Protocol Deviation'),
+          array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']),
+          array('escape' => false, 'class' => 'btn btn-info')
+        );
+      }
+    }
+
+    if ($redir == 'monitor' or $redir == 'outsource') {
       echo $this->Html->link(
         __('<i class="icon-random"></i> Add Protocol Deviation'),
         array('controller' => 'deviations', 'action' => 'add', $application['Application']['id']),
@@ -139,8 +149,11 @@ if (isset($this->params['named']['deviation_edit']) || isset($this->params['name
                     echo $this->element('comments/add', [
                       // 'model' => ['model_id' => $deviation['id'], 'foreign_key' => $deviation['id'], 
                       'model' => [
-                        'model_id' => $application['Application']['id'], 'foreign_key' => $deviation['id'],
-                        'model' => 'Deviation', 'category' => 'external', 'url' => 'add_dev_external'
+                        'model_id' => $application['Application']['id'],
+                        'foreign_key' => $deviation['id'],
+                        'model' => 'Deviation',
+                        'category' => 'external',
+                        'url' => 'add_dev_external'
                       ]
                     ])
                     ?>

@@ -26,6 +26,7 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                         <?php
                         if ($this->fetch('is-applicant') == 'true') {
                             if ($application['Application']['submitted']) {
+                                if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
                                 if ($application['Application']['submitted']) {
                                     echo "<br>";
                                     echo $this->Html->link(
@@ -41,7 +42,7 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                                     );
                                     echo "<br>";
                                     echo "<br>";
-                                }
+                                }}
                             }
                         }
                         ?>
@@ -113,9 +114,11 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                         if ($application['Application']['submitted']) {
                             if ($application['Application']['submitted']) {
                                 echo "<br>";
+                                if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
                         ?>
+                        
                                 <a class="btn btn-success btn-mini" role="button" data-toggle="collapse" href="#gTab" aria-controls="gTab"><i class="icon-plus"></i> Create Generalized Report</a>
-
+<?php } ?>
                                 <div id="gTab" class="collapse show">
                                     <?php
 
@@ -236,9 +239,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                         if ($application['Application']['submitted']) {
                             if ($application['Application']['submitted']) {
                                 echo "<br>";
+                                if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
                         ?>
                                 <a class="btn btn-success btn-mini" role="button" data-toggle="collapse" href="#lineTab" aria-controls="lineTab"><i class="icon-plus"></i> Create Line Report</a>
-
+<?php } ?>
                                 <div id="lineTab" class="collapse show">
                                     <?php
 
@@ -366,9 +370,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                         if ($application['Application']['submitted']) {
                             if ($application['Application']['submitted']) {
                                 echo "<br>";
+                                if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
                         ?>
                                 <a class="btn btn-success btn-mini" role="button" data-toggle="collapse" href="#dsurTab" aria-controls="dsurTab"><i class="icon-plus"></i> Create DSUR Report</a>
-
+<?php } ?>
                                 <div id="dsurTab" class="collapse show">
                                     <?php
 
@@ -496,9 +501,10 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
                         if ($application['Application']['submitted']) {
                             if ($application['Application']['submitted']) {
                                 echo "<br>";
+                                if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
                         ?>
                                 <a class="btn btn-success btn-mini" role="button" data-toggle="collapse" href="#dsmbTab" aria-controls="dsmbTab"><i class="icon-plus"></i> Create DSMB Report</a>
-
+<?php }?>
                                 <div id="dsmbTab" class="collapse show">
                                     <?php
 

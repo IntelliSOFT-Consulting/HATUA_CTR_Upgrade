@@ -11,7 +11,7 @@ $(function() {
         } else {
             intId = 1;
         }
-        if ($("#concomittant-drugs .concomittant-group").length < 9) {
+        if ($("#concomittant-drugs .concomittant-group").length < 100) {
             var new_concomittantdrug = $('<div class="concomittant-group">\
     <div class="row-fluid">\
         <div class="span6">\

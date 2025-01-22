@@ -3357,10 +3357,18 @@ class ApplicationsController extends AppController
 
         $response = $this->_isApplicant($id);
 
+
+
         if ($response['Application']['deactivated']) {
             $this->redirect(array('action' => 'view', $id));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
+
+            //For you to edit, you have to be the owner
+            if ($response['Application']['user_id'] != $this->Auth->user('id')) {
+                $this->Session->setFlash(__('Please contact the Site Owner for submission'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
 
             if (isset($this->request->data['cancelReport'])) {
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
@@ -3789,8 +3797,8 @@ class ApplicationsController extends AppController
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
             // $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
             if ($response['Application']['is_child'] != 1) {
-            $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
-            $this->redirect(array('action' => 'index'));
+                $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
+                $this->redirect(array('action' => 'index'));
             }
         } elseif ($response['Application']['submitted']) {
             $this->Session->setFlash(__('You cannot edit this application because it has been submitted to PPB.'), 'alerts/flash_error');

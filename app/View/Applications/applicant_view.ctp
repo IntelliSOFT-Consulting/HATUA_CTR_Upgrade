@@ -150,8 +150,9 @@ echo $this->Session->flash();
           } else {
 
           ?>
-            <a class="btn btn-primary" role="button" data-toggle="collapse" href="#nModal" aria-controls="nModal">New Amendment</a>
-
+            <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+              <a class="btn btn-primary" role="button" data-toggle="collapse" href="#nModal" aria-controls="nModal">New Amendment</a>
+            <?php } ?>
             <div id="nModal" class="collapse show">
               <div class="row-fluid">
                 <div class="span12">
@@ -159,18 +160,19 @@ echo $this->Session->flash();
                 </div>
               </div>
 
-              <?php 
-            echo $this->Html->link(
-              'Submit',
-              array('controller' => 'amendments', 'action' => 'add', $application['Application']['id']),
-              array(
-                  'escape' => false, 
-                  'class' => 'btn btn-primary', 
+              <?php
+              echo $this->Html->link(
+                'Submit',
+                array('controller' => 'amendments', 'action' => 'add', $application['Application']['id']),
+                array(
+                  'escape' => false,
+                  'class' => 'btn btn-primary',
                   'onclick' => "return confirm('Please ensure you\'ve submitted all the required files.');",
-                  'style' => 'margin-right: 10px;')
-          );
+                  'style' => 'margin-right: 10px;'
+                )
+              );
 
- 
+
 
               ?>
               <hr>

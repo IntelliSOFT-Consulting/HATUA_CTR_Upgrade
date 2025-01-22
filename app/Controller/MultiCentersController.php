@@ -50,11 +50,8 @@ class MultiCentersController extends AppController
 		if (!$this->MultiCenter->exists()) {
 			throw new NotFoundException(__('Invalid Multi Center request'));
 		}
-
+		$contains = $this->a_contain;
 		// Check if already approved
-
-
-
 		$center = $this->MultiCenter->read(null, $id);
 		if ($center['MultiCenter']['status'] === 'Approved') {
 
@@ -64,7 +61,10 @@ class MultiCentersController extends AppController
 		// Retrieve the application and its related data
 		$application = $this->Application->find('first', array(
 			'conditions' => array('Application.id' => $center['MultiCenter']['application_id']),
-			// 'contain' => array('MultiCenter', 'Sae', 'Message', 'MeetingDate')
+			'contain' => array('Manufacturer','StudyRoute',
+				'Budget' ,'Sponsor' , 'Placebo', 'SiteDetail', 'Organization', 'EthicalCommittee', 'Pharmacist',
+		'InvestigatorContact'
+			),
 		));
 
 		if (empty($application)) {
@@ -81,9 +81,21 @@ class MultiCentersController extends AppController
 		// map them in terms of alphabetical letters i.e. A, B, C, D, E, F, G, H, I, J, K, L, M, N, O
 		$assignedCenters = chr(65 + $assignedCenters);
 
-
+		$application = Hash::remove($application, 'Manufacturer.{n}.id');
+		$application = Hash::remove($application, 'StudyRoute.{n}.id');
+		$application = Hash::remove($application, 'Budget.{n}.id');
+		$application = Hash::remove($application, 'Sponsor.{n}.id');
+		$application = Hash::remove($application, 'Placebo.{n}.id');
+		$application = Hash::remove($application, 'SiteDetail.{n}.id');
+		$application = Hash::remove($application, 'Organization.{n}.id');
+		$application = Hash::remove($application, 'EthicalCommittee.{n}.id');
+		$application = Hash::remove($application, 'Pharmacist.{n}.id');
+		$application = Hash::remove($application, 'InvestigatorContact.{n}.id');
+		       
+		
 		$newApplication = $application;
 		unset($newApplication['Application']['id']);
+		unset($newApplication['Application']['trial_status_id']);
 		$newApplication['Application']['protocol_no'] = $application['Application']['protocol_no'] . ' - ' . $assignedCenters;
 		$newApplication['Application']['application_id'] = $application['Application']['id'];
 		$newApplication['Application']['user_id'] = $center['MultiCenter']['user_id'];
@@ -95,7 +107,7 @@ class MultiCentersController extends AppController
 		$newApplication = $this->mapExtraFields($newApplication, $application);
 
 		$this->Application->create();
-		if ($this->Application->save($newApplication, array('validate' => true))) {
+		if ($this->Application->saveAssociated($newApplication, array('validate' => true))) {
 			// update the current Multicenter as approved
 			$newApplicationId = $this->Application->id;
 			$this->MultiCenter->saveField('status', 'Approved');

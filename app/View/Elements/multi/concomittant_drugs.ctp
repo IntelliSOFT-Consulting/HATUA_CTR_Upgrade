@@ -1,5 +1,5 @@
 <?php
-    $this->Html->script('multi/concomittant_drugs', array('inline' => false));
+    $this->Html->script('multi/concomittant_drug', array('inline' => false));
 ?>
 <h5>Concomittant Drug(s) (<small>where necessary, Click button to add more -
 <button type="button" class="btn btn-small btn-primary" id="addConcomittantDrug">Add Concomittant Drug</button></small>) </h5>

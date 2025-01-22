@@ -181,6 +181,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
                   }
                   if ($application['Application']['submitted']) {
                     echo "<br>";
+                    if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) {
                     echo $this->Html->link(
                       '<i class="icon-list-alt"></i> Create SAE',
                       array('controller' => 'saes', 'action' => 'add', $application['Application']['id'], 'sae'),
@@ -198,7 +199,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
                       array('controller' => 'cioms', 'action' => 'add', $application['Application']['id']),
                       array('escape' => false, 'class' => 'btn btn-inverse btn-mini')
                     );
-                  }
+                  }}
                 }
               ?>
             </ol>
