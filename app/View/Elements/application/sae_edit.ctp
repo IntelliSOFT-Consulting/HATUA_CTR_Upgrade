@@ -42,7 +42,7 @@
             <?php
                 // echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
                 echo $this->Form->input('patient_initials',
-                    array('label' => array('class' => 'control-label required', 'text' => 'Patient Initials <small class="muted">(first, last)</small> <span class="sterix">*</span>'),));
+                    array('label' => array('class' => 'control-label required', 'text' => 'Subject Matter <small class="muted">(first, last)</small> <span class="sterix">*</span>'),));
                 echo $this->Form->input('enrollment_date', array('type' => 'text', 'class' => 'datepickers',
                     'label' => array('class' => 'control-label required', 'text' => 'Date of enrollment into the study </small> <span class="sterix">*</span>')
                 ));

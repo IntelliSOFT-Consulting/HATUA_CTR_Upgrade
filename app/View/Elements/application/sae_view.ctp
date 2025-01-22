@@ -31,7 +31,7 @@
     <table class="table  table-condensed">
       <tbody>
         <tr>
-          <td class="table-label required" width="25%"><p>Patient Initials <small class="muted">(first, last)</small> <span class="sterix">*</span></p></td>
+          <td class="table-label required" width="25%"><p>Subject Matter <small class="muted">(first, last)</small> <span class="sterix">*</span></p></td>
           <td  width="25%"><?php  echo $sae['Sae']['patient_initials']; ?></td>
           <td colspan="2"><h5 style="text-align: center;">Check All Appropriate to Adverse Reaction</h5></td>
         </tr>

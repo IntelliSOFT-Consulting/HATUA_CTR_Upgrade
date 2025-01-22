@@ -103,6 +103,7 @@
 				<th><?php echo $this->Paginator->sort('CoPI'); ?></th>
 				<th><?php echo $this->Paginator->sort('Protocol'); ?></th>
 				<th><?php echo $this->Paginator->sort('site_name'); ?></th>
+				<th><?php echo $this->Paginator->sort('site_protocol_no'); ?></th>
 				<th><?php echo $this->Paginator->sort('status'); ?></th>
 				<th><?php echo $this->Paginator->sort('created'); ?></th>
 				<th class="actions"><?php echo __('Actions'); ?></th>
@@ -110,21 +111,38 @@
 		</thead>
 		<tbody>
 			<?php
-			foreach ($multicenters as $dt) : 
-			// debug($dt);
+			foreach ($multicenters as $dt) :
+				// debug($dt);
 			?>
 				<tr class="">
 					<td><?php echo h($dt['MultiCenter']['id']); ?>&nbsp;</td>
 					<td><?php echo h($dt['CoPI']['name']); ?>&nbsp;</td>
 					<td><?php echo h($dt['Application']['protocol_no']); ?>&nbsp;</td>
 					<td><?php echo h($dt['MultiCenter']['site_name']); ?>&nbsp;</td>
+					<td><?php
+
+						if (isset($dt['NewApplication'])) {
+							$reference = $dt['NewApplication']['protocol_no'];
+							$action = !empty($dt['NewApplication']['submitted']) ? 'view' : 'edit';
+
+							echo $this->Html->link(
+								__($reference),
+								array('controller' => 'applications', 'action' => $action, $dt['NewApplication']['id']),
+								array('class' => '', 'confirm' => 'Are you sure you want to navigate to the site protocol?', 'target' => '_blank')
+							);
+						}
+
+						?>
+						&nbsp;</td>
 					<td><?php echo h($dt['MultiCenter']['status']); ?>&nbsp;</td>
 					<td><?php echo h($dt['MultiCenter']['created']); ?>&nbsp;</td>
-					<td class="actions"> 
+					<td class="actions">
 
-						  <!-- show confirmation action to assign site study --> 
-						   <!-- Ensure there is a confirmation dilaog before real action  --> 
-						  <?php echo $this->Html->link(__('Assign Site Study'), array('action' => 'assign_site_study', $dt['MultiCenter']['id']), array('class' => 'btn btn-mini btn-success', 'confirm' => 'Are you sure you want to assign this site study?')); ?>
+						<!-- show confirmation action to assign site study -->
+						<!-- Ensure there is a confirmation dilaog before real action  -->
+						<?php
+						echo $this->Html->link(__('Assign Site Study'), array('action' => 'assign_site_study', $dt['MultiCenter']['id']), array('class' => 'btn btn-mini btn-success', 'confirm' => 'Are you sure you want to assign this site study?'));
+						?>
 
 
 					</td>

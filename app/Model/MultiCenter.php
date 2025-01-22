@@ -85,6 +85,13 @@ class MultiCenter extends AppModel {
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
+		),
+		'NewApplication' => array(
+			'className' => 'Application',
+			'foreignKey' => 'app_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
 		)
 	);
 }

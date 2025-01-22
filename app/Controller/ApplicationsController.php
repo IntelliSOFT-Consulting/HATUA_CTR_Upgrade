@@ -1411,48 +1411,49 @@ class ApplicationsController extends AppController
         $total_days = 0;
 
         if (Hash::check($application['ApplicationStage'], '{n}[stage=AnnualApproval].id')) {
-                $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
-                $ann_s = new DateTime($ann['start_date']);
-                $ann_e = new DateTime($ann['end_date']);
+            $ann = min(Hash::extract($application['ApplicationStage'], '{n}[stage=AnnualApproval]'));
+            $ann_s = new DateTime($ann['start_date']);
+            $ann_e = new DateTime($ann['end_date']);
 
-                $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
-                $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
+            $stages['AnnualApproval']['start_date'] = $ann_s->format('d-M-Y');
+            $stages['AnnualApproval']['end_date'] = $ann_e->format('d-M-Y');
 
-                $ann_now = new DateTime();
+            $ann_now = new DateTime();
 
-                if ($ann_now > $ann_e) {
-                    $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
-                    $total_days = 0;
-                } else {
+            if ($ann_now > $ann_e) {
+                $stages['AnnualApproval']['days'] = 0; // Set remaining days to 0
+                $total_days = 0;
+            } else {
 
-                    $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
-                    $total_days = $ann_now->diff($ann_e)->format('%a');
-                }
-
-                if ($ann['status'] == 'Current') {
-                    $stages['AnnualApproval']['color'] = 'success';
-                } elseif ($ann['status'] == 'Pending') {
-                    $stages['AnnualApproval']['color'] = 'warning';
-                } elseif ($ann['status'] == 'Expired') {
-                    $stages['AnnualApproval']['color'] = 'danger';
-                }
+                $stages['AnnualApproval']['days'] = $ann_now->diff($ann_e)->format('%a');
+                $total_days = $ann_now->diff($ann_e)->format('%a');
             }
 
-            return $total_days;
+            if ($ann['status'] == 'Current') {
+                $stages['AnnualApproval']['color'] = 'success';
+            } elseif ($ann['status'] == 'Pending') {
+                $stages['AnnualApproval']['color'] = 'warning';
+            } elseif ($ann['status'] == 'Expired') {
+                $stages['AnnualApproval']['color'] = 'danger';
+            }
+        }
+
+        return $total_days;
     }
 
-    public function diff_weekdays($start_date, $end_date, $holidays = []) {
+    public function diff_weekdays($start_date, $end_date, $holidays = [])
+    {
         $start = new DateTime($start_date);
         $end = new DateTime($end_date);
         $end->modify('+1 day'); // Include end date in the calculation
-     
+
         $interval = new DateInterval('P1D');
         $period = new DatePeriod($start, $interval, $end);
-    
+
         $workdays = 0;
         foreach ($period as $dt) {
             $curr = $dt->format('D');
-    
+
             // Check if it's a weekend
             if ($curr != 'Sat' && $curr != 'Sun') {
                 // Check if it's a holiday
@@ -1461,7 +1462,7 @@ class ApplicationsController extends AppController
                 }
             }
         }
-    
+
         return $workdays;
     }
     public function stages_applicant($id = null)
@@ -1504,18 +1505,18 @@ class ApplicationsController extends AppController
                 $scr_s = new DateTime($creation['start_date']);
                 $creation_end_date = $csd->format('d-M-Y');
                 $creation_start_date = $scr_s->format('d-M-Y');
-                $total_days=$this->diff_weekdays($creation_start_date, $creation_end_date);
- 
-                $stages['Creation']['end_date'] = $creation_end_date;
-                $stages['Creation']['days'] =$total_days;
+                $total_days = $this->diff_weekdays($creation_start_date, $creation_end_date);
 
-                    $stages['Submission'] = [
-                        'application_name' => $application_name,
-                        'label' => 'Application <br>Submission',
-                        'days' => '',
-                        'start_date' => $csd->format('d-M-Y'),
-                        'color' => $ccolor
-                    ];
+                $stages['Creation']['end_date'] = $creation_end_date;
+                $stages['Creation']['days'] = $total_days;
+
+                $stages['Submission'] = [
+                    'application_name' => $application_name,
+                    'label' => 'Application <br>Submission',
+                    'days' => '',
+                    'start_date' => $csd->format('d-M-Y'),
+                    'color' => $ccolor
+                ];
             }
             //Screening for Completeness
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
@@ -2716,7 +2717,7 @@ class ApplicationsController extends AppController
             return $date;
         }
 
-        return " dated: ".$formattedDate;
+        return " dated: " . $formattedDate;
     }
 
     public function confirm_file_version($version = null)
@@ -2765,7 +2766,7 @@ class ApplicationsController extends AppController
 
 
                             (isset($checklist[$formdata['pocket_name']])) ?
-                                 $checklist[$formdata['pocket_name']] .= $file_link . $this->confirm_file_date($formdata['file_date']) .' '.$this->confirm_file_version($formdata['version_no']) . '<br>' :
+                                $checklist[$formdata['pocket_name']] .= $file_link . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>' :
                                 $checklist[$formdata['pocket_name']] = $file_link . $this->confirm_file_date($formdata['file_date']) . ' ' . $this->confirm_file_version($formdata['version_no']) . '<br>';
                         }
                         $deeds = $this->Pocket->find('list', array(
@@ -3786,9 +3787,11 @@ class ApplicationsController extends AppController
             )
         ));
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
-            $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
+            // $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
+            if ($response['Application']['is_child'] != 1) {
             $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
             $this->redirect(array('action' => 'index'));
+            }
         } elseif ($response['Application']['submitted']) {
             $this->Session->setFlash(__('You cannot edit this application because it has been submitted to PPB.'), 'alerts/flash_error');
             $this->redirect(array('action' => 'index'));
@@ -3825,8 +3828,12 @@ class ApplicationsController extends AppController
         );
         if ($response['Application']['user_id'] != $this->Auth->user('id')) {
             $this->log("_isOwnedBy: application id = " . $response['Application']['id'] . " User = " . $this->Auth->user('id'), 'debug');
-            $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');
-            $this->redirect(array('action' => 'index'));
+
+            // confirm if this is a child protocol
+            if ($response['Application']['is_child'] != 1) {
+                $this->Session->setFlash(__('You do not have permission to access this resource.'), 'alerts/flash_error');
+                $this->redirect(array('action' => 'index'));
+            }
         }
         return $response;
     }

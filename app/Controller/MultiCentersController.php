@@ -37,9 +37,9 @@ class MultiCentersController extends AppController
 		// check initial_date_submitted is not empty then assign the value to the child datetime field
 		if (!empty($parent['Application']['initial_date_submitted'])) {
 			// convert the date to a valid datetime format
-			$child['Application']['initial_date_submitted'] = date('Y-m-d H:i:s', strtotime($parent['Application']['initial_date_submitted'])); 
+			$child['Application']['initial_date_submitted'] = date('Y-m-d H:i:s', strtotime($parent['Application']['initial_date_submitted']));
 		}
-		 
+
 		return $child;
 	}
 
@@ -51,8 +51,16 @@ class MultiCentersController extends AppController
 			throw new NotFoundException(__('Invalid Multi Center request'));
 		}
 
-		$center = $this->MultiCenter->read(null, $id);
+		// Check if already approved
 
+
+
+		$center = $this->MultiCenter->read(null, $id);
+		if ($center['MultiCenter']['status'] === 'Approved') {
+
+			$this->Session->setFlash(__('The request has already been approved. Please try another request'), 'alerts/flash_error');
+			return $this->redirect(array('action' => 'admin_index'));
+		}
 		// Retrieve the application and its related data
 		$application = $this->Application->find('first', array(
 			'conditions' => array('Application.id' => $center['MultiCenter']['application_id']),
@@ -73,13 +81,15 @@ class MultiCentersController extends AppController
 		// map them in terms of alphabetical letters i.e. A, B, C, D, E, F, G, H, I, J, K, L, M, N, O
 		$assignedCenters = chr(65 + $assignedCenters);
 
-	
+
 		$newApplication = $application;
 		unset($newApplication['Application']['id']);
 		$newApplication['Application']['protocol_no'] = $application['Application']['protocol_no'] . ' - ' . $assignedCenters;
 		$newApplication['Application']['application_id'] = $application['Application']['id'];
 		$newApplication['Application']['user_id'] = $center['MultiCenter']['user_id'];
 		$newApplication['Application']['is_child'] = true;
+		$newApplication['Application']['submitted'] = 0;
+		$newApplication['Application']['created'] = date("Y-m-d H:i:s");
 
 		// call another function to map some extra fields
 		$newApplication = $this->mapExtraFields($newApplication, $application);
@@ -87,7 +97,9 @@ class MultiCentersController extends AppController
 		$this->Application->create();
 		if ($this->Application->save($newApplication, array('validate' => true))) {
 			// update the current Multicenter as approved
+			$newApplicationId = $this->Application->id;
 			$this->MultiCenter->saveField('status', 'Approved');
+			$this->MultiCenter->saveField('app_id', $newApplicationId);
 
 			$this->Session->setFlash(__('The application has been copied successfully.'), 'alerts/flash_success');
 		} else {
