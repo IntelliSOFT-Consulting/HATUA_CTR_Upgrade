@@ -3953,8 +3953,8 @@ class ApplicationsController extends AppController
             $this->Session->setFlash(__('The application has been successfully ' . $trial_statuses), 'alerts/flash_success');
             $this->redirect($this->referer());
         } else {
-            debug($this->Application->validationErrors);
-            exit;
+            // debug($this->Application->validationErrors);
+            // exit;
             $this->Session->setFlash(__('Failed to update the application status: '), 'alerts/flash_error'); // Displaying application save errors
             $this->redirect($this->referer());
         }

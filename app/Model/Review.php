@@ -50,6 +50,12 @@ class Review extends AppModel {
             'foreignKey' => 'foreign_key',
             'dependent' => true,
             'conditions' => array('ExternalComment.model' => 'Review', 'ExternalComment.category' => 'external' ),
+        ), 
+        'Attachment' => array(
+            'className' => 'Attachment',
+            'foreignKey' => 'foreign_key',
+            'dependent' => true,
+            'conditions' => array('Attachment.model' => 'Review', 'Attachment.group' => 'attachment'),
         ),
     );
 }

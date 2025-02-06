@@ -70,7 +70,7 @@ class AppController extends Controller
     'Budget',
     'Document',
     'ActiveInspector',
-    'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'),
+    'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User','Attachment'),
     'Sae',
     'AmendmentLetter',
     'AnnualLetter' => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')),

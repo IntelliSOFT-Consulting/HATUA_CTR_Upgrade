@@ -19,7 +19,7 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
-    <li><a href="#amendments" data-toggle="tab">Amendments</a></li> 
+    <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
     <?php
     $count_reviews = 0;
     $count_inspectors = 0;
@@ -49,16 +49,16 @@ echo $this->Session->flash();
                                                                     ?>)</small></a>
     </li>
     <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
-    <li><a href="#tab7" data-toggle="tab">Safety Reports  (<?php 
-    
-    $sae = count($application['Sae']);
-    $gen = count($application['SafetyReportGen']);
-    $dsmb = count($application['SafetyReportDSMB']);
-    $dsur = count($application['SafetyReportDSUR']);
-    $line = count($application['SafetyReportLINE']);
-    $safety = $sae + $gen + $dsmb + $dsur + $line;
+    <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php
 
-    echo $safety ?>)</a></li>
+                                                          $sae = count($application['Sae']);
+                                                          $gen = count($application['SafetyReportGen']);
+                                                          $dsmb = count($application['SafetyReportDSMB']);
+                                                          $dsur = count($application['SafetyReportDSUR']);
+                                                          $line = count($application['SafetyReportLINE']);
+                                                          $safety = $sae + $gen + $dsmb + $dsur + $line;
+
+                                                          echo $safety ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
     <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
     <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
@@ -177,9 +177,9 @@ echo $this->Session->flash();
               array('escape' => false, 'class' => 'btn btn-info')
             );
 
-            echo "<hr>"; 
+            echo "<hr>";
             ?>
-               
+
           </div>
         <?php
         }
@@ -241,7 +241,7 @@ echo $this->Session->flash();
                         'foreign_key' => $eid['id'],
                         'model' => 'ApplicationStage',
                         'category' => 'external',
-                    'message_type' => 'screening_feedback',
+                        'message_type' => 'screening_feedback',
                         'url' => 'add_screening_query',
                         'type' => 50
                       ]
@@ -265,7 +265,7 @@ echo $this->Session->flash();
         <div class="span12">
           <?php
           echo $this->Form->create(
-            'Review', 
+            'Review',
             array('url' => array('controller' => 'reviews', 'action' => 'assign', $application['Application']['id']))
           );
           $counter = 0;
@@ -387,6 +387,15 @@ echo $this->Session->flash();
                                 created on: " . date('d-m-Y H:i:s', strtotime($review['created'])) . "</small>";
               echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['text'] . "</div>";
               echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['recommendation'] . "</div>";
+
+              foreach ($review['Attachment'] as $protocol) {
+                echo "<br>";
+                echo $this->Html->link(
+                  __($protocol['basename']),
+                  array('controller' => 'attachments',   'action' => 'download', $protocol['id']),
+                  array('class' => 'btn btn-info')
+                ) . "<br>";
+              }
             }
           }
           ?>
@@ -400,24 +409,31 @@ echo $this->Session->flash();
       <div class="row-fluid">
         <div class="span12">
           <?php
-          echo $this->Form->create('Review', array('url' => array(
-            'controller' => 'reviews',
-            'action' => 'comment', $application['Application']['id']
-          ))); 
+          echo $this->Form->create('Review', array(
+            'type' => 'file',
+            'url' => array(
+              'controller' => 'reviews',
+              'action' => 'comment',
+              $application['Application']['id']
+            )
+          ));
 
           echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
           echo $this->Form->input('text', array(
-            'type' => 'textarea', 
+            'type' => 'textarea',
             'rows' => 3,
-            'value' =>$this->Session->read('text'), 
+            'value' => $this->Session->read('text'),
             'label' => array('class' => 'required', 'text' => '3. Manager\'s Comment(s)')
           ));
           echo $this->Form->input('recommendation', array(
             'type' => 'textarea',
-             'rows' => 3, 
-             'value' =>$this->Session->read('recommendation'),  
+            'rows' => 3,
+            'value' => $this->Session->read('recommendation'),
             'label' => array('class' => 'required', 'text' => '4. Manager\'s recommendation(s)')
           ));
+
+          // Add a section to upload documents
+          echo $this->element('multi/manager_comments');
           echo $this->Form->input('password', array('type' => 'password', 'label' => 'Your Password *'));
           echo $this->Form->end(array(
             'label' => 'Submit Review',
@@ -458,9 +474,11 @@ echo $this->Session->flash();
                     <?php
                     if (!empty($rid))  echo $this->element('comments/add', [
                       'model' => [
-                        'model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],
-                        'model' => 'Review', 'category' => 'external',                         
-                        'message_type'=>'review_response',
+                        'model_id' => $application['Application']['id'],
+                        'foreign_key' => $rid['id'],
+                        'model' => 'Review',
+                        'category' => 'external',
+                        'message_type' => 'review_response',
                         'url' => 'add_review_response'
                       ]
                     ])
@@ -500,9 +518,11 @@ echo $this->Session->flash();
                     <?php
                     if (!empty($rid))  echo $this->element('comments/add', [
                       'model' => [
-                        'model_id' => $application['Application']['id'], 'foreign_key' => $rid['id'],
-                        'model' => 'Review', 'category' => 'internal',                                               
-                        'message_type'=>'review_response',
+                        'model_id' => $application['Application']['id'],
+                        'foreign_key' => $rid['id'],
+                        'model' => 'Review',
+                        'category' => 'internal',
+                        'message_type' => 'review_response',
                         'url' => 'add_internal_review_response'
                       ]
                     ])
@@ -582,8 +602,8 @@ echo $this->Session->flash();
 
     <div class="tab-pane" id="tab7">
       <div class="row-fluid">
-       
-      <?php echo $this->element('application/safety');?>
+
+        <?php echo $this->element('application/safety'); ?>
       </div>
     </div>
 

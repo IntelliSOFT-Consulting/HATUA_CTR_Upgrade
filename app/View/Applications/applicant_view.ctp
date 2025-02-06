@@ -220,6 +220,7 @@ echo $this->Session->flash();
             array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
             array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
           );
+          
 
           ?>
         </div>
