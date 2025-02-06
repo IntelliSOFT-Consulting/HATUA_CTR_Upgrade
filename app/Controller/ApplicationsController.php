@@ -442,6 +442,9 @@ class ApplicationsController extends AppController
                 $associatedData = $this->request->data;
                 unset($associatedData['Application']);
 
+                // debug($this->request->data);
+                // exit;
+
                 // Temporarily save the parent data without validation
                 $this->Application->create();
                 if ($this->Application->save($parentData, array('validate' => false))) {
@@ -455,12 +458,14 @@ class ApplicationsController extends AppController
                             }
                         }
                     }
-
                     // Validate each associated model individually
                     $isValid = true;
                     foreach ($associatedData as $model => $modelData) {
+                        // debug($modelData);
                         if (!empty($modelData)) {
                             foreach ($modelData as $data) {
+                                $data['application_id'] = $parentId;
+                                // debug($data);
                                 $this->Application->$model->create($data);
                                 if (!$this->Application->$model->validates()) {
                                     $isValid = false;
@@ -469,13 +474,18 @@ class ApplicationsController extends AppController
                             }
                         }
                     }
-
+                    // debug($this->request->data);
+                    // debug($associatedData);
+                    // exit;
                     if ($isValid) {
                         // Save each associated model individually
                         $success = true;
                         foreach ($associatedData as $model => $modelData) {
+                            // debug($modelData);
                             if (!empty($modelData)) {
                                 foreach ($modelData as $data) {
+                                    $data['application_id'] = $parentId;
+                                    // debug($data);
                                     $this->Application->$model->create($data);
                                     if (!$this->Application->$model->save(null, array('validate' => false))) {
                                         $success = false;
@@ -484,6 +494,10 @@ class ApplicationsController extends AppController
                                 }
                             }
                         }
+                        // debug($this->request->data);
+                        // debug($isValid);
+
+                        // exit;
 
                         if ($success) {
 
@@ -500,7 +514,7 @@ class ApplicationsController extends AppController
                                     'id' => $this->Application->id,
                                     'name' => $this->Auth->user('name'),
                                     'email' => $this->Auth->user('email'),
-                                    'protocol_no' =>  $this->Application->protocol_no
+                                    'protocol_no' =>  $this->Application->short_title
                                 )
                             );
                             CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));

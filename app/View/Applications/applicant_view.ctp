@@ -37,18 +37,21 @@ echo $this->Session->flash();
 <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
-    <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+    <?php 
+    //if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
 
       <!-- check if the application is not child -->
       <?php if ($application['Application']['is_child'] == 0) { ?>
         <li><a href="#multicenter" data-toggle="tab">Multi Centers (<?php echo count($application['MultiCenter']) ?>)</a></li>
-      <?php } ?>
+      <?php } if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
       <li><a href="#outsourcing" data-toggle="tab">Grant Access </a></li>
+      <?php } ?>
       <li><a href="#tab17" data-toggle="tab">Screening</a></li>
       <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
       <li><a href="#tab2" data-toggle="tab">Reviewers&rsquo; Comments <small>(<?php echo $reviewers_comments; ?>)</small></a></li>
       <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
-    <?php }
+    <?php 
+    //}
 
     $sae = count($application['Sae']);
     $gen = count($application['SafetyReportGen']);
@@ -61,7 +64,8 @@ echo $this->Session->flash();
     <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php echo $safety ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
     <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
-    <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+    <?php
+    // if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
       <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
       <li><a href="#tab10" data-toggle="tab" style="color: #52A652;">Annual Participants Flow</a></li>
       <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
@@ -70,7 +74,9 @@ echo $this->Session->flash();
       <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
       <?php if ($application['Application']['approved'] == 2) { ?>
         <li><a href="#tab9" data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
-    <?php }
+    <?php
+    
+  //}
     } ?>
   </ul>
   <div class="tab-content my-tab-content">

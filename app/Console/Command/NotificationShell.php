@@ -219,7 +219,7 @@ class NotificationShell extends Shell
 
             $variables = array(
               'protocol_link' => '<a href="https://prims.pharmacyboardkenya.org/crunch?type=ecitizen_invoice&id=' . $raw_id . '">Click here to view invoice</a>',
-              'protocol_no' => $application['Application']['protocol_no'],
+              'protocol_no' => $application['Application']['short_title'],
               'name' => $user['name']
             );
 
@@ -240,7 +240,7 @@ class NotificationShell extends Shell
             $email->subject(Sanitize::html(String::insert($messages['applicant_invoice_email_subject'], $variables), array('remove' => true)));
             $email->viewVars(array('message' => $message));
             if (!$email->send()) {
-              $this->log($email, 'submit_email');
+              $this->log($email, 'submit_email'); 
             }
           } else {
             $this->log('saved application', 'e-citizen-error_saved');
