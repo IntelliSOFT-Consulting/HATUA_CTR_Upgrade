@@ -612,16 +612,19 @@ class ReviewsController extends AppController
     public function reviewer_respond()
     {
         if ($this->request->is('post')) {
-            if (empty($this->request->data['Review']['accepted'])) {
-                $this->Session->setFlash(__('Please accept / decline the offer!!'), 'alerts/flash_error');
-                $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
-            }
+          
             if (empty($this->request->data['Review']['conflict'])) {
                 $this->Session->setFlash(__('Please declare your conflict of interest with this offer!!'), 'alerts/flash_error');
                 $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
             }
+            if($this->request->data['Review']['conflict']=="Yes"){
+                $this->request->data['Review']['accepted'] = 'declined';
+            }
 
-
+            if (empty($this->request->data['Review']['accepted'])) {
+                $this->Session->setFlash(__('Please accept / decline the offer!!'), 'alerts/flash_error');
+                $this->redirect(array('controller' => 'applications', 'action' => 'view', $this->request->data['Review']['application_id']));
+            }
             $review = $this->Review->find('first', array('conditions' => array(
                 'Review.application_id' => $this->request->data['Review']['application_id'],
                 'Review.user_id' => $this->Auth->User('id'),

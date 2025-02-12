@@ -1056,6 +1056,7 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/Amendments/applicant_delete');
         $this->Acl->allow($group, 'controllers/Applications/applicant_index');
         $this->Acl->allow($group, 'controllers/Applications/applicant_create');
+        $this->Acl->allow($group, 'controllers/Applications/applicant_download_termination');
         $this->Acl->allow($group, 'controllers/Applications/applicant_create_multi_center');
         $this->Acl->allow($group, 'controllers/Applications/applicant_generate_safety_report');
         $this->Acl->allow($group, 'controllers/Applications/applicant_safety_delete');

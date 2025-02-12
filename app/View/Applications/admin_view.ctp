@@ -270,66 +270,301 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
       </div>
 
       <div class="row-fluid">
-        <div class="span4">
-          <?php
+
+        <!-- Start -->
+        <div class="amend-form">
+          <ul class="nav nav-tabs">
+
+            <li class="active"><a href="#statuses" data-toggle="tab">Application Status</a></li>
+            <li><a href="#letter" data-toggle="tab">Letters</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="statuses">
+              <div class="row-fluid">
+                <div class="span4">
+                  <?php
 
 
-          echo $this->Form->create('Application', array(
-            'url' => array('controller' => 'applications', 'action' => 'suspend',$application['Application']['id']),
-            'type' => 'file',
-            'class' => 'form-horizontal',
-            'inputDefaults' => array(
-              'div' => array('class' => 'control-group'),
-              'label' => array('class' => 'control-label'),
-              'between' => '<div class="controls">',
-              'after' => '</div>',
-              'class' => '',
-              'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
-              'error' => array('attributes' => array('class' => 'controls help-block')),
-            ),
-          ));
-          echo $this->Form->input('id');
-         
-          echo $this->Form->input('status', array(
-            'type' => 'select',
-            'options' => array(
-              '1'=>'Recruiting',
-              '2'=>'Not yet recruiting',
-              '3' => 'Suspended',
-              '4' => 'Stopped',
-              '5'=>'Completed',
-              '6'=>'In follow-up',
-              '7'=>'Analysing',
-              '8'=>'Writing-up',
-              '9'=>'Application withdrawn'
-            ),
-            'empty' => true,
-            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Trial Status  <span class="sterix">*</span></h5>'),
-            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
-            'escape' => false,
-          ));
-          echo $this->Form->input('admin_stopped_reason', array(
-            'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Reason <span class="sterix">*</span></h5>'),
-            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
-            'escape' => false,
-          ));
+                  echo $this->Form->create('Application', array(
+                    'url' => array('controller' => 'applications', 'action' => 'suspend', $application['Application']['id']),
+                    'type' => 'file',
+                    'class' => 'form-horizontal',
+                    'inputDefaults' => array(
+                      'div' => array('class' => 'control-group'),
+                      'label' => array('class' => 'control-label'),
+                      'between' => '<div class="controls">',
+                      'after' => '</div>',
+                      'class' => '',
+                      'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                      'error' => array('attributes' => array('class' => 'controls help-block')),
+                    ),
+                  ));
+                  echo $this->Form->input('id');
 
-          echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
-            'name' => 'submitReport',
-            'formnovalidate' => 'formnovalidate',
-            'onclick' => "return confirm('Are you sure you wish to stop/suspend the protocol?');",
-            'class' => 'btn btn-info btn-block mapop',
-            'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
-            'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
-            'div' => false,
-          ));
+                  echo $this->Form->input('status', array(
+                    'type' => 'select',
+                    'options' => array(
+                      '1' => 'Recruiting',
+                      '2' => 'Not yet recruiting',
+                      '3' => 'Suspended',
+                      '4' => 'Stopped',
+                      '5' => 'Completed',
+                      '6' => 'In follow-up',
+                      '7' => 'Analysing',
+                      '8' => 'Writing-up',
+                      '9' => 'Application withdrawn'
+                    ),
+                    'empty' => true,
+                    'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Trial Status  <span class="sterix">*</span></h5>'),
+                    'placeholder' => ' ',
+                    'class' => 'input-xxlarge',
+                    'between' => '<div class="nocontrols">',
+                    'escape' => false,
+                  ));
+                  echo $this->Form->input('admin_stopped_reason', array(
+                    'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Reason <span class="sterix">*</span></h5>'),
+                    'placeholder' => ' ',
+                    'class' => 'input-xxlarge',
+                    'between' => '<div class="nocontrols">',
+                    'escape' => false,
+                  ));
 
-          ?>
-          <hr>
-          <?php
-          echo $this->Form->end();
-          ?>
+                  echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+                    'name' => 'submitReport',
+                    'formnovalidate' => 'formnovalidate',
+                    'onclick' => "return confirm('Are you sure you wish to stop/suspend the protocol?');",
+                    'class' => 'btn btn-info btn-block mapop',
+                    'id' => 'ApplicationSubmitReport',
+                    'title' => 'Save and Submit Report',
+                    'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+                    'div' => false,
+                  ));
+
+                  ?>
+                  <hr>
+                  <?php
+                  echo $this->Form->end();
+                  ?>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="letter">
+              <div class="row-fluid">
+                <div class="span12">
+
+                  <!-- button to create new letter -->
+                  <div class="well">
+                    <?php
+                    echo $this->Html->link(
+                      __('<i class="icon-plus"></i> New Letter'),
+                      array('action' => 'letter', $application['Application']['id']),
+                      array('escape' => false, 'class' => 'btn btn-success')
+                    );
+                    ?>
+                  </div>
+
+
+                  <table class="table  table-bordered" style="margin-bottom: 1px;">
+
+                    <thead>
+                      <tr>
+                        <th style="width:3%">ID</th>
+                        <th style="width:3%">Protocol No</th>
+                        <th style="width:3%">Status</th>
+                        <th style="width:3%">User</th>
+                        <th style="width:3%">Created</th>
+                        <th style="width:3%"><?php echo __('Actions'); ?></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php
+
+                      foreach ($application['Termination'] as $akey => $dd) {
+                      ?>
+                        <tr>
+
+                          <td><?php echo $akey + 1; ?></td>
+                          <td><?php echo $dd['reference_no']; ?></td>
+                          <td><?php echo ($dd['submitted'] == 0) ? 'Unsubmitted' : 'Submitted'; ?></td>
+                          <td><?php echo $dd['User']['name']; ?></td>
+                          <td><?php echo $dd['created']; ?></td>
+                          <td>
+                            <?php
+                            if ($dd['submitted'] == 0) {
+                              echo $this->Html->link(
+                                '<span class="label label-success"> Edit </span>',
+                                array('action' => 'view', $application['Application']['id'], 'eterm' => $dd['id']),
+                                array('escape' => false)
+                              );
+                              echo "&nbsp;";
+                              echo $this->Form->postLink(
+                                __('<span class="label label-warning"> Delete </span>'),
+                                array('action' => 'delete_letter', $dd['id']),
+                                array('escape' => false),
+                                __('Are you sure you want to delete Application # %s? You will not be able to recover it later.', $dd['id'])
+                              );
+                            } else {
+                              echo "&nbsp;";
+                              echo $this->Html->link(
+                                '<span class="label label-info"> View </span>',
+                                array('action' => 'view', $application['Application']['id'], 'vterm' => $dd['id']),
+                                array('escape' => false)
+                              );
+                              echo "&nbsp;";
+                              echo $this->Html->link(
+                                __('<span class="label label-success"> <i class="icon-download-alt"></i>  Download PDF </span>'),
+                                array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'download_termination', $dd['id']),
+                                array('escape' => false)
+                              );
+                            }
+                            echo "&nbsp;";
+
+                            ?>
+                        </tr>
+
+                      <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+              <hr>
+
+              <!-- View Letter -->
+
+              <?php
+              if (isset($this->params['named']['vterm']))  $cid = $this->params['named']['vterm'];
+
+              if (isset($this->params['named']['vterm'])) {
+                foreach ($application['Termination'] as $akey => $kk) {
+                  if ($kk['id'] == $cid) {
+              ?>
+
+
+                    <div class="span12">
+                      <h4 class="text-info">View Letter</h4>
+                      <hr class="soften" style="margin: 10px 0px;">
+                    </div>
+                    <div class="span12">
+                      <div class="well">
+                        <div class="row-fluid">
+                          <div class="span12">
+                            <p><strong>Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
+                            <p><strong>Study Title: </strong><?php echo $application['Application']['study_title']; ?></p>
+                            <p><strong>Letter Reference: </strong><?php echo $kk['reference_no']; ?></p>
+                            <p><strong>Created on: </strong><?php echo date('d-m-Y h:i:s a', strtotime($kk['created'])); ?></p>
+                            <hr>
+                            <p><strong>Letter Content</strong></p>
+                            <div class="well">
+                              <?php echo $kk['content']; ?>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
+              <?php }
+                }
+              } ?>
+
+              <!-- View Letter -->
+
+
+
+
+
+              <?php
+
+
+
+              if (isset($this->params['named']['eterm']))  $cid = $this->params['named']['eterm'];
+
+              if (isset($this->params['named']['eterm'])) {
+                foreach ($application['Termination'] as $akey => $kk) {
+                  if ($kk['id'] == $cid) {
+              ?>
+                    <div class="row-fluid">
+                      <div class="bs-example">
+
+                        <?php
+                        $content = $this->requestAction('/pockets/view/51');
+                        echo $this->Form->create('Termination', array(
+                          'url' => array('controller' => 'applications', 'action' => 'terminate', $application['Application']['id']),
+                          'type' => 'file',
+                          'class' => false,
+                          'inputDefaults' => array(
+                            'div' => array('class' => 'control-group'),
+                            'label' => array('class' => 'control-label'),
+                            'between' => '<div class="controls">',
+                            'after' => '</div>',
+                            'class' => '',
+                            'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                            'error' => array('attributes' => array('class' => 'controls help-block')),
+                          ),
+                        ));
+                        echo $this->Form->input('id', ['type' => 'hidden', 'value' => $kk['id']]);
+                        echo $this->Form->input('reference_no', ['type' => 'hidden', 'value' => $application['Application']['protocol_no']]);
+                        echo $this->Form->input('application_id', ['type' => 'hidden', 'value' => $application['Application']['id']]);
+                        echo $this->Form->input('user_id', ['type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')]);
+                        $uniqueId = 'content_' . uniqid();
+                        echo $this->Form->input('content', array(
+                          'label' => false,
+                          'value' => $kk['content'],
+                          // 'value' => $content['Pocket']['content'],
+                          'between' => '<div class="span12">',
+                          'class' => 'input-large editor',
+                          'id' => $uniqueId,
+                        ));
+                        ?>
+                        <div class="form-group">
+
+                          <div class="well controls">
+                            <?php
+                            echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+                              'name' => 'saveChanges',
+                              'class' => 'btn btn-success mapop',
+                              'id' => 'rreviewSaveChanges',
+                              'title' => 'Save & continue editing',
+                              'data-content' => 'Save changes to form without submitting it.
+                                          The form will still be available for further editing.',
+                              'div' => false,
+                            ));
+                            ?>
+                            <?php
+                            echo $this->Form->button('<i class="icon-rocket"></i> Submit', array(
+                              'name' => 'submitReport',
+                              'onclick' => "return confirm('Are you sure you wish to submit this letter?');",
+                              'class' => 'btn btn-primary mapop',
+                              'id' => 'rreviewSubmitReport',
+                              'title' => 'Save and Submit Report',
+                              'data-content' => 'Submit report for peer review and approval.',
+                              'div' => false,
+                            ));
+
+                            ?>
+                          </div>
+                        </div>
+                        <?php echo $this->Form->end() ?>
+
+                        <script type="text/javascript">
+                          // Ensure CKEditor is initialized on the textarea
+                          if (typeof CKEDITOR !== 'undefined') {
+                            CKEDITOR.replace('<?php echo $uniqueId; ?>', {});
+                          }
+                        </script>
+                      </div> <!-- /bs-example -->
+                    </div>
+              <?php
+                  }
+                }
+              }
+              ?>
+            </div>
+          </div>
         </div>
+        <!-- End -->
       </div>
     </div>
 
@@ -339,13 +574,13 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
       <div class="marketing">
         <div class="row-fluid">
           <div class="span12">
-             <h4 class="text-info">
-            Invoice Generation : (
-            <span class="xeditable iseditable" id="data[Application][protocol_no]" data-type="text" data-pk="<?php echo $application['Application']['id']; ?>" data-original-title="Update protocol no">
-              <?php echo $application['Application']['protocol_no']; ?></span>
-            ) &mdash;
-            <small>Additional sites</small>
-          </h4>
+            <h4 class="text-info">
+              Invoice Generation : (
+              <span class="xeditable iseditable" id="data[Application][protocol_no]" data-type="text" data-pk="<?php echo $application['Application']['id']; ?>" data-original-title="Update protocol no">
+                <?php echo $application['Application']['protocol_no']; ?></span>
+              ) &mdash;
+              <small>Additional sites</small>
+            </h4>
           </div>
         </div>
         <hr class="soften" style="margin: 10px 0px;">
@@ -357,7 +592,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
 
 
           echo $this->Form->create('Application', array(
-            'url' => array('controller' => 'applications', 'action' => 'extra',$application['Application']['id']),
+            'url' => array('controller' => 'applications', 'action' => 'extra', $application['Application']['id']),
             'type' => 'file',
             'class' => 'form-horizontal',
             'inputDefaults' => array(
@@ -371,17 +606,21 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
             ),
           ));
           echo $this->Form->input('id');
-         
+
           echo $this->Form->input('total_sites', array(
-            'type' => 'number', 
-            'min'=>1,
+            'type' => 'number',
+            'min' => 1,
             'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Extra Site  <span class="sterix">*</span></h5>'),
-            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
+            'placeholder' => ' ',
+            'class' => 'input-xxlarge',
+            'between' => '<div class="nocontrols">',
             'escape' => false,
           ));
           echo $this->Form->input('admin_stopped_reason', array(
             'label' => array('class' => 'control-nolabel required', 'text' => '<h5> Reason <span class="sterix">*</span></h5>'),
-            'placeholder' => ' ', 'class' => 'input-xxlarge', 'between' => '<div class="nocontrols">',
+            'placeholder' => ' ',
+            'class' => 'input-xxlarge',
+            'between' => '<div class="nocontrols">',
             'escape' => false,
           ));
 
@@ -390,7 +629,8 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
             'formnovalidate' => 'formnovalidate',
             'onclick' => "return confirm('Are you sure you wish to generate an extra invoice to this protocol?');",
             'class' => 'btn btn-info btn-block mapop',
-            'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
+            'id' => 'ApplicationSubmitReport',
+            'title' => 'Save and Submit Report',
             'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
             'div' => false,
           ));

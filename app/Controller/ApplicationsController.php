@@ -26,6 +26,171 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
+
+    public function applicant_download_termination($id)
+    {
+        $this->download_termination($id);
+    }
+    public function admin_download_termination($id)
+    {
+        $this->download_termination($id);
+    }
+    public function download_termination($id)
+    {
+        $this->loadModel('Termination');
+        $this->Termination->id = $id;
+        if (!$this->Termination->exists()) {
+            throw new NotFoundException(__('Invalid Termination letter'));
+        }
+        $dt = $this->Termination->find(
+            'first',
+            array(
+                'conditions' => array('Termination.id' => $id),
+                'contain' => array('User', 'Application')
+            )
+        );
+
+        $this->set('letter', $dt);
+        $this->pdfConfig = array('filename' => 'Termination Letter' . $id,  'orientation' => 'portrait');
+        $this->render('download_letter');
+    }
+    public function admin_letter($application_id)
+    {
+        $this->loadModel('Termination');
+        $content = $this->requestAction('/pockets/view/51');
+
+        $this->Termination->create();
+        $this->request->data['Termination']['application_id'] = $application_id;
+        $this->request->data['Termination']['user_id'] = $this->Auth->user('id');
+        $this->request->data['Termination']['content'] = $content['Pocket']['content'];
+        $this->request->data['Termination']['submitted'] = 0;
+        if ($this->Termination->save($this->request->data)) {
+            $id = $this->Termination->id;
+            $this->Session->setFlash(__('The letter has been saved'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id, 'eterm' => $id));
+        } else {
+            $this->Session->setFlash(__('The letter could not be saved. Please, try again.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+    }
+
+    public function admin_delete_letter($id)
+    {
+        $this->loadModel('Termination');
+
+        if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Termination->id = $id;
+        if (!$this->Termination->exists()) {
+            throw new NotFoundException(__('Invalid application letter'));
+        }
+        if ($this->Termination->delete()) {
+            $this->Session->setFlash(__('Letter deleted successfully'), 'alerts/flash_success');
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Application letter was not deleted,please try again later!!'), 'alerts/flash_error');
+        $this->redirect($this->referer());
+    }
+    public function admin_terminate($application_id)
+    {
+        $this->loadModel('Termination');
+        if ($this->request->is('post')) {
+            if (isset($this->request->data['submitReport'])) {
+                $this->request->data['Termination']['submitted'] = 1;
+            }
+            $this->Termination->create();
+            if ($this->Termination->saveAssociated($this->request->data, array('deep' => true))) {
+                $id = $this->Termination->id;
+                if (isset($this->request->data['submitReport'])) {
+
+
+                    $application = $this->Application->find('first', array(
+                        'conditions' => array('Application.id' => $application_id),
+                        'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+                    ));
+
+
+                    // Start of Notification
+
+
+                    $this->loadModel('Message');
+                    $html = new HtmlHelper(new ThemeView());
+                    $message = $this->Message->find('first', array('conditions' => array('name' => 'termination_letter')));
+                    $anl = $this->Termination->find('first', array(
+                        'contain' => array('Application'),
+                        'conditions' => array('Termination.id' => $this->Termination->id)
+                    ));
+
+                    $users = $this->Termination->Application->User->find('all', array(
+                        'contain' => array('Group'),
+                        'conditions' => array('OR' => array('User.id' => $this->Termination->Application->field('user_id'), 'User.group_id' => 2)) //Applicant and managers
+                    ));
+                    foreach ($users as $user) {
+                        $variables = array(
+                            'name' => $user['User']['name'],
+                            'protocol_no' => $anl['Application']['protocol_no'],
+                            'protocol_link' => $html->link($anl['Application']['protocol_no'], array(
+                                'controller' => 'applications',
+                                'action' => 'view',
+                                $anl['Application']['id'],
+                                $user['Group']['redir'] => true,
+                                'full_base' => true
+                            ), array('escape' => false))
+                        );
+                        $datum = array(
+                            'email' => $user['User']['email'],
+                            'id' => $application_id,
+                            'user_id' => $user['User']['id'],
+                            'type' => 'termination_letter',
+                            'model' => 'Termination',
+                            'subject' => String::insert($message['Message']['subject'], $variables),
+                            'message' => String::insert($message['Message']['content'], $variables)
+                        );
+                        CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                        CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                    }
+
+
+
+                    // End of Notification
+
+
+
+
+
+
+                    $audit = array(
+                        'AuditTrail' => array(
+                            'foreign_key' => $id,
+                            'model' => 'Termination Letter',
+                            'message' => 'Termination Letter for the protocol with reference number ' . $application['Application']['protocol_no'] . ' has been created by ' . $this->Auth->user('username'),
+                            'ip' => $application['Application']['protocol_no']
+                        )
+                    );
+                    $this->loadModel('AuditTrail');
+                    $this->AuditTrail->Create();
+                    if ($this->AuditTrail->save($audit)) {
+                        $this->log($this->request->data, 'audit_success');
+                    } else {
+                        $this->log('Error creating an audit trail', 'notifications_error');
+                        $this->log($this->request->data, 'notifications_error');
+                    }
+                    $this->Session->setFlash(__('The letter has been sent to the user'), 'alerts/flash_success');
+                    $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id, 'vterm' => $id));
+                }
+                $this->Session->setFlash(__('The letter has been saved'), 'alerts/flash_success');
+                $this->redirect($this->referer());
+            } else {
+                $this->Session->setFlash(__('The letter could not be saved. Please, try again.'), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        }
+        // debug($id);
+        // debug($this->request->data);
+        // exit;
+    }
+
     public function applicant_create_multi_center($id = null)
     {
         $this->loadModel('MultiCenter');
@@ -2638,6 +2803,7 @@ class ApplicationsController extends AppController
         $this->set('application', $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array(
+                'Termination' => array('User'),
                 'Amendment',
                 'EthicalCommittee',
                 'InvestigatorContact',
@@ -3829,6 +3995,7 @@ class ApplicationsController extends AppController
         $contains['SiteInspection']['conditions'] = array('SiteInspection.summary_approved' => 2);
         $contains['Deviation']['conditions'] = array('Deviation.user_id' => $this->Auth->user('id'));
         $contains['Review']['conditions'] = array('Review.type' => 'ppb_comment');
+        $contains['Termination']['conditions'] = array('Termination.submitted' => 1);
         // $contains['ApplicationStage']['ExternalComment']['conditions'] = array('ExternalComment.submitted' => '2');
         $contains['ApplicationStage'] = array(
             'conditions' => array(), // No filtering on ApplicationStage

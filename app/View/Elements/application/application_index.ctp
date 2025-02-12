@@ -398,11 +398,15 @@
                 $counder = ($this->request->paging['Application']['page'] - 1) * $this->request->paging['Application']['limit'];
                 foreach ($applications as $application) :
                 ?>
-                  <tr class="<?php if ($this->fetch('color-codes') == 'true') {
-                                if ($application['Application']['deactivated']) echo 'text-warning';
-                                if ($application['Application']['approved'] == 1) echo 'text-error';
-                                if ($application['Application']['approved'] == 2) echo 'text-success';
-                              } ?>">
+                  <tr class="<?php
+
+                  $targets = ["3", "4"];
+                  echo isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], $targets) ? 'error' : ''; 
+                  // if ($this->fetch('color-codes') == 'true') {
+                  //   if ($application['Application']['deactivated']) echo 'text-warning';
+                  //   if ($application['Application']['approved'] == 1) echo 'text-error';
+                  //   if ($application['Application']['approved'] == 2) echo 'text-success';
+                  // } ?>">
                     <td rowspan="2">
                       <p class="tablenums"><?php $counder++;
                                             echo $counder; ?>.</p>

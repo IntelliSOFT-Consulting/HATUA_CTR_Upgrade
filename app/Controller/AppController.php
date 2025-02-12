@@ -87,6 +87,7 @@ class AppController extends Controller
     'SafetyReportLINE' => array('Attachment'),
     'MultiCenter' => array('Owner', 'CoPI','NewApplication'),
     'AnnualChecklistReview' => array('Attachment'),
+    'Termination'=>array('User'),
   );
   public $components = array(
     'Acl',
