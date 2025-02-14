@@ -1366,7 +1366,12 @@ class ApplicationsController extends AppController
 
                 //Submission Stage
                 $stages['Submission'] = ['label' => 'Application <br>Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
-                $csd = new DateTime($application['Application']['date_submitted']);
+                
+                if ($application['Application']['unsubmitted']) {
+                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                } else {
+                    $csd = new DateTime($application['Application']['date_submitted']);
+                } 
                 $ccolor = 'success';
                 $stages['Submission'] = [
                     'application_name' => $application_name,
@@ -1381,9 +1386,9 @@ class ApplicationsController extends AppController
                     $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Screening]'));
                     $scr_s = new DateTime($scr['start_date']);
                     $scr_e = new DateTime($scr['end_date']);
-                    $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
+                    // $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
                     // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
-                    $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
+                    // $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
 
                     $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');
                     // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
@@ -1405,9 +1410,8 @@ class ApplicationsController extends AppController
                         $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
                         $scr_s = new DateTime($scr['start_date']);
                         $scr_e = new DateTime($scr['end_date']);
-                        $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
+                        $stages['Submission']['start_date'] = $scr_s->format('d-M-Y');
                         $stages['Submission']['end_date'] = $scr_e->format('d-M-Y');
-                        // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
                         $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
 
                         $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
@@ -1622,6 +1626,9 @@ class ApplicationsController extends AppController
 
     public function diff_weekdays($start_date, $end_date, $holidays = [])
     {
+        if ($start_date == $end_date) {
+            return 0; // No workdays counted for a single-day input
+        }
         $start = new DateTime($start_date);
         $end = new DateTime($end_date);
         $end->modify('+1 day'); // Include end date in the calculation
@@ -1678,7 +1685,12 @@ class ApplicationsController extends AppController
             $stages['Submission'] = ['label' => 'Application <br> Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
 
             if ($application['Application']['submitted']) {
-                $csd = new DateTime($application['Application']['date_submitted']);
+
+                if ($application['Application']['unsubmitted']) {
+                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                } else {
+                    $csd = new DateTime($application['Application']['date_submitted']);
+                }
                 $ccolor = 'success';
                 $creation = $stages['Creation'];
                 $scr_s = new DateTime($creation['start_date']);
@@ -1701,9 +1713,17 @@ class ApplicationsController extends AppController
             $stages['Screening'] = ['label' => 'Screening', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
             if (Hash::check($application['ApplicationStage'], '{n}[stage=Screening].id')) {
                 $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Screening]'));
+
+
+                if ($application['Application']['unsubmitted']) {
+                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                } else {
+                    $csd = new DateTime($application['Application']['date_submitted']);
+                }
+
                 $scr_s = new DateTime($scr['start_date']);
                 $scr_e = new DateTime($scr['end_date']);
-                $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
+                $stages['Submission']['end_date'] = $csd->format('d-M-Y');
                 // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
                 $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
 
@@ -1727,10 +1747,17 @@ class ApplicationsController extends AppController
                     $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
                     $scr_s = new DateTime($scr['start_date']);
                     $scr_e = new DateTime($scr['end_date']);
-                    $stages['Creation']['end_date'] = $scr_s->format('d-M-Y');
-                    $stages['Creation']['end_date'] = $scr_e->format('d-M-Y');
+
+                    
+                if ($application['Application']['unsubmitted']) {
+                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                } else {
+                    $csd = new DateTime($application['Application']['date_submitted']);
+                }
+                    // $stages['Submission']['start_date'] = $scr_s->format('d-M-Y');
+                    $stages['Submission']['end_date'] = $csd->format('d-M-Y');
                     // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
-                    $stages['Creation']['days'] = $this->diff_wdays($csd, $scr_s);
+                    $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
 
                     $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
                     $stages['Unsubmitted']['end_date'] = $scr_e->format('d-M-Y');

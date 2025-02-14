@@ -22,9 +22,13 @@ $this->Html->script('multi/afro_attachments', array('inline' => false));
 $reviewers_comments = 0;
 foreach ($application['Review'] as $review) {
     if ($review['type'] == 'ppb_comment') {
-        $reviewers_comments++;
+        $reviewers_comments++; 
     }
 }
+$this->assign('is-applicant', 'true');
+?>
+<?php
+echo $this->Session->flash();
 ?>
 <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
     <ul class="nav nav-tabs">
@@ -243,47 +247,76 @@ foreach ($application['Review'] as $review) {
             <?php $this->start('endjs'); ?>
         </div> <!-- End or bootstrap tab1 -->
         <div class="tab-pane" id="tab2">
-            <p style="text-align: center;"><strong>Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
-            <hr class="soften" style="margin: 10px 0px;">
-            <div class="row-fluid">
-                <h4 class="text-success">Assigned Reviewers (<?php echo $count_reviews; ?>)</h4>
-                <hr>
-                <div class="span12">
-                    <?php
-                    $counter = 0;
-                    echo "<ol>";
-                    foreach ($users as $user_id => $user) {
-                        echo "<li>";
-                        $responded = false;
-                        foreach ($application['Review'] as $response) {
-                            if ($response['user_id'] == $user_id) {
-                                if ($response['type'] == 'request' && $response['accepted'] == '') {
-                                    $responded = true;
-                                    echo '<p class="text-info"><i class="icon-check-empty"> </i> ' . $user . '.
-                               <small class="muted">(Notified but no response yet.)</small></p>';
-                                } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
-                                    $responded = true;
-                                    echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . ' <small class="muted">(Accepts)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
-                                    // echo '<p><i class="icon-minus"> </i> '.$response['text'].'</p>';
-                                } elseif ($response['type'] == 'request' && $response['accepted'] == 'declined') {
-                                    $responded = true;
-                                    echo '<p class="text-error"><i class="icon-remove"> </i> ' . $user . ' <small class="muted">(Declines)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
-                                }
-                            }
-                        }
-
-                        if (!$responded) {
-                            echo '<p><i class="icon-check-empty"> </i> ' . $user . '.
-                               <small class="muted">(Not requested.)</small></p>';
-                        }
-                        $counter++;
-                        echo "</li>";
-                    }
-                    echo "</ol>";
-                    ?>
-                </div>
-            </div>
+      <div class="marketing">
+        <div class="row-fluid">
+          <div class="span12">
+            <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
+            <h3 class="text-info" style="text-decoration: underline;">Reviewer's Comments</h3>
+          </div>
         </div>
+        <hr class="soften" style="margin: 10px 0px;">
+      </div>
+      <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
+      <p><strong>2. Protocol title: </strong><?php echo $application['Application']['study_title']; ?></p>
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 class="text-success">Reviewer's Comments
+            <?php
+            echo $this->Html->link(
+              __('<i class="icon-download-alt"></i> Download Comments <small>(PDF)</small>'),
+              array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
+              array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
+            );
+            ?>
+          </h4>
+          <?php
+          $counter = 0;
+          foreach ($application['Review'] as $review) {
+            $counter++;
+            echo "<hr><span class=\"badge badge-success\">" . $counter . "</span> <small class='muted'>created on: " . date('d-m-Y H:i:s', strtotime($review['created'])) . "</small>";
+            echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['text'] . "</div>";
+            // echo "<br>";
+            echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['recommendation'] . "</div>";
+          }
+          ?>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <br>
+          <div class="amend-form">
+            <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+            <div class="row-fluid">
+              <div class="span8">
+                <?php
+                //Reviews limited to ppb_comment already
+                $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
+                $rid = null;
+                if (!empty($var)) $rid = min($var);
+                // debug($rid);
+                if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'], 'show' => false]);
+                ?>
+              </div>
+              <div class="span4 lefty">
+                <?php
+                if (!empty($rid))  echo $this->element('comments/add', [
+                  'model' => [
+                    'model_id' => $application['Application']['id'],
+                    'foreign_key' => $rid['id'],
+                    'model' => 'Review',
+                    'category' => 'external',
+                    'url' => 'add_review_response'
+                  ]
+                ])
+                ?>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
         <div class="tab-pane" id="tab3">
             <p style="text-align: center;"><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>

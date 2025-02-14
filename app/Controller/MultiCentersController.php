@@ -101,7 +101,10 @@ class MultiCentersController extends AppController
 		$newApplication['Application']['user_id'] = $center['MultiCenter']['user_id'];
 		$newApplication['Application']['is_child'] = true;
 		$newApplication['Application']['submitted'] = 0;
-		$newApplication['Application']['created'] = date("Y-m-d H:i:s");
+		$newApplication['Application']['created'] = date("Y-m-d H:i:s"); 
+		$newApplication['Application']['approved'] = 0;
+		$newApplication['Application']['approved_reason'] = null;
+		$newApplication['Application']['approval_date'] = null;
 
 		// call another function to map some extra fields
 		$newApplication = $this->mapExtraFields($newApplication, $application);

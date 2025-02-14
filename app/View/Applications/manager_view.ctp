@@ -19,6 +19,9 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
+    <?php if ($application['Application']['is_child'] == 0) { ?>
+      <li><a href="#multicenter" data-toggle="tab">Multi Centers (<?php echo count($application['MultiCenter']) ?>)</a></li>
+    <?php } ?>
     <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
     <?php
     $count_reviews = 0;
@@ -541,6 +544,14 @@ echo $this->Session->flash();
     <div class="tab-pane" id="tab5">
       <?php echo $this->element('multi/manager_approve'); ?>
     </div>
+
+    <div class="tab-pane" id="multicenter">
+            <div class="row-fluid">
+                <div class="span12">
+                    <?php echo $this->element('application/multicenter_manager'); ?>
+                </div>
+            </div>
+        </div>
 
     <div class="tab-pane" id="ecitizen_invoice">
       <?php echo $this->element('application/invoice'); ?>
