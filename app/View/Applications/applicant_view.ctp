@@ -81,10 +81,8 @@ echo $this->Session->flash();
             <div class="row-fluid">
                 <?php if ($application['Application']['submitted'] == 1) { ?>
                     <h4 class="text-success">
-                        Submitted Application : (
-                        <span class="xeditable iseditable" id="data[Application][protocol_no]" data-type="text" data-pk="<?php echo $application['Application']['id']; ?>" data-original-title="Update protocol no">
-                            <?php echo $application['Application']['protocol_no']; ?></span>
-                        ) &mdash;
+                    Submitted Application : (<?php echo $application['Application']['protocol_no']; ?>)                        
+                         &mdash;
                         <small> Created on:
                             <?php
                             echo date('d-m-Y h:i:s a', strtotime($application['Application']['created']));
