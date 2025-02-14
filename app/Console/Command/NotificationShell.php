@@ -256,6 +256,46 @@ class NotificationShell extends Shell
     }
   }
 
+
+  public function unsubmittedApplication()
+  {
+    $messages = $this->Message->find('list', array(
+      'conditions' => array('Message.name' => array(
+        'unsubmitted_application', 
+        'unsubmitted_application_subject'
+      )),
+      'fields' => array('Message.name', 'Message.content')
+    )); 
+    $variables = array(
+      'protocol_link' => Router::url(array(
+        'controller' => 'applications',
+        'action' => 'view',
+        $this->args[0]['Application']['id'],
+        'manager' => true
+      ), true),
+      'protocol_no' => $this->args[0]['Application']['protocol_no'],
+      'name' => $this->args[0]['Application']['name']
+    );
+    
+ 
+ 
+    //<!-- Send email to applicant -->
+    $message = String::insert($messages['unsubmitted_application'], $variables);
+    $email = new CakeEmail();
+    $email->config('gmail');
+    $email->template('default');
+    $email->emailFormat('html');
+    $email->to($this->args[0]['Application']['email']);
+    // $email->cc(array('pv@pharmacyboardkenya.org', 'info@pharmacyboardkenya.org'));
+    $email->bcc(array('itsjkiprotich@gmail.com'));
+    $email->subject(Sanitize::html(String::insert($messages['unsubmitted_application_subject'], $variables), array('remove' => true)));
+    $email->viewVars(array('message' => $message));
+    if (!$email->send()) {
+      $this->log($email, 'submit_email');
+    }
+  }
+
+
   public function ppbNewApplication()
   {
     $managers = $this->User->find('all', array('conditions' => array('group_id' => 2, 'is_active' => 1), 'contain' => array()));
