@@ -48,7 +48,6 @@ $this->Html->script('multicenter', array('inline' => false));
                                                     <!-- here  -->
                                                     <?php
 
-                                                    // debug($center['NewApplication']);
                                                     if (!empty($center['NewApplication']) && isset($center['NewApplication']['protocol_no'], $center['NewApplication']['id'])) {
                                                         $reference = $center['NewApplication']['protocol_no'];
                                                         $action = !empty($center['NewApplication']['submitted']) ? 'view' : 'edit';
@@ -73,7 +72,7 @@ $this->Html->script('multicenter', array('inline' => false));
                                                         if (!empty($center['NewApplication']) && isset($center['NewApplication']['protocol_no'], $center['NewApplication']['id'])) {
                                                             $reference = $center['NewApplication']['protocol_no'];
                                                             $action = !empty($center['NewApplication']['submitted']) ? 'view' : 'edit';
-    
+
                                                             echo $this->Html->link(
                                                                 __('View'),
                                                                 array('controller' => 'applications', 'action' => $action, $center['NewApplication']['id']),
@@ -81,9 +80,20 @@ $this->Html->script('multicenter', array('inline' => false));
                                                             );
                                                         }
                                                     } else { ?>
-                                                        <a href="#" class="btn btn-mini btn-info" title="Edit" data-toggle="modal" data-target="#editCenter<?php echo $center['id']; ?>"><i class="icon-edit">Edit</i></a>
-                                                        <a href="#" class="btn btn-mini btn-danger" title="Delete" data-toggle="modal" data-target="#deleteCenter<?php echo $center['id']; ?>"><i class="icon-trash">Delete</i></a>
-                                                    <?php } ?>
+                                                        <?php
+                                                        echo $this->Html->link(
+                                                            '<i class="icon-edit"></i>Edit</label>',
+                                                            array('action' => 'view', $application['Application']['id'], 'center_edit' => $center['id']),
+                                                            array('escape' => false, 'class' => 'btn btn-mini btn-success')
+                                                        );
+                                                        ?> &nbsp; <?php
+                                                                    echo $this->Form->postLink(
+                                                                        __('<i class="icon-trash"></i> Delete'),
+                                                                        array('action' => 'delete_center', $center['id'], $application['Application']['id']),
+                                                                        array('escape' => false, 'class' => 'btn btn-danger btn-mini'),
+                                                                        __('Are you sure you want to delete this multi site # %s? You will not be able to recover it later.', $center['id'])
+                                                                    );
+                                                                } ?>
                                                 </td>
                                             </tr>
 
@@ -96,7 +106,98 @@ $this->Html->script('multicenter', array('inline' => false));
 
 
                             </div>
+
+                            <!-- Start -->
+
+                            <?php
+                            if (isset($this->params['named']['center_edit']))  $cid = $this->params['named']['center_edit'];
+
+                            if (isset($this->params['named']['center_edit'])) {
+                                foreach ($application['MultiCenter'] as $akey => $aucdata) {
+                                    if ($aucdata['id'] == $cid) {  ?>
+
+                                        <div class="row-fluid">
+                                            <div class="span10">
+                                                <hr>
+                                                <h5>Modify Multi Center Request</h5>
+
+                                                <?php
+                                                echo $this->Form->create('MultiCenter', array(
+                                                    'url' => array('controller' => 'applications', 'action' => 'create_multi_center', $application['Application']['id']),
+                                                    'type' => 'file',
+                                                    'class' => 'form-vertical',
+                                                    'inputDefaults' => array(
+                                                        'div' => array('class' => 'control-group'),
+                                                        'label' => array('class' => 'control-label'),
+
+                                                        'class' => '',
+                                                        'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
+                                                        'error' => array('attributes' => array('class' => 'controls')),
+                                                    ),
+                                                )); 
+
+                                                echo $this->Form->input('id', array('type' => 'hidden', 'value' => $aucdata['id']));
+                                                echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
+                                                ?>
+                                                <?php
+
+                                                echo $this->Form->input('site_name', array(
+                                                    'label' => array('class' => 'control-label', 'text' => 'Site Name'),
+                                                    'value' => $aucdata['site_name'],
+
+                                                ));
+                                                echo $this->Form->input('name', array(
+                                                    'label' => array('class' => 'control-label', 'text' => 'Name'),
+                                                    'id' => 'name',
+                                                    'value' => $aucdata['CoPI']['name'],
+                                                ));
+                                                echo $this->Form->input('owner_id', array(
+                                                    'type' => 'hidden',
+                                                    'label' => array('class' => 'control-label', 'text' => 'User Id'),
+                                                    'value' => $this->Session->read('Auth.User.id'),
+                                                ));
+                                                echo $this->Form->input('user_id', array(
+                                                    'type' => 'hidden',
+                                                    'value' => $aucdata['CoPI']['id'],
+                                                    'label' => array('class' => 'control-label', 'text' => 'User Id'),
+                                                    'id' => 'user_id',
+                                                ));
+                                                echo $this->Form->input('email', array(
+                                                    'type' => 'email',
+                                                    'value' => $aucdata['CoPI']['email'],
+                                                    'div' => array('class' => 'control-group required'),
+                                                    'label' => array(
+                                                        'class' => 'control-label required',
+                                                        'text' => 'E-MAIL ADDRESS <span class="sterix">*</span>'
+                                                    ),
+                                                    'id' => 'email',
+                                                    'autocomplete' => 'off',
+                                                    'list' => 'email-dropdown',
+                                                    'after' => '<datalist id="email-dropdown"></datalist>'
+                                                ));
+
+                                                echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+                                                    'name' => 'submitReport',
+                                                    'formnovalidate' => 'formnovalidate',
+                                                    'onclick' => "return confirm('Are you sure you wish to edit the report?.');",
+                                                    'class' => 'btn btn-info mapop',
+                                                    'id' => 'ApplicationSubmitReport',
+                                                    'title' => 'Save and Submit Report',
+                                                    'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+                                                    'div' => false,
+                                                ));
+
+                                                echo $this->Form->end();
+                                                ?>
+                                            </div>
+                                        </div>
+                            <?php }
+                                }
+                            } ?>
+
+                            <!-- End -->
                         </div>
+
                     </div>
                     <div class="tab-pane" id="ncenter">
                         <div class="row-fluid">

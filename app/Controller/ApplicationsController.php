@@ -26,7 +26,23 @@ class ApplicationsController extends AppController
 
         $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
     }
+    public function applicant_delete_center($id, $application_id)
+    {
+        // debug($id);
+        // debug($application_id);
+        // exit;
+        $this->loadModel('MultiCenter');
+        $this->MultiCenter->id = $id;
+        if (!$this->MultiCenter->exists()) {
+            throw new NotFoundException(__('Invalid application letter'));
+        }
 
+        $this->MultiCenter->id = $id;
+$this->MultiCenter->saveField('deleted', true);
+$this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));        
+        $this->Session->setFlash(__('Application Multi Center deleted successfully'), 'alerts/flash_success');
+           $this->redirect($this->referer());
+    }
     public function applicant_download_termination($id)
     {
         $this->download_termination($id);
@@ -1387,7 +1403,7 @@ class ApplicationsController extends AppController
                     $scr_s = new DateTime($scr['start_date']);
                     $scr_e = new DateTime($scr['end_date']);
 
-                     
+
 
                     $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');
                     // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
@@ -3655,7 +3671,7 @@ class ApplicationsController extends AppController
                 unset($filedata['Checklist']);
                 // Check if previously unsubmitted
                 // if (!$response['Application']['unsubmitted']) {
-                    $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
+                $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
                 // }
                 $this->request->data['Application']['submitted'] = 1;
                 //Start application stage 
@@ -3954,10 +3970,7 @@ class ApplicationsController extends AppController
         }
     }
 
-    public function update_screening($id)
-    {
-
-    }
+    public function update_screening($id) {}
 
     public function admin_unsubmit($id = null)
     {
@@ -3983,7 +3996,7 @@ class ApplicationsController extends AppController
                 'contain' => array(),
                 'conditions' => array('ApplicationStage.application_id' => $id)
             ));
-            
+
             $this->clear_all_other_stages($id);
             if (!Hash::check($stages, '{n}.ApplicationStage[stage=Unsubmitted].id')) {
                 $this->Application->ApplicationStage->create();

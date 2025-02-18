@@ -1060,6 +1060,7 @@ class UsersController extends AppController
         $this->Acl->allow($group, 'controllers/Applications/applicant_create_multi_center');
         $this->Acl->allow($group, 'controllers/Applications/applicant_generate_safety_report');
         $this->Acl->allow($group, 'controllers/Applications/applicant_safety_delete');
+        $this->Acl->allow($group, 'controllers/Applications/applicant_delete_center');
         // $this->Acl->allow($group, 'controllers/Applications/applicant_add');  //why?
         $this->Acl->allow($group, 'controllers/Applications/applicant_view');
         $this->Acl->allow($group, 'controllers/Applications/applicant_invoice');
