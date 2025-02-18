@@ -43,6 +43,9 @@ class AmendmentsController extends AppController {
 		$application = $this->_isNewAmndt($id);
 		$this->Amendment->create();
 		$this->request->data['Amendment']['application_id'] = $id;
+
+		debug($this->request->data);
+		exit;
 		if ($this->Amendment->save($this->request->data, false)) {
 			$data = array('id' => $this->Amendment->id, 'application_id' => $application['Application']['id'],
 				'user_id' => $this->Auth->User('id'),'protocol_no' => $application['Application']['protocol_no']);

@@ -17,7 +17,7 @@ class Attachment extends AppModel {
  */
     var $name = 'Attachment';
 	var $actsAs = array('Containable', 'Media.Transfer', 'Media.Coupler', 'Media.Meta');
-
+ 
 	public $belongsTo = array(
 		'Application' => array(
 			'className' => 'Application',

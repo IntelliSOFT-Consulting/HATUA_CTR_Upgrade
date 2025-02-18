@@ -22,7 +22,7 @@ $this->Html->script('multi/afro_attachments', array('inline' => false));
 $reviewers_comments = 0;
 foreach ($application['Review'] as $review) {
     if ($review['type'] == 'ppb_comment') {
-        $reviewers_comments++; 
+        $reviewers_comments++;
     }
 }
 $this->assign('is-applicant', 'true');
@@ -81,8 +81,8 @@ echo $this->Session->flash();
             <div class="row-fluid">
                 <?php if ($application['Application']['submitted'] == 1) { ?>
                     <h4 class="text-success">
-                    Submitted Application : (<?php echo $application['Application']['protocol_no']; ?>)                        
-                         &mdash;
+                        Submitted Application : (<?php echo $application['Application']['protocol_no']; ?>)
+                        &mdash;
                         <small> Created on:
                             <?php
                             echo date('d-m-Y h:i:s a', strtotime($application['Application']['created']));
@@ -101,11 +101,10 @@ echo $this->Session->flash();
             </div>
             <?php $this->end(); ?>
 
-
             <?php $this->start('form-header'); ?>
-            <div class="span10">
+            <div class="span12">
                 <?php
-                echo $this->Form->create('Application', array(
+                echo $this->Form->create('Amend', array(
                     'type' => 'file',
                     'class' => 'form-horizontal',
                     'inputDefaults' => array(
@@ -149,6 +148,51 @@ echo $this->Session->flash();
                                 <a class="btn btn-primary" role="button" data-toggle="collapse" href="#nModal" aria-controls="nModal">New Amendment</a>
                             <?php } ?>
                             <div id="nModal" class="collapse show">
+                                <?php
+
+
+                                echo $this->Form->input('id');
+                                echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
+                                echo $this->Form->input('cover_letter', array(
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '1. Cover letter <span class="sterix">*</span>'),
+                                    'between' => '<div class="nocontrols">',
+                                    'placeholder' => '',
+                                    'class' => 'input-xxlarge',
+                                ));
+                                
+                                echo $this->Form->input('summary', array(
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '2. Summary of the proposed amendments <span class="sterix">*</span>'),
+                                    'between' => '<div class="nocontrols">',
+                                    'placeholder' => ' ',
+                                    'class' => 'input-xxlarge',
+                                ));
+                                echo $this->Form->input('reason', array(
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '3 Reason for the amendment <span class="sterix">*</span>'),
+                                    'between' => '<div class="nocontrols">',
+                                    'placeholder' => ' ',
+                                    'class' => 'input-xxlarge',
+                                ));
+                                echo $this->Form->input('objectives_impacts', array(
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '4 Impact of the amendment on the original study objectives <span class="sterix">*</span>'),
+                                    'between' => '<div class="nocontrols">',
+                                    'placeholder' => ' ',
+                                    'class' => 'input-xxlarge',
+                                ));
+                                echo $this->Form->input('endpoints_impacts', array(
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '5 Impact of the amendments on the study endpoints and data generated <span class="sterix">*</span>'),
+                                    'between' => '<div class="nocontrols">',
+                                    'placeholder' => ' ',
+                                    'class' => 'input-xxlarge',
+                                ));
+                                echo $this->Form->input('safety_impacts', array(
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '6 Impact of the proposed amendments on the safety and wellbeing of study
+participants <span class="sterix">*</span>'),
+                                    'between' => '<div class="nocontrols">',
+                                    'placeholder' => ' ',
+                                    'class' => 'input-xxlarge',
+                                ));
+                                ?>
+
                                 <div class="row-fluid">
                                     <div class="span12">
                                         <?php echo $this->element('multi/amendment_new'); ?>
@@ -156,6 +200,16 @@ echo $this->Session->flash();
                                 </div>
 
                                 <?php
+
+echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+    'name' => 'submitReport',
+    'formnovalidate' => 'formnovalidate',
+    'onclick' => "return confirm('Please ensure you\'ve submitted all the required files.');",
+    'class' => 'btn btn-info btn-block mapop',
+    'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
+    'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+    'div' => false,
+  ));
                                 echo $this->Html->link(
                                     'Submit',
                                     array('controller' => 'amendments', 'action' => 'add', $application['Application']['id']),
@@ -166,12 +220,8 @@ echo $this->Session->flash();
                                         'style' => 'margin-right: 10px;'
                                     )
                                 );
-
-
-
                                 ?>
                                 <hr>
-
 
                                 <?php
                                 echo $this->Form->end();
@@ -245,76 +295,76 @@ echo $this->Session->flash();
             <?php $this->start('endjs'); ?>
         </div> <!-- End or bootstrap tab1 -->
         <div class="tab-pane" id="tab2">
-      <div class="marketing">
-        <div class="row-fluid">
-          <div class="span12">
-            <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
-            <h3 class="text-info" style="text-decoration: underline;">Reviewer's Comments</h3>
-          </div>
-        </div>
-        <hr class="soften" style="margin: 10px 0px;">
-      </div>
-      <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
-      <p><strong>2. Protocol title: </strong><?php echo $application['Application']['study_title']; ?></p>
-      <div class="row-fluid">
-        <div class="span12">
-          <h4 class="text-success">Reviewer's Comments
-            <?php
-            echo $this->Html->link(
-              __('<i class="icon-download-alt"></i> Download Comments <small>(PDF)</small>'),
-              array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
-              array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
-            );
-            ?>
-          </h4>
-          <?php
-          $counter = 0;
-          foreach ($application['Review'] as $review) {
-            $counter++;
-            echo "<hr><span class=\"badge badge-success\">" . $counter . "</span> <small class='muted'>created on: " . date('d-m-Y H:i:s', strtotime($review['created'])) . "</small>";
-            echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['text'] . "</div>";
-            // echo "<br>";
-            echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['recommendation'] . "</div>";
-          }
-          ?>
-        </div>
-      </div>
-
-      <div class="row-fluid">
-        <div class="span12">
-          <br>
-          <div class="amend-form">
-            <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
-            <div class="row-fluid">
-              <div class="span8">
-                <?php
-                //Reviews limited to ppb_comment already
-                $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
-                $rid = null;
-                if (!empty($var)) $rid = min($var);
-                // debug($rid);
-                if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'], 'show' => false]);
-                ?>
-              </div>
-              <div class="span4 lefty">
-                <?php
-                if (!empty($rid))  echo $this->element('comments/add', [
-                  'model' => [
-                    'model_id' => $application['Application']['id'],
-                    'foreign_key' => $rid['id'],
-                    'model' => 'Review',
-                    'category' => 'external',
-                    'url' => 'add_review_response'
-                  ]
-                ])
-                ?>
-              </div>
+            <div class="marketing">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <h2 class="text-info">The Expert Committee on Clinical Trials</h2>
+                        <h3 class="text-info" style="text-decoration: underline;">Reviewer's Comments</h3>
+                    </div>
+                </div>
+                <hr class="soften" style="margin: 10px 0px;">
             </div>
-          </div>
-        </div>
-      </div>
+            <p><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
+            <p><strong>2. Protocol title: </strong><?php echo $application['Application']['study_title']; ?></p>
+            <div class="row-fluid">
+                <div class="span12">
+                    <h4 class="text-success">Reviewer's Comments
+                        <?php
+                        echo $this->Html->link(
+                            __('<i class="icon-download-alt"></i> Download Comments <small>(PDF)</small>'),
+                            array('controller' => 'applications', 'ext' => 'pdf', 'action' => 'view', $application['Application']['id']),
+                            array('escape' => false, 'class' => 'btn pull-right', 'style' => 'margin-right: 10px;')
+                        );
+                        ?>
+                    </h4>
+                    <?php
+                    $counter = 0;
+                    foreach ($application['Review'] as $review) {
+                        $counter++;
+                        echo "<hr><span class=\"badge badge-success\">" . $counter . "</span> <small class='muted'>created on: " . date('d-m-Y H:i:s', strtotime($review['created'])) . "</small>";
+                        echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['text'] . "</div>";
+                        // echo "<br>";
+                        echo "<div style='padding-left: 29px;' class='morecontent'>" . $review['recommendation'] . "</div>";
+                    }
+                    ?>
+                </div>
+            </div>
 
-    </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <br>
+                    <div class="amend-form">
+                        <h5 class="text-center text-info"><u>FEEDBACK</u></h5>
+                        <div class="row-fluid">
+                            <div class="span8">
+                                <?php
+                                //Reviews limited to ppb_comment already
+                                $var = Hash::extract($application, 'Review.{n}[type=ppb_comment]');
+                                $rid = null;
+                                if (!empty($var)) $rid = min($var);
+                                // debug($rid);
+                                if (!empty($rid)) echo $this->element('comments/list', ['comments' => $rid['ExternalComment'], 'show' => false]);
+                                ?>
+                            </div>
+                            <div class="span4 lefty">
+                                <?php
+                                if (!empty($rid))  echo $this->element('comments/add', [
+                                    'model' => [
+                                        'model_id' => $application['Application']['id'],
+                                        'foreign_key' => $rid['id'],
+                                        'model' => 'Review',
+                                        'category' => 'external',
+                                        'url' => 'add_review_response'
+                                    ]
+                                ])
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
         <div class="tab-pane" id="tab3">
             <p style="text-align: center;"><strong>1. Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
@@ -1112,6 +1162,13 @@ echo $this->Session->flash();
         $(".morecontent").expander();
         $('#ReviewText').ckeditor();
         $('#ReviewRecommendation').ckeditor();
+
+        CKEDITOR.replace('data[Amend][cover_letter]');
+        CKEDITOR.replace('data[Amend][summary]');
+        CKEDITOR.replace('data[Amend][reason]');
+        CKEDITOR.replace('data[Amend][objectives_impacts]');
+        CKEDITOR.replace('data[Amend][endpoints_impacts]');
+        CKEDITOR.replace('data[Amend][safety_impacts]');
     });
 </script>
 <?php $this->end(); ?>

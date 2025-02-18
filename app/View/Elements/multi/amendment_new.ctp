@@ -18,6 +18,10 @@ if ($redir == 'applicant') {
     $years = array_unique(Hash::extract($application['AmendmentChecklist'], '{n}.year'));
     rsort($years);
 ?>
+
+
+
+
     <h5>Checklist Form</h5>
     <ul id="amendment_tab" class="nav nav-tabs">
         <li class="active"><a href="#aaa">Checklist</a></li>

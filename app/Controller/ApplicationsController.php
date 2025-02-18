@@ -1368,7 +1368,7 @@ class ApplicationsController extends AppController
                 $stages['Submission'] = ['label' => 'Application <br>Submission', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'status' => ''];
 
                 if ($application['Application']['unsubmitted']) {
-                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                    $csd = new DateTime($application['Application']['date_submitted']);
                 } else {
                     $csd = new DateTime($application['Application']['date_submitted']);
                 }
@@ -1386,9 +1386,8 @@ class ApplicationsController extends AppController
                     $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Screening]'));
                     $scr_s = new DateTime($scr['start_date']);
                     $scr_e = new DateTime($scr['end_date']);
-                    // $stages['Submission']['end_date'] = $scr_s->format('d-M-Y');
-                    // $stages['Creation']['days'] = $scr_s->diff($csd)->format('%a');
-                    // $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
+
+                     
 
                     $stages['Screening']['start_date'] = $scr_s->format('d-M-Y');
                     // $stages['Screening']['days'] = $scr_s->diff($scr_e)->format('%a');                
@@ -1410,9 +1409,21 @@ class ApplicationsController extends AppController
                         $scr = min(Hash::extract($application['ApplicationStage'], '{n}[stage=Unsubmitted]'));
                         $scr_s = new DateTime($scr['start_date']);
                         $scr_e = new DateTime($scr['end_date']);
-                        $stages['Submission']['start_date'] = $scr_s->format('d-M-Y');
+
+                        if ($application['Application']['unsubmitted']) {
+                            $csd = new DateTime($application['Application']['date_submitted']);
+                        } else {
+                            $csd = new DateTime($application['Application']['date_submitted']);
+                        }
+
+                        $creation_end_date = $csd->format('d-M-Y');
+                        $creation_start_date = $scr_s->format('d-M-Y');
+                        $total_days = $this->diff_weekdays($creation_start_date, $creation_end_date);
+
+
+                        $stages['Submission']['start_date'] = $csd->format('d-M-Y');
                         $stages['Submission']['end_date'] = $scr_e->format('d-M-Y');
-                        $stages['Submission']['days'] = $this->diff_wdays($csd, $scr_s);
+                        $stages['Submission']['days'] = $total_days;
 
                         $stages['Unsubmitted']['start_date'] = $scr_s->format('d-M-Y');
                         $stages['Unsubmitted']['end_date'] = $scr_e->format('d-M-Y');
@@ -1687,7 +1698,7 @@ class ApplicationsController extends AppController
             if ($application['Application']['submitted']) {
 
                 if ($application['Application']['unsubmitted']) {
-                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                    $csd = new DateTime($application['Application']['date_submitted']);
                 } else {
                     $csd = new DateTime($application['Application']['date_submitted']);
                 }
@@ -1716,7 +1727,7 @@ class ApplicationsController extends AppController
 
 
                 if ($application['Application']['unsubmitted']) {
-                    $csd = new DateTime($application['Application']['initial_date_submitted']);
+                    $csd = new DateTime($application['Application']['date_submitted']);
                 } else {
                     $csd = new DateTime($application['Application']['date_submitted']);
                 }
@@ -1750,7 +1761,7 @@ class ApplicationsController extends AppController
 
 
                     if ($application['Application']['unsubmitted']) {
-                        $csd = new DateTime($application['Application']['initial_date_submitted']);
+                        $csd = new DateTime($application['Application']['date_submitted']);
                     } else {
                         $csd = new DateTime($application['Application']['date_submitted']);
                     }
@@ -3604,7 +3615,7 @@ class ApplicationsController extends AppController
         // exit;
         if ($stages) {
             foreach ($stages as $stage) {
-                if ($stage['ApplicationStage']['stage'] !== 'Unsubmitted') {
+                if ($stage['ApplicationStage']['stage'] !== 'Unsubmitted' && $stage['ApplicationStage']['stage'] !== 'Screening') {
                     $this->Application->ApplicationStage->delete($stage['ApplicationStage']['id']);
                 }
             }
@@ -3643,9 +3654,9 @@ class ApplicationsController extends AppController
                 $filedata = $this->request->data;
                 unset($filedata['Checklist']);
                 // Check if previously unsubmitted
-                if (!$response['Application']['unsubmitted']) {
+                // if (!$response['Application']['unsubmitted']) {
                     $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
-                }
+                // }
                 $this->request->data['Application']['submitted'] = 1;
                 //Start application stage 
                 if ($response['Application']['unsubmitted']) {
@@ -3943,6 +3954,11 @@ class ApplicationsController extends AppController
         }
     }
 
+    public function update_screening($id)
+    {
+
+    }
+
     public function admin_unsubmit($id = null)
     {
         $this->Application->id = $id;
@@ -3967,6 +3983,8 @@ class ApplicationsController extends AppController
                 'contain' => array(),
                 'conditions' => array('ApplicationStage.application_id' => $id)
             ));
+            
+            $this->clear_all_other_stages($id);
             if (!Hash::check($stages, '{n}.ApplicationStage[stage=Unsubmitted].id')) {
                 $this->Application->ApplicationStage->create();
                 $this->Application->ApplicationStage->save(
@@ -3993,6 +4011,8 @@ class ApplicationsController extends AppController
                     }
                 }
             }
+
+            $this->update_screening($id);
             $this->loadModel('AuditTrail');
             $audit = array(
                 'AuditTrail' => array(

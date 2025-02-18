@@ -1,4 +1,7 @@
 <?php
+
+use function GuzzleHttp\json_decode;
+
 App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
@@ -13,14 +16,149 @@ App::uses('HttpSocket', 'Network/Http');
 class AttachmentsController extends AppController
 {
 
+
     public $paginate = array();
-
-
+    public $presetVars = true;
 
     public function beforeFilter()
     {
         parent::beforeFilter();
         $this->Auth->allow('applicant_upload', 'genereateQRCode', 'approve', 'update_amendment');
+    }
+
+    public function admin_delete($id = null)
+    {
+        $this->Attachment->id = $id;
+        if (!$this->Attachment->exists()) {
+            throw new NotFoundException(__('Invalid Attachment'));
+        }
+
+        if ($this->Attachment->delete()) {
+            $this->set('message', 'Attachment deleted');
+            $this->set('_serialize', 'message');
+        } else {
+            $this->set('message', 'Attachment was not deleted');
+            $this->set('_serialize', 'message');
+        }
+
+        $this->Session->setFlash(__('The attachment has been deleted successfully'), 'alerts/flash_success');
+        $this->redirect($this->referer());
+    }
+    public function admin_declarations()
+    {
+
+        $page_options = array('5' => '5', '10' => '10');
+
+        $criteria['Attachment.model'] = 'Declaration';
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Attachment.created' => 'desc');
+
+        $this->set('page_options', $page_options);
+        $this->set('declarations', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
+    public function admin_declarations_add()
+    {
+        if ($this->request->is('post')) {
+            if ($this->RequestHandler->isAjax()) {
+                $data = $this->request->data;
+                $response = array();
+
+                foreach ($data['Attachment'] as $key => $attachment) {
+                    if (!empty($attachment['file']['name'])) {
+
+                        // Prepare data for saving
+                        $attachmentData = array(
+                            'Attachment' => array(
+                                'file' => $attachment['file'],
+                                'foreign_key' => 1,
+                                'model' => 'Declaration',
+                            )
+                        );
+                        $this->Attachment->create();
+                        if ($this->Attachment->save($attachmentData)) {
+                            $id = $this->Attachment->id;
+                            $attachment = $this->Attachment->find(
+                                'first',
+                                array(
+                                    'conditions' => array(
+                                        'Attachment.id' => $id
+                                    ),
+                                    'contain' => array()
+                                )
+                            );
+                            $response = array('message' => 'Success', 'content' => $attachment);
+                        } else {
+                            $message = $this->Attachment->validationErrors;
+                            $this->set('response', array('message' => 'Failure', 'errors' => $message));
+                        }
+                    }
+                }
+                $this->set('response', $response);
+
+                if ($this->RequestHandler->isAjax()) $this->set('_serialize', 'response');
+            } else {
+                $data = $this->request->data;
+                // debug($data);
+                // exit;
+                $attachments = $data['Attachment']; // Get the attachment data
+                $success = true;
+                // Iterate over the provided attachments to either create or update them
+                foreach ($attachments as $attachment) {
+                    // If an 'id' is provided, we will attempt to update the existing record
+                    if (!empty($attachment['id'])) {
+                        $this->Attachment->id = $attachment['id']; // Set the record ID
+                    } else {
+                        $this->Attachment->create(); // If no ID is provided, prepare for a new record
+                    }
+
+                    // Save or update the attachment
+                    if ($this->Attachment->save($attachment)) {
+                        $success = true;
+                    } else {
+                        $success = false;
+                    }
+                }
+                if ($success) {
+                    $this->Session->setFlash(__('The attachments has been saved'), 'alerts/flash_success');
+                    $this->redirect(array('action' => 'declarations'));
+                } else {
+                    $this->Session->setFlash(__('The attachment could not be saved. Please, try again.'), 'alerts/flash_error');
+                }
+            }
+        }
+
+
+
+
+        //     $audit = array(
+        //         'Attachment' => array(
+        //             'file' => $data['Attachment']['file']
+        //         )
+        //     );
+        //     $this->loadModel('Attachment');
+        //     if ($this->Attachment->save($audit)) {
+        //         $this->set('response', array(
+        //             'message' => 'Success',
+        //             'content' => array(
+        //                 'message' => 'File upload successfull',
+        //                 'payload' => $data
+        //             )
+        //         ));
+        //         $this->set('_serialize', 'response');
+        //     } else {
+        //         $errors= $this->Attachment->validationErrors;
+
+        //         $this->set('response', array(
+        //             'message' => 'Error',
+        //             'content' => array(
+        //                 'message' => 'Error uploading File',
+        //                 'payload' => $data,
+        //                 'errors' => json_encode($errors)
+        //             )
+        //         ));
+        //         $this->set('_serialize', 'response');
+        //     }
+        // }
     }
     public function applicant_delete($id = null)
     {
@@ -252,6 +390,8 @@ class AttachmentsController extends AppController
     }
     public function applicant_upload()
     {
+
+
         if ($this->request->is('post')) {
 
 
@@ -324,6 +464,27 @@ class AttachmentsController extends AppController
             );
             $this->set($params);
         } else if ($this->Session->read('Auth.User.group_id') == 1 || $this->Session->read('Auth.User.group_id') == 2 || $this->Session->read('Auth.User.group_id') == 3) {
+            $attachment = $this->Attachment->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Attachment']['basename'],
+                'download'  => true,
+                'path'      => 'media' . DS . 'transfer' . DS . $attachment['Attachment']['dirname'] . DS
+            );
+            $this->set($params);
+        }
+    }
+    public function applicant_checklist_download($id = null)
+    {
+        $this->viewClass = 'Media';
+        $this->Attachment->id = $id;
+        if (!$this->Attachment->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else if (!$this->Attachment->isOwnedBy($id, $this->Auth->user('id'))) {
+            $this->Session->setFlash(__('You do not have permission to access this resource
+                                            id = ' . $id . ' and user = ' . $this->Auth->user('id')), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else {
             $attachment = $this->Attachment->read(null, $id);
             $params = array(
                 'id'        => $attachment['Attachment']['basename'],

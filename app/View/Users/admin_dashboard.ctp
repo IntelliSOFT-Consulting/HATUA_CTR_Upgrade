@@ -308,6 +308,13 @@ $this->assign('Dashboard', 'active');
         );
         ?>
       </li>
+      <li><?php
+          echo $this->Html->link(
+            '<i class="icon-file"></i> Declarations <small class="muted"></small>',
+            array('controller' => 'attachments', 'action' => 'declarations', 'admin' => true),
+            array('escape' => false)
+          ); ?>
+      </li>
     </ul>
 
     <h5>Checklist items <small class="muted">(For protocol and annual approval)</small> </h5>
