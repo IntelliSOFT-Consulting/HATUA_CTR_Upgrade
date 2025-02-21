@@ -4201,15 +4201,16 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
         }
 
         $trial_statuses = "";
-        $stopped = false;
+        $stopped = 0;
         if ($data['Application']['status'] == 3) {
             $trial_statuses = "Suspended";
-            $stopped = true;
+            $stopped = 1;
         } else  if ($data['Application']['status'] == 4) {
             $trial_statuses =  "Stopped";
-            $stopped = true;
+            $stopped = 1;
         } else {
             $trial_statuses =  $data['Application']['status'];
+            $stopped = 0;
         }
         $app = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
@@ -4233,7 +4234,7 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
                 $this->log('Error creating an audit trail', 'audit_error');
                 $this->log($app['Application']['protocol_no'], 'audit_error');
             }
-            $this->Session->setFlash(__('The application has been successfully ' . $trial_statuses), 'alerts/flash_success');
+            $this->Session->setFlash(__('The application has been successfully updated'), 'alerts/flash_success');
             $this->redirect($this->referer());
         } else {
             // debug($this->Application->validationErrors);

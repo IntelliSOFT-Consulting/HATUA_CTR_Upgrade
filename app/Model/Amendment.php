@@ -6,13 +6,14 @@ App::uses('AppModel', 'Model');
  * @property Application $Application
  * @property TrialStatus $TrialStatus
  */
-class Amendment extends AppModel {
+class Amendment extends AppModel
+{
 	public $actsAs = array('Containable');
-/**
- * Validation rules
- *
- * @var array
- */
+	/**
+	 * Validation rules
+	 *
+	 * @var array
+	 */
 	public $validate = array(
 		'submitted' => array(
 			'boolean' => array(
@@ -28,11 +29,11 @@ class Amendment extends AppModel {
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
-/**
- * belongsTo associations
- *
- * @var array
- */
+	/**
+	 * belongsTo associations
+	 *
+	 * @var array
+	 */
 	public $belongsTo = array(
 		'Application' => array(
 			'className' => 'Application',
@@ -51,21 +52,27 @@ class Amendment extends AppModel {
 	);
 
 	public $hasMany = array(
-             'Attachment' => array(
-                        'className' => 'Attachment',
-                        'foreignKey' => 'foreign_key',
-                        'dependent' => true,
-                        'conditions' => array('Attachment.model' => 'Amendment', 'Attachment.group' => 'attachment'),
-             ),
+		'Attachment' => array(
+			'className' => 'Attachment',
+			'foreignKey' => 'foreign_key',
+			'dependent' => true,
+			'conditions' => array('Attachment.model' => 'Amendment', 'Attachment.group' => 'attachment'),
+		),
+		'Amend' => array(
+			'className' => 'Amend',
+			'foreignKey' => 'amendment_id',
+			'dependent' => true, // if an amendment is deleted, all its amendments are deleted
+		),
 		'CoverLetter' => array(
 			'className' => 'Attachment',
 			'foreignKey' => 'foreign_key',
 			'dependent' => true,
 			'conditions' => array('CoverLetter.model' => 'Amendment', 'CoverLetter.group' => 'cover_letter'),
 		),
-       );
+	);
 
-	public function beforeSave() {
+	public function beforeSave()
+	{
 		if (!empty($this->data['Amendment']['date_of_protocol'])) {
 			$this->data['Amendment']['date_of_protocol'] = $this->dateFormatBeforeSave($this->data['Amendment']['date_of_protocol']);
 		}
@@ -79,14 +86,15 @@ class Amendment extends AppModel {
 			$this->data['Amendment']['declaration_date2'] = $this->dateFormatBeforeSave($this->data['Amendment']['declaration_date2']);
 		}
 
-		if(empty($this->data['Amendment']['ecct_ref_number'])){
+		if (empty($this->data['Amendment']['ecct_ref_number'])) {
 			$this->data['Amendment']['ecct_ref_number'] = '';
 		}
 		return true;
 	}
 
 
-	function afterFind($results) {
+	function afterFind($results)
+	{
 		foreach ($results as $key => $val) {
 			if (isset($val['Amendment']['date_of_protocol'])) {
 				$results[$key]['Amendment']['date_of_protocol'] = $this->dateFormatAfterFind($val['Amendment']['date_of_protocol']);

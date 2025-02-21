@@ -3,28 +3,96 @@ App::uses('AppController', 'Controller');
 /**
  * Amendments Controller
  *
- * @property Amendment $Amendment
+ * @property Amendment $Amendment 
  */
-class AmendmentsController extends AppController {
+class AmendmentsController extends AppController
+{
 
-/**
- * index method
- *
- * @return void
- */
-	public function applicant_index() {
+	/**
+	 * index method
+	 *
+	 * @return void
+	 */
+	public function applicant_index()
+	{
 		$this->Amendment->recursive = 0;
 		$this->set('amendments', $this->paginate());
 	}
+	public function  applicant_edit_amd($id = null)
+	{
+		$this->loadModel('Amend');
+		$this->Amend->id = $id;
+		if (!$this->Amend->exists()) {
+			$this->Session->setFlash(__('Invalid Amendment.'), 'alerts/flash_error');
+			$this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
+		}
+		$amndt = $this->Amend->find('first', array('conditions' => array('Amend.id' => $id), 'contain' => array('Amendment')));
 
-/**
- * view method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-	public function view($id = null) {
+		if ($this->request->is('post') || $this->request->is('put')) {
+
+			// debug($this->request->data);
+			// exit;
+			// 
+
+
+
+			$validate = false;
+			if (isset($this->request->data['submitReport'])) {
+				$validate = 'first';
+				$this->request->data['Amend']['submitted'] = 1;
+				$this->request->data['Amend']['date_submitted'] = date('Y-m-d H:i:s');
+			}
+
+			if ($this->Amend->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
+				if ($validate) {
+					$this->Session->setFlash(__('You have successfully submitted the amendment to PPB. PPB will review
+						this amendment and notify you on the progress. You can view the progress of the application by clicking on
+						&#39;my applications&#39; on the dashboard menu. Thank you.'), 'alerts/flash_success');
+					$this->redirect(array('action' => 'edit', $amndt['Amend']['amendment_id']));
+				} else {
+					$this->Session->setFlash(__('The amendment justification has been saved'), 'alerts/flash_success');
+					$this->redirect(array('action' => 'edit_amd', $this->Amend->id));
+				}
+			} else {
+				$this->Session->setFlash(__('The amendment could not be saved. Please, try again.'), 'alerts/flash_error');
+			}
+		} else {
+			$this->request->data = $amndt;
+		}
+		$contains = $this->a_contain;
+		$contains['Amendment'] =  array('Attachment', 'CoverLetter', 'Amend');
+
+		$contains['Review'] = array('conditions' => array('Review.type' => 'ppb_comment'));
+		$application = $this->Amendment->Application->find('first', array(
+			'conditions' => array('Application.id' => $amndt['Amend']['application_id']),
+			'contain' => $contains
+		));
+		$this->set('application', $application);
+	}
+
+
+	public function applicant_basic_add($amd, $apl)
+	{
+		$this->loadModel('Amend');
+		$this->Amend->create();
+		if ($this->Amend->save($this->request->data, false)) {
+
+			$this->Session->setFlash(__('Amendment Justification has been saved, please proceed'), 'alerts/flash_success');
+			$this->redirect(array('action' => 'edit_amd', $this->Amend->id));
+		} else {
+			$this->Session->setFlash(__('The amendment could not be saved. Please, try again.'));
+		}
+	}
+
+	/**
+	 * view method
+	 *
+	 * @throws NotFoundException
+	 * @param string $id
+	 * @return void
+	 */
+	public function view($id = null)
+	{
 		$this->Amendment->id = $id;
 		if (!$this->Amendment->exists()) {
 			throw new NotFoundException(__('Invalid amendment'));
@@ -32,60 +100,90 @@ class AmendmentsController extends AppController {
 		$this->set('amendment', $this->Amendment->read(null, $id));
 	}
 
-/**
- * add method
- *
- * @return void
- */
-	public function applicant_add($id = null) {
+	/**
+	 * add method
+	 *
+	 * @return void
+	 */
+	public function applicant_add($id = null)
+	{
 		$this->Amendment->Application->id = $id;
 
 		$application = $this->_isNewAmndt($id);
 		$this->Amendment->create();
 		$this->request->data['Amendment']['application_id'] = $id;
 
-		debug($this->request->data);
-		exit;
+		// debug($this->request->data);
+		// exit;
 		if ($this->Amendment->save($this->request->data, false)) {
-			$data = array('id' => $this->Amendment->id, 'application_id' => $application['Application']['id'],
-				'user_id' => $this->Auth->User('id'),'protocol_no' => $application['Application']['protocol_no']);
+			$amd = $this->Amendment->id;
+			// Create a new Amend as well
+			$this->loadModel('Amend');
+			$this->Amend->create();
+			$this->request->data['Amend']['amendment_id'] = $amd;
+			$this->request->data['Amend']['application_id'] = $id;
+
+			// now save this data
+			$this->Amend->save($this->request->data, false);
+
+			$data = array(
+				'id' => $this->Amendment->id,
+				'application_id' => $application['Application']['id'],
+				'user_id' => $this->Auth->User('id'),
+				'protocol_no' => $application['Application']['protocol_no']
+			);
 			CakeResque::enqueue('default', 'NotificationShell', array('newAmndtNotifyApplicant', $data));
 			$this->Session->setFlash(__('New amendment'), 'alerts/flash_success');
-			$this->redirect(array('action' => 'edit',$this->Amendment->id));
+			$this->redirect(array('action' => 'edit_amd', $this->Amend->id));
 		} else {
 			$this->Session->setFlash(__('The amendment could not be saved. Please, try again.'));
 		}
 	}
 
-/**
- * edit method
- *
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-	public function applicant_edit($id = null) {
+	/**
+	 * edit method
+	 *
+	 * @throws NotFoundException
+	 * @param string $id
+	 * @return void
+	 */
+	public function applicant_edit($id = null)
+	{
 		$this->Amendment->id = $id;
 		if (!$this->Amendment->exists()) {
 			$this->Session->setFlash(__('Invalid Amendment.'), 'alerts/flash_error');
 			$this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
 		}
-		$amndt = $this->Amendment->find('first', array('conditions' => array('Amendment.id' => $id), 'contain' => array()));
-		/*$application = $this->Amendment->Application->find('first', array(
-		  'conditions' => array('Application.id' => $amndt['Amendment']['application_id']),
-		  'contain' => array(
-		  	'Amendment' => array('Attachment', 'CoverLetter'),
-		  	'InvestigatorContact', 'Sponsor', 'SiteDetail', 'Organization', 'Placebo', 'Attachment', 'AnnualApproval',
-		  	'Review' => array('conditions' => array('Review.type' => 'ppb_comment')))
-		));*/
+		$amndt = $this->Amendment->find('first', array('conditions' => array('Amendment.id' => $id), 'contain' => array('Amend')));
+		if (!empty($amndt['Amend'])) {
+			$notSubmitted = array_filter($amndt['Amend'], function ($amend) {
+				return isset($amend['submitted']) && $amend['submitted'] === '0';
+			});
+
+			if (!empty($notSubmitted)) {
+				usort($notSubmitted, function ($a, $b) {
+					return strtotime($b['created']) - strtotime($a['created']);
+				});
+
+				// Pick the latest unsubmitted amendment
+				$latestUnsubmitted = reset($notSubmitted);
+				// debug($latestUnsubmitted['id']);
+				return $this->redirect(array('action' => 'edit_amd', $latestUnsubmitted['id']));
+			}
+		}
+
+		// debug($amndt);
+		// exit;
+
 		$contains = $this->a_contain;
-		$contains['Amendment'] =  array('Attachment', 'CoverLetter');
+		$contains['Amendment'] =  array('Attachment', 'CoverLetter', 'Amend');
+
 		$contains['Review'] = array('conditions' => array('Review.type' => 'ppb_comment'));
 		$application = $this->Amendment->Application->find('first', array(
-		  'conditions' => array('Application.id' => $amndt['Amendment']['application_id']),
-		  'contain' => $contains
+			'conditions' => array('Application.id' => $amndt['Amendment']['application_id']),
+			'contain' => $contains
 		));
-		
+
 		$this->_isEditAmndt($application['Application']['user_id'], $application['Application']['id'], $amndt['Amendment']['submitted']);
 
 		if ($this->request->is('post') || $this->request->is('put')) {
@@ -102,22 +200,21 @@ class AmendmentsController extends AppController {
 
 			$filedata = $this->request->data;
 			unset($filedata['Amendment']);
-			if(empty($this->request->data)) {
+			if (empty($this->request->data)) {
 				$this->Session->setFlash(__('The file(s) you provided could not be saved. Kindly ensure that the file(s) are less than
 					18 MB in size. <small>If they are larger, compress (zip,tar...) them to the required size first</small>'), 'alerts/flash_error');
 				$this->redirect(array('action' => 'edit', $id));
-			}
-			elseif (!$this->Amendment->saveAll($filedata, array(
+			} elseif (!$this->Amendment->saveAll($filedata, array(
 				'validate' => 'only',
 				'fieldList' => array(
-			       	'Attachment' => 'file'
-			    	)))) {
+					'Attachment' => 'file'
+				)
+			))) {
 				$this->Session->setFlash(__('The file(s) is not valid. If the file(s) are more than
 					18 MB in size please compress them to below 18 MB first.'), 'alerts/flash_error');
-			}
-			else {
+			} else {
 				if ($this->Amendment->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
-					if($validate) {
+					if ($validate) {
 						$this->Session->setFlash(__('You have successfully submitted the amendment to PPB. PPB will review
 							this amendment and notify you on the progress. You can view the progress of the application by clicking on
 							&#39;my applications&#39; on the dashboard menu. Thank you.'), 'alerts/flash_success');
@@ -135,18 +232,20 @@ class AmendmentsController extends AppController {
 		} else {
 			$this->request->data = $amndt;
 		}
+		$this->set('current', $id);
 		$this->set('application', $application);
 	}
 
-/**
- * delete method
- *
- * @throws MethodNotAllowedException
- * @throws NotFoundException
- * @param string $id
- * @return void
- */
-	public function applicant_delete($id = null) {
+	/**
+	 * delete method
+	 *
+	 * @throws MethodNotAllowedException
+	 * @throws NotFoundException
+	 * @param string $id
+	 * @return void
+	 */
+	public function applicant_delete($id = null)
+	{
 		// if (!$this->request->is('post')) {
 		// 	throw new MethodNotAllowedException();
 		// }
@@ -162,10 +261,11 @@ class AmendmentsController extends AppController {
 		$this->redirect(array('action' => 'index'));
 	}
 
-/**
-* Utility Methods
-*/
-	protected function _isNewAmndt($id) {
+	/**
+	 * Utility Methods
+	 */
+	protected function _isNewAmndt($id)
+	{
 		$application = $this->Amendment->Application->find('first', array(
 			'conditions' => array('Application.id' => $id),
 			'fields' => array('Application.id', 'Application.submitted', 'Application.user_id', 'Application.protocol_no'),
@@ -183,15 +283,18 @@ class AmendmentsController extends AppController {
 				before you create a new one.'), 'alerts/flash_error');
 			$this->redirect(array('controller' => 'amendments', 'action' => 'edit', $application['Amendment'][0]['id']));
 		} elseif ($application['Application']['submitted'] != 1) {
-			$this->Session->setFlash(__('You cannot amend this application because it has not been submitted to PPB.'),
-				'alerts/flash_error');
+			$this->Session->setFlash(
+				__('You cannot amend this application because it has not been submitted to PPB.'),
+				'alerts/flash_error'
+			);
 			$this->redirect(array('controller' => 'applications', 'action' => 'edit', $id));
 		}
 		return $application;
 	}
 
-	protected function _isEditAmndt($user_id, $application_id, $amndt_submitted) {
-		if($user_id != $this->Auth->User('id')) {
+	protected function _isEditAmndt($user_id, $application_id, $amndt_submitted)
+	{
+		if ($user_id != $this->Auth->User('id')) {
 			$this->Session->setFlash(__('You do not have permission to access this amendment'), 'alerts/flash_error');
 			$this->redirect(array('controller' => 'applications', 'action' => 'index'));
 		} elseif ($amndt_submitted) {
