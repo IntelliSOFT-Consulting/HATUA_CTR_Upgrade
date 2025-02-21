@@ -3,12 +3,13 @@
 
 $this->Html->script('ckeditor/ckeditor', array('inline' => false));
 $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
-$this->Html->script('multi/amendment_attachment', array('inline' => false));
+// $this->Html->script('multi/amendment_attachment', array('inline' => false));
 $this->Html->script('summary/sum', array('inline' => false));
 if ($redir === 'applicant') {
-    $this->Html->script('multi/extrask', array('inline' => false));
+    // $this->Html->script('multi/amends', array('inline' => false));
+    // $this->Html->script('multi/amendment_new', array('inline' => false));
 }
-?>
+?> 
 
 <?php
 
@@ -22,25 +23,24 @@ if ($redir == 'applicant') {
 
 
 
-    <h5>Checklist Form</h5>
+    <h5>Checklist Form  </h5>
     <ul id="amendment_tab" class="nav nav-tabs">
-        <li class="active"><a href="#aaa">Checklist</a></li>
-        <li><a href="#bbb">Additional Files</a></li>
+        <li class="active"><a href="#checkdata">Checklist</a></li>
+        <li><a href="#checkfiles">Additional Files</a></li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active" id="aaa">
+        <div class="tab-pane active" id="checkdata">
             <div class="well">
                 <table id="pastyears" class="table table-bordered  table-condensed table-striped">
                     <thead>
-                        <tr id="approvalsTableHeader">
+                        <tr id="amendsTableHeader">
                             <th>#</th>
                             <th style="width: 10%;">
-                                <small class="muted">Select year</small>
+                                <small class="muted">Amnd No.</small>
                                 <?php
-                                $options = array();
-                                for ($i = 1; $i <= 10; $i++) {
-                                    $options['amd-' . $i] = $i;
-                                }
+                                $options = array(); 
+                                    $options['amd-' . $count] = $count;
+                                
                                 echo $this->Form->input('Fake.year', array(
                                     'type' => 'select', // Change the input type to select
                                     'label' => false,
@@ -50,14 +50,12 @@ if ($redir == 'applicant') {
                                     'options' => $options, // Use the manually created options array
                                     'default' => date('Y'), // Set default value to current year
                                     'data-original-title' => "Click here to change years",
-                                    'class' => 'span12 amendmentyear tiptip'
+                                    'class' => 'span12 amendmentdatasampleyear tiptip'
                                 ));
                                 ?>
                             </th>
-                            <th style="width: 40%;">Description</th>
+                            <th style="width: 40%;">Description</th> 
                             <th>File <span class="sterix">*</span></th>
-                            <th style="width: 7%">Version No.</th>
-                            <th style="width: 12%">Date <small class="muted">(dd-mm-yyyy)</small></th>
                             <th style="width: 7%">Submit</th>
                         </tr>
                     </thead>
@@ -109,34 +107,8 @@ if ($redir == 'applicant') {
                                                         'type' => 'file',
                                                     ));
                                                     ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AmendmentChecklist.' . $key . '.version_no', array(
-                                        'label' => false,
-                                        'between' => false,
-                                        'after' => false,
-                                        'div' => false,
-                                        'placeholder' => 'Version',
-                                        'class' => 'span12 input-file',
-                                        'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
-                                    ));
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if ($this->fetch('is-applicant') == 'true')  echo $this->Form->input('AmendmentChecklist.' . $key . '.file_date', array(
-                                        'type' => 'text',
-                                        'label' => false,
-                                        'between' => false,
-                                        'after' => false,
-                                        'div' => false,
-                                        'placeholder' => 'dd-mm-yyyy',
-                                        'class' => 'span12 input-file pickadate',
-                                        'error' => array('escape' => false, 'attributes' => array('class' => 'help-block')),
-                                    ));
-                                    ?>
-                                </td>
+                                </td> 
+                            
                                 <td>
                                     <?php
                                     echo $this->Form->button('<i class="icon-save"></i> ', array(
@@ -156,7 +128,7 @@ if ($redir == 'applicant') {
                 </table>
             </div>
         </div>
-        <div class="tab-pane" id="bbb">
+        <div class="tab-pane" id="checkfiles">
             <div class="span12">
 
                 <p class="selected-year-name"></p>

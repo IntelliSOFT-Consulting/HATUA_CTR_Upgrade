@@ -3,7 +3,7 @@ $(function () {
     $(document).on('click', '.update-row-amendment', update_description);
 
     yeardataset();
-    $('.amendmentyear').change(function () {
+    $('.amendmentdatasampleyear').change(function () {
       // Get the selected value
       var selectedYear = $(this).val(); 
       console.log("Selected year " +selectedYear); 
@@ -12,10 +12,10 @@ $(function () {
     });
   
     function yeardataset() {
-      $('.selected-year-name').text($('.amendmentyear').val().trim());
-      if ($('.checklistyearyear').val() != $('.amendmentyear').val()) {
-        $('.amendmentyear').closest('table').find('input[name*="year"]').each(function () {
-          $(this).val($('.amendmentyear').val().trim());
+      $('.selected-year-name').text($('.amendmentdatasampleyear').val().trim());
+      if ($('.checklistyearyear').val() != $('.amendmentdatasampleyear').val()) {
+        $('.amendmentdatasampleyear').closest('table').find('input[name*="year"]').each(function () {
+          $(this).val($('.amendmentdatasampleyear').val().trim());
           
         });
       }
@@ -48,11 +48,11 @@ $(function () {
             });
             data.formData = fieldData;
             //Don't allow saving records without application id. will result in rogue applications created
-            if (!$('#ApplicationId').val()) {
-              $(this).focus();
-              alert('we have an unexpected problem. please logout and login again.');
-              return false;
-            }
+            // if (!$('#ApplicationId').val()) {
+            //   $(this).focus();
+            //   alert('we have an unexpected problem. please logout and login again.');
+             //   return false;
+            // }
           },
           progress: function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);

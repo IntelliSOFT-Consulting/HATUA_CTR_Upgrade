@@ -2171,6 +2171,12 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
             }
         }
 
+    //    if expired is passed
+        if (!empty($this->passedArgs['expired'])) {
+            // here I wannt t0 add a contition where annual letter is expired and the application does not have annual checklist
+            $this->passedArgs['expired'] = true;
+
+        }
 
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -3350,7 +3356,7 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
                         //******************       Send Email and Notifications Managers    *****************************
                         $this->loadModel('Message');
                         $html = new HtmlHelper(new ThemeView());
-                        $message = $this->Message->find('first', array('conditions' => array('name' => 'manager_approve_letter')));
+                        $message = $this->Message->find('first', array('conditions' => array('name' => 'initial_approval_letter')));
 
                         $users = $this->Application->User->find('all', array(
                             'contain' => array('Group'),
@@ -3375,7 +3381,7 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
                                 'email' => $user['User']['email'],
                                 'id' => $id,
                                 'user_id' => $user['User']['id'],
-                                'type' => 'manager_approve_letter',
+                                'type' => 'initial_approval_letter',
                                 'model' => 'AnnaulLetter',
                                 'subject' => String::insert($message['Message']['subject'], $variables),
                                 'message' => String::insert($message['Message']['content'], $variables)

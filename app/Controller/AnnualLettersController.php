@@ -679,6 +679,7 @@ class AnnualLettersController extends AppController
                 'approval_date' => date('d-m-Y'),
                 'expiry_date' => date('d-m-Y', strtotime('+1 year')),
                 'status' => 'submitted',
+                'type' => '1',
                 'content' => String::insert($approval_letter['Pocket']['content'], $variables)
             ),
         );
@@ -1307,12 +1308,22 @@ class AnnualLettersController extends AppController
 
             if ($this->AnnualLetter->save($this->request->data)) {
 
+                $this->AnnualLetter->id = $id;
+
+                // debug($this->AnnualLetter->field('type'));
+                // exit;
 
                 if (isset($this->request->data['submitReport'])) {
                     //******************       Send Email and Notifications to Applicant and Managers    *****************************
                     $this->loadModel('Message');
                     $html = new HtmlHelper(new ThemeView());
-                    $message = $this->Message->find('first', array('conditions' => array('name' => 'annual_approval_letter')));
+                    if ($this->AnnualLetter->field('type') == "0") {
+                        $type = "initial_approval_letter";
+                    } else {
+                        $type = "annual_approval_letter";
+                    }
+
+                    $message = $this->Message->find('first', array('conditions' => array('name' => $type)));
                     $anl = $this->AnnualLetter->find('first', array('contain' => array('Application'), 'conditions' => array('AnnualLetter.id' => $this->AnnualLetter->id)));
 
                     $users = $this->AnnualLetter->Application->User->find('all', array(

@@ -23,6 +23,7 @@ class Application extends AppModel
         'filter' => array('type' => 'query', 'method' => 'orConditions', 'encode' => true),
         'start_date' => array('type' => 'query', 'method' => 'dummy'),
         'end_date' => array('type' => 'query', 'method' => 'dummy'),
+        'expired'=> array('type' => 'query', 'method' => 'dummy'),
         'submitted' => array('type' => 'value'),
         'approved' => array('type' => 'value'),
         'deactivated' => array('type' => 'value'),

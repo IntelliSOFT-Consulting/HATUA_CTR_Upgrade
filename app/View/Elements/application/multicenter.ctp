@@ -71,7 +71,11 @@ $this->Html->script('multicenter', array('inline' => false));
 
                                                         if (!empty($center['NewApplication']) && isset($center['NewApplication']['protocol_no'], $center['NewApplication']['id'])) {
                                                             $reference = $center['NewApplication']['protocol_no'];
-                                                            $action = !empty($center['NewApplication']['submitted']) ? 'view' : 'edit';
+                                                            if ($this->fetch('is-applicant') == 'true') {
+                                                                $action = !empty($center['NewApplication']['submitted']) ? 'view' : 'edit';
+                                                            } else {
+                                                                $action = 'view';
+                                                            }
 
                                                             echo $this->Html->link(
                                                                 __('View'),
@@ -134,7 +138,7 @@ $this->Html->script('multicenter', array('inline' => false));
                                                         'format' => array('before', 'label', 'between', 'input', 'after', 'error'),
                                                         'error' => array('attributes' => array('class' => 'controls')),
                                                     ),
-                                                )); 
+                                                ));
 
                                                 echo $this->Form->input('id', array('type' => 'hidden', 'value' => $aucdata['id']));
                                                 echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));

@@ -301,7 +301,13 @@
                       echo $this->Form->input('product_type_proteins', array('label' => 'Proteins', 'hiddenField' => false));
                       echo $this->Form->input('product_type_immunologicals', array('label' => 'Immunologicals', 'hiddenField' => false));
                     }
+
+
                     ?>
+                    <h6> Expired Letters</h6>
+                    <?php echo $this->Form->input('expired', array(
+                      'type'=>'checkbox',
+                      'label' => 'Show', 'hiddenField' => false)); ?>
                   </td>
                   <td>
                     <?php
@@ -400,13 +406,14 @@
                 ?>
                   <tr class="<?php
 
-                  $targets = ["3", "4"];
-                  echo isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], $targets) ? 'error' : ''; 
-                  // if ($this->fetch('color-codes') == 'true') {
-                  //   if ($application['Application']['deactivated']) echo 'text-warning';
-                  //   if ($application['Application']['approved'] == 1) echo 'text-error';
-                  //   if ($application['Application']['approved'] == 2) echo 'text-success';
-                  // } ?>">
+                              $targets = ["3", "4"];
+                              echo isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], $targets) ? 'error' : '';
+                              // if ($this->fetch('color-codes') == 'true') {
+                              //   if ($application['Application']['deactivated']) echo 'text-warning';
+                              //   if ($application['Application']['approved'] == 1) echo 'text-error';
+                              //   if ($application['Application']['approved'] == 2) echo 'text-success';
+                              // } 
+                              ?>">
                     <td rowspan="2">
                       <p class="tablenums"><?php $counder++;
                                             echo $counder; ?>.</p>

@@ -12,13 +12,119 @@ $this->Html->css('amendment', null, array('inline' => false));
 ?>
 <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab1" data-toggle="tab">Amendment No. <?php echo count($application['Amendment']); ?></a></li>
+    <li class="active"><a href="#basic" data-toggle="tab">Justification</a></li>
+    <li><a href="#tab1" data-toggle="tab">Amendment No. <?php echo count($application['Amendment']); ?></a></li>
     <li><a href="#tab2" data-toggle="tab">Reviewer's Comments</a></li>
   </ul>
   <div class="tab-content my-tab-content">
-    <div class="tab-pane active" id="tab1">
-      <!-- content for tab1 comes here -->
+    <div class="tab-pane active" id="basic">
+      <?php
 
+      $amdData = null;
+      foreach ($application['Amendment'] as $akey => $amd) {
+        if ($amd['id'] == $current) {
+          $amdData = $amd;
+          break;
+        }
+      }
+      //check if amdData is null
+      if ($amdData != null) { 
+       
+        $latestUnsubmitted = reset($amdData['Amend']); 
+        ?>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>1. Cover letter: <span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $latestUnsubmitted['cover_letter'] ?></td>
+            </tr>
+          </tbody>
+        </table>
+ 
+        </table> <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>2. Summary of the proposed amendments: <span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $latestUnsubmitted['summary'] ?></td>
+            </tr>
+          </tbody>
+
+        </table> 
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>3. Reason for the amendment: <span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $latestUnsubmitted['reason'] ?></td>
+            </tr>
+          </tbody>
+        </table> 
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>4. Impact of the amendment on the original study objectives: <span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $latestUnsubmitted['objectives_impacts'] ?></td>
+            </tr>
+          </tbody>
+        </table>
+         <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>5. Impact of the amendments on the study endpoints and data generated: <span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $latestUnsubmitted['endpoints_impacts'] ?></td>
+            </tr>
+          </tbody>
+        </table> 
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>6. Impact of the proposed amendments on the safety and wellbeing of study participants: <span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $latestUnsubmitted['safety_impacts'] ?></td>
+            </tr>
+          </tbody>
+        </table>
+
+      <?php }
+      ?>
+
+    </div>
+    <!-- content for tab1 comes here -->
+    <div class="tab-pane" id="tab1">
       <div class="row-fluid">
         <h4 class="text-success">
           Submitted Application : (<?php echo $application['Application']['protocol_no']; ?>) &mdash; <span class="muted">Amendment No.

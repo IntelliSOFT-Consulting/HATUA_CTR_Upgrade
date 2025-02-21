@@ -14,7 +14,7 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
 $this->Html->script('bootstrap-editable', array('inline' => false));
 $this->Html->css('bootstrap-editable', null, array('inline' => false));
 //Only meant for applicant
-$this->Html->script('multi/amendmentchecklist', array('inline' => false));
+// $this->Html->script('multi/amendmentchecklist', array('inline' => false));
 $this->Html->script('multi/approval_year', array('inline' => false));
 $this->Html->script('multi/documents', array('inline' => false));
 $this->Html->script('multi/afro_attachments', array('inline' => false));
@@ -143,10 +143,17 @@ echo $this->Session->flash();
                             );
                         } else {
 
+                            echo $this->Html->link(
+                                'New Amendment',
+                                array('controller' => 'amendments', 'action' => 'add', $application['Application']['id']),
+                                array('escape' => false, 'class' => 'btn btn-primary', 'style' => 'margin-right: 10px;')
+                            );
+                        }
+
                         ?>
-                            <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
-                                <a class="btn btn-primary" role="button" data-toggle="collapse" href="#nModal" aria-controls="nModal">New Amendment</a>
-                            <?php } ?>
+                        <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
+                            <!-- <a class="btn btn-primary" role="button" data-toggle="collapse" href="#nModal" aria-controls="nModal">New Amendment</a> -->
+                            <?php ?>
                             <div id="nModal" class="collapse show">
                                 <?php
 
@@ -159,7 +166,7 @@ echo $this->Session->flash();
                                     'placeholder' => '',
                                     'class' => 'input-xxlarge',
                                 ));
-                                
+
                                 echo $this->Form->input('summary', array(
                                     'label' => array('class' => 'control-nolabel required', 'text' => '2. Summary of the proposed amendments <span class="sterix">*</span>'),
                                     'between' => '<div class="nocontrols">',
@@ -185,8 +192,7 @@ echo $this->Session->flash();
                                     'class' => 'input-xxlarge',
                                 ));
                                 echo $this->Form->input('safety_impacts', array(
-                                    'label' => array('class' => 'control-nolabel required', 'text' => '6 Impact of the proposed amendments on the safety and wellbeing of study
-participants <span class="sterix">*</span>'),
+                                    'label' => array('class' => 'control-nolabel required', 'text' => '6 Impact of the proposed amendments on the safety and wellbeing of study participants <span class="sterix">*</span>'),
                                     'between' => '<div class="nocontrols">',
                                     'placeholder' => ' ',
                                     'class' => 'input-xxlarge',
@@ -201,15 +207,16 @@ participants <span class="sterix">*</span>'),
 
                                 <?php
 
-echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
-    'name' => 'submitReport',
-    'formnovalidate' => 'formnovalidate',
-    'onclick' => "return confirm('Please ensure you\'ve submitted all the required files.');",
-    'class' => 'btn btn-info btn-block mapop',
-    'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
-    'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
-    'div' => false,
-  ));
+                                // echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+                                //     'name' => 'submitReport',
+                                //     'formnovalidate' => 'formnovalidate',
+                                //     'onclick' => "return confirm('Please ensure you\'ve submitted all the required files.');",
+                                //     'class' => 'btn btn-info btn-block mapop',
+                                //     'id' => 'ApplicationSubmitReport',
+                                //     'title' => 'Save and Submit Report',
+                                //     'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+                                //     'div' => false,
+                                // ));
                                 echo $this->Html->link(
                                     'Submit',
                                     array('controller' => 'amendments', 'action' => 'add', $application['Application']['id']),
