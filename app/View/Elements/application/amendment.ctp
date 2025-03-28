@@ -80,6 +80,15 @@ $this->Html->script('multi/afro_attachments', array('inline' => false));
 
 
                     ?>
+
+                    <!-- Attachment --> 
+
+                    <hr>
+                    <?php
+                    
+                    echo $this->element('multi/amends', array( 'model' => 'Amend', 'group' => 'attachment'));
+                    
+                    ?>
  
 
                     <div class="form-actions" style="margin-top: 0px; padding-left: 10px;">

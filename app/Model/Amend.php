@@ -6,13 +6,14 @@ App::uses('AppModel', 'Model');
  * @property Amendment $Amendment
  * @property Application $Application
  */
-class Amend extends AppModel {
+class Amend extends AppModel
+{
 
-/**
- * Validation rules
- *
- * @var array
- */
+	/**
+	 * Validation rules
+	 *
+	 * @var array
+	 */
 	public $validate = array(
 		'cover_letter' => array(
 			'notempty' => array(
@@ -78,11 +79,11 @@ class Amend extends AppModel {
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
-/**
- * belongsTo associations
- *
- * @var array
- */
+	/**
+	 * belongsTo associations
+	 *
+	 * @var array
+	 */
 	public $belongsTo = array(
 		'Amendment' => array(
 			'className' => 'Amendment',
@@ -98,5 +99,13 @@ class Amend extends AppModel {
 			'fields' => '',
 			'order' => ''
 		)
+	);
+	public $hasMany = array(
+		'Attachment' => array(
+			'className' => 'Attachment',
+			'foreignKey' => 'foreign_key',
+			'dependent' => true,
+			'conditions' => array('Attachment.model' => 'Amend', 'Attachment.group' => 'attachment'),
+		),
 	);
 }

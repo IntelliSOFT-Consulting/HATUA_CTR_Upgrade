@@ -38,10 +38,10 @@ class ApplicationsController extends AppController
         }
 
         $this->MultiCenter->id = $id;
-$this->MultiCenter->saveField('deleted', true);
-$this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));        
+        $this->MultiCenter->saveField('deleted', true);
+        $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
         $this->Session->setFlash(__('Application Multi Center deleted successfully'), 'alerts/flash_success');
-           $this->redirect($this->referer());
+        $this->redirect($this->referer());
     }
     public function applicant_download_termination($id)
     {
@@ -1969,7 +1969,7 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
 
         $criteria = $this->Application->parseCriteria($this->passedArgs);
         $criteria['Application.submitted'] = 1;
-        $criteria['Application.approved'] = 2;
+        // $criteria['Application.approved'] = 2;
         $criteria['Application.deactivated'] = 0;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
@@ -2171,11 +2171,10 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
             }
         }
 
-    //    if expired is passed
+        //    if expired is passed
         if (!empty($this->passedArgs['expired'])) {
             // here I wannt t0 add a contition where annual letter is expired and the application does not have annual checklist
             $this->passedArgs['expired'] = true;
-
         }
 
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
@@ -2713,6 +2712,7 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
                 'conditions' => array('Application.id' => $id),
                 'contain' => $contains
             ));
+            $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 2, 6), 'User.is_active' => 1))));
             $this->set('counties', $this->Application->SiteDetail->County->find('list'));
             $this->set('application', $application);
             if ($application['Application']['deactivated']) {
@@ -3726,6 +3726,7 @@ $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
                 unset($filedata['Checklist']);
             }
             unset($filedata['Application']);
+
             if (empty($this->request->data)) {
                 $message = 'The file you provided could not be saved. Kindly ensure that the file is less than
                         18 MB in size. <small>If it is larger, compress (zip,tar...) it to the required size first</small>';

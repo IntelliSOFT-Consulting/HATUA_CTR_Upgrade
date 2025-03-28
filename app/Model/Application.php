@@ -144,6 +144,7 @@ class Application extends AppModel
             'OR' => array(
                 $this->alias . '.study_title LIKE' => '%' . $filter . '%',
                 $this->alias . '.abstract_of_study LIKE' => '%' . $filter . '%',
+                $this->alias . '.short_title LIKE' => '%' . $filter . '%',
             )
         );
         return $cond;
@@ -545,7 +546,11 @@ class Application extends AppModel
             'foreignKey' => 'application_id',
             'dependent' => true,
         ),
-        
+        'Amend' => array(
+            'className' => 'Amend',
+            'foreignKey' => 'application_id',
+            'dependent' => true,
+        ),
 
     );
 

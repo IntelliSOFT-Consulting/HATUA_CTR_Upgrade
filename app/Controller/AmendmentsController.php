@@ -21,20 +21,21 @@ class AmendmentsController extends AppController
 	public function  applicant_edit_amd($id = null)
 	{
 		$this->loadModel('Amend');
+		$this->loadModel('Attachment');
+		$this->loadModel('Application');
 		$this->Amend->id = $id;
 		if (!$this->Amend->exists()) {
 			$this->Session->setFlash(__('Invalid Amendment.'), 'alerts/flash_error');
 			$this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
 		}
-		$amndt = $this->Amend->find('first', array('conditions' => array('Amend.id' => $id), 'contain' => array('Amendment')));
+		$amndt = $this->Amend->find('first', array('conditions' => array('Amend.id' => $id), 'contain' => array('Attachment', 'Amendment')));
+
+		$appId = $amndt['Amend']['application_id'];
+
+		$app = $this->Application->find('first', array('conditions' => array('Application.id' => $appId), 'contain' => array('Amendment')));
+
 
 		if ($this->request->is('post') || $this->request->is('put')) {
-
-			// debug($this->request->data);
-			// exit;
-			// 
-
-
 
 			$validate = false;
 			if (isset($this->request->data['submitReport'])) {
@@ -43,19 +44,67 @@ class AmendmentsController extends AppController
 				$this->request->data['Amend']['date_submitted'] = date('Y-m-d H:i:s');
 			}
 
-			if ($this->Amend->saveAssociated($this->request->data, array('validate' => $validate, 'deep' => true))) {
+
+			$filedata = $this->request->data;
+
+			// Check if 'Attachment' exists and get the first element
+			$attachments = isset($filedata['Attachment']) ? $filedata['Attachment'] : [];
+			$firstAttachment = !empty($attachments) ? reset($attachments) : [];
+
+			if (!empty($firstAttachment) && !empty($firstAttachment['foreign_key'])) {
+				$foreignKey = $firstAttachment['foreign_key'];
+
+				// Find existing amendment using foreign_key
+				$existingAmend = $this->Amend->find('first', [
+					'conditions' => ['Amend.id' => $foreignKey],
+					'fields' => ['id']
+				]);
+
+				if (!empty($existingAmend)) {
+					$filedata['Amend']['id'] = $existingAmend['Amend']['id']; // Use existing ID
+				}
+			}
+
+			if ($this->Amend->saveAssociated($filedata, array('validate' => $validate, 'deep' => true))) {
 				if ($validate) {
 					$this->Session->setFlash(__('You have successfully submitted the amendment to PPB. PPB will review
 						this amendment and notify you on the progress. You can view the progress of the application by clicking on
 						&#39;my applications&#39; on the dashboard menu. Thank you.'), 'alerts/flash_success');
 					$this->redirect(array('action' => 'edit', $amndt['Amend']['amendment_id']));
 				} else {
-					$this->Session->setFlash(__('The amendment justification has been saved'), 'alerts/flash_success');
-					$this->redirect(array('action' => 'edit_amd', $this->Amend->id));
+					$message = "The amendment justification has been saved";
+					if ($this->RequestHandler->isAjax()) {
+						// Get the last key in 'Attachment' array
+						end($this->request->data['Attachment']);
+						$lastKey = key($this->request->data['Attachment']);
+
+						$latestAttachment = $this->Amend->Attachment->find('first', [
+							'conditions' => [
+								'Attachment.foreign_key' => $this->request->data['Attachment'][$lastKey]['foreign_key']
+							],
+							'order' => ['Attachment.id' => 'DESC'], // Get the most recently added attachment
+							'contain' => []
+						]);
+
+						$this->set('response', [
+							'message' => 'Success',
+							'content' => $latestAttachment
+						]);
+					} else {
+
+						$this->Session->setFlash(__($message), 'alerts/flash_success');
+						$this->redirect(array('action' => 'edit_amd', $this->Amend->id));
+					}
 				}
 			} else {
-				$this->Session->setFlash(__('The amendment could not be saved. Please, try again.'), 'alerts/flash_error');
+				$message = "The amendment could not be saved. Please, try again.";
+				if ($this->RequestHandler->isAjax()) {
+					$this->set('response', array('message' => 'Failure', 'errors' => $message));
+				} else {
+					$this->Session->setFlash(__($message), 'alerts/flash_error');
+				}
 			}
+			if ($this->RequestHandler->isAjax()) $this->set('_serialize', 'response');
 		} else {
 			$this->request->data = $amndt;
 		}
@@ -67,6 +116,9 @@ class AmendmentsController extends AppController
 			'conditions' => array('Application.id' => $amndt['Amend']['application_id']),
 			'contain' => $contains
 		));
+		$counter = 'amd-' . count($app['Amendment']);
+		$this->set('counter', $counter);
+		$this->set('current', $id);
 		$this->set('application', $application);
 	}
 

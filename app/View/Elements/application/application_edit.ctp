@@ -49,8 +49,7 @@ $this->Html->script('jUpload/jquery.fileupload.js', array('inline' => false));
       </ul>
       <div id="tabs-1">
         <?php
-
-        echo $current. "Study";
+ 
         echo $this->Form->input('study_title', array(
           'label' => array('class' => 'control-nolabel required', 'text' => 'Study Title <span class="sterix">*</span>'),
           'between' => '<div class="nocontrols">', 'placeholder' => 'study title', 'class' => 'input-large',

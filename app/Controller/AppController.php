@@ -73,6 +73,7 @@ class AppController extends Controller
     'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User','Attachment'),
     'Sae',
     'AmendmentLetter',
+    'Amend'=>array('Attachment'),
     'AnnualLetter' => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')),
     'StudyRoute',
     'Manufacturer',

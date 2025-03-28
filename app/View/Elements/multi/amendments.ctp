@@ -23,9 +23,19 @@ if ($redir === 'applicant') {
     <tbody>
         <?php
         App::uses('Hash', 'Utility');
+
+        $attachments = array();
+        foreach ($application['Amend'] as $amend) {
+            if (!empty($amend['Attachment'])) {
+                $attachments = array_merge($attachments, $amend['Attachment']);
+            }
+        }
+        // debug($attachments);
+
         $former = $this->requestAction('/pockets/checklist/amendment');
-        $years = array_unique(Hash::extract($application['AmendmentChecklist'], '{n}.year'));
+        $years = array_unique(Hash::extract($attachments, '{n}.year'));
         rsort($years);
+
         foreach ($years as $year) : ?>
             <tr class="">
                 <td><b><?php echo h($year); ?></b></td>
@@ -37,7 +47,7 @@ if ($redir === 'applicant') {
                         echo "<div id='$rem$year'>";
                         echo "$f. ";
                         echo "$mer<br/>";
-                        foreach ($application['AmendmentChecklist'] as $anc) {
+                        foreach ($attachments as $anc) {
                             if ($anc['year'] == $year && $anc['pocket_name'] == $rem) {
                                 $id = $anc['id'];
                                 echo "&nbsp;&nbsp; <span id='$rem$id'> &nbsp;<i class='icon-file-text-alt'></i> ";
@@ -48,11 +58,16 @@ if ($redir === 'applicant') {
                                 );
                                 $version_no = $anc['version_no'];
                                 $file_date = $anc['file_date'];
-                                echo "</span>&nbsp;
-                          <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>
+                                if (!empty($version_no)) {
+                                    echo "</span>&nbsp;
+                          <span id='version$id' style='margin-left:10px;'>Version: $version_no</span>";
+                                }
+                                if (!empty($file_date)) {
+                                    echo "
                           <span id='fileDate$id' style='margin-left:10px;'>Dated: $file_date</span>
-                          <span id='AmendmentChecklist$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>
-                          <br>";
+                          <span id='AmendmentChecklist$id' style='margin-left:10px;' class='btn btn-mini'><i class='icon-remove'></i></span>";
+                                }
+                                echo "<br>";
                             }
                         }
                         echo "</div>";
@@ -153,13 +168,13 @@ if ($redir === 'applicant') {
                                                         'options' => array('rejected' => 'No'),
                                                     ));
 
-                                                   
+
                                                     echo $this->Form->input('password', array(
                                                         'label' => array('class' => 'control-label', 'text' => 'Your Password <span class="sterix">*</span>'),
                                                         'placeholder' => 'password',
                                                         'class' => 'input-large',
                                                     ));
-                                                    ?> 
+                                                    ?>
                                                     <div class="controls">
                                                         <?php
                                                         echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
@@ -460,6 +475,6 @@ if (isset($this->params['named']['ame'])) {
     </div>
 
 
- 
+
 <?php
-}?>
+} ?>

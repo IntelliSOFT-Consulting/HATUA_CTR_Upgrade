@@ -42,7 +42,7 @@
                     elseif($site_inspection['approved'] == 1) echo 'Awaiting Peer Review';
                     elseif($site_inspection['approved'] == 2) { 
                         echo "Approved"." <small class='muted'> by ".$users[($site_inspection['approved_by']) ? $site_inspection['approved_by'] : $site_inspection['user_id']]; 
-                      }
+                      } 
                     ?></p>
             </td>
           <?php } ?>
@@ -147,7 +147,9 @@
                   <?php  
                        echo $this->element('comments/add', [
                                 'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $site_inspection['id'], 
-                                            'model' => 'SiteInspection', 'category' => 'internal', 'url' => 'add_si_internal']]) 
+                                            'model' => 'SiteInspection', 'category' => 'internal',
+                                            'message_type'=>'51',
+                                             'url' => 'add_si_internal']]) 
                   ?>
                 </div>
               </div>
@@ -173,7 +175,9 @@
                        echo $this->element('comments/add', [
                                 // 'model' => ['model_id' => $site_inspection['id'], 'foreign_key' => $site_inspection['id'], 
                                 'model' => ['model_id' => $application['Application']['id'], 'foreign_key' => $site_inspection['id'], 
-                                            'model' => 'SiteInspection', 'category' => 'external', 'url' => 'add_si_external']]) 
+                                            'model' => 'SiteInspection', 
+                                            'message_type'=>'51',
+                                            'category' => 'external', 'url' => 'add_si_external']]) 
                   ?>
                 </div>
               </div>

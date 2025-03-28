@@ -119,6 +119,7 @@ class AmendmentApprovalsController extends AppController
 	}
 	public function manager_approve($application_id)
 	{
+		$contains = $this->a_contain;
 		if ($this->request->data['AmendmentApproval']['status'] == null) {
 			$this->Session->setFlash(__('Please select if approved or not.'), 'alerts/flash_error');
 			$this->redirect($this->referer());
@@ -136,12 +137,25 @@ class AmendmentApprovalsController extends AppController
 						$this->loadModel('Application');
 						$html = new HtmlHelper(new ThemeView());
 						$approval_letter = $this->Pocket->find('first', array('conditions' => array('Pocket.name' => 'amendment_letter')));
-						$application = $this->Application->find('first', array('conditions' => array('Application.id' => $application_id)));
+						$application = $this->Application->find('first', array(
+							'conditions' => array('Application.id' => $application_id),
+							'contain' => $contains
+						
+						));
 						$checklist = array();
 						$data = $application['AmendmentChecklist'];
 				
 				
-						foreach ($data as $formdata) {
+						$attachments = array();
+						foreach ($application['Amend'] as $amend) {
+							if (!empty($amend['Attachment'])) {
+								$attachments = array_merge($attachments, $amend['Attachment']);
+							}
+						}
+						// debug($application['Amend']);
+						// debug($attachments);
+						// exit;
+						foreach ($attachments as $formdata) {
 							if ($formdata['year'] == $id) {
 								$pocket_name = !empty($formdata['pocket_name']) ? $formdata['pocket_name'] : $formdata['description'];
 				
