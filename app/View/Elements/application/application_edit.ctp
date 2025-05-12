@@ -1604,27 +1604,49 @@ $this->Html->script('jUpload/jquery.fileupload.js', array('inline' => false));
     <div data-spy="affix" class="my-sidebar">
       <div class="well">
         <?php
-        echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+        // echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+        //   'name' => 'saveChanges',
+        //   'formnovalidate' => 'formnovalidate',
+        //   'class' => 'btn btn-success btn-block mapop',
+        //   'id' => 'SadrSaveChanges', 'title' => 'Save & continue editing',
+        //   'data-content' => 'Save changes to form without submitting it.
+        //                                 The form will still be available for further editing.',
+        //   'div' => false,
+        // ));
+        echo $this->Form->submit('Save Changes', array(
           'name' => 'saveChanges',
           'formnovalidate' => 'formnovalidate',
           'class' => 'btn btn-success btn-block mapop',
-          'id' => 'SadrSaveChanges', 'title' => 'Save & continue editing',
-          'data-content' => 'Save changes to form without submitting it.
-                                        The form will still be available for further editing.',
-          'div' => false,
+          'id' => 'SadrSaveChanges',
+          'title' => 'Save & continue editing',
+          'data-content' => 'Save changes to form without submitting it.',
+          'escape' => false, // Allows the <i> icon to render
         ));
+        
         ?>
         <hr>
         <?php
-        echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+        // echo $this->Form->button('<i class="icon-thumbs-up"></i> Submit', array(
+        //   'name' => 'submitReport',
+        //   'formnovalidate' => 'formnovalidate',
+        //   'onclick' => "return confirm('Are you sure you wish to submit the form to PPB? You will not be able to edit it later.');",
+        //   'class' => 'btn btn-info btn-block mapop',
+        //   'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
+        //   'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+        //   'div' => false,
+        // ));
+        echo $this->Form->submit('Submit', array(
           'name' => 'submitReport',
           'formnovalidate' => 'formnovalidate',
           'onclick' => "return confirm('Are you sure you wish to submit the form to PPB? You will not be able to edit it later.');",
           'class' => 'btn btn-info btn-block mapop',
-          'id' => 'ApplicationSubmitReport', 'title' => 'Save and Submit Report',
-          'data-content' => 'Save the report and submit it to the pharmacy and Poisons Board. You will also get a copy of this report.',
+          'id' => 'ApplicationSubmitReport',
+          'title' => 'Save and Submit Report',
+          'data-content' => 'Save and submit the report to PPB.',
+          'escape' => false,
           'div' => false,
         ));
+        
 
         ?>
         <hr>

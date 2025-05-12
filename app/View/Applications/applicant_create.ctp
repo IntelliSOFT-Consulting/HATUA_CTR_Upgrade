@@ -20,6 +20,7 @@ $this->assign('Applications', 'active');
                 <?php
                 echo $this->Form->create('Application');
                 echo $this->Form->input('email_address', array('type' => 'email', 'value' => $this->Session->read('Auth.User.email')));
+                echo $this->Form->input('deactivated', array('type' => 'hidden', 'value' => 0));
                 ?>
 
                 <div class="row-fluid">

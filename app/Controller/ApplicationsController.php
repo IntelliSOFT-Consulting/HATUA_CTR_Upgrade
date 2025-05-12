@@ -2789,6 +2789,8 @@ class ApplicationsController extends AppController
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
             }
+            // debug($this->request->data);
+            // exit;
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
                 $validate = 'first';
@@ -2954,6 +2956,7 @@ class ApplicationsController extends AppController
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
             }
+           
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
                 $validate = 'first';

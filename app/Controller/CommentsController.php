@@ -741,7 +741,7 @@ class CommentsController extends AppController
 
     private function add_review_response()
     {
-        if ($this->request->is('post')) {
+        if ($this->request->is('post')) { 
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
 
