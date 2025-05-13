@@ -31,7 +31,7 @@ class ApplicationsController extends AppController
 
         $data = $this->request->data['Application'];
         $total_sites = $data['total_sites'];
-         
+
         $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
@@ -48,10 +48,9 @@ class ApplicationsController extends AppController
                     'protocol_no' =>  $application['Application']['protocol_no']
                 )
             );
-            
+
             CakeResque::enqueue('default', 'NotificationShell', array('generate_report_missed_invoice', $invoice));
-            
-        } 
+        }
         $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
     }
@@ -74,9 +73,8 @@ class ApplicationsController extends AppController
                     'protocol_no' =>  $application['Application']['protocol_no']
                 )
             );
-           
+
             CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
-            
         }
         $this->Session->setFlash(__('The outsourced request has been revoked'), 'alerts/flash_success');
         $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
@@ -315,7 +313,7 @@ class ApplicationsController extends AppController
                             // if(empty($this->request->data['Application']['total_sites']))
                             // {
                             //     $this->Session->setFlash(__('Please enter number of sites. Please, correct the errors.'), 'alerts/flash_warning');
-                              
+
                             // }
 
                             $invoice = array(
@@ -2792,59 +2790,65 @@ class ApplicationsController extends AppController
             // debug($this->request->data);
             // exit;
             $validate = false;
-            if (isset($this->request->data['submitReport'])) {
-                $validate = 'first';
-                $filedata = $this->request->data;
-                unset($filedata['Checklist']);
-                // Check if previously unsubmitted
-                if (!$response['Application']['unsubmitted']) {
-                    $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
-                }
-                $this->request->data['Application']['submitted'] = 1;
-                //Start application stage 
-                if ($response['Application']['unsubmitted']) {
-                    $stages = $this->Application->ApplicationStage->find('all', array(
-                        'contain' => array(),
-                        'conditions' => array('ApplicationStage.application_id' => $id)
-                    ));
-                    $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Unsubmitted]');
-                    if (!empty($var)) {
-                        $s1['ApplicationStage'] = min($var);
-                        if (empty($s1['ApplicationStage']['end_date'])) {
-                            $this->Application->ApplicationStage->create();
-                            $s1['ApplicationStage']['status'] = 'Complete';
-                            $s1['ApplicationStage']['comment'] = 'Principal Investigator Re Submission';
-                            $s1['ApplicationStage']['end_date'] = date('Y-m-d');
-                            $this->Application->ApplicationStage->save($s1);
-                        }
+            // if (isset($this->request->data['submit_type'])) {
+            if (!empty($this->request->data['Application']['submit_type'])) {
+                if ($this->request->data['Application']['submit_type'] === 'submitReport') {
+
+                    $validate = 'first';
+                    $filedata = $this->request->data;
+                    unset($filedata['Checklist']);
+                    // Check if previously unsubmitted
+                    if (!$response['Application']['unsubmitted']) {
+                        $this->request->data['Application']['date_submitted'] = date('Y-m-d H:i:s');
                     }
-                } else {
-                    $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
-                    $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
-                    $this->request->data['ApplicationStage'][0]['status'] = 'Current';
+                    $this->request->data['Application']['submitted'] = 1;
+                    //Start application stage 
+                    if ($response['Application']['unsubmitted']) {
+                        $stages = $this->Application->ApplicationStage->find('all', array(
+                            'contain' => array(),
+                            'conditions' => array('ApplicationStage.application_id' => $id)
+                        ));
+                        $var = Hash::extract($stages, '{n}.ApplicationStage[stage=Unsubmitted]');
+                        if (!empty($var)) {
+                            $s1['ApplicationStage'] = min($var);
+                            if (empty($s1['ApplicationStage']['end_date'])) {
+                                $this->Application->ApplicationStage->create();
+                                $s1['ApplicationStage']['status'] = 'Complete';
+                                $s1['ApplicationStage']['comment'] = 'Principal Investigator Re Submission';
+                                $s1['ApplicationStage']['end_date'] = date('Y-m-d');
+                                $this->Application->ApplicationStage->save($s1);
+                            }
+                        }
+                    } else {
+                        $this->request->data['ApplicationStage'][0]['stage'] = 'Screening';
+                        $this->request->data['ApplicationStage'][0]['start_date'] = date('Y-m-d');
+                        $this->request->data['ApplicationStage'][0]['status'] = 'Current';
+                    }
+                    // 
+
+                    if (empty($response['Application']['protocol_no'])) {
+                        $count = $this->Application->find('count',  array('conditions' => array(
+                            'Application.date_submitted BETWEEN ? and ?' => array(date("Y-m-01 00:00:00"), date("Y-m-d H:i:s"))
+                        )));
+                        $count++;
+                        $count = ($count < 10) ? "0$count" : $count;
+                        $this->request->data['Application']['protocol_no'] = 'ECCT/' . date('y/m') . '/' . $count;
+                    }
+
+                    // Check number of Sites
+
+                    // if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
+                    //     $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
+                    //     $this->redirect($this->referer());
+                    // }
                 }
-                // 
-
-                if (empty($response['Application']['protocol_no'])) {
-                    $count = $this->Application->find('count',  array('conditions' => array(
-                        'Application.date_submitted BETWEEN ? and ?' => array(date("Y-m-01 00:00:00"), date("Y-m-d H:i:s"))
-                    )));
-                    $count++;
-                    $count = ($count < 10) ? "0$count" : $count;
-                    $this->request->data['Application']['protocol_no'] = 'ECCT/' . date('y/m') . '/' . $count;
-                }
-
-                // Check number of Sites
-
-                // if (count($this->request->data['SiteDetail']) > $response['Application']['total_sites']) {
-                //     $this->Session->setFlash(__('You\'ve exceeded the maximum number of sites!, ' . $response['Application']['total_sites'] . ' sites allowed!'), 'alerts/flash_error');
-                //     $this->redirect($this->referer());
-                // }
             }
 
             $filedata = $this->request->data;
-            if (isset($this->request->data['saveChanges'])) {
-                unset($filedata['Checklist']);
+            if (!empty($this->request->data['Application']['submit_type'])) {
+                if ($this->request->data['Application']['submit_type'] === 'saveChanges') {
+                    unset($filedata['Checklist']);
+                }
             }
             unset($filedata['Application']);
             if (empty($this->request->data)) {
@@ -2925,12 +2929,14 @@ class ApplicationsController extends AppController
                         }
                     }
                 } else {
+                    $this->request->data = $response;
                     $message = 'The application was not successfully submitted. Please correct the errors below...';
                     if ($this->RequestHandler->isAjax()) {
                         $this->set('response', array('message' => 'Failure', 'errors' => $message));
                     } else {
                         $this->Session->setFlash(__($message), 'alerts/flash_error');
                     }
+                    $this->request->data = $response;
                 }
             }
             if ($this->RequestHandler->isAjax()) $this->set('_serialize', 'response');
@@ -2956,7 +2962,7 @@ class ApplicationsController extends AppController
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
             }
-           
+
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
                 $validate = 'first';
