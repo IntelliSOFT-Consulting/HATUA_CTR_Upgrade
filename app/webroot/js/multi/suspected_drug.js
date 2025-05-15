@@ -11,7 +11,7 @@ $(function() {
         } else {
             intId = 1;
         }
-        if ($("#suspected-drugs .suspected-group").length < 9) {
+        if ($("#suspected-drugs .suspected-group").length < 50) {
             var new_suspectdrug = $('<div class="suspected-group">\
     <div class="row-fluid">\
         <div class="span6">\

@@ -1,5 +1,5 @@
 <?php
-    $this->Html->script('multi/suspected_drugs', array('inline' => false));
+    $this->Html->script('multi/suspected_drug', array('inline' => false));
 ?>
 <h5>Suspected Drug(s) (<small>where necessary, Click button to add more -
 <button type="button" class="btn btn-small btn-primary" id="addSuspectedDrug">Add Suspected Drug</button></small>) </h5>

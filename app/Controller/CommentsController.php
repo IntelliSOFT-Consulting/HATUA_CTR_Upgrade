@@ -39,36 +39,79 @@ class CommentsController extends AppController
     {
         $currentId = base64_encode($id);
 
-        $currentUrl = Router::url('/comments/verify/' . $currentId, true);
-        $options = array(
-            'ssl_verify_peer' => false
-        );
-        $HttpSocket = new HttpSocket($options);
 
-        //Request Access Token
-        $initiate = $HttpSocket->post(
-            'https://smp.imeja.co.ke/api/qr/generate',
-            array('url' => $currentUrl),
-            array('header' => array())
-        );
-
-        // debug($initiate);
+        // $url = 'https://smp.imeja.co.ke/api/qr/generate';
+        // $data = ['url' => $currentId];
+        
+        // $options = [
+        //     'http' => [
+        //         'header'  => "Content-Type: application/json\r\n",
+        //         'method'  => 'POST',
+        //         'content' => json_encode($data),
+        //         'timeout' => 30
+        //     ],
+        //     'ssl' => [
+        //         'verify_peer'      => false,
+        //         'verify_peer_name' => false
+        //     ]
+        // ];
+        
+        // $context  = stream_context_create($options);
+        // $result = file_get_contents($url, false, $context);
+        
+        // debug($result);
         // exit;
-        if ($initiate->isOk()) {
+        
 
-            $body = $initiate->body;
-            $resp = json_decode($body, true);
-            $this->Comment->id = $id;
-            if (!$this->Comment->exists()) {
-                throw new NotFoundException(__('Invalid annual approval letter'));
-            }
-            $qr_code = $resp['data']['qr_code'];
-            $data = $this->Comment->read(null, $id);
-            $data['Comment']['qrcode'] = $qr_code;
 
-            $this->Comment->Create();
-            if ($this->Comment->save($data)) {
+
+
+
+
+        // debug($currentId);
+        // exit;
+        try {
+            $currentUrl = Router::url('/comments/verify/' . $currentId, true);
+            $options = array( 
+                'timeout' => 30,
+                'ssl_verify_peer' => false,
+                'ssl_verify_host' => false
+            );
+            $HttpSocket = new HttpSocket($options);
+            $jsonBody = json_encode(['url' => $currentUrl]);
+
+            //Request Access Token
+            $initiate = $HttpSocket->post(
+                'https://smp.imeja.co.ke/api/qr/generate', $jsonBody,
+                array(
+                    'header' => array(
+                        'Content-Type'=>'application/json',
+                           'Accept' => 'application/json',
+                        'Content-Length' => strlen($jsonBody)
+                        ))
+            );
+
+            // debug($initiate);
+            // exit;
+            if ($initiate->isOk()) {
+
+                $body = $initiate->body;
+                $resp = json_decode($body, true);
+                $this->Comment->id = $id;
+                if (!$this->Comment->exists()) {
+                    throw new NotFoundException(__('Invalid annual approval letter'));
+                }
+                $qr_code = $resp['data']['qr_code'];
+                $data = $this->Comment->read(null, $id);
+                $data['Comment']['qrcode'] = $qr_code;
+
+                $this->Comment->Create();
+                if ($this->Comment->save($data)) {
+                }
             }
+        } catch (Exception $e) {
+            // debug("Error Encountered:  ".$e->getMessage());
+            // exit;
         }
     }
     public function manager_add_annual_letter()
@@ -669,9 +712,10 @@ class CommentsController extends AppController
     {
         $this->add_meeting_date_external();
     }
-    public function reviewer_update_comment_details($id=null) {
+    public function reviewer_update_comment_details($id = null)
+    {
         $this->update_comment_details($id);
-	}
+    }
     public function manager_update_comment_details($id = null)
     {
         $this->update_comment_details($id);
@@ -686,9 +730,9 @@ class CommentsController extends AppController
                 $this->Session->setFlash(__('Comment not found.'), 'alerts/flash_error');
                 $this->redirect($this->referer());
             }
-            $comment=$this->Comment->read(null,$id);
-           
-            $message_type=$comment['Comment']['message_type'];
+            $comment = $this->Comment->read(null, $id);
+
+            $message_type = $comment['Comment']['message_type'];
             // debug($message_type);
             // exit;
             if (isset($this->request->data['submitReport'])) {
@@ -702,7 +746,7 @@ class CommentsController extends AppController
                     $this->loadModel('Message');
                     $html = new HtmlHelper(new ThemeView());
                     $message = $this->Message->find('first', array('conditions' => array('name' => $message_type)));
-                  
+
                     $this->loadModel('Application');
                     $app = $this->Application->find('first', array(
                         'contain' => array(),
@@ -759,14 +803,15 @@ class CommentsController extends AppController
         $this->redirect($this->referer());
     }
 
-    public function applicant_add_annual_checklist_query() {
+    public function applicant_add_annual_checklist_query()
+    {
         $this->add_annual_checklist_query();
+    }
 
-	}
-
-	public function manager_add_annual_checklist_query() {
+    public function manager_add_annual_checklist_query()
+    {
         $this->add_annual_checklist_query();
-	}
+    }
 
     private function add_annual_checklist_query()
     {
@@ -775,7 +820,7 @@ class CommentsController extends AppController
 
             if (isset($this->request->data['submitReport'])) {
                 $this->request->data['Comment']['submitted'] = 2;
-            } 
+            }
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
 
                 //Get ID of the currently saved record 
@@ -791,7 +836,7 @@ class CommentsController extends AppController
                     $app = $this->Application->find('first', array(
                         'contain' => array(),
                         'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
-                    )); 
+                    ));
 
 
                     $users = $this->Comment->User->find('all', array(
@@ -872,7 +917,7 @@ class CommentsController extends AppController
                         'contain' => array(),
                         'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
                     ));
- 
+
                     $this->loadModel('ApplicationStage');
                     $stage = $this->ApplicationStage->read(null, $this->request->data['Comment']['foreign_key']);
 

@@ -434,7 +434,39 @@ class ReviewsController extends AppController
                     // debug($this->request->data);
                     // exit;
                     //end stages
+
+
+                    //Let's create and audit trails
+
                     $doer = $this->Auth->user('name');
+                   $reviews= $this->request->data;
+ 
+                    if (count($reviews) > 0) {
+                        foreach ($reviews as $review) {
+
+                            $this->loadModel('AuditTrail');
+                            $this->loadModel('Application');
+                            $audit = array(
+                              'AuditTrail' => array(
+                                'foreign_key' => $review['Review']['application_id'],
+                                'model' => 'Application',
+                                'message' => 'A Report with protocol number ' .  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id'])) . ' has been assigned to ' . $this->User->field('username', array('id' => $review['Review']['user_id'])) . ' for review  by ' . $doer,
+                                'ip' =>  $this->Application->field('protocol_no', array('id' => $review['Review']['application_id']))
+                              )
+                            );
+                            $this->AuditTrail->Create();
+                            if ($this->AuditTrail->save($audit)) {
+                              $this->log($this->args[0], 'audit_success');
+                            } else {
+                              $this->log('Error creating an audit trail', 'notifications_error');
+                              $this->log($this->args[0], 'notifications_error');
+                            }
+                        }
+                    }
+
+
+
+
                     CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data, $doer));
 
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');

@@ -36,12 +36,20 @@ class AmendmentsController extends AppController
 
 
 		if ($this->request->is('post') || $this->request->is('put')) {
-
+			$filedata = $this->request->data;
 			$validate = false;
 			if (isset($this->request->data['submitReport'])) {
 				$validate = 'first';
+
+				$counts = isset($filedata['Attachment']) ? $filedata['Attachment'] : [];
+				if(!empty($filedata['Attachment'])){
 				$this->request->data['Amend']['submitted'] = 1;
 				$this->request->data['Amend']['date_submitted'] = date('Y-m-d H:i:s');
+				}else{
+					$message = "You need to upload the cover letter. Please, try again.";
+					 $this->Session->setFlash(__($message), 'alerts/flash_error');
+					return  $this->redirect($this->referer());
+				}
 			}
 
 

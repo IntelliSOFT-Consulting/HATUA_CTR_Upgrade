@@ -23,7 +23,7 @@ class AttachmentsController extends AppController
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow('applicant_upload', 'genereateQRCode', 'approve', 'update_amendment');
+        $this->Auth->allow('applicant_upload','export', 'genereateQRCode', 'approve', 'update_amendment');
     }
 
     public function admin_delete($id = null)
@@ -442,7 +442,23 @@ class AttachmentsController extends AppController
         }
         $this->set('attachment', $this->Attachment->read(null, $id));
     }
-
+    public function export($id = null)
+    {
+        $this->viewClass = 'Media';
+        $this->Attachment->id = $id;
+        if (!$this->Attachment->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } 
+         $attachment = $this->Attachment->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Attachment']['basename'],
+                'download'  => true,
+                'path'      => 'media' . DS . 'transfer' . DS . $attachment['Attachment']['dirname'] . DS
+            );
+            $this->set($params);
+        
+    }
 
     public function download($id = null)
     {

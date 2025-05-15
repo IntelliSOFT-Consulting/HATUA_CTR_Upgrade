@@ -145,6 +145,18 @@
           <?php   }
           } ?>
           <?php echo $this->fetch('version_no'); ?>
+
+          <!-- Start -->
+         
+          <tr>
+            <td class="table-label required">
+              <p>Protocol No: <span class="sterix"></span></p>
+            </td>
+            <td><?php echo $application['Application']['reference_no'] ?></td>
+          </tr> 
+
+        <?php echo $this->fetch('reference_no'); ?>
+          <!-- End -->
           <tr>
             <td class="table-label required">
               <p>Date of Protocol <span class="sterix">*</span></p>

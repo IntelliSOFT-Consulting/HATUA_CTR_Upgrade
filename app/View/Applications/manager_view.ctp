@@ -80,6 +80,7 @@ echo $this->Session->flash();
     <div class="tab-pane active" id="tab1">
       <!-- content for tab1 comes here -->
 
+
       <div class="row-fluid">
         <?php if ($application['Application']['submitted'] == 1) { ?>
           <h4 class="text-success">
@@ -105,6 +106,8 @@ echo $this->Session->flash();
 
       <?php $this->start('form-header'); ?>
       <div class="span10">
+
+      <!-- <h5>Deactivation Narrative</h5> -->
         <?php
         echo $this->Form->create('Application', array(
           'type' => 'file',

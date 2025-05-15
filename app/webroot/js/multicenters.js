@@ -8,7 +8,7 @@ $(document).ready(function () {
                 method: 'GET',
                 success: function (data) {
                     response($.map(data, function (item) {
-                        return {
+                        return { 
                             label: item.User.email,
                             value: item.User.email,
                             id: item.User.id,

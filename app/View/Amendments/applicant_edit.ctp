@@ -31,6 +31,8 @@ $this->Html->css('amendment', null, array('inline' => false));
       if ($amdData != null) { 
        
         $latestUnsubmitted = reset($amdData['Amend']); 
+
+        // debug($latestUnsubmitted);
         ?>
         <table class="table table-condensed">
           <thead>
@@ -115,6 +117,36 @@ $this->Html->css('amendment', null, array('inline' => false));
           <tbody>
             <tr>
               <td><?php echo $latestUnsubmitted['safety_impacts'] ?></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="table-label required">
+                <h5>Cover Letter Attachment(s)<span class="sterix">*</span></h5>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php
+              
+              // foreach($latestUnsubmitted['Attachment']  as $adt){
+                for ($i = 0; $i <= count($latestUnsubmitted['Attachment']) - 1; $i++) {
+
+echo $this->Html->link(
+  __($latestUnsubmitted['Attachment'][$i]['basename']),
+  array(
+    'controller' => 'attachments',
+    'admin' => false,
+    'action' => 'download',
+    $latestUnsubmitted['Attachment'][$i]['id']
+  ),
+  array('class' => 'btn btn-info')
+);
+              }?></td>
             </tr>
           </tbody>
         </table>

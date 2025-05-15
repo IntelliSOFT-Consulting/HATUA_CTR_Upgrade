@@ -1,5 +1,5 @@
 <?php
-$this->Html->script('multicenter', array('inline' => false));
+$this->Html->script('multicenters', array('inline' => false));
 ?>
 
 <div class="row-fluid">

@@ -76,7 +76,7 @@ $this->Html->script('jUpload/jquery.fileupload.js', array('inline' => false));
           'placeholder' => ' ', 'class' => 'input-xxlarge',
         ));
         echo $this->Form->input('reference_no', array(
-          'label' => array('class' => 'control-label required', 'text' => 'Protocl No: <span class="sterix">*</span>'),
+          'label' => array('class' => 'control-label required', 'text' => 'Protocol No: <span class="sterix">*</span>'),
           'placeholder' => ' ', 'class' => 'input-xxlarge',
         ));
         echo $this->Form->input('date_of_protocol', array(
