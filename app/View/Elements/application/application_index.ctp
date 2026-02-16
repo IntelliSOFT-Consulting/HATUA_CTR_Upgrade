@@ -244,6 +244,14 @@
                         ),
                         'label' => array('class' => 'required', 'text' => 'Trial Phase'),
                       ));
+                      echo $this->Form->input('estimated_duration', array(
+                        'type' => 'number',
+                        'min' => 0,
+                        'step' => 1,
+                        'div' => false,
+                        'class' => 'span12 unauthorized_index',
+                        'label' => array('class' => 'required', 'text' => 'Estimated Duration (Months)'),
+                      ));
                     }
                     ?>
                                     </td>
