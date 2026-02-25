@@ -906,7 +906,7 @@ class ApplicationsController extends AppController
 
         $this->set('page_options', $page_options);
         $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 9), 'User.is_active' => 1))));
         $this->loadModel('Erc');
         $this->set('ercs', $this->Erc->find('list', array('fields' => array('Erc.name', 'Erc.name'),)));
 
@@ -1889,7 +1889,7 @@ class ApplicationsController extends AppController
 
         $this->set('page_options', $page_options);
         $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 9), 'User.is_active' => 1))));
         $this->loadModel('Erc');
         $this->set('ercs', $this->Erc->find('list', array('fields' => array('Erc.name', 'Erc.name'),)));
 
@@ -1987,7 +1987,7 @@ class ApplicationsController extends AppController
 
         $this->set('page_options', $page_options);
         $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 9), 'User.is_active' => 1))));
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
@@ -2104,7 +2104,7 @@ class ApplicationsController extends AppController
 
         $this->set('page_options', $page_options);
         $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 9), 'User.is_active' => 1))));
         $this->loadModel('Erc');
         $this->set('ercs', $this->Erc->find('list', array('fields' => array('Erc.name', 'Erc.name'),)));
 
