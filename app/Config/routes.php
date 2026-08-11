@@ -51,6 +51,8 @@ Router::connect('/monitor', array('controller' => 'users', 'action' => 'dashboar
 Router::connect('/outsource', array('controller' => 'users', 'action' => 'dashboard', 'outsource' => true));
 //PPB INTERNAL USER ROUTING: DASHBOARD PAGE
 Router::connect('/internalreviewer', array('controller' => 'users', 'action' => 'dashboard', 'internalreviewer' => true));
+// AUDITOR ROUTING: DASHBOARD PAGE
+Router::connect('/auditor', array('controller' => 'users', 'action' => 'dashboard', 'auditor' => true));
 
 /**
  * Load all plugin routes.  See the CakePlugin documentation on 
