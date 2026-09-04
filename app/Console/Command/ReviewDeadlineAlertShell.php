@@ -56,6 +56,18 @@ App::uses('CakeEmail', 'Network/Email');
  * application (same check WeeklyReviewerReminderTaskShell already uses) -
  * at that point they drop out of every tier above, permanently.
  *
+ * A reviewer can also become inactive - `users.is_active` false or
+ * `users.deactivated` true (the same flags UsersController checks at
+ * login, and that every reviewer-assignment picklist elsewhere in the app
+ * filters on) - after they've already accepted a review. Chasing that
+ * account with escalating emails is pointless, and auto-opening a CAPA
+ * that names them "responsible" for missing an SLA on an account they can
+ * no longer log into to clear is actively misleading. _processReview()
+ * checks this before anything else and, if inactive, skips both the
+ * reminder and the CAPA entirely - logging a one-time AuditTrail entry
+ * (see _flagInactiveReviewer()) so a manager sees the review needs
+ * reassigning instead of the reviewer silently going quiet.
+ *
  * Idempotency: every reminder sent is logged to AuditTrail (foreign_key =
  * Review.id, model = 'Review Deadline Reminder <tier>'). One-time tiers
  * (Day 1/14/21) check AuditTrail for *any* prior send; the daily tier
@@ -68,6 +80,26 @@ App::uses('CakeEmail', 'Network/Email');
  * and review_deadline_alert.sh, which mirror the existing
  * setup_weekly_reminder.sh / reviewer_weekly_reminder.sh pattern already
  * used for the weekly reviewer nudge.
+ *
+ * Same-day watermark: `reviews.deadline_alert_checked_on` (see
+ * app/Config/Schema/reviews_deadline_alert_checked_on_column.sql) is
+ * stamped with today's date at the end of _processReview() for every
+ * review it looks at, whatever the outcome. main() excludes any review
+ * already stamped for today, so re-running this shell more than once on
+ * the same day (manual testing, a cron double-fire) only touches reviews
+ * it hasn't checked yet instead of re-scanning and re-skipping the whole
+ * table. This is deliberately NOT a "resume from last run" cursor - it
+ * resets every midnight, because an overdue review must still be
+ * re-evaluated every single day (the daily reminder has to keep firing,
+ * and any review could cross a tier boundary on any given day).
+ *
+ * _markChecked() writes that column via updateAll() rather than
+ * save()/saveField() - a normal save would run through Review's Timestamp
+ * behavior and bump `modified`, which _processReview() reads as this
+ * review's "accepted on" date (see the CAVEAT above) - silently resetting
+ * every reviewer's SLA clock to today, every day. updateAll() is a plain
+ * SQL UPDATE with no behavior callbacks, so it can only ever touch the one
+ * column named there.
  */
 class ReviewDeadlineAlertShell extends AppShell
 {
@@ -80,6 +112,20 @@ class ReviewDeadlineAlertShell extends AppShell
      * 14, 7 remaining at Day 21, due at Day 28).
      */
     const SLA_DAYS = 28;
+
+    /**
+     * Cases accepted before this date are excluded from every run
+     * entirely (not just from the reminder tiers - main()'s query filters
+     * them out before _processReview() ever sees them). This app has
+     * accepted Review rows going back to 2012 - old enough that most are
+     * either stale test/seed data or long since handled outside this
+     * shell (it didn't exist until 2026) - and every one of them reads as
+     * "thousands of days overdue" under the 28-day SLA, which is not a
+     * real, actionable overdue case. Pragmatic cutoff, not a business
+     * rule: raise/lower it (or remove the filter below) once the backlog
+     * of pre-2022 Review rows has been triaged/cleaned up properly.
+     */
+    const MIN_ACCEPTED_DATE = '2026-08-10';
 
     protected $_messages = array();
 
@@ -120,10 +166,33 @@ class ReviewDeadlineAlertShell extends AppShell
             'conditions' => array(
                 'Review.type' => 'request',
                 'Review.accepted' => 'accepted',
+                // Same-day watermark (see class docblock) - skip whatever
+                // _markChecked() already stamped for today, so a same-day
+                // rerun doesn't re-scan the whole table. Kept as its own
+                // array element (see MIN_ACCEPTED_DATE comment below) so
+                // this 'OR' key doesn't collide with the next one.
+                array(
+                    'OR' => array(
+                        array('Review.deadline_alert_checked_on' => null),
+                        array('Review.deadline_alert_checked_on <' => date('Y-m-d')),
+                    ),
+                ),
+                // Ignore the pre-2022 backlog entirely (see
+                // MIN_ACCEPTED_DATE) - mirrors _processReviewOnce()'s own
+                // "$acceptedOn = modified, falling back to created" logic.
+                array(
+                    'OR' => array(
+                        array('Review.modified >=' => self::MIN_ACCEPTED_DATE),
+                        array(
+                            'Review.modified' => null,
+                            'Review.created >=' => self::MIN_ACCEPTED_DATE,
+                        ),
+                    ),
+                ),
             ),
         ));
 
-        $this->out('Found ' . count($reviews) . ' accepted review assignment(s) to check.');
+        $this->out('Found ' . count($reviews) . ' accepted review assignment(s) accepted on/after ' . self::MIN_ACCEPTED_DATE . ' and not yet checked today.');
 
         foreach ($reviews as $row) {
             $this->_processReview($row);
@@ -135,6 +204,18 @@ class ReviewDeadlineAlertShell extends AppShell
     protected function _processReview($row)
     {
         $review = $row['Review'];
+        try {
+            $this->_processReviewOnce($review, $row);
+        } finally {
+            // Runs on every exit path above - normal return, an early
+            // return, or an exception - so a same-day rerun never
+            // re-touches this review regardless of how it was handled.
+            $this->_markChecked($review['id']);
+        }
+    }
+
+    protected function _processReviewOnce($review, $row)
+    {
         if (empty($row['Application']) || empty($row['User'])) {
             return;
         }
@@ -151,6 +232,14 @@ class ReviewDeadlineAlertShell extends AppShell
             ),
         ));
         if ($submitted) {
+            return;
+        }
+
+        // Inactive or deactivated reviewer - see the class docblock. Skip
+        // the whole escalation ladder (including CAPA auto-creation) and
+        // just flag it once for a manager to reassign.
+        if (empty($row['User']['is_active']) || !empty($row['User']['deactivated'])) {
+            $this->_flagInactiveReviewer($review, $row);
             return;
         }
 
@@ -204,6 +293,49 @@ class ReviewDeadlineAlertShell extends AppShell
         } else {
             $this->out("- Review #{$review['id']} ({$row['Application']['protocol_no']}): {$elapsedDays}/" . self::SLA_DAYS . " days elapsed, nothing to send.");
         }
+    }
+
+    /**
+     * Stamp `deadline_alert_checked_on` = today for this review - see the
+     * class docblock's "Same-day watermark" section for why this uses
+     * updateAll() instead of save()/saveField().
+     */
+    protected function _markChecked($reviewId)
+    {
+        $db = $this->Review->getDataSource();
+        $this->Review->updateAll(
+            array('Review.deadline_alert_checked_on' => $db->value(date('Y-m-d'), 'string')),
+            array('Review.id' => $reviewId)
+        );
+    }
+
+    /**
+     * A reviewer went inactive/deactivated after accepting a review. Skip
+     * the reminder email and CAPA auto-creation entirely, and leave a
+     * one-time AuditTrail note (guarded via _alreadySent() the same way
+     * the one-time reminder tiers are, so re-running the shell daily
+     * doesn't spam the trail) so a manager can see this review needs to be
+     * reassigned to an active reviewer.
+     */
+    protected function _flagInactiveReviewer($review, $row)
+    {
+        $reviewId = $review['id'];
+        $auditModel = 'Review Deadline Reminder Inactive Reviewer';
+
+        if ($this->_alreadySent($reviewId, $auditModel, false)) {
+            return;
+        }
+
+        $this->out("- Review #{$reviewId} ({$row['Application']['protocol_no']}): reviewer {$row['User']['name']} is inactive/deactivated - skipping reminder and CAPA, flagging for reassignment.");
+
+        $this->AuditTrail->create();
+        $this->AuditTrail->save(array('AuditTrail' => array(
+            'foreign_key' => $reviewId,
+            'model' => $auditModel,
+            'message' => 'Reviewer ' . $row['User']['name'] . ' is inactive/deactivated - deadline reminders and CAPA auto-creation skipped for application '
+                . $row['Application']['protocol_no'] . '. This review needs to be reassigned to an active reviewer.',
+            'ip' => $row['Application']['protocol_no'],
+        )));
     }
 
     protected function _alreadySent($reviewId, $auditModel, $repeatDaily)
