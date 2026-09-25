@@ -917,7 +917,7 @@ class ApplicationsController extends AppController
     public function manager_amendment_summary()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('20' => '20', '50' => '50','100'=>'100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -1901,7 +1901,7 @@ class ApplicationsController extends AppController
     public function manager_workflow()
     {
         $this->Prg->commonProcess();
-        $page_options = array('20' => '20', '50' => '50','100'=>'100');
+        $page_options = array('5' => '5', '10' => '10');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         // debug($this->params['named']['stages']);
 
@@ -2763,7 +2763,7 @@ class ApplicationsController extends AppController
             )
         )));
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 9), 'User.is_active' => 1))));
 
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');

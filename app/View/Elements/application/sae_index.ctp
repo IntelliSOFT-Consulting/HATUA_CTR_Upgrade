@@ -248,7 +248,7 @@ $this->assign('SAE', 'active');
                     <td>
                         <?php
                         echo $this->Form->input('phase', array(
-'type' => 'select',
+                            'type' => 'select',
                             'div' => false,
                             'class' => 'span12',
                             'empty' => true,
