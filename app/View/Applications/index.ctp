@@ -9,7 +9,7 @@
     <div class="marketing">
       <div class="row-fluid">
             <div class="span12">
-              <h4>Clinical Trial Applications:<small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view applications</small> <?php  echo $this->element('google-recommend');?></h4>
+              <h4>Clinical Trial Applications<?php if (!empty($status)) echo ' - ' . h(ucfirst($status)); ?>:<small> <i class="icon-glass"></i> Filter, <i class="icon-search"></i> Search, and <i class="icon-eye-open"></i> view applications</small> <?php  echo $this->element('google-recommend');?></h4>
               <!-- <hr style="margin: 10px 0px"> -->
               <hr class="soften" style="margin: 10px 0px;">
             </div>

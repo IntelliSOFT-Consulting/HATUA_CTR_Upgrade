@@ -44,7 +44,7 @@ class Application extends AppModel
         'month_year' => array('type' => 'query', 'method' => 'dummy'),
         'mode' => array('type' => 'expression', 'method' => 'makeMonthYearCondition', 'field' => 'Application.date_submitted BETWEEN ? AND ?'),
         'phase' => array('type' => 'query', 'method' => 'phaseConditions', 'encode' => true),
-        'status'     => array('type' => 'query', 'method' => 'statusCheckConditions', 'encode' => true),
+        'status'     => array('type' => 'query', 'method' => 'statusCheckConditions'),
 
     );
 
@@ -64,12 +64,9 @@ class Application extends AppModel
 
             case 'stopped':
             case 'suspended':
-                $trialStatus = $this->TrialStatus->find('first', array(
-                    'conditions' => array('TrialStatus.name' => ucfirst($data['status'])), // adjust field/value to match actual TrialStatus data
-                    'fields' => array('TrialStatus.id')
-                ));
-                $conditions['Application.trial_status_id'] = !empty($trialStatus['TrialStatus']['id'])
-                    ? $trialStatus['TrialStatus']['id']
+                $trialStatusId = $this->publicTrialStatusId($data['status']);
+                $conditions['Application.trial_status_id'] = $trialStatusId
+                    ? $trialStatusId
                     : 0; // 0 forces no results if not found, instead of matching everything
                 break;
             case 'approved':
@@ -81,6 +78,82 @@ class Application extends AppModel
 
         return $conditions;
     }
+    /**
+     * Cache of TrialStatus ids for the public Stopped / Suspended lists.
+     */
+    protected $_publicTrialStatusIds = array();
+
+    /**
+     * TrialStatus id for 'stopped' / 'suspended' (looked up by name, as the
+     * public list filter does), or null if no such status exists.
+     */
+    public function publicTrialStatusId($status)
+    {
+        $status = strtolower($status);
+        if (!array_key_exists($status, $this->_publicTrialStatusIds)) {
+            $trialStatus = $this->TrialStatus->find('first', array(
+                'conditions' => array('TrialStatus.name' => ucfirst($status)),
+                'fields' => array('TrialStatus.id'),
+                'recursive' => -1,
+            ));
+            $this->_publicTrialStatusIds[$status] = !empty($trialStatus['TrialStatus']['id'])
+                ? (int)$trialStatus['TrialStatus']['id']
+                : null;
+        }
+        return $this->_publicTrialStatusIds[$status];
+    }
+
+    /**
+     * The public decisions/actions that apply to an application, each with
+     * the date it was taken, keyed by the public list status:
+     *   approved / rejected  -> Application.approval_date (stamped by manager_approve)
+     *   stopped / suspended  -> Application.trial_status_date (stamped in beforeSave
+     *                           whenever trial_status_id changes)
+     * 'date' is a d-m-Y string, or null when no date was recorded.
+     */
+    public function publicActionDates($application)
+    {
+        $app = isset($application['Application']) ? $application['Application'] : $application;
+        $actions = array();
+
+        if (isset($app['approved']) && ((int)$app['approved'] === 2 || (int)$app['approved'] === 1)) {
+            $key = ((int)$app['approved'] === 2) ? 'approved' : 'rejected';
+            $actions[$key] = array(
+                'label' => ucfirst($key),
+                'date' => $this->_publicDisplayDate(isset($app['approval_date']) ? $app['approval_date'] : null),
+            );
+        }
+
+        if (!empty($app['trial_status_id'])) {
+            foreach (array('suspended', 'stopped') as $key) {
+                if ((int)$app['trial_status_id'] === $this->publicTrialStatusId($key)) {
+                    $actions[$key] = array(
+                        'label' => ucfirst($key),
+                        'date' => $this->_publicDisplayDate(isset($app['trial_status_date']) ? $app['trial_status_date'] : null),
+                    );
+                }
+            }
+        }
+
+        return $actions;
+    }
+
+    /**
+     * d-m-Y for display, or null for empty / zero / unparseable dates
+     * (e.g. '0000-00-00', which afterFind would otherwise turn into a bogus date).
+     */
+    protected function _publicDisplayDate($value)
+    {
+        if (empty($value) || strpos($value, '0000') === 0) {
+            return null;
+        }
+        $ts = strtotime($value);
+        if ($ts === false || (int)date('Y', $ts) < 1990) {
+            return null;
+        }
+        return date('d-m-Y', $ts);
+    }
+
     public function phaseConditions($data = array())
     {
         $filter = $data['phase'];
@@ -1701,7 +1774,54 @@ class Application extends AppModel
         if (empty($this->data['Application']['ecct_ref_number'])) {
             $this->data['Application']['ecct_ref_number'] = '';
         }
+
+        $this->_stampTrialStatusDate();
         return true;
+    }
+
+    /**
+     * Records when the trial status last changed (used as the "date stopped /
+     * suspended" on the public lists). Covers every path that writes
+     * trial_status_id - admin_suspend()'s saveField() and the applicant's
+     * status update - and only stamps on an actual change, so re-posting the
+     * same status does not move the date.
+     *
+     * Skipped silently until the trial_status_date column has been added
+     * (app/Config/Schema/applications_trial_status_date_column.sql).
+     */
+    protected function _stampTrialStatusDate()
+    {
+        if (!isset($this->data[$this->alias]) || !array_key_exists('trial_status_id', $this->data[$this->alias])
+            || !$this->hasField('trial_status_date')) {
+            return;
+        }
+
+        $newStatus = $this->data[$this->alias]['trial_status_id'];
+        $id = !empty($this->data[$this->alias][$this->primaryKey]) ? $this->data[$this->alias][$this->primaryKey] : $this->id;
+
+        $oldStatus = null;
+        if (!empty($id)) {
+            $current = $this->find('first', array(
+                'conditions' => array($this->alias . '.' . $this->primaryKey => $id),
+                'fields' => array($this->alias . '.trial_status_id'),
+                'recursive' => -1,
+                'callbacks' => false,
+            ));
+            if (!empty($current[$this->alias])) {
+                $oldStatus = $current[$this->alias]['trial_status_id'];
+            }
+        }
+
+        if ((string)$oldStatus === (string)$newStatus) {
+            return;
+        }
+
+        $this->data[$this->alias]['trial_status_date'] = empty($newStatus) ? null : date('Y-m-d H:i:s');
+        // saveField()/fieldList saves whitelist columns; Model::save() applies the
+        // whitelist after beforeSave, so the stamp must be added to it here.
+        if (!empty($this->whitelist) && !in_array('trial_status_date', $this->whitelist)) {
+            $this->whitelist[] = 'trial_status_date';
+        }
     }
 
 

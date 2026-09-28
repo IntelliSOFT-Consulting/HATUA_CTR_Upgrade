@@ -1648,9 +1648,12 @@ class ApplicationsController extends AppController
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
         else $this->paginate['limit'] = reset($page_options);
-        $this->passedArgs['status'] = !empty($this->params['named']['status'])
-            ? $this->params['named']['status']
-            : 'approved';
+        $publicStatuses = array('approved', 'rejected', 'stopped', 'suspended');
+        $status = !empty($this->params['named']['status']) ? strtolower($this->params['named']['status']) : 'approved';
+        if (!in_array($status, $publicStatuses)) {
+            $status = 'approved';
+        }
+        $this->passedArgs['status'] = $status;
         $criteria = $this->Application->parseCriteria($this->passedArgs);
         $criteria['Application.submitted'] = 1;
         // $criteria['Application.approved'] = 2;
@@ -1660,7 +1663,17 @@ class ApplicationsController extends AppController
         $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
 
         $this->set('page_options', $page_options);
-        $this->set('applications', Sanitize::clean($this->paginate(), array('encode' => false)));
+        $applications = Sanitize::clean($this->paginate(), array('encode' => false));
+        foreach ($applications as $key => $application) {
+            $actions = $this->Application->publicActionDates($application);
+            $applications[$key]['PublicAction'] = isset($actions[$status])
+                ? $actions[$status]
+                : array('label' => ucfirst($status), 'date' => null);
+        }
+        $this->set('applications', $applications);
+        $this->set('status', $status);
+        // Column the "Date <action>" header sorts on
+        $this->set('action_date_field', in_array($status, array('approved', 'rejected')) ? 'approval_date' : 'trial_status_date');
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
@@ -2139,7 +2152,9 @@ class ApplicationsController extends AppController
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
         }
-        $this->set('application', $this->Application->read(null, $id));
+        $application = $this->Application->read(null, $id);
+        $this->set('application', $application);
+        $this->set('publicActions', $this->Application->publicActionDates($application));
     }
 
     public function applicant_view($id = null)

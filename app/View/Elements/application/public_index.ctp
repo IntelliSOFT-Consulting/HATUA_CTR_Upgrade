@@ -3,6 +3,10 @@
 
     <?php echo $this->fetch('header'); ?>
     <?php
+          // Keep the public list (approved / rejected / stopped / suspended) on every
+          // search, clear and phase-filter link - the form posts to 'index' otherwise
+          // and the list silently falls back to Approved.
+          $statusArg = !empty($status) ? array('status' => $status) : array();
           $thp = $tte = $ttc = $ttu =  '';
           if (isset($this->request->params['named']['trial_human_pharmacology'])) {
             if($this->request->params['named']['trial_human_pharmacology'] == '1') {
@@ -33,25 +37,25 @@
               <li class="<?php echo $thp; ?>">
                 <?php
                   echo $this->Html->link('<i class="icon-hand-right"></i>Phase I -  <br> <small class="muted">Human pharmacology</small>',
-                            array('action' => 'index', 'trial_human_pharmacology'=>'1'), array('escape' => false));
+                            array_merge(array('action' => 'index', 'trial_human_pharmacology'=>'1'), $statusArg), array('escape' => false));
                 ?>
               </li>
               <li class="<?php echo $tte; ?>">
                 <?php
                   echo $this->Html->link('<i class="icon-hand-right"></i>Phase II -  <small class="muted">Therapeutic exploratory</small>',
-                            array('action' => 'index', 'trial_therapeutic_exploratory'=>'1'), array('escape' => false));
+                            array_merge(array('action' => 'index', 'trial_therapeutic_exploratory'=>'1'), $statusArg), array('escape' => false));
                 ?>
               </li>
               <li class="<?php echo $ttc; ?>">
                 <?php
                   echo $this->Html->link('<i class="icon-hand-right"></i>Phase III - <small class="muted">Therapeutic confirmatory</small> ',
-                            array('action' => 'index', 'trial_therapeutic_confirmatory'=>'1'), array('escape' => false));
+                            array_merge(array('action' => 'index', 'trial_therapeutic_confirmatory'=>'1'), $statusArg), array('escape' => false));
                 ?>
               </li>
               <li class="<?php echo $ttu; ?>">
                 <?php
                   echo $this->Html->link('<i class="icon-hand-right"></i>Phase IV - <small class="muted">Therapeutic use</small>',
-                            array('action' => 'index', 'trial_therapeutic_use'=>'1'), array('escape' => false));
+                            array_merge(array('action' => 'index', 'trial_therapeutic_use'=>'1'), $statusArg), array('escape' => false));
                 ?>
               </li>
               <?php echo $this->fetch('sidebar'); ?>
@@ -63,7 +67,7 @@
         <div class="span10">
       <?php
         echo $this->Form->create('Application', array(
-          'url' => array_merge(array('action' => 'index'), $this->params['pass']),
+          'url' => array_merge(array('action' => 'index'), $this->params['pass'], $statusArg),
           'class' => 'ctr-groups', 'style'=>array('padding:9px;', 'background-color: #F5F5F5'),
         ));
       ?>
@@ -126,7 +130,7 @@
                       'style' => array('margin-bottom: 5px')
                   ));
 
-                  echo $this->Html->link('<i class="icon-remove"></i> Clear', array('action' => 'index'), array('class' => 'btn', 'escape' => false, 'style' => array('margin-bottom: 5px')));
+                  echo $this->Html->link('<i class="icon-remove"></i> Clear', array_merge(array('action' => 'index'), $statusArg), array('class' => 'btn', 'escape' => false, 'style' => array('margin-bottom: 5px')));
                   echo "<br>";
                   if($redir) echo $this->Html->link('<i class="icon-file-alt"></i> Excel', array('action' => 'index', 'ext' => 'csv'), array('class' => 'btn btn-success', 'escape' => false));
                 ?>
@@ -210,6 +214,9 @@
                 <th style="width: 13%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
                 <th style="width: 26%;"><?php echo $this->Paginator->sort('study_title'); ?></th>
                 <th style="width: 26%;">Investigator(s) &amp; Site(s)</th>
+                <?php if (!empty($status)) { ?>
+                <th style="width: 12%;"><?php echo $this->Paginator->sort($action_date_field, 'Date ' . ucfirst($status)); ?></th>
+                <?php } ?>
                 <!-- <th style="width: 27%">Application Status </th> -->
                 <th style="width: 5%;"><i class="icon-link"></i></th>
               </tr>
@@ -257,6 +264,14 @@
                           echo "<br>";
                           $cound++;
                         }?> &nbsp; </td>
+                <?php if (!empty($status)) { ?>
+                <td>
+                  <?php
+                    if (!empty($application['PublicAction']['date'])) echo h($application['PublicAction']['date']);
+                    else echo '<em class="muted">Not recorded</em>';
+                  ?>
+                </td>
+                <?php } ?>
                 <!-- <td> 
                   <?php //echo $this->element($this->fetch('attributes'), array('application' => $application)); ?>
                  </td> -->

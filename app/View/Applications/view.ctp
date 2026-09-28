@@ -14,7 +14,15 @@
 			<div class="well" style="width:195px; padding:8px;">
 				<ul class="nav nav-list">
 				  <li class="divider"></li>
-				  <li><?php echo $this->Html->link(__('List Applications'), array('action' => 'index')); ?> </li>
+				  <?php
+					// Back to the public list for the report's current state (e.g. Suspended over Approved)
+					$listArgs = array('action' => 'index');
+					if (!empty($publicActions)) {
+						$actionKeys = array_keys($publicActions);
+						$listArgs['status'] = end($actionKeys);
+					}
+				  ?>
+				  <li><?php echo $this->Html->link(__('List Applications'), $listArgs); ?> </li>
 				  <li class="divider"></li>
 				</ul>
 			</div>
@@ -54,6 +62,19 @@
 							<td style="width: 25%;">Date of Protocol:</td>
 							<td style="width: 25%;"><strong><?php echo __($application['Application']['date_of_protocol'], true) ?></strong></td>
 						</tr>
+						<?php if (!empty($publicActions)) { ?>
+						<?php foreach ($publicActions as $publicAction) { ?>
+						<tr>
+							<td style="width: 25%;">Status:</td>
+							<td style="width: 25%;"><strong><?php echo h($publicAction['label']); ?></strong></td>
+							<td style="width: 25%;">Date <?php echo h($publicAction['label']); ?>:</td>
+							<td style="width: 25%;"><strong><?php
+								if (!empty($publicAction['date'])) echo h($publicAction['date']);
+								else echo '<em class="muted">Not recorded</em>';
+							?></strong></td>
+						</tr>
+						<?php } ?>
+						<?php } ?>
 					</table>
 					 <hr>
 					<table style="width: 100%;">
