@@ -217,8 +217,14 @@
                       echo $this->Form->input('ercs', array(
                         'type' => 'select', 'div' => false, 'class' => 'span12',
                         'empty' => true,
-                        'options' => $ercs,
+                        'options' => isset($ercs) ? $ercs : array(),
                         'label' => array('class' => 'required', 'text' => 'ERCs'),
+                      ));
+                      echo $this->Form->input('sponsors', array(
+                        'type' => 'select', 'div' => false, 'class' => 'span12',
+                        'empty' => true,
+                        'options' => isset($sponsor_options) ? $sponsor_options : array(),
+                        'label' => array('class' => 'required', 'text' => 'Sponsors'),
                       ));
                     }
                     ?>
@@ -243,6 +249,14 @@
                         ),
                         'label' => array('class' => 'required', 'text' => 'Trial Phase'),
                       ));
+                      echo $this->Form->input('estimated_duration', array(
+                        'type' => 'number',
+                        'min' => 0,
+                        'step' => 1,
+                        'div' => false,
+                        'class' => 'span12 unauthorized_index',
+                        'label' => array('class' => 'required', 'text' => 'Estimated Duration (Months)'),
+                      ));
                     }
                     ?>
                   </td>
@@ -264,7 +278,7 @@
                         'div' => false,
                         'class' => 'span12',
                         'empty' => true,
-                        'options' => $trial_statuses,
+                        'options' => isset($trial_statuses) ? $trial_statuses : array(),
                         'label' => array('class' => 'required', 'text' => 'Trial Status'),
                       ));
                     }
