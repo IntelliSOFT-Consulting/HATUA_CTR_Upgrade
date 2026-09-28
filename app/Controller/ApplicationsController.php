@@ -852,7 +852,7 @@ class ApplicationsController extends AppController
     public function manager_stages_summary()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10', '50' => '50', '100' => '100', '500' => '500', '1000' => '1000');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100', '500' => '500', '1000' => '1000');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -1644,7 +1644,7 @@ class ApplicationsController extends AppController
     {
 
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
         else $this->paginate['limit'] = reset($page_options);
@@ -1691,7 +1691,7 @@ class ApplicationsController extends AppController
     public function applicant_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -1723,7 +1723,7 @@ class ApplicationsController extends AppController
     public function monitor_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -1760,7 +1760,7 @@ class ApplicationsController extends AppController
     public function outsource_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -1914,7 +1914,7 @@ class ApplicationsController extends AppController
     public function manager_workflow()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         // debug($this->params['named']['stages']);
 
@@ -1965,7 +1965,7 @@ class ApplicationsController extends AppController
     public function inspector_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10', '50' => '50', '100' => '100');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -2009,7 +2009,7 @@ class ApplicationsController extends AppController
     public function internalreviewer_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -2037,7 +2037,7 @@ class ApplicationsController extends AppController
     public function reviewer_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -2065,7 +2065,7 @@ class ApplicationsController extends AppController
     public function partner_index()
     {
         $this->Prg->commonProcess();
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
@@ -2085,7 +2085,7 @@ class ApplicationsController extends AppController
     {
         $this->Prg->commonProcess();
         // $this->Application->softDelete(false);
-        $page_options = array('5' => '5', '10' => '10');
+        $page_options = array('10' => '10', '50' => '50', '100' => '100');
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (!empty($this->passedArgs['month_year'])) $this->passedArgs['mode'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
