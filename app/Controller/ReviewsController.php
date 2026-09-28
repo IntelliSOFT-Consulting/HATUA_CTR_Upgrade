@@ -90,6 +90,29 @@ class ReviewsController extends AppController
                     $doer = $this->Auth->user('name');
                     CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $this->request->data,$doer));
 
+                    $this->loadModel('AuditTrail');
+                    $protocolNo = $this->Application->field('protocol_no', array('id' => $id));
+                    foreach ($this->request->data as $item) {
+                        if (!empty($item['Review']['user_id'])) {
+                            $revUser = $this->Review->User->find('first', array(
+                                'conditions' => array('User.id' => $item['Review']['user_id']),
+                                'fields' => array('User.username'),
+                                'contain' => array()
+                            ));
+                            $reviewerUsername = !empty($revUser['User']['username']) ? $revUser['User']['username'] : 'reviewer';
+                            $audit = array(
+                                'AuditTrail' => array(
+                                    'foreign_key' => $id,
+                                    'model' => 'Application',
+                                    'message' => 'A Report with protocol number ' . $protocolNo . ' has been assigned to ' . $reviewerUsername . ' for review  by ' . $doer,
+                                    'ip' => $protocolNo
+                                )
+                            );
+                            $this->AuditTrail->create();
+                            $this->AuditTrail->save($audit);
+                        }
+                    }
+
                     $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
                     $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
                 } else {
@@ -590,6 +613,31 @@ class ReviewsController extends AppController
 
 
 	}
+
+    public function admin_assign($id = null)
+    {
+        $this->manager_assign($id);
+    }
+
+    public function admin_assign_internal($id = null)
+    {
+        $this->manager_assign_internal($id);
+    }
+
+    public function admin_manager_assign_internal($id = null)
+    {
+        $this->manager_assign_internal($id);
+    }
+
+    public function admin_revoke($id = null, $application_id = null)
+    {
+        $this->manager_revoke($id, $application_id);
+    }
+
+    public function admin_manager_revoke($id = null, $application_id = null)
+    {
+        $this->manager_revoke($id, $application_id);
+    }
 
     public function reviewer_test($id = null)
     {
@@ -1115,6 +1163,25 @@ class ReviewsController extends AppController
                 //end stages
                 $doer = $this->Auth->user('name');
                 CakeResque::enqueue('default', 'NotificationShell', array('newAppNotifyReviewer', $saveData, $doer));
+
+                $this->loadModel('AuditTrail');
+                $protocolNo = $this->Application->field('protocol_no', array('id' => $id));
+                $revUser = $this->User->find('first', array(
+                    'conditions' => array('User.id' => $selectedUserId),
+                    'fields' => array('User.username'),
+                    'contain' => array()
+                ));
+                $reviewerUsername = !empty($revUser['User']['username']) ? $revUser['User']['username'] : 'reviewer';
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $id,
+                        'model' => 'Application',
+                        'message' => 'A Report with protocol number ' . $protocolNo . ' has been assigned to ' . $reviewerUsername . ' for review  by ' . $doer,
+                        'ip' => $protocolNo
+                    )
+                );
+                $this->AuditTrail->create();
+                $this->AuditTrail->save($audit);
 
                 $this->Session->setFlash(__('The reviewers have been notified'), 'alerts/flash_success');
                 $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));

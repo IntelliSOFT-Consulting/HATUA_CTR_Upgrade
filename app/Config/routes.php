@@ -50,6 +50,14 @@
 	Router::connect('/outsource', array('controller' => 'users', 'action' => 'dashboard', 'outsource' => true));	
 	//PPB INTERNAL USER ROUTING: DASHBOARD PAGE
 	Router::connect('/internalreviewer', array('controller' => 'users', 'action' => 'dashboard', 'internalreviewer' => true));	
+	//SPONSOR USER ROUTING: DASHBOARD PAGE
+	Router::connect('/sponsor', array('controller' => 'users', 'action' => 'dashboard', 'sponsor' => true));
+	//CRO USER ROUTING: DASHBOARD PAGE
+	Router::connect('/cro', array('controller' => 'users', 'action' => 'dashboard', 'cro' => true));
+	//PV USER ROUTING: DASHBOARD PAGE
+	Router::connect('/pv', array('controller' => 'users', 'action' => 'dashboard', 'pv' => true));
+	//PHARMA INDUSTRY USER ROUTING: DASHBOARD PAGE
+	Router::connect('/pharmaindustry', array('controller' => 'users', 'action' => 'dashboard', 'pharmaindustry' => true));
  
 /**
  * Load all plugin routes.  See the CakePlugin documentation on 

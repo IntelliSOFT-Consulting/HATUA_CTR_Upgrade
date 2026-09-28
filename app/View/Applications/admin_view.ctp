@@ -16,6 +16,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
     <?php
     $count_reviews = 0;
     $count_comments = 0;
+    $count_internal_reviews = 0;
     $my_reviews = 0;
     foreach ($application['Review'] as $review) {
       if ($review['type'] == 'request' && $review['accepted'] != 'declined') {
@@ -26,6 +27,20 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
       }
       if ($review['type'] == 'ppb_comment') {
         $my_reviews++;
+      }
+    }
+
+    if (!empty($application['InternalReview']) && is_array($application['InternalReview'])) {
+      foreach ($application['InternalReview'] as $review) {
+        if ($review['type'] == 'request' && $review['accepted'] != 'declined') {
+          $count_internal_reviews++;
+        }
+        if ($review['type'] == 'reviewer_comment') {
+          $count_comments++;
+        }
+        if ($review['type'] == 'ppb_comment') {
+          $my_reviews++;
+        }
       }
     }
     ?>
@@ -151,10 +166,15 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
       <p style="text-align: center;"><strong>Protocol Code: </strong><?php echo $application['Application']['protocol_no']; ?></p>
       <hr class="soften" style="margin: 10px 0px;">
       <div class="row-fluid">
+        
+        <div class="span6">
         <h4 class="text-success">Assigned Reviewers (<?php echo $count_reviews; ?>)</h4>
         <hr>
-        <div class="span12">
           <?php
+          echo $this->Form->create(
+            'Review',
+            array('url' => array('controller' => 'reviews', 'action' => 'admin_assign', $application['Application']['id']))
+          );
           $counter = 0;
           echo "<ol>";
           foreach ($users as $user_id => $user) {
@@ -165,29 +185,137 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
                 if ($response['type'] == 'request' && $response['accepted'] == '') {
                   $responded = true;
                   echo '<p class="text-info"><i class="icon-check-empty"> </i> ' . $user . '.
-                               <small class="muted">(Notified but no response yet.)</small></p>';
+                               <small class="muted">(Notified but no response yet. 
+                                <a class="ResendReview tiptip" href="#" id="' . $response['id'] . '" title="Resend Notification?">Resend?</a>)</small> </p>';
+                  if ($response['conflict'] != '') {
+                    echo '<p>Has Conflict of interest? <b>' . $response['conflict'] . '</b> </p>';
+                  }
+                  echo $this->Html->link(
+                    __('<small class="muted"> Revoke Access</small>'),
+                    array('controller' => 'reviews', 'action' => 'admin_revoke', $response['id'], $application['Application']['id']),
+                    array('escape' => false),
+                    __('Are you sure you want to revoke access for %s?', $user)
+                  );
                 } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
                   $responded = true;
                   echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . ' <small class="muted">(Accepts)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
-                  // echo '<p><i class="icon-minus"> </i> '.$response['text'].'</p>';
+                  echo '<p>Has Conflict of interest? ' . $response['conflict'] . ' </p>';
+                  echo '<p><i class="icon-time"> </i> Date Assigned: ' . date('d-m-Y H:i:s', strtotime($response['created'])) . '</p>';
+                  $assignedBy = !empty($response['assigned_by_name']) ? $response['assigned_by_name'] : 'N/A';
+                  echo '<p><i class="icon-user"> </i> Assigned By: ' . h($assignedBy) . '</p>';
+                  echo $this->Html->link(
+                    __('<small class="muted"> Revoke Access</small>'),
+                    array('controller' => 'reviews', 'action' => 'admin_revoke', $response['id'], $application['Application']['id']),
+                    array('escape' => false),
+                    __('Are you sure you want to revoke access for %s?', $user)
+                  );
+                  echo '<hr>';
                 } elseif ($response['type'] == 'request' && $response['accepted'] == 'declined') {
                   $responded = true;
                   echo '<p class="text-error"><i class="icon-remove"> </i> ' . $user . ' <small class="muted">(Declines)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
+                  echo '<p>Has Conflict of interest? ' . $response['conflict'] . ' </p>';
                 }
               }
             }
 
             if (!$responded) {
-              echo '<p><i class="icon-check-empty"> </i> ' . $user . '.
-                               <small class="muted">(Not requested.)</small></p>';
+              echo '<label class="checkbox" style="color: #333333">';
+              echo $this->Form->checkbox($counter . '.Review.user_id', array('hiddenField' => false, 'value' => $user_id));
+              echo $user;
+              echo '</label>';
             }
             $counter++;
             echo "</li>";
           }
           echo "</ol>";
+          echo $this->Form->input('Message.text', array('type' => 'textarea', 'rows' => 3, 'label' => 'Message'));
+          echo $this->Form->end(array(
+            'label' => 'Assign',
+            'value' => 'Assign',
+            'class' => 'btn btn-success',
+          ));
           ?>
         </div>
-      </div>
+     
+
+        <!-- INTERNAL REVIEWERS -->
+
+
+        <div class="span6">
+        <h4 class="text-success">Assigned Internal Reviewers (<?php echo $count_internal_reviews; ?>)</h4>
+        <p><small class="muted">Assign one internal reviewer at a time. The next assignment unlocks only after the previous reviewer submits assessment feedback.</small></p>
+        <hr>
+          <?php
+          echo $this->Form->create(
+            'Review',
+            array('url' => array('controller' => 'reviews', 'action' => 'admin_assign_internal', $application['Application']['id']))
+          );
+          $counter = 0;
+          echo "<ol>";
+          if (!empty($external) && is_array($external)) {
+            foreach ($external as $user_id => $user) {
+              echo "<li>";
+              $responded = false;
+              if (!empty($application['InternalReview']) && is_array($application['InternalReview'])) {
+                foreach ($application['InternalReview'] as $response) {
+                  if ($response['user_id'] == $user_id) {
+                    if ($response['type'] == 'request' && $response['accepted'] == '') {
+                      $responded = true;
+                      echo '<p class="text-info"><i class="icon-check-empty"> </i> ' . $user . '.
+                                   <small class="muted">(Notified but no response yet. 
+                                    <a class="ResendReview tiptip" href="#" id="' . $response['id'] . '" title="Resend Notification?">Resend?</a>)</small> </p>';
+                      if ($response['conflict'] != '') {
+                        echo '<p>Has Conflict of interest? <b>' . $response['conflict'] . '</b> </p>';
+                      }
+                      echo $this->Html->link(
+                        __('<small class="muted"> Revoke Access</small>'),
+                        array('controller' => 'reviews', 'action' => 'admin_revoke', $response['id'], $application['Application']['id']),
+                        array('escape' => false),
+                        __('Are you sure you want to revoke access for %s?', $user)
+                      );
+                    } elseif ($response['type'] == 'request' && $response['accepted'] == 'accepted') {
+                      $responded = true;
+                      echo '<p class="text-success"><i class="icon-check"> </i> ' . $user . ' <small class="muted">(Accepts)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
+                      echo '<p>Has Conflict of interest? ' . $response['conflict'] . ' </p>';
+                      echo '<p><i class="icon-time"> </i> Date Assigned: ' . date('d-m-Y H:i:s', strtotime($response['created'])) . '</p>';
+                      $assignedBy = !empty($response['assigned_by_name']) ? $response['assigned_by_name'] : 'N/A';
+                      echo '<p><i class="icon-user"> </i> Assigned By: ' . h($assignedBy) . '</p>';
+                      echo $this->Html->link(
+                        __('<small class="muted"> Shown Interest? Revoke Access</small>'),
+                        array('controller' => 'reviews', 'action' => 'admin_revoke', $response['id'], $application['Application']['id']),
+                        array('escape' => false),
+                        __('Are you sure you want to revoke access for %s?', $user)
+                      );
+                      echo '<hr>';
+                    } elseif ($response['type'] == 'request' && $response['accepted'] == 'declined') {
+                      $responded = true;
+                      echo '<p class="text-error"><i class="icon-remove"> </i> ' . $user . ' <small class="muted">(Declines)</small> <i class="icon-minus"> </i> ' . $response['recommendation'] . '</p>';
+                      echo '<p>Has Conflict of interest? ' . $response['conflict'] . ' </p>';
+                    }
+                  }
+                }
+              }
+
+              if (!$responded) {
+                echo '<label class="radio" style="color: #333333">';
+                echo '<input type="radio" name="data[Review][user_id]" value="' . (int) $user_id . '"> ';
+                echo h($user);
+                echo '</label>';
+              }
+              $counter++;
+              echo "</li>";
+            }
+          }
+          echo "</ol>"; 
+          echo $this->Form->input('Message.text', array('type' => 'textarea', 'rows' => 3, 'label' => 'Message'));
+          echo $this->Form->end(array(
+            'label' => 'Assign',
+            'value' => 'Assign',
+            'class' => 'btn btn-success',
+          ));
+          ?>
+        </div>
+      </div> 
     </div>
 
     <div class="tab-pane" id="tab3">

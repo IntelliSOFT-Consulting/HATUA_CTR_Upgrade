@@ -420,6 +420,10 @@ class UsersController extends AppController
                 if ($this->Auth->User('group_id') == '7') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'monitor' => 'monitor'));
                 if ($this->Auth->User('group_id') == '8') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'outsource' => 'outsource'));
                 if ($this->Auth->User('group_id') == '9') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'internalreviewer' => 'internalreviewer'));
+                if ($this->Auth->User('group_id') == '11') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'sponsor' => 'sponsor'));
+                if ($this->Auth->User('group_id') == '12') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'cro' => 'cro'));
+                if ($this->Auth->User('group_id') == '13') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'pv' => 'pv'));
+                if ($this->Auth->User('group_id') == '14') $this->redirect(array('controller' => 'users', 'action' => 'dashboard', 'pharmaindustry' => 'pharmaindustry'));
             } else {
                 $this->Session->setFlash('Your username or password was incorrect.', 'alerts/flash_error');
             }
