@@ -3,6 +3,8 @@ App::uses('AppController', 'Controller');
 App::uses('File', 'Utility');
 App::uses('Xml', 'Utility');
 App::uses('Sanitize', 'Utility');
+App::uses('CiomsR3Parser', 'Lib'); 
+
 /**
  * Cioms Controller
  *
@@ -174,8 +176,10 @@ class CiomsController extends AppController {
                 $this->redirect('/');
         }
         
-        $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
-        $this->set(compact('ciom', 'e2b'));
+       $parsed = CiomsR3Parser::parse($ciom['Ciom']['e2b_content']);                                                                                                                                                                                                       
+    $e2b = $parsed['raw'];                                                                                                                                                                                                                                              
+    $r3 = ($parsed['version'] === 'R3') ? $parsed['summary'] : array();                                                                                                                                                                                                 
+    $this->set(compact('ciom', 'e2b', 'r3')); 
 
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'CIOM_' . $id,  'orientation' => 'portrait');
@@ -193,8 +197,10 @@ class CiomsController extends AppController {
                 $this->redirect('/');
         }
         
-        $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
-		$this->set(compact('ciom', 'e2b'));
+       $parsed = CiomsR3Parser::parse($ciom['Ciom']['e2b_content']);                                                                                                                                                                                                       
+    $e2b = $parsed['raw'];                                                                                                                                                                                                                                              
+    $r3 = ($parsed['version'] === 'R3') ? $parsed['summary'] : array();                                                                                                                                                                                                 
+    $this->set(compact('ciom', 'e2b', 'r3')); 
 
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'CIOM_' . $id,  'orientation' => 'portrait');
@@ -212,8 +218,10 @@ class CiomsController extends AppController {
         //         $this->redirect('/');
         // }
         
-        $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
-		$this->set(compact('ciom', 'e2b'));
+        $parsed = CiomsR3Parser::parse($ciom['Ciom']['e2b_content']);
+        $e2b = $parsed['raw'];
+        $r3 = ($parsed['version'] === 'R3') ? $parsed['summary'] : array();
+		$this->set(compact('ciom', 'e2b', 'r3'));
 
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'CIOM_' . $id,  'orientation' => 'portrait');
@@ -227,8 +235,10 @@ class CiomsController extends AppController {
 		$ciom = $this->Ciom->read(null, $id);
         if( strpos($ciom['Ciom']['basename'], 'xml') !== false ) {
             $this->Session->setFlash(__('Invalid E2B file. Unable to parse content!!'), 'alerts/flash_error');
-            $e2b = Xml::toArray(Xml::build($ciom['Ciom']['e2b_content']));
-            $this->set(compact('ciom', 'e2b'));
+            $parsed = CiomsR3Parser::parse($ciom['Ciom']['e2b_content']);
+            $e2b = $parsed['raw'];
+            $r3 = ($parsed['version'] === 'R3') ? $parsed['summary'] : array();
+            $this->set(compact('ciom', 'e2b', 'r3'));
         } else {
             $this->redirect($this->referer());
         }
@@ -252,7 +262,11 @@ class CiomsController extends AppController {
             // debug($this->request->data);
 
             $file = new File($this->request->data['Ciom']['file']['tmp_name']);
-            $this->request->data['Ciom']['e2b_content'] = $file->read();
+              $xmlContent = $file->read();  
+            $this->request->data['Ciom']['e2b_content'] = $xmlContent;
+            $parsed = CiomsR3Parser::parse($xmlContent);                                                                                                                                                                                                            
+                $this->request->data['Ciom']['e2b_version'] = $parsed['version'];                                                                                                                                                                                       
+                $this->request->data['Ciom']['parsed_json'] = json_encode($parsed['summary']); 
 
             if ($this->Ciom->save($this->request->data)) {
                 $this->Session->setFlash(__('The ciom has been saved'), 'alerts/flash_success');
@@ -273,7 +287,11 @@ class CiomsController extends AppController {
 			// debug($this->request->data);
 
 			$file = new File($this->request->data['Ciom']['file']['tmp_name']);
-            $this->request->data['Ciom']['e2b_content'] = $file->read();
+              $xmlContent = $file->read();    
+             $this->request->data['Ciom']['e2b_content'] = $xmlContent;
+            $parsed = CiomsR3Parser::parse($xmlContent);                                                                                                                                                                                                            
+                $this->request->data['Ciom']['e2b_version'] = $parsed['version'];                                                                                                                                                                                       
+                $this->request->data['Ciom']['parsed_json'] = json_encode($parsed['summary']); 
 
 			if ($this->Ciom->save($this->request->data)) {
 				$this->Session->setFlash(__('The ciom has been saved'), 'alerts/flash_success');
@@ -294,7 +312,11 @@ class CiomsController extends AppController {
 			// debug($this->request->data);
 
 			$file = new File($this->request->data['Ciom']['file']['tmp_name']);
-            $this->request->data['Ciom']['e2b_content'] = $file->read();
+              $xmlContent = $file->read();    
+             $this->request->data['Ciom']['e2b_content'] = $xmlContent;
+            $parsed = CiomsR3Parser::parse($xmlContent);                                                                                                                                                                                                            
+                $this->request->data['Ciom']['e2b_version'] = $parsed['version'];                                                                                                                                                                                       
+                $this->request->data['Ciom']['parsed_json'] = json_encode($parsed['summary']);   
 
 			if ($this->Ciom->save($this->request->data)) {
 				$this->Session->setFlash(__('The ciom has been saved'), 'alerts/flash_success');

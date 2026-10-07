@@ -51,6 +51,12 @@ class PagesController extends AppController {
  * @param mixed What page to display
  * @return void
  */
+    public function beforeFilter() {                                                                                                                               
+            parent::beforeFilter();                                                                                                                                        
+            if (isset($this->Auth)) {                                                                                                                                      
+                $this->Auth->allow('display', 'api_health');                                                                                                                   
+            }                                                                                                                                                              
+        }   
 	public function display() {
 		$path = func_get_args();
 
@@ -72,4 +78,14 @@ class PagesController extends AppController {
 		$this->set(compact('page', 'subpage', 'title_for_layout'));
 		$this->render(implode('/', $path));
 	}
+	 
+		 public function api_health() {                                                                                                                                 
+            $this->autoRender = false;                                                                                                                                     
+            $this->response->type('json');                                                                                                                                 
+            echo json_encode(array(                                                                                                                                        
+                'status' => 'healthy',                                                                                                                                         
+                'timestamp' => date('c'),                                                                                                                                      
+                'service' => 'HATUA CTR SAE Gateway'                                                                                                                           
+            ));
+        }   
 }

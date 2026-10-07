@@ -32,6 +32,11 @@ Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home
  * ...and connect the rest of 'Pages' controller's urls.
  */
 Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
+Router::connect('/api/health', array('controller' => 'pages', 'action' => 'health', 'api' => true));                                                           
+Router::connect('/api/v1/health', array('controller' => 'pages', 'action' => 'health', 'api' => true));                                                        
+Router::connect('/api/sae/submit', array('controller' => 'saes', 'action' => 'submit', 'api' => true));                                                        
+Router::connect('/api/v1/sae/submit', array('controller' => 'saes', 'action' => 'submit', 'api' => true));                                                     
+Router::connect('/api/v1/auth/login', array('controller' => 'users', 'action' => 'login', 'api' => true));      
 Router::connect('/api/:controller/:action/*', array('api' => true));
 //APPLICANT ROUTING: DASHBOARD PAGE
 Router::connect('/applicant', array('controller' => 'users', 'action' => 'dashboard', 'applicant' => true));

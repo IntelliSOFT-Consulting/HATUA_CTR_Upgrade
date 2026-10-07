@@ -25,7 +25,14 @@ class Attachment extends AppModel {
 			'conditions' => array('Attachment.model' => 'Application', 'Attachment.group' => 'attachment'),
 			'fields' => '',
 			'order' => ''
-		)
+		),
+		 'Sae' => array(                                                                                                                                                                                                                                                    
+                'className' => 'Sae',                                                                                                                                                                                                                                              
+                'foreignKey' => 'foreign_key',                                                                                                                                                                                                                                     
+                'conditions' => array('Attachment.model' => 'Sae'),                                                                                                                                                                                                                
+                'fields' => '',                                                                                                                                                                                                                                                    
+                'order' => ''                                                                                                                                                                                                                                                      
+            )   
 	);
 
 	var $validate = array(
