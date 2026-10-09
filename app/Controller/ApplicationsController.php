@@ -694,6 +694,53 @@ class ApplicationsController extends AppController
             'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
         ));
 
+        if (empty($application) || $application['Application']['user_id'] != $this->Auth->user('id')) {
+            $this->Session->setFlash(__('You do not have permission to access this resource'), 'alerts/flash_error');
+            $this->redirect(array('action' => 'index'));
+        }
+
+        if ($this->request->is('post')) {
+            $totalSites = null;
+            if (isset($this->request->data['Application']['total_sites'])) {
+                $totalSites = filter_var(
+                    $this->request->data['Application']['total_sites'],
+                    FILTER_VALIDATE_INT,
+                    array('options' => array('min_range' => 1))
+                );
+            }
+
+            if ($totalSites === false || $totalSites === null) {
+                $this->Session->setFlash(__('Please provide a valid number of sites.'), 'alerts/flash_error');
+                return $this->redirect(array('action' => 'edit', $id));
+            }
+
+            $this->Application->id = $id;
+            if (!$this->Application->saveField('total_sites', (int)$totalSites)) {
+                $this->Session->setFlash(__('Unable to save the number of sites. Please try again.'), 'alerts/flash_error');
+                return $this->redirect(array('action' => 'edit', $id));
+            }
+
+            $invoice = array(
+                'function' => 'ppbNewApplication',
+                'Application' => array(
+                    'id' => $id,
+                    'total_sites' => (int)$totalSites,
+                    'name' => $this->Auth->user('name'),
+                    'email' => $this->Auth->user('email'),
+                    'protocol_no' => !empty($application['Application']['protocol_no']) ? $application['Application']['protocol_no'] : ''
+                )
+            );
+
+            $queued = CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
+            if ($queued) {
+                $this->Session->setFlash(__('Invoice generation has started. The invoice details will be sent shortly.'), 'alerts/flash_success');
+            } else {
+                $this->Session->setFlash(__('Invoice could not be generated at the moment. Please try again.'), 'alerts/flash_error');
+            }
+
+            return $this->redirect(array('action' => 'edit', $id));
+        }
+
         $HttpSocket = new HttpSocket($options);
 
         $header_options = array(
@@ -2371,6 +2418,162 @@ class ApplicationsController extends AppController
         // }
     }
 
+    private function _attachReviewerAssignmentMeta($application = array())
+    {
+        if (empty($application['Application']['id'])) {
+            return $application;
+        }
+
+        $auditMap = $this->_buildReviewerAssignmentAuditMap((int) $application['Application']['id']);
+        if (empty($auditMap)) {
+            return $application;
+        }
+
+        $reviewerUserIds = array();
+        foreach (array('Review', 'InternalReview') as $collection) {
+            if (empty($application[$collection]) || !is_array($application[$collection])) {
+                continue;
+            }
+            foreach ($application[$collection] as $entry) {
+                if (
+                    isset($entry['type']) &&
+                    $entry['type'] === 'request' &&
+                    !empty($entry['user_id'])
+                ) {
+                    $reviewerUserIds[(int) $entry['user_id']] = (int) $entry['user_id'];
+                }
+            }
+        }
+
+        if (empty($reviewerUserIds)) {
+            return $application;
+        }
+
+        $userRows = $this->Application->User->find('all', array(
+            'conditions' => array('User.id' => array_values($reviewerUserIds)),
+            'fields' => array('User.id', 'User.username'),
+            'contain' => array()
+        ));
+
+        $usernameByUserId = array();
+        foreach ($userRows as $userRow) {
+            if (!empty($userRow['User']['id']) && !empty($userRow['User']['username'])) {
+                $usernameByUserId[(int) $userRow['User']['id']] = strtolower(trim($userRow['User']['username']));
+            }
+        }
+
+        foreach (array('Review', 'InternalReview') as $collection) {
+            if (empty($application[$collection]) || !is_array($application[$collection])) {
+                continue;
+            }
+            foreach ($application[$collection] as $index => $entry) {
+                if (!isset($entry['type']) || $entry['type'] !== 'request') {
+                    continue;
+                }
+
+                $assignedByName = null;
+                $reviewerUserId = !empty($entry['user_id']) ? (int) $entry['user_id'] : 0;
+                if ($reviewerUserId > 0 && !empty($usernameByUserId[$reviewerUserId])) {
+                    $assignedByName = $this->_consumeAssignedByFromAuditMap(
+                        $auditMap,
+                        $usernameByUserId[$reviewerUserId],
+                        !empty($entry['created']) ? $entry['created'] : null
+                    );
+                }
+                $application[$collection][$index]['assigned_by_name'] = !empty($assignedByName) ? $assignedByName : 'N/A';
+            }
+        }
+
+        return $application;
+    }
+
+    private function _buildReviewerAssignmentAuditMap($applicationId)
+    {
+        $this->loadModel('AuditTrail');
+        $rows = $this->AuditTrail->find('all', array(
+            'conditions' => array(
+                'AuditTrail.model' => 'Application',
+                'AuditTrail.foreign_key' => $applicationId,
+                'AuditTrail.message LIKE' => '% has been assigned to % for review%'
+            ),
+            'fields' => array('AuditTrail.id', 'AuditTrail.message', 'AuditTrail.created'),
+            'order' => array('AuditTrail.created' => 'ASC', 'AuditTrail.id' => 'ASC'),
+            'contain' => array()
+        ));
+
+        $auditMap = array();
+        foreach ($rows as $row) {
+            $message = isset($row['AuditTrail']['message']) ? $row['AuditTrail']['message'] : '';
+            $matches = array();
+            if (!preg_match('/has been assigned to\s+(.+?)\s+for review\s+by\s+(.+)$/i', $message, $matches)) {
+                continue;
+            }
+
+            $reviewerUsername = strtolower(trim(preg_replace('/\s+/', ' ', $matches[1])));
+            $assignedByName = trim(preg_replace('/\s+/', ' ', $matches[2]));
+            if ($reviewerUsername === '' || $assignedByName === '') {
+                continue;
+            }
+
+            if (!isset($auditMap[$reviewerUsername])) {
+                $auditMap[$reviewerUsername] = array();
+            }
+            $auditMap[$reviewerUsername][] = array(
+                'assigned_by_name' => $assignedByName,
+                'created' => !empty($row['AuditTrail']['created']) ? $row['AuditTrail']['created'] : null,
+                'used' => false
+            );
+        }
+
+        return $auditMap;
+    }
+
+    private function _consumeAssignedByFromAuditMap(&$auditMap, $reviewerUsername, $createdAt = null)
+    {
+        $reviewerKey = strtolower(trim((string) $reviewerUsername));
+        if ($reviewerKey === '' || empty($auditMap[$reviewerKey])) {
+            return null;
+        }
+
+        $events =& $auditMap[$reviewerKey];
+        $bestIndex = null;
+        $bestScore = PHP_INT_MAX;
+        $createdTimestamp = !empty($createdAt) ? strtotime($createdAt) : false;
+
+        if ($createdTimestamp !== false) {
+            foreach ($events as $index => $event) {
+                if (!empty($event['used'])) {
+                    continue;
+                }
+                $eventTimestamp = !empty($event['created']) ? strtotime($event['created']) : false;
+                if ($eventTimestamp === false) {
+                    continue;
+                }
+                $score = abs($createdTimestamp - $eventTimestamp);
+                if ($score < $bestScore) {
+                    $bestScore = $score;
+                    $bestIndex = $index;
+                }
+            }
+        }
+
+        if ($bestIndex === null) {
+            foreach ($events as $index => $event) {
+                if (empty($event['used'])) {
+                    $bestIndex = $index;
+                    break;
+                }
+            }
+        }
+
+        if ($bestIndex === null) {
+            return null;
+        }
+
+        $events[$bestIndex]['used'] = true;
+        return $events[$bestIndex]['assigned_by_name'];
+    }
+
     private function aview($id = null)
     {
         $this->Application->id = $id;
@@ -2737,7 +2940,7 @@ class ApplicationsController extends AppController
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
 
-        $this->set('application', $this->Application->find('first', array(
+        $application = $this->Application->find('first', array(
             'conditions' => array('Application.id' => $id),
             'contain' => array(
                 'Amendment',
@@ -2765,6 +2968,7 @@ class ApplicationsController extends AppController
                 'Addendum',
                 'Registration',
                 'Fee',
+                'InternalReview' => array('ReviewAnswer'),
                 'Checklist',
                 'AnnualLetter',
                 'StudyRoute',
@@ -2776,9 +2980,12 @@ class ApplicationsController extends AppController
                 'Document',
                 'Review' => array('ReviewAnswer')
             )
-        )));
+        ));
+        $application = $this->_attachReviewerAssignmentMeta($application);
+        $this->set('application', $application);
         $this->set('counties', $this->Application->SiteDetail->County->find('list'));
-        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => array(3, 9), 'User.is_active' => 1))));
+        $this->set('users', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 3, 'User.is_active' => 1))));
+        $this->set('external', $this->Application->User->find('list', array('conditions' => array('User.group_id' => 9, 'User.is_active' => 1))));
 
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
@@ -2872,12 +3079,13 @@ class ApplicationsController extends AppController
                         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
                         $expiry_date_s = date('Y-m-d', strtotime($application['Application']['approval_date'] . " +1 year"));
 
+                        $principalInvestigator = $this->getPrimaryInvestigatorContact($application);
                         $qualification = $names = $professional_address = $telephone = null;
-                        if (isset($application['InvestigatorContact'][0])) {
-                            $qualification = $application['InvestigatorContact'][0]['qualification'];
-                            $names = $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'];
-                            $professional_address = $application['InvestigatorContact'][0]['professional_address'];
-                            $telephone = $application['InvestigatorContact'][0]['telephone'];
+                        if (!empty($principalInvestigator)) {
+                            $qualification = $principalInvestigator['qualification'];
+                            $names = $this->getInvestigatorFullName($principalInvestigator);
+                            $professional_address = $principalInvestigator['professional_address'];
+                            $telephone = $principalInvestigator['telephone'];
                         }
                         $variables = array(
                             'approval_no' => $approval_no,
@@ -3308,14 +3516,23 @@ class ApplicationsController extends AppController
         $year = date('Y', strtotime($this->Application->field('approval_date')));
         $approval_no = 'APL/' . $cnt . '/' . $year . '-' . $application['Application']['protocol_no'];
         $expiry_date = date('jS F Y', strtotime($application['Application']['approval_date'] . " +1 year"));
+        $principalInvestigator = $this->getPrimaryInvestigatorContact($application);
+        $qualification = $names = $professional_address = $telephone = null;
+        if (!empty($principalInvestigator)) {
+            $qualification = $principalInvestigator['qualification'];
+            $names = $this->getInvestigatorFullName($principalInvestigator);
+            $professional_address = $principalInvestigator['professional_address'];
+            $telephone = $principalInvestigator['telephone'];
+        }
+
         $variables = array(
             'approval_no' => $approval_no,
             'protocol_no' => $application['Application']['protocol_no'],
             'letter_date' => date('jS F Y', strtotime($application['Application']['approval_date'])),
-            'qualification' => $application['InvestigatorContact'][0]['qualification'],
-            'names' => $application['InvestigatorContact'][0]['given_name'] . ' ' . $application['InvestigatorContact'][0]['middle_name'] . ' ' . $application['InvestigatorContact'][0]['family_name'],
-            'professional_address' => $application['InvestigatorContact'][0]['professional_address'],
-            'telephone' => $application['InvestigatorContact'][0]['telephone'],
+            'qualification' => $qualification,
+            'names' => $names,
+            'professional_address' => $professional_address,
+            'telephone' => $telephone,
             'study_title' => $application['Application']['short_title'],
             'checklist' => $checkstring,
             'status' => $application['TrialStatus']['name'],
@@ -3400,6 +3617,49 @@ class ApplicationsController extends AppController
         }
     }
 
+    protected function _queueApplicantInvoiceFromEdit($id, $response)
+    {
+        $totalSites = null;
+        if (isset($this->request->data['Application']['total_sites'])) {
+            $totalSites = filter_var(
+                $this->request->data['Application']['total_sites'],
+                FILTER_VALIDATE_INT,
+                array('options' => array('min_range' => 1))
+            );
+        }
+
+        if ($totalSites === false || $totalSites === null) {
+            $this->Session->setFlash(__('Please provide a valid number of sites.'), 'alerts/flash_error');
+            return $this->redirect(array('action' => 'edit', $id));
+        }
+
+        $this->Application->id = $id;
+        if (!$this->Application->saveField('total_sites', (int)$totalSites)) {
+            $this->Session->setFlash(__('Unable to save the number of sites. Please try again.'), 'alerts/flash_error');
+            return $this->redirect(array('action' => 'edit', $id));
+        }
+
+        $invoice = array(
+            'function' => 'ppbNewApplication',
+            'Application' => array(
+                'id' => $id,
+                'total_sites' => (int)$totalSites,
+                'name' => $this->Auth->user('name'),
+                'email' => $this->Auth->user('email'),
+                'protocol_no' => !empty($response['Application']['protocol_no']) ? $response['Application']['protocol_no'] : ''
+            )
+        );
+
+        $queued = CakeResque::enqueue('default', 'NotificationShell', array('generate_report_invoice', $invoice));
+        if ($queued) {
+            $this->Session->setFlash(__('Invoice generation has started. The invoice details will be sent shortly.'), 'alerts/flash_success');
+        } else {
+            $this->Session->setFlash(__('Invoice could not be generated at the moment. Please try again.'), 'alerts/flash_error');
+        }
+
+        return $this->redirect(array('action' => 'edit', $id));
+    }
+
     public function applicant_edit($id = null)
     {
         $this->Application->id = $id;
@@ -3426,6 +3686,9 @@ class ApplicationsController extends AppController
             if (isset($this->request->data['cancelReport'])) {
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
+            }
+            if (isset($this->request->data['generateInvoice'])) {
+                return $this->_queueApplicantInvoiceFromEdit($id, $response);
             }
             $validate = false;
             if (isset($this->request->data['submitReport'])) {
@@ -3596,6 +3859,9 @@ class ApplicationsController extends AppController
             if (isset($this->request->data['cancelReport'])) {
                 $this->Session->setFlash(__('Form cancelled.'), 'alerts/flash_info');
                 $this->redirect(array('controller' => 'users', 'action' => 'dashboard'));
+            }
+            if (isset($this->request->data['generateInvoice'])) {
+                return $this->_queueApplicantInvoiceFromEdit($id, $response);
             }
             // debug($this->request->data);
             // exit;
