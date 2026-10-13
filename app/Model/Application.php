@@ -567,12 +567,16 @@ class Application extends AppModel
        'message' => 'The protocol number you have provided is already in use!',
     ),
         ),*/
-        'version_no' => array(
-            'notEmpty' => array(
-                'rule'     => 'notEmpty',
-                'required' => true,
-                'message'  => 'Abstract : Please enter the version number'
-            ),
+          'protocol_urn' => array(                                                                                                                                
+                'notEmpty' => array(                                                                                                                                
+                    'rule'     => 'notEmpty',                                                                                                                       
+                    'required' => true,                                                                                                                             
+                    'message'  => 'Abstract : Please enter the Protocol URN'                                                                                        
+                ),                                                                                                                                                  
+                'unique' => array(                                                                                                                                  
+                    'rule'     => 'isUnique',                                                                                                                       
+                    'message'  => 'The Protocol URN you have provided is already registered!'                                                                       
+                )                           
         ),
         'date_of_protocol' => array(
             'notEmpty' => array(

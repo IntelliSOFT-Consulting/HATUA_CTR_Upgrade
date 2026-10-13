@@ -659,7 +659,7 @@ class UsersController extends AppController
         return array('data' => $decoded);
     }
 
-    private function _apiJsonResponse($statusCode, $payload = array())
+    protected function _apiJsonResponse($statusCode, $payload = array())
     {
         $this->autoRender = false;
         $this->_setApiResponseStatusCode($statusCode);

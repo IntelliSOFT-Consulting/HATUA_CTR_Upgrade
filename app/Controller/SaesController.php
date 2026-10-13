@@ -1,5 +1,6 @@
 <?php
 App::uses('AppController', 'Controller');
+ App::uses('FhirAdverseEventMapper', 'Lib');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
 App::uses('HtmlHelper', 'View/Helper');
@@ -240,14 +241,18 @@ class SaesController extends AppController
             return $this->_jsonErrorResponse(405, 'Only POST requests are allowed for SAE submission.');
         }
 
-        $user = $this->_getAuthenticatedApiUser();
-        if (empty($user['id'])) {
-            $this->_logSaeApiAttempt('failed', 'Unauthenticated SAE submission attempt.', array(
-                'status_code' => 401
-            ));
-
-            return $this->_jsonErrorResponse(401, 'Authentication required. Provide a valid Bearer token in the Authorization header or an access_token in the request.');
-        }
+        $user = $this->_getAuthenticatedApiUser();                                                                                                              
+            if (empty($user['id'])) {                                                                                                                               
+                $statusCode = !empty($this->apiAuthError['code']) ? (int)$this->apiAuthError['code'] : 401;                                                         
+                $errorMessage = !empty($this->apiAuthError['message']) ? $this->apiAuthError['message'] : 'Authentication required. Provide a valid Bearer token in 
+  Authorization header or an X-API-Key header.';
+  
+                $this->_logSaeApiAttempt('failed', $errorMessage, array(
+                    'status_code' => $statusCode
+                ));
+  
+                return $this->_jsonErrorResponse($statusCode, $errorMessage);
+            }
 
         $rawBody = trim((string)$this->request->input());
         if ($rawBody === '') {
@@ -363,43 +368,53 @@ class SaesController extends AppController
             'contain' => array('Application'),
             'conditions' => array('Sae.id' => $saeId)
         ));
-
+          $savedAttachments = $this->_saveSaeAttachments($saeId, $payload);
         $this->_queueSaeSubmissionNotifications($sae, $user);
+        $this->_recordSaeAuditTrail($sae, $user, $data);  
         $this->_logSaeApiAttempt('success', 'SAE submitted successfully.', array(
             'status_code' => 200,
             'user_id' => $user['id'],
             'application_id' => $data['Sae']['application_id'],
             'sae_id' => $saeId,
-            'reference_no' => $data['Sae']['reference_no']
+            'reference_no' => $data['Sae']['reference_no'],
+            'attachments_count' => count($savedAttachments)
         ));
 
         return $this->_jsonSuccessResponse('SAE submitted successfully', array(
-            'sae_id' => $saeId,
-            'submitted_at' => $submittedAt
+             'sae_id' => $saeId,                                                                                                                                                                                                                                     
+                'reference_no' => $data['Sae']['reference_no'],                                                                                                                                                                                                         
+                'protocol_urn' => !empty($data['Sae']['protocol_urn']) ? $data['Sae']['protocol_urn'] : null,                                                                                                                                                           
+                'attachments_saved' => count($savedAttachments),                                                                                                                                                                                                        
+                'submitted_at' => $submittedAt   
         ));
     }
 
-    private function _normalizeSubmissionPayload($payload = array(), $user = array())
-    {
-        $data = array(
-            'Sae' => array(),
-            'SuspectedDrug' => array(),
-            'ConcomittantDrug' => array(),
-        );
-
-        if (isset($payload['Sae']) || isset($payload['SuspectedDrug']) || isset($payload['ConcomittantDrug'])) {
-            $data['Sae'] = (!empty($payload['Sae']) && is_array($payload['Sae'])) ? $payload['Sae'] : array();
-            $data['SuspectedDrug'] = (!empty($payload['SuspectedDrug']) && is_array($payload['SuspectedDrug'])) ? $payload['SuspectedDrug'] : array();
-            $data['ConcomittantDrug'] = (!empty($payload['ConcomittantDrug']) && is_array($payload['ConcomittantDrug'])) ? $payload['ConcomittantDrug'] : array();
-
-            foreach (array('reference_no', 'protocol_no', 'application_reference_no') as $referenceField) {
-                if (empty($data['Sae'][$referenceField]) && array_key_exists($referenceField, $payload)) {
-                    $data['Sae'][$referenceField] = $payload[$referenceField];
+   private function _normalizeSubmissionPayload($payload = array(), $user = array())                                                                                                                         
+        {                                                                                                                                
+            if (!empty($payload['resourceType']) && $payload['resourceType'] === 'AdverseEvent') {                                                                                                                
+                $payload = FhirAdverseEventMapper::toSaePayload($payload);                                                                                                                                        
+            }                                                                                                                                                                                                     
+                                                                                                                                                                                                                  
+            $data = array(                                                                                                                                                                                        
+                'Sae' => array(),                                                                                                                                                                                 
+                'SuspectedDrug' => array(),                                                                                                                                                                       
+                'ConcomittantDrug' => array(),                                                                                                                                                                    
+            );                                                                                                                                                                                                    
+                                                                                                                                                                                                                  
+            if (isset($payload['Sae']) || isset($payload['SuspectedDrug']) || isset($payload['ConcomittantDrug'])) {                                                                                              
+                $data['Sae'] = (!empty($payload['Sae']) && is_array($payload['Sae'])) ? $payload['Sae'] : array();                                                                                                
+                $data['SuspectedDrug'] = (!empty($payload['SuspectedDrug']) && is_array($payload['SuspectedDrug'])) ? $payload['SuspectedDrug'] : array();                                                        
+                $data['ConcomittantDrug'] = (!empty($payload['ConcomittantDrug']) && is_array($payload['ConcomittantDrug'])) ? $payload['ConcomittantDrug'] : array();                                            
+                                                                                                                                                                                                                  
+                foreach (array('protocol_urn', 'reference_no', 'protocol_no', 'application_reference_no') as $referenceField) {                                                                                   
+                    if (empty($data['Sae'][$referenceField]) && array_key_exists($referenceField, $payload)) {                                                                                                    
+                        $data['Sae'][$referenceField] = $payload[$referenceField]; 
                 }
             }
         } else {
             $saeFields = array(
                 'application_id',
+                 'protocol_urn', 
                 'reference_no',
                 'protocol_no',
                 'application_reference_no',
@@ -480,6 +495,9 @@ class SaesController extends AppController
 
         $data['Sae']['form_type'] = !empty($data['Sae']['form_type']) ? strtoupper($data['Sae']['form_type']) : 'SAE';
         $data['Sae']['user_id'] = $user['id'];
+         if (empty($data['Sae']['country_id'])) {                                                                                                                                                                                                                    
+                $data['Sae']['country_id'] = 115;                                                                                                                                                                                                                       
+            }
 
         if (empty($data['Sae']['reporter_email']) && !empty($user['email'])) {
             $data['Sae']['reporter_email'] = $user['email'];
@@ -582,6 +600,36 @@ class SaesController extends AppController
         $errors = array();
 
         if (empty($data['SuspectedDrug'])) {
+             $seriousnessFlags = array(                                                                                                                                                                                                                                  
+                'patient_died',                                                                                                                                                                                                                                         
+                'prolonged_hospitalization',                                                                                                                                                                                                                            
+                'incapacity',                                                                                                                                                                                                                                           
+                'life_threatening',                                                                                                                                                                                                                                     
+                'reaction_other'                                                                                                                                                                                                                                        
+            );                                                                                                                                                                                                                                                          
+            $hasSeriousness = false;                                                                                                                                                                                                                                    
+            foreach ($seriousnessFlags as $flag) {                                                                                                                                                                                                                      
+                if (!empty($data['Sae'][$flag]) && (int)$data['Sae'][$flag] === 1) {                                                                                                                                                                                    
+                    $hasSeriousness = true;                                                                                                                                                                                                                             
+                    break;                                                                                                                                                                                                                                              
+                }                                                                                                                                                                                                                                                       
+            }                                                                                                                                                                                                                                                           
+            if (!$hasSeriousness) {                                                                                                                                                                                                                                     
+                $errors['seriousness'] = array('At least one seriousness criterion must be marked (patient died, prolonged hospitalization, incapacity, life-threatening, or other).');                                                                                 
+            }                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                   
+            if (!empty($data['Sae']['reaction_onset'])) {                                                                                                                                                                                                               
+                $onsetTime = strtotime($data['Sae']['reaction_onset']);                                                                                                                                                                                                 
+                if ($onsetTime > time()) {                                                                                                                                                                                                                              
+                    $errors['reaction_onset'] = array('Reaction onset date cannot be in the future.');                                                                                                                                                                  
+                }                                                                                                                                                                                                                                                       
+                if (!empty($data['Sae']['reaction_end_date'])) {                                                                                                                                                                                                        
+                    $endTime = strtotime($data['Sae']['reaction_end_date']);                                                                                                                                                                                            
+                    if ($endTime < $onsetTime) {                                                                                                                                                                                                                        
+                        $errors['reaction_end_date'] = array('Reaction end date cannot be earlier than reaction onset date.');                                                                                                                                          
+                    }                                                                                                                                                                                                                                                   
+                }                                                                                                                                                                                                                                                       
+            }                  
             $errors['suspected_drugs'] = array('Please provide at least one suspected drug.');
         }
 
@@ -693,6 +741,9 @@ class SaesController extends AppController
 
     private function _extractApplicationReference($data = array())
     {
+        if (!empty($data['Sae']['protocol_urn'])) {                                                                                                                                                           
+                return trim((string)$data['Sae']['protocol_urn']);                                                                                                                                                
+            }   
         if (!empty($data['Sae']['application_reference_no'])) {
             return trim((string)$data['Sae']['application_reference_no']);
         }
@@ -711,10 +762,14 @@ class SaesController extends AppController
             return array();
         }
 
-        return $this->Application->find('first', array(
-            'contain' => array(),
-            'conditions' => array(
-                'Application.reference_no' => $referenceNo
+        return $this->Application->find('first', array(                                                                                                                                                                                                             
+                'contain' => array(),                                                                                                                                                                                                                                   
+                'conditions' => array(                                                                                                                                                                                                                                  
+                    'OR' => array(                                                                                                                                                                                                                                      
+                        'Application.protocol_urn' => $referenceNo,                                                                                                                                                                                                     
+                        'Application.reference_no' => $referenceNo,                                                                                                                                                                                                     
+                        'Application.protocol_no' => $referenceNo                                                                                                                                                                                                       
+                    )  
             )
         ));
     }
@@ -724,6 +779,9 @@ class SaesController extends AppController
         if (!empty($application['Application']['id'])) {
             $data['Sae']['application_id'] = $application['Application']['id'];
         }
+         if (!empty($application['Application']['protocol_urn'])) {                                                                                                                                                                                                  
+                $data['Sae']['protocol_urn'] = $application['Application']['protocol_urn'];                                                                                                                                                                             
+            }   
 
         if (empty($data['Sae']['email_address']) && !empty($application['Application']['email_address'])) {
             $data['Sae']['email_address'] = $application['Application']['email_address'];
@@ -805,6 +863,19 @@ class SaesController extends AppController
                     )
                 )
             ));
+              if (!empty($sae['Application']['id'])) {                                                                                                                                                                                                                
+                    $monitorUserIds = $this->Sae->Application->StudyMonitor->find('list', array(                                                                                                                                                                        
+                        'fields' => array('StudyMonitor.user_id', 'StudyMonitor.user_id'),                                                                                                                                                                              
+                        'conditions' => array('StudyMonitor.application_id' => $sae['Application']['id'])                                                                                                                                                               
+                    ));                                                                                                                                                                                                                                                 
+                    if (!empty($monitorUserIds)) {                                                                                                                                                                                                                      
+                        $monitors = $this->User->find('all', array(                                                                                                                                                                                                     
+                            'contain' => array(),                                                                                                                                                                                                                       
+                            'conditions' => array('User.id' => array_values($monitorUserIds))                                                                                                                                                                           
+                        ));                                                                                                                                                                                                                                             
+                        $recipients = array_merge($recipients, $monitors);                                                                                                                                                                                              
+                    }                                                                                                                                                                                                                                                   
+                }     
 
             foreach ($recipients as $recipient) {
                 $actionPrefix = ($recipient['User']['id'] == $submitter['id'] && !empty($submitterPrefix)) ? $submitterPrefix : 'manager';
@@ -812,6 +883,7 @@ class SaesController extends AppController
                     'name' => $recipient['User']['name'],
                     'reference_no' => $sae['Sae']['reference_no'],
                     'protocol_no' => $sae['Application']['protocol_no'],
+                     'protocol_urn' => !empty($sae['Application']['protocol_urn']) ? $sae['Application']['protocol_urn'] : $sae['Application']['protocol_no'],  
                     'reference_link' => $html->link(
                         $sae['Sae']['reference_no'],
                         array('controller' => 'saes', 'action' => 'view', $sae['Sae']['id'], $actionPrefix => true, 'full_base' => true),
@@ -1756,4 +1828,132 @@ class SaesController extends AppController
         $this->Session->setFlash(__('Sae was not deleted'), 'alerts/flash_error');
         $this->redirect(array('action' => 'index'));
     }
+       private function _saveSaeAttachments($saeId, $payload = array())                                                                                                                                                                                                
+        {                                                                                                                                                                                                                                                               
+            $saved = array();                                                                                                                                                                                                                                           
+            $targetDir = WWW_ROOT . 'media' . DS . 'transfer';                                                                                                                                                                                                          
+            if (!file_exists($targetDir)) {                                                                                                                                                                                                                             
+                @mkdir($targetDir, 0775, true);                                                                                                                                                                                                                         
+            }                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                        
+            $AttachmentModel = ClassRegistry::init('Attachment');                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                        
+            // 1. Process base64 attachments in JSON payload                                                                                                                                                                                                            
+            if (!empty($payload['attachments']) && is_array($payload['attachments'])) {                                                                                                                                                                                 
+                foreach ($payload['attachments'] as $item) {                                                                                                                                                                                                            
+                    if (empty($item['content']) && empty($item['file_content'])) {                                                                                                                                                                                      
+                        continue;                                                                                                                                                                                                                                       
+                    }                                                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                                                        
+                    $content = !empty($item['content']) ? $item['content'] : $item['file_content'];                                                                                                                                                                     
+                    $decoded = base64_decode($content, true);                                                                                                                                                                                                           
+                    if ($decoded === false) {                                                                                                                                                                                                                           
+                        continue;                                                                                                                                                                                                                                       
+                    }                                                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                                                        
+                    $rawName = !empty($item['basename']) ? $item['basename'] : (!empty($item['file_name']) ? $item['file_name'] : 'attachment.pdf');                                                                                                                    
+                    $safeName = 'sae_' . $saeId . '_' . time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $rawName);                                                                                                                                               
+                    $filePath = $targetDir . DS . $safeName;                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                        
+                    if (file_put_contents($filePath, $decoded) !== false) {                                                                                                                                                                                             
+                        $AttachmentModel->create();                                                                                                                                                                                                                     
+                        $attData = array(                                                                                                                                                                                                                               
+                            'Attachment' => array(                                                                                                                                                                                                                      
+                                'model' => 'Sae',                                                                                                                                                                                                                       
+                                'foreign_key' => $saeId,                                                                                                                                                                                                                
+                                'dirname' => 'media/transfer',                                                                                                                                                                                                          
+                                'basename' => $rawName,                                                                                                                                                                                                                 
+                                'file' => $filePath,                                                                                                                                                                                                                    
+                                'checksum' => md5($decoded),                                                                                                                                                                                                            
+                                'group' => 'attachment',                                                                                                                                                                                                                
+                                'description' => !empty($item['description']) ? $item['description'] : 'API Attachment',                                                                                                                                                
+                                'file_date' => date('Y-m-d')                                                                                                                                                                                                            
+                            )                                                                                                                                                                                                                                           
+                        );                                                                                                                                                                                                                                              
+                        if ($AttachmentModel->save($attData, array('validate' => false))) {                                                                                                                                                                             
+                            $saved[] = $safeName;                                                                                                                                                                                                                       
+                        }                                                                                                                                                                                                                                               
+                    }                                                                                                                                                                                                                                                   
+                }                                                                                                                                                                                                                                                       
+            }                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                        
+            // 2. Process multipart file uploads via $_FILES                                                                                                                                                                                                            
+            if (!empty($_FILES)) {                                                                                                                                                                                                                                      
+                foreach ($_FILES as $fileKey => $fileData) {                                                                                                                                                                                                            
+                    $files = isset($fileData['name']) && is_array($fileData['name']) ? $this->_restructureFilesArray($fileData) : array($fileData);                                                                                                                     
+                    foreach ($files as $file) {                                                                                                                                                                                                                         
+                        if (empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {                                                                                                                                                                         
+                            continue;                                                                                                                                                                                                                                   
+                        }                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                        
+                        $rawName = $file['name'];                                                                                                                                                                                                                       
+                        $safeName = 'sae_' . $saeId . '_' . time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $rawName);                                                                                                                                           
+                        $filePath = $targetDir . DS . $safeName;                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                        
+                        if (move_uploaded_file($file['tmp_name'], $filePath)) {                                                                                                                                                                                         
+                            $AttachmentModel->create();                                                                                                                                                                                                                 
+                            $attData = array(                                                                                                                                                                                                                           
+                                'Attachment' => array(                                                                                                                                                                                                                  
+                                    'model' => 'Sae',                                                                                                                                                                                                                   
+                                    'foreign_key' => $saeId,                                                                                                                                                                                                            
+                                    'dirname' => 'media/transfer',                                                                                                                                                                                                      
+                                    'basename' => $rawName,                                                                                                                                                                                                             
+                                    'file' => $filePath,                                                                                                                                                                                                                
+                                    'checksum' => md5_file($filePath),                                                                                                                                                                                                  
+                                    'group' => 'attachment',                                                                                                                                                                                                            
+                                    'description' => 'API Uploaded File',                                                                                                                                                                                               
+                                    'file_date' => date('Y-m-d')                                                                                                                                                                                                        
+                                )                                                                                                                                                                                                                                       
+                            );                                                                                                                                                                                                                                          
+                            if ($AttachmentModel->save($attData, array('validate' => false))) {                                                                                                                                                                         
+                                $saved[] = $safeName;                                                                                                                                                                                                                   
+                            }                                                                                                                                                                                                                                           
+                        }                                                                                                                                                                                                                                               
+                    }                                                                                                                                                                                                                                                   
+                }                                                                                                                                                                                                                                                       
+            }                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                        
+            return $saved;                                                                                                                                                                                                                                              
+        }                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                        
+        private function _restructureFilesArray($fileData)                                                                                                                                                                                                              
+        {
+            $result = array();
+            foreach ($fileData['name'] as $key => $name) {
+                $result[] = array(
+                    'name' => $name,
+                    'type' => $fileData['type'][$key],
+                    'tmp_name' => $fileData['tmp_name'][$key],
+                    'error' => $fileData['error'][$key],
+                    'size' => $fileData['size'][$key],
+                );
+            }
+            return $result;
+        }
+         private function _recordSaeAuditTrail($sae = array(), $user = array(), $data = array())                                                                                                                                                                         
+        {                                                                                                                                                                                                                                                               
+            try {                                                                                                                                                                                                                                                       
+                $AuditTrail = ClassRegistry::init('AuditTrail');                                                                                                                                                                                                        
+                $AuditTrail->create();                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                        
+                $clientIdentifier = !empty($user['client_name']) ? $user['client_name'] : (!empty($user['name']) ? $user['name'] : (!empty($user['username']) ? $user['username'] : 'API Submitter'));                                                                  
+                $protocolUrnText = !empty($data['Sae']['protocol_urn']) ? ' (Protocol URN: ' . $data['Sae']['protocol_urn'] . ')' : '';                                                                                                                                 
+                                                                                                                                                                                                                                                                        
+                $auditEntry = array(                                                                                                                                                                                                                                    
+                    'AuditTrail' => array(                                                                                                                                                                                                                              
+                        'foreign_key' => $sae['Sae']['id'],                                                                                                                                                                                                             
+                        'model' => 'Sae',                                                                                                                                                                                                                               
+                        'message' => 'API SAE Submission: Reference ' . $sae['Sae']['reference_no'] . $protocolUrnText . ' submitted by ' . $clientIdentifier . ' (User ID: ' . $user['id'] . ')',
+                        'ip' => $this->request->clientIp(),
+                        'uri' => $this->request->here(),
+                        'user_agent' => $this->request->header('User-Agent'),
+                        'created' => date('Y-m-d H:i:s')
+                    )
+                );
+  
+                $AuditTrail->save($auditEntry, array('validate' => false));
+            } catch (Exception $e) {
+                $this->_logSaeApiAttempt('warning', 'Database audit trail could not be saved: ' . $e->getMessage());
+            }
+        }
 }

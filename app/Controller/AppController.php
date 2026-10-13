@@ -37,6 +37,7 @@ use Firebase\JWT\JWT;
  */
 class AppController extends Controller
 {
+  public $apiAuthError = array();  
   protected $a_contain = array(
     'Amendment',
     'EthicalCommittee',
@@ -110,24 +111,16 @@ class AppController extends Controller
   public function beforeFilter()
   {
 
-     // --- API requests: bypass session Auth entirely, use token auth instead ---
     $this->_isApiRequest = !empty($this->request->params['prefix']) && $this->request->params['prefix'] === 'api';
 
     if ($this->_isApiRequest) {
-        $this->Auth->allow(); // skip session-Auth checks/redirects for API actions
+        $this->Auth->allow(); 
         $this->response->type('json');
         $this->autoRender = false;
         $this->layout = false;
 
-        // api_login must be reachable without a token (it's how tokens are issued)
-        if ($this->request->action !== 'api_login') {
-            $this->apiUser = $this->_requireApiToken();
-            if (!$this->apiUser) {
-                return $this->response; // 401 already sent inside _requireApiToken()
-            }
-        }
-
-        return; // stop here — none of the web-app group/redirect logic below applies to API calls
+      
+        return; 
     }
     
     $this->Auth->allow('display');
@@ -350,20 +343,33 @@ protected function _apiJsonResponse($statusCode, $data)
     return array_unique($candidates);
   }
 
-  protected function _getAuthenticatedApiUser()
-  {
-    $sessionUser = $this->Auth->user();
-    if (!empty($sessionUser['id'])) {
-      return $sessionUser;
-    }
-
-    $token = $this->_extractApiAccessToken();
-    if (empty($token)) {
-      return array();
-    }
-
-    return $this->_findUserByApiAccessToken($token);
-  }
+   protected function _getAuthenticatedApiUser()                                                                                                                 
+      {                                                                                                                                                             
+        $this->apiAuthError = array();                                                                                                                              
+                                                                                                      
+        $sessionUser = $this->Auth->user();                                                                                                                         
+        if (!empty($sessionUser['id'])) {                                                                                                                           
+          return $sessionUser;                                                                                                                                      
+        }                                                                                                                                                           
+                                                                                                                
+        $token = $this->_extractApiAccessToken();                                                                                                                   
+        if (!empty($token)) {                                                                                                                                       
+          $user = $this->_findUserByApiAccessToken($token);                                                                                                         
+          if (!empty($user)) {                                                                                                                                      
+            return $user;                                                                                                                                           
+          }                                                                                                                                                         
+        }                                                                                                                                                           
+                                                                                                            
+        $apiKey = $this->_extractApiKey();                                                                                                                          
+        if (!empty($apiKey)) {                                                                                                                                      
+          $user = $this->_findUserByApiKey($apiKey);                                                                                                                
+          if (!empty($user)) {                                                                                                                                      
+            return $user;                                                                                                                                           
+          }                                                                                                                                                         
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        return array();                                                                                                                                             
+      }                      
 
   protected function _extractApiAccessToken()
   {
@@ -588,7 +594,117 @@ protected function _apiJsonResponse($statusCode, $data)
 
     return (string) $knownString === (string) $userString;
   }
-
+ protected function _extractApiKey()                                                                                                                           
+      {                                                                                                                                                             
+        foreach (array('X-API-Key', 'x-api-key', 'X-Api-Key', 'HTTP_X_API_KEY') as $headerName) {                                                                   
+          $headerValue = $this->request->header($headerName);                                                                                                       
+          if (!empty($headerValue)) {                                                                                                                               
+            return trim((string)$headerValue);                                                                                                                      
+          }                                                                                                                                                         
+          if (!empty($_SERVER[$headerName])) {                                                                                                                      
+            return trim((string)$_SERVER[$headerName]);                                                                                                             
+          }                                                                                                                                                         
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        if (!empty($this->request->query['api_key'])) {                                                                                                             
+          return trim((string)$this->request->query['api_key']);                                                                                                    
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        if (is_array($this->request->data) && !empty($this->request->data['api_key'])) {                                                                            
+          return trim((string)$this->request->data['api_key']);                                                                                                     
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        $rawBody = trim((string)$this->request->input());                                                                                                           
+        if ($rawBody !== '') {                                                                                                                                      
+          $decoded = json_decode($rawBody, true);                                                                                                                   
+          if (is_array($decoded) && !empty($decoded['api_key'])) {                                                                                                  
+            return trim((string)$decoded['api_key']);                                                                                                               
+          }                                                                                                                                                         
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        return '';                                                                                                                                                  
+      }                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                              
+      protected function _findUserByApiKey($apiKey)                                                                                                                 
+      {                                                                                                                                                             
+        $apiKey = trim((string)$apiKey);                                                                                                                            
+        if (strlen($apiKey) < 14) {                                                                                                                                 
+          $this->apiAuthError = array('code' => 401, 'message' => 'Invalid API key format.');                                                                       
+          return array();                                                                                                                                           
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        $prefix = substr($apiKey, 0, 14);                                                                                                                           
+        $ApiKeyModel = ClassRegistry::init('ApiKey');                                                                                                               
+                                                                                                                                                                    
+        $keyRecord = $ApiKeyModel->find('first', array(                                                                                                             
+          'conditions' => array(                                                                                                                                    
+            'ApiKey.api_key_prefix' => $prefix,                                                                                                                     
+            'ApiKey.is_active' => 1                                                                                                                                 
+          ),                                                                                                                                                        
+          'recursive' => -1                                                                                                                                         
+        ));                                                                                                                                                         
+                                                                                                                                                                    
+        if (empty($keyRecord['ApiKey'])) {                                                                                                                          
+          $this->apiAuthError = array('code' => 401, 'message' => 'API key not recognized or is inactive.');                                                        
+          return array();                                                                                                                                           
+        }                                                                                                                                                           
+                                                                                                                                        
+        if (!empty($keyRecord['ApiKey']['expires_at'])) {                                                                                                           
+          if (strtotime($keyRecord['ApiKey']['expires_at']) < time()) {                                                                                             
+            $this->apiAuthError = array('code' => 401, 'message' => 'The provided API key has expired.');                                                           
+            return array();                                                                                                                                         
+          }                                                                                                                                                         
+        }                                                                                                                                                           
+                                                                                                                            
+        $computedHash = hash('sha256', $apiKey);                                                                                                                    
+        if (!$this->_hashEquals($keyRecord['ApiKey']['api_key_hash'], $computedHash)) {                                                                             
+          $this->apiAuthError = array('code' => 401, 'message' => 'Invalid API key credentials.');                                                                  
+          return array();                                                                                                                                           
+        }                                                                                                                                                           
+                                                                                                                                       
+        $clientIp = $this->request->clientIp();                                                                                                                     
+        if (!$ApiKeyModel->isIpAllowed($clientIp, $keyRecord['ApiKey']['ip_whitelist'])) {                                                                          
+          $this->apiAuthError = array(                                                                                                                              
+            'code' => 403,                                                                                                                                          
+            'message' => 'Client IP address [' . $clientIp . '] is not authorized to use this API key.'                                                             
+          );                                                                                                                                                        
+          return array();                                                                                                                                           
+        }                                                                                                                                                           
+                                                                                                                                         
+        $UserModel = ClassRegistry::init('User');                                                                                                                   
+        $user = $UserModel->find('first', array(                                                                                                                    
+          'conditions' => array('User.id' => $keyRecord['ApiKey']['user_id']),                                                                                      
+          'fields' => array(                                                                                                                                        
+            'User.id',                                                                                                                                              
+            'User.group_id',                                                                                                                                        
+            'User.name',                                                                                                                                            
+            'User.username',                                                                                                                                        
+            'User.email',                                                                                                                                           
+            'User.is_active',                                                                                                                                       
+            'User.deactivated'                                                                                                                                      
+          ),                                                                                                                                                        
+          'recursive' => -1                                                                                                                                         
+        ));                                                                                                                                                         
+                                                                                                                                                                    
+        if (empty($user['User'])) {                                                                                                                                 
+          $this->apiAuthError = array('code' => 401, 'message' => 'The user account linked to this API key does not exist.');                                       
+          return array();                                                                                                                                           
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        if (                                                                                                                                                        
+          (isset($user['User']['is_active']) && (int)$user['User']['is_active'] === 0) ||                                                                           
+          (isset($user['User']['deactivated']) && (int)$user['User']['deactivated'] === 1)                                                                          
+        ) {                                                                                                                                                         
+          $this->apiAuthError = array('code' => 403, 'message' => 'The account linked to this API key is deactivated.');                                            
+          return array();                                                                                                                                           
+        }                                                                                                                                                           
+                                                                                                                                                                    
+        $userData = $user['User'];                                                                                                                                  
+        $userData['api_key_id'] = $keyRecord['ApiKey']['id'];                                                                                                       
+        $userData['client_name'] = $keyRecord['ApiKey']['client_name'];                                                                                             
+                                                                                                                                                                    
+        return $userData;                                                                                                                                           
+      }                                                          
   protected function _setApiResponseStatusCode($statusCode)
   {
     $statusCode = (int) $statusCode;

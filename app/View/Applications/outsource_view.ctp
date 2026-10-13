@@ -350,10 +350,8 @@ echo $this->Session->flash();
                 <td><?php echo $application['Application']['reference_no'] ?></td>
               </tr>
               <tr>
-                <td class="table-label required">
-                  <p>Version No: <span class="sterix">*</span></p>
-                </td>
-                <td><?php echo $application['Application']['version_no'] ?></td>
+                <td class="table-label required"><p>Protocol URN: <span class="sterix">*</span></p></td>
+      <td><?php echo !empty($application['Application']['protocol_urn']) ? $application['Application']['protocol_urn'] : $application['Application']['version_no']; ?></td>
               </tr>
               <?php
               foreach ($application['Amendment'] as $key => $amendment) {

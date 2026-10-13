@@ -23,6 +23,7 @@ class Sae extends AppModel {
     public $filterArgs = array(
             'reference_no' => array('type' => 'like', 'encode' => true),
             'protocol_no' => array('type' => 'query', 'method' => 'findByProtocolNo', 'encode' => true),
+             'protocol_urn' => array('type' => 'like', 'encode' => true),     
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Sae.created BETWEEN ? AND ?'),
             'start_date' => array('type' => 'query', 'method' => 'dummy'),
             'end_date' => array('type' => 'query', 'method' => 'dummy'),
@@ -200,6 +201,18 @@ class Sae extends AppModel {
             'dependent' => true,
             'conditions' => array('Comment.model' => 'Sae', 'Comment.category' => 'external' ),
         ),
+        'SuspectedDrug' => array(                                                                                                                                                                                                                                   
+                'className' => 'SuspectedDrug',
+        ),
+        'ConcomittantDrug' => array(                                                                                                                                                                                                                                
+                'className' => 'ConcomittantDrug',
+                ),
+      'Attachment' => array(                                                                                                                                                                                                                                      
+                'className' => 'Attachment',                                                                                                                                                                                                                            
+                'foreignKey' => 'foreign_key',                                                                                                                                                                                                                          
+                'dependent' => true,                                                                                                                                                                                                                                    
+                'conditions' => array('Attachment.model' => 'Sae'),                                                                                                                                                                                                     
+            ),    
     );
 
     public $validate = array(

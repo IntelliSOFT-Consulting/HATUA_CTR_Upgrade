@@ -78,10 +78,10 @@ $this->Html->script('save', array('inline' => false));
         'label' => array('class' => 'control-label required', 'text' => 'Protocol No:<span class="sterix"></span>'),
         'placeholder' => ' ' , 'class' => 'input-xxlarge',
         ));
-        echo $this->Form->input('version_no', array(
-          'label' => array('class' => 'control-label required', 'text' => 'Version No: <span class="sterix">*</span>'),
-          'placeholder' => ' ',
-          'class' => 'input-xxlarge',
+       echo $this->Form->input('protocol_urn', array(
+              'label' => array('class' => 'control-label required', 'text' => 'Protocol URN: <span class="sterix">*</span>'),
+              'placeholder' => 'Enter Protocol URN',
+              'class' => 'input-xxlarge',
         ));
         echo $this->Form->input('date_of_protocol', array(
           'div' => array('class' => 'control-group'),

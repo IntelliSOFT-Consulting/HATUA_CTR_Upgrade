@@ -14,6 +14,7 @@ class Ciom extends AppModel {
 	public $filterArgs = array(
             'reference_no' => array('type' => 'like', 'encode' => true),
             'protocol_no' => array('type' => 'like', 'encode' => true),
+		'protocol_urn' => array('type' => 'like', 'encode' => true),     
             'range' => array('type' => 'expression', 'method' => 'makeRangeCondition', 'field' => 'Sae.created BETWEEN ? AND ?'),
         );
     public function makeRangeCondition($data = array()) {
