@@ -89,7 +89,13 @@
         </tr>
         <tr>
           <td class="table-label required"><p>Date of initial administration of investigational product</p></td>
-          <td><?php  echo $sae['Sae']['administration_date']; ?></td>
+          <td><?php  echo $sae['Sae']['administration_date']; 
+          if (!empty($sae['SaeDate'])) {
+            foreach($sae['SaeDate'] as $dates){
+              echo "<br>".$dates['date'];
+            }
+          }
+          ?></td>
           <td class="table-label required"><p>Other</p></td>
           <td><?php  echo ($sae['Sae']['reaction_other']) ? $checked : $nChecked; ?></td>
         </tr>
@@ -99,6 +105,18 @@
           <td class="table-label required"></td>
           <td></td>
         </tr>
+        <tr>
+          <td class="table-label"><p>IP was not given to the participant</p></td>
+          <td><?php echo ($sae['Sae']['ip_not_given']) ? $checked : $nChecked; ?></td>
+          <td class="table-label"></td>
+          <td></td>
+        </tr>
+        <?php if (!empty($sae['Sae']['ip_not_given'])) { ?>
+        <tr>
+          <td class="table-label"><p>Reason IP was not given</p></td>
+          <td colspan="3"><?php echo $sae['Sae']['ip_not_given_narrative']; ?></td>
+        </tr>
+        <?php } ?>
         <tr>
           <td class="table-label required"><p>Reaction Onset <span class="sterix">*</span></p></td>
           <td><?php  echo $sae['Sae']['reaction_onset']; ?></td>
