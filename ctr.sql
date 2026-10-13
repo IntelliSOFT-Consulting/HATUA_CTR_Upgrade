@@ -14522,10 +14522,14 @@ INSERT INTO `groups` (`id`, `name`, `description`, `redir`, `created`, `modified
 (4, 'Partners', 'This role will belong to PPB partners like KEMRI etc. They will have access to creating existing reports.', 'partner', '2012-10-05 20:02:23', '2013-01-12 12:25:24'),
 (5, 'Principal Investigators', 'Also called applicants, these are the end users who register in the system and create applications.', 'applicant', '2012-10-05 20:02:39', '2013-01-12 12:20:03'),
 (6, 'GCP Inspectors', 'GCP Inspectors', 'inspector', '2020-01-26 22:19:03', '2020-01-26 22:19:19'),
-(7, 'Monitors', 'Monitors related to specific user', 'monitor', '2020-02-11 21:13:36', '2020-02-11 21:13:36'),
+(7, 'Study Monitors', 'Study Monitors related to specific user', 'monitor', '2020-02-11 21:13:36', '2020-02-11 21:13:36'),
 (8, 'Outsource', 'List of users for outsourced services', 'outsource', '2020-02-11 21:13:36', '2020-02-11 21:13:36'),
 (9, 'Internal Reviewers', 'Shows a list of PPB\'s Internal \r\nReviewers', 'internalreviewer', '2026-02-04 20:02:09', '2026-02-04 11:58:20'),
-(10, 'Auditor', 'Auditor', NULL, '2026-08-10 15:51:16', '2026-08-10 15:51:16');
+(10, 'Auditor', 'Auditor', NULL, '2026-08-10 15:51:16', '2026-08-10 15:51:16'),
+(11, 'Sponsor', 'Sponsors', 'sponsor', '2026-09-28 10:00:00', '2026-09-28 10:00:00'),
+(12, 'CRO', 'Contract Research Organization', 'cro', '2026-09-28 10:00:00', '2026-09-28 10:00:00'),
+(13, 'PV', 'Pharmacovigilance', 'pv', '2026-09-28 10:00:00', '2026-09-28 10:00:00'),
+(14, 'Pharma Industry', 'Pharmaceutical Industry', 'pharmaindustry', '2026-09-28 10:00:00', '2026-09-28 10:00:00');
 
 -- --------------------------------------------------------
 
