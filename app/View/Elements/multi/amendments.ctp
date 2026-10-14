@@ -493,7 +493,7 @@ if ($redir == 'applicant') {
         <li class="active"><a href="#aaa">Checklist</a></li>
         <li><a href="#bbb">Additional Files</a></li>
     </ul>
-    <div class="tab-content">
+    <div class="tab-content clearfix">
         <div class="tab-pane active" id="aaa">
             <div class="well">
                 <table id="pastyears" class="table table-bordered  table-condensed table-striped">
