@@ -120,7 +120,7 @@ $this->Html->script('save', array('inline' => false));
           'class' => 'input-xxlarge',
         ));
         // echo $this->Form->input('protocol_no', array(
-        // 'label' => array('class' => 'control-label required', 'text' => 'Protocol No:<span class="sterix">*</span>'),
+        // 'label' => array('class' => 'control-label required', 'text' => 'ECCT Reference No:<span class="sterix">*</span>'),
         // 'placeholder' => ' ' , 'class' => 'input-xxlarge',
         // ));
         echo $this->Form->input('version_no', array(
@@ -2134,6 +2134,10 @@ $this->Html->script('save', array('inline' => false));
           'label' => array('class' => 'control-label required', 'text' => ' <span class="sterix">*</span>'),
           'placeholder' => ' ',
           'class' => 'input-xlarge datepickers'
+        ));
+        echo $this->Form->input('protocol_not_ai_generated', array(
+          'type' => 'checkbox',
+          'label' => array('class' => 'control-label required', 'text' => ' I declare that the clinical trial protocol submitted is not AI-generated. <span class="sterix">*</span>'),
         ));
         ?>
       </div>

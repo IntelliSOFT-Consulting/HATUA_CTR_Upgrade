@@ -440,6 +440,107 @@ class AttachmentsController extends AppController
         }
     }
 
+    public function admin_declarations()
+    {
+        $page_options = array('5' => '5', '10' => '10');
+
+        $criteria['Attachment.model'] = 'Declaration';
+        $this->paginate['conditions'] = $criteria;
+        $this->paginate['order'] = array('Attachment.created' => 'desc');
+
+        $this->set('page_options', $page_options);
+        $this->set('declarations', Sanitize::clean($this->paginate(), array('encode' => false)));
+    }
+
+    public function admin_declarations_add()
+    {
+        if ($this->request->is('post')) {
+            if ($this->RequestHandler->isAjax()) {
+                $data = $this->request->data;
+                $response = array();
+
+                foreach ($data['Attachment'] as $key => $attachment) {
+                    if (!empty($attachment['file']['name'])) {
+
+                        // Prepare data for saving
+                        $attachmentData = array(
+                            'Attachment' => array(
+                                'file' => $attachment['file'],
+                                'foreign_key' => 1,
+                                'model' => 'Declaration',
+                            )
+                        );
+                        $this->Attachment->create();
+                        if ($this->Attachment->save($attachmentData)) {
+                            $id = $this->Attachment->id;
+                            $attachment = $this->Attachment->find(
+                                'first',
+                                array(
+                                    'conditions' => array(
+                                        'Attachment.id' => $id
+                                    ),
+                                    'contain' => array()
+                                )
+                            );
+                            $response = array('message' => 'Success', 'content' => $attachment);
+                        } else {
+                            $message = $this->Attachment->validationErrors;
+                            $this->set('response', array('message' => 'Failure', 'errors' => $message));
+                        }
+                    }
+                }
+                $this->set('response', $response);
+
+                if ($this->RequestHandler->isAjax()) $this->set('_serialize', 'response');
+            } else {
+                $data = $this->request->data;
+                $attachments = $data['Attachment'];
+                $success = true;
+                foreach ($attachments as $attachment) {
+                    if (!empty($attachment['id'])) {
+                        $this->Attachment->id = $attachment['id'];
+                    } else {
+                        $this->Attachment->create();
+                    }
+
+                    if ($this->Attachment->save($attachment)) {
+                        $success = true;
+                    } else {
+                        $success = false;
+                    }
+                }
+                if ($success) {
+                    $this->Session->setFlash(__('The attachments has been saved'), 'alerts/flash_success');
+                    $this->redirect(array('action' => 'declarations'));
+                } else {
+                    $this->Session->setFlash(__('The attachment could not be saved. Please, try again.'), 'alerts/flash_error');
+                }
+            }
+        }
+    }
+
+    public function applicant_checklist_download($id = null)
+    {
+        $this->viewClass = 'Media';
+        $this->Attachment->id = $id;
+        if (!$this->Attachment->exists()) {
+            $this->Session->setFlash(__('The requested file does not exist!.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else if (!$this->Attachment->isOwnedBy($id, $this->Auth->user('id'))) {
+            $this->Session->setFlash(__('You do not have permission to access this resource
+                                            id = ' . $id . ' and user = ' . $this->Auth->user('id')), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        } else {
+            $attachment = $this->Attachment->read(null, $id);
+            $params = array(
+                'id'        => $attachment['Attachment']['basename'],
+                'download'  => true,
+                'path'      => 'media' . DS . 'transfer' . DS . $attachment['Attachment']['dirname'] . DS
+            );
+            $this->set($params);
+        }
+    }
+
 
     /**
      * delete method
