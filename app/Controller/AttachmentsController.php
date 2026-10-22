@@ -4,7 +4,6 @@ App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
 App::uses('HtmlHelper', 'View/Helper');
 App::uses('Sanitize', 'Utility');
-App::uses('HttpSocket', 'Network/Http');
 /**
  * Attachments Controller
  *
@@ -42,45 +41,8 @@ class AttachmentsController extends AppController
     }
     public function genereateQRCode($id = null)
     {
-
         $this->loadModel('AmendmentLetter');
-
-        $currentId = base64_encode($id);
-
-        $currentUrl = Router::url('/amendment_letters/verify/' . $currentId, true);
-
-        $options = array(
-            'ssl_verify_peer' => false
-        );
-        $HttpSocket = new HttpSocket($options);
-
-        //Request Access Token
-        $initiate = $HttpSocket->post(
-            'https://smp.imeja.co.ke/api/qr/generate',
-            array('url' => $currentUrl),
-            array('header' => array())
-        );
-
-        // debug($initiate);
-        // exit;
-        if ($initiate->isOk()) {
-
-            $body = $initiate->body;
-            $resp = json_decode($body, true);
-            $this->AmendmentLetter->id = $id;
-            if (!$this->AmendmentLetter->exists()) {
-                throw new NotFoundException(__('Invalid amendment approval letter'));
-            }
-            $qr_code = $resp['data']['qr_code'];
-            $data = $this->AmendmentLetter->read(null, $id);
-            $data['AmendmentLetter']['qrcode'] = $qr_code;
-
-            $this->AmendmentLetter->Create();
-            if ($this->AmendmentLetter->save($data)) {
-            }
-        } else {
-            $body = $initiate->body;
-        }
+        $this->QrCode->attach($this->AmendmentLetter, $id, Router::url('/amendment_letters/verify/' . base64_encode($id), true));
     }
 
     public function approve($id = null, $application_id = null)

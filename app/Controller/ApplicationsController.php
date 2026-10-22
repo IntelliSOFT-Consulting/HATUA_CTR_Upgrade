@@ -851,50 +851,8 @@ class ApplicationsController extends AppController
     }
     public function genereateQRCode($id = null)
     {
-
         $this->loadModel('AnnualLetter');
-
-        $currentId = base64_encode($id);
-
-        $currentUrl = Router::url('/annual_letters/verify/' . $id, true);
-
-        // debug($currentUrl);
-        // exit;
-        //   $base64EncodedUrl = $$currentUrl;//base64_encode($currentUrl);
-
-        //    $base64EncodedUrl;
-        $options = array(
-            'ssl_verify_peer' => false
-        );
-        $HttpSocket = new HttpSocket($options);
-
-        //Request Access Token
-        $initiate = $HttpSocket->post(
-            'https://smp.imeja.co.ke/api/qr/generate',
-            array('url' => $currentUrl),
-            array('header' => array())
-        );
-
-        // debug($initiate);
-        // exit;
-        if ($initiate->isOk()) {
-
-            $body = $initiate->body;
-            $resp = json_decode($body, true);
-            $this->AnnualLetter->id = $id;
-            if (!$this->AnnualLetter->exists()) {
-                throw new NotFoundException(__('Invalid annual approval letter'));
-            }
-            $qr_code = $resp['data']['qr_code'];
-            $data = $this->AnnualLetter->read(null, $id);
-            $data['AnnualLetter']['qrcode'] = $qr_code;
-
-            $this->AnnualLetter->Create();
-            if ($this->AnnualLetter->save($data)) {
-            }
-        } else {
-            $body = $initiate->body;
-        }
+        $this->QrCode->attach($this->AnnualLetter, $id, Router::url('/annual_letters/verify/' . $id, true));
     }
     public function manager_stages_summary()
     {

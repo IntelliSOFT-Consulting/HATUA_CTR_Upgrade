@@ -2,7 +2,6 @@
 App::uses('AppController', 'Controller');
 App::uses('String', 'Utility');
 App::uses('ThemeView', 'View');
-App::uses('HttpSocket', 'Network/Http');
 App::uses('HtmlHelper', 'View/Helper');
 /**
  * Comments Controller
@@ -37,39 +36,7 @@ class CommentsController extends AppController
     }
     public function generateQRCode($id = null)
     {
-        $currentId = base64_encode($id);
-
-        $currentUrl = Router::url('/comments/verify/' . $currentId, true);
-        $options = array(
-            'ssl_verify_peer' => false
-        );
-        $HttpSocket = new HttpSocket($options);
-
-        //Request Access Token
-        $initiate = $HttpSocket->post(
-            'https://smp.imeja.co.ke/api/qr/generate',
-            array('url' => $currentUrl),
-            array('header' => array())
-        );
-
-        // debug($initiate);
-        // exit;
-        if ($initiate->isOk()) {
-
-            $body = $initiate->body;
-            $resp = json_decode($body, true);
-            $this->Comment->id = $id;
-            if (!$this->Comment->exists()) {
-                throw new NotFoundException(__('Invalid annual approval letter'));
-            }
-            $qr_code = $resp['data']['qr_code'];
-            $data = $this->Comment->read(null, $id);
-            $data['Comment']['qrcode'] = $qr_code;
-
-            $this->Comment->Create();
-            if ($this->Comment->save($data)) {
-            }
-        }
+        $this->QrCode->attach($this->Comment, $id, Router::url('/comments/verify/' . base64_encode($id), true));
     }
     public function manager_add_annual_letter()
     {
