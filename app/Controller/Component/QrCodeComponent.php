@@ -19,7 +19,8 @@ class QrCodeComponent extends Component {
  * @return string
  */
 	public function generate($url, $options = array()) {
-		return base64_encode(QrEncoder::svg($url, $options + array('size' => 150)));
+		// Fixed 150px like SMP; a 2-module margin keeps modules large enough to scan, the page supplies the rest.
+		return base64_encode(QrEncoder::svg($url, $options + array('size' => 150, 'border' => 2)));
 	}
 
 /**
