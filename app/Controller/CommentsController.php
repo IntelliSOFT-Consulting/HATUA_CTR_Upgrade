@@ -605,20 +605,9 @@ public function internalreviewer_add_review_internal()
         if ($this->request->is('post')) {
             $this->Comment->create();
             if ($this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+                $commentId = $this->Comment->id;
 
-                //Get ID of the currently saved record 
-                $this->generateQRCode($this->Comment->id);
-
-                //******************       Send Email and Notifications to Applicant and Managers          *****************************
-                $this->loadModel('Message');
-                $html = new HtmlHelper(new ThemeView());
-                $message = $this->Message->find('first', array('conditions' => array('name' => 'screening_feedback')));
-                $this->loadModel('Application');
-                $app = $this->Application->find('first', array(
-                    'contain' => array(),
-                    'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
-                ));
-
+                //Stage transition runs first so a failing QR code or email can't leave screening stuck as Current
                 //Check if request is coming from manager/applicant
                 //Applicant can't respond during screening phase until manager makes comment
                 //When manager responds, the screening phase is complete. Check if manager response is first
@@ -653,6 +642,22 @@ public function internalreviewer_add_review_internal()
                     );
                 }
 
+                //QR code is cosmetic; log and carry on so notifications still go out
+                try {
+                    $this->generateQRCode($commentId);
+                } catch (Exception $e) {
+                    $this->log('Screening query QR code failed for comment ' . $commentId . ': ' . $e->getMessage(), 'error');
+                }
+
+                //******************       Send Email and Notifications to Applicant and Managers          *****************************
+                $this->loadModel('Message');
+                $html = new HtmlHelper(new ThemeView());
+                $message = $this->Message->find('first', array('conditions' => array('name' => 'screening_feedback')));
+                $this->loadModel('Application');
+                $app = $this->Application->find('first', array(
+                    'contain' => array(),
+                    'conditions' => array('Application.id' => $this->request->data['Comment']['model_id'])
+                ));
 
                 $users = $this->Comment->User->find('all', array(
                     'contain' => array(),
