@@ -2565,6 +2565,16 @@
               <p><?php echo $application['Application']['declaration_date2']; ?> </p>
             </td>
           </tr>
+          <tr>
+            <td class="table-label required">
+              <p>I declare that the clinical trial protocol submitted is not AI-generated.</p>
+            </td>
+            <td>
+              <p>
+                <?php echo ($application['Application']['protocol_not_ai_generated'] ? $ichecked : $nchecked); ?> 
+              </p>
+            </td>
+          </tr>
           <?php
           foreach ($application['Amendment']  as $key => $amendment) {
             if ($amendment['submitted'] == 1 && !empty($amendment['declaration_date2'])) {      ?>

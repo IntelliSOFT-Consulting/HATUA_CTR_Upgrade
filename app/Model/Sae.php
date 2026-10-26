@@ -222,6 +222,11 @@ class Sae extends AppModel {
             'dependent' => true,
             'conditions' => array('Comment.model' => 'Sae', 'Comment.category' => 'external' ),
         ),
+        'SaeDate' => array(
+            'className' => 'SaeDate',
+            'foreignKey' => 'sae_id',
+            'dependent' => true
+        ),
     );
 
     public $validate = array(
@@ -350,38 +355,67 @@ class Sae extends AppModel {
             )
         ),
         'administration_date' => array(
-            'notEmpty' => array(
-                'rule'     => 'notEmpty',
-                'required' => true,
-                'message'  => 'Please enter the date of initial administration of the investigational product!'
+            'checkInitialRequired' => array(
+                'rule' => 'checkInitialRequired',
+                'message' => 'Please enter the initial date of administration (or check "IP was not given").'
+            ),
+            'validDateValue' => array(
+                'rule' => 'validDateValue',
+                'allowEmpty' => true,
+                'message' => 'Please enter a valid date of initial administration of the investigational product!'
             ),
             'dateBeforeAdministration' => array(
                 'rule' => 'dateBeforeAdministration',
+                'allowEmpty' => true,
                 'message' => 'The date of initial administration of the investigational product must be after the date of enrollment into the study!'
             ),
             'dateAfterBirthDate' => array(
                 'rule' => 'dateAfterBirthDate',
+                'allowEmpty' => true,
                 'message' => 'The date of initial administration of the investigational product must be after the date of birth!'
             )
         ),
         'latest_date' => array(
-            'notEmpty' => array(
-                'rule'     => 'notEmpty',
-                'required' => true,
-                'message'  => 'Please enter the date of latest administration of the investigational product!'
+            'checkLatestDependency' => array(
+                'rule' => 'checkLatestDependency',
+                'message' => 'You cannot provide a latest administration date without an initial administration date.'
+            ),
+            'validDateValue' => array(
+                'rule' => 'validDateValue',
+                'allowEmpty' => true,
+                'message' => 'Please enter a valid date of latest administration of the investigational product!'
             ),
             'dateBeforeAdministration' => array(
                 'rule' => 'dateBeforeAdministration',
+                'allowEmpty' => true,
                 'message' => 'The date of the latest administration of the investigational product must be after the date of enrollment into the study and date of initial administration!'
             ),
             'dateAfterBirthDate' => array(
                 'rule' => 'dateAfterBirthDate',
+                'allowEmpty' => true,
                 'message' => 'The date of the latest administration of the investigational product must be after the date of birth!'
+            )
+        ),
+        'ip_not_given_narrative' => array(
+            'checkNarrativeRequired' => array(
+                'rule' => 'checkNarrativeRequired',
+                'message' => 'Please provide a narrative explaining why the IP was not given.'
             )
         ),
       );
 
     public function beforeSave() {
+        if (!empty($this->data['Sae']['ip_not_given'])) {
+            $this->data['Sae']['administration_date'] = null;
+            $this->data['Sae']['latest_date'] = null;
+        } else {
+            $this->data['Sae']['ip_not_given_narrative'] = null;
+            $this->data['Sae']['ip_not_given'] = 0;
+            if (empty($this->data['Sae']['latest_date'])) {
+                $this->data['Sae']['latest_date'] = null;
+            }
+        }
+
         if (!empty($this->data['Sae']['date_of_birth'])) {
             $this->data['Sae']['date_of_birth'] = $this->dateFormatBeforeSave($this->data['Sae']['date_of_birth']);
         }
@@ -439,51 +473,148 @@ class Sae extends AppModel {
         return true;
     }
 
+    public function validDateValue($field = null) {
+        $value = reset($field);
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return ($this->_dateTimestamp($value) !== false);
+    }
+
+    public function validAgeYears($field = null) {
+        $value = reset($field);
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return is_numeric($value) && $value >= 0 && $value <= 140;
+    }
+
     public function dateAfterStartDates($field = null) {
+        $reactionOnset = $this->_dateTimestamp(reset($field));
+        if ($reactionOnset === false) {
+            return true;
+        }
+
         if (!empty($this->data['SuspectedDrug'])) {
             foreach ($this->data['SuspectedDrug'] as $val) {
-                if(strtotime($field['reaction_onset']) < strtotime($val['date_from']))    return false;
+                if (empty($val['date_from'])) {
+                    continue;
+                }
+
+                $therapyStart = $this->_dateTimestamp($val['date_from']);
+                if ($therapyStart !== false && $reactionOnset < $therapyStart) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
     public function dateBeforeAdministration($field = null) {
-        if (!empty($field['administration_date'])) {
-            if(strtotime($field['administration_date']) < strtotime($this->data['Sae']['enrollment_date']))    return false;
+        $fieldName = key($field);
+        $value = $this->_dateTimestamp(reset($field));
+        if ($value === false) {
+            return true;
         }
-        if (!empty($field['latest_date'])) {
-            if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['enrollment_date']))    return false;
+
+        $enrollmentDate = !empty($this->data['Sae']['enrollment_date']) ? $this->_dateTimestamp($this->data['Sae']['enrollment_date']) : false;
+        $administrationDate = !empty($this->data['Sae']['administration_date']) ? $this->_dateTimestamp($this->data['Sae']['administration_date']) : false;
+        $latestDate = !empty($this->data['Sae']['latest_date']) ? $this->_dateTimestamp($this->data['Sae']['latest_date']) : false;
+
+        if ($fieldName === 'enrollment_date') {
+            if ($administrationDate !== false && $value > $administrationDate) {
+                return false;
+            }
+            if ($latestDate !== false && $value > $latestDate) {
+                return false;
+            }
+
+            return true;
         }
-        if (!empty($field['latest_date'])) {
-            if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['administration_date']))    return false;
+
+        if ($fieldName === 'administration_date' && $enrollmentDate !== false) {
+            if ($value < $enrollmentDate) {
+                return false;
+            }
+            if ($latestDate !== false && $value > $latestDate) {
+                return false;
+            }
+
+            return true;
         }
+
+        if ($fieldName === 'latest_date') {
+            if ($enrollmentDate !== false && $value < $enrollmentDate) {
+                return false;
+            }
+            if ($administrationDate !== false && $value < $administrationDate) {
+                return false;
+            }
+        }
+
         return true;
     }
 
     public function dateAfterBirthDate($field = null) {
-        if (!empty($field['enrollment_date']) && !empty($field['date_of_birth'])) {
-            if(strtotime($field['enrollment_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
+        $value = $this->_dateTimestamp(reset($field));
+        $birthDate = !empty($this->data['Sae']['date_of_birth']) ? $this->_dateTimestamp($this->data['Sae']['date_of_birth']) : false;
+
+        if ($value === false || $birthDate === false) {
+            return true;
         }
-        if (!empty($field['administration_date']) && !empty($field['date_of_birth'])) {
-            if(strtotime($field['administration_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
-        }
-        if (!empty($field['latest_date']) && !empty($field['date_of_birth'])) {
-            if(strtotime($field['latest_date']) < strtotime($this->data['Sae']['date_of_birth']))    return false;
-        }
-        return true;
+
+        return ($value >= $birthDate);
     }
 
     public function dateAfterOnsetDate($field = null) {
-        if (!empty($field['reaction_end_date'])) {
-            if(strtotime($field['reaction_end_date']) < strtotime($this->data['Sae']['reaction_onset']))    return false;
+        $reactionEndDate = $this->_dateTimestamp(reset($field));
+        $reactionOnset = !empty($this->data['Sae']['reaction_onset']) ? $this->_dateTimestamp($this->data['Sae']['reaction_onset']) : false;
+
+        if ($reactionEndDate === false || $reactionOnset === false) {
+            return true;
         }
-        return true;
+
+        return ($reactionEndDate >= $reactionOnset);
     }
 
     public function sourceSelected($field = null) {
         if (empty($this->data['Sae']['source_study']) and empty($this->data['Sae']['source_literature']) and empty($this->data['Sae']['source_health_professional'])) {
             return false;
+        }
+        return true;
+    }
+
+    protected function _dateTimestamp($value) {
+        if ($value === null || $value === '') {
+            return false;
+        }
+
+        return strtotime($value);
+    }
+
+    public function checkInitialRequired($check) {
+        if (!empty($this->data['Sae']['ip_not_given'])) {
+            return true; 
+        }
+        $value = reset($check);
+        return !empty($value); 
+    }
+
+    public function checkLatestDependency($check) {
+        $latestDate = reset($check);
+        
+        if (!empty($latestDate) && empty($this->data['Sae']['administration_date'])) {
+            return false;
+        }
+        return true;
+    }
+
+    public function checkNarrativeRequired($check) {
+        if (!empty($this->data['Sae']['ip_not_given'])) {
+            $value = reset($check);
+            return !empty($value); 
         }
         return true;
     }
