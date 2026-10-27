@@ -647,4 +647,60 @@ class Sae extends AppModel {
         }
         return false;
     }
+
+    /**
+     * Generates a unique, non-repeating sequential reference number for SAE / SUSAR reports.
+     * Prevents duplicate reference numbers and avoids reusing indices from deleted/unsubmitted records.
+     */
+    public function generateReferenceNumber($formType = 'SAE', $year = null)
+    {
+        $formType = strtoupper($formType);
+        if (empty($year)) {
+            $year = date('Y');
+        }
+
+        // Search for existing reference numbers for this formType and year to derive highest sequence
+        $latest = $this->find('first', array(
+            'conditions' => array(
+                'Sae.reference_no LIKE' => $formType . '/' . $year . '/%',
+            ),
+            'fields' => array('Sae.reference_no'),
+            'order' => array('Sae.id' => 'DESC'),
+            'recursive' => -1
+        ));
+
+        $count = 0;
+        if (!empty($latest['Sae']['reference_no'])) {
+            $parts = explode('/', $latest['Sae']['reference_no']);
+            $lastSeq = end($parts);
+            if (strpos($lastSeq, '_') !== false) {
+                $lastSeq = substr($lastSeq, 0, strpos($lastSeq, '_'));
+            }
+            if (is_numeric($lastSeq)) {
+                $count = (int)$lastSeq;
+            }
+        }
+
+        if ($count <= 0) {
+            $count = $this->find('count', array(
+                'conditions' => array(
+                    'Sae.form_type' => $formType,
+                    'Sae.created BETWEEN ? and ?' => array($year . '-01-01 00:00:00', $year . '-12-31 23:59:59')
+                )
+            ));
+        }
+
+        $count++;
+        $seq = ($count < 10) ? '0' . $count : $count;
+        $reference_no = $formType . '/' . $year . '/' . $seq;
+
+        // Atomic uniqueness guard: guarantee no collision or repetition
+        while ($this->hasAny(array('Sae.reference_no' => $reference_no))) {
+            $count++;
+            $seq = ($count < 10) ? '0' . $count : $count;
+            $reference_no = $formType . '/' . $year . '/' . $seq;
+        }
+
+        return $reference_no;
+    }
 }

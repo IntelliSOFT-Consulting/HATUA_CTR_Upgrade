@@ -73,7 +73,7 @@ class AppController extends Controller
     'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'),
     'InternalReview'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'),
     
-    'Sae',
+    'Sae' => array('Country'),
     'AmendmentLetter',
     'AnnualLetter' => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')),
     'StudyRoute',
@@ -82,7 +82,12 @@ class AppController extends Controller
     'Deviation' => array('ExternalComment' => array('Attachment')),
     'SiteInspection' => array('SiteAnswer', 'Attachment', 'InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'User'),
     'ApplicationStage' => array('Comment' => array('Attachment')),
-    'Outsource' => array('User')
+    'Outsource' => array('User'),
+    'SafetyReportGen' => array('Attachment'),
+    'SafetyReportDSMB' => array('Attachment'),
+    'SafetyReportDSUR' => array('Attachment'),
+    'SafetyReportLINE' => array('Attachment'),
+    'MultiCenter' => array('User', 'Application'),
   );
   public $components = array(
     'Acl',

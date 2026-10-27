@@ -358,40 +358,26 @@ class SaesController extends AppController
         }
 
         if ($type == 'sae') {
-            $count = $this->Sae->find('count',  array('conditions' => array(
-                'Sae.form_type' => 'SAE',
-                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
-            )));
-            $count++;
-            $count = ($count < 10) ? "0$count" : $count;
-            // $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
-            // $this->Sae->saveField('form_type', 'SAE');
+            $reference_no = $this->Sae->generateReferenceNumber('SAE');
             $this->Sae->create();
             $this->Sae->save(['Sae' => [
                 'application_id' => $id,
                 'user_id' => $this->Auth->User('id'),
                 'reporter_email' => $this->Auth->User('email'),
                 'email_address' => $this->Auth->User('email'),
-                'reference_no' => 'SAE/' . date('Y') . '/' . $count,
+                'reference_no' => $reference_no,
                 'form_type' => 'SAE'
             ]], false);
             $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
         } elseif ($type == 'susar') {
-            $count = $this->Sae->find('count',  array('conditions' => array(
-                'Sae.form_type' => 'SUSAR',
-                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
-            )));
-            $count++;
-            $count = ($count < 10) ? "0$count" : $count;
-            // $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
-            // $this->Sae->saveField('form_type', 'SUSAR');
+            $reference_no = $this->Sae->generateReferenceNumber('SUSAR');
             $this->Sae->create();
             $this->Sae->save(['Sae' => [
                 'application_id' => $id,
                 'user_id' => $this->Auth->User('id'),
                 'email_address' => $this->Auth->User('email'),
                 'reporter_email' => $this->Auth->User('email'),
-                'reference_no' => 'SUSAR/' . date('Y') . '/' . $count,
+                'reference_no' => $reference_no,
                 'form_type' => 'SUSAR'
             ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
@@ -446,37 +432,23 @@ class SaesController extends AppController
         }
 
         if ($type == 'sae') {
-            $count = $this->Sae->find('count',  array('conditions' => array(
-                'Sae.form_type' => 'SAE',
-                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
-            )));
-            $count++;
-            $count = ($count < 10) ? "0$count" : $count;
-            // $this->Sae->saveField('reference_no', 'SAE/'.date('Y').'/'.$count);
-            // $this->Sae->saveField('form_type', 'SAE');
+            $reference_no = $this->Sae->generateReferenceNumber('SAE');
             $this->Sae->create();
             $this->Sae->save([
                 'Sae' => [
                     'application_id' => $id,
                     'user_id' => $this->Auth->User('id'),
                     'reporter_email' => $this->Auth->User('email'),
-                    'reference_no' => 'SAE/' . date('Y') . '/' . $count,
+                    'reference_no' => $reference_no,
                     'form_type' => 'SAE'
                 ]
             ], false);
             $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
         } elseif ($type == 'susar') {
-            $count = $this->Sae->find('count',  array('conditions' => array(
-                'Sae.form_type' => 'SUSAR',
-                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
-            )));
-            $count++;
-            $count = ($count < 10) ? "0$count" : $count;
-            // $this->Sae->saveField('reference_no', 'SUSAR/'.date('Y').'/'.$count);
-            // $this->Sae->saveField('form_type', 'SUSAR');
+            $reference_no = $this->Sae->generateReferenceNumber('SUSAR');
             $this->Sae->create();
             $this->Sae->save(['Sae' => [
-                'application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => 'SUSAR/' . date('Y') . '/' . $count,
+                'application_id' => $id, 'user_id' => $this->Auth->User('id'), 'reporter_email' => $this->Auth->User('email'), 'reference_no' => $reference_no,
                 'form_type' => 'SUSAR'
             ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');
@@ -494,12 +466,7 @@ class SaesController extends AppController
         }
 
         if ($type == 'sae') {
-            $count = $this->Sae->find('count',  array('conditions' => array(
-                'Sae.form_type' => 'SAE',
-                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
-            )));
-            $count++;
-            $count = ($count < 10) ? "0$count" : $count;
+            $reference_no = $this->Sae->generateReferenceNumber('SAE');
             $this->Sae->create();
             $this->Sae->save([
                 'Sae' => [
@@ -507,25 +474,20 @@ class SaesController extends AppController
                     'user_id' => $this->Auth->User('id'),
                     'reporter_email' => $this->Auth->User('email'),
                     'email_address' => $this->Auth->User('email'),
-                    'reference_no' => 'SAE/' . date('Y') . '/' . $count,
+                    'reference_no' => $reference_no,
                     'form_type' => 'SAE'
                 ]
             ], false);
             $this->Session->setFlash(__('The SAE has been created'), 'alerts/flash_success');
         } elseif ($type == 'susar') {
-            $count = $this->Sae->find('count',  array('conditions' => array(
-                'Sae.form_type' => 'SUSAR',
-                'Sae.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
-            )));
-            $count++;
-            $count = ($count < 10) ? "0$count" : $count;
+            $reference_no = $this->Sae->generateReferenceNumber('SUSAR');
             $this->Sae->create();
             $this->Sae->save(['Sae' => [
                 'application_id' => $id,
                 'user_id' => $this->Auth->User('id'),
                 'reporter_email' => $this->Auth->User('email'),
                 'email_address' => $this->Auth->User('email'),
-                'reference_no' => 'SUSAR/' . date('Y') . '/' . $count,
+                'reference_no' => $reference_no,
                 'form_type' => 'SUSAR'
             ]], false);
             $this->Session->setFlash(__('The SUSAR has been created'), 'alerts/flash_success');

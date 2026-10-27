@@ -348,7 +348,7 @@ $this->assign('SAE', 'active');
                     <th><?php echo $this->Paginator->sort('report_type'); ?></th>
                     <th><?php echo $this->Paginator->sort('application_id'); ?></th>
                     <th><?php echo $this->Paginator->sort('patient_initials'); ?></th>
-                    <th><?php echo $this->Paginator->sort('country_id'); ?></th>
+                    <th><?php echo $this->Paginator->sort('country_id', 'Site / Origin'); ?></th>
                     <th><?php echo $this->Paginator->sort('created'); ?></th>
                     <th><?php echo $this->Paginator->sort('date_submitted'); ?></th>
                     <th class="actions"><?php echo __('Actions'); ?></th>
@@ -405,7 +405,25 @@ $this->assign('SAE', 'active');
                                                             echo $this->Html->link($sae['Application']['protocol_no'], array('controller' => 'applications', 'action' => 'view', $sae['Application']['id']), array('escape' => false));
                                                             ?>&nbsp;</td>
                         <td style="<?= h($cellStyle) ?>"><?php echo h($sae['Sae']['patient_initials']); ?>&nbsp;</td>
-                        <td style="<?= h($cellStyle) ?>"><?php echo h($sae['Country']['name']); ?>&nbsp;</td>
+                        <td style="<?= h($cellStyle) ?>">
+                            <?php
+                            $isKenyan = false;
+                            if (!empty($sae['Sae']['country_id']) && $sae['Sae']['country_id'] == 115) {
+                                $isKenyan = true;
+                            } elseif (!empty($sae['Country']['name']) && strtolower($sae['Country']['name']) === 'kenya') {
+                                $isKenyan = true;
+                            } elseif (empty($sae['Sae']['country_id']) && empty($sae['Country']['name'])) {
+                                $isKenyan = true;
+                            }
+
+                            if ($isKenyan) {
+                                echo '<span class="label label-success">Kenyan Site</span>';
+                            } else {
+                                $countryName = !empty($sae['Country']['name']) ? ' (' . h($sae['Country']['name']) . ')' : '';
+                                echo '<span class="label label-info">International Site' . $countryName . '</span>';
+                            }
+                            ?>&nbsp;
+                        </td>
                         <td style="<?= h($cellStyle) ?>"><?php echo h($sae['Sae']['created']); ?>&nbsp;</td>
                         <td style="<?= h($cellStyle) ?>"><?php echo h($sae['Sae']['date_submitted']); ?>&nbsp;</td>
                         <td style="<?= h($cellStyle) ?>" class="actions">
