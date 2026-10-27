@@ -54,6 +54,202 @@ class ApplicationsController extends AppController
 
         $this->set('sponsor_options', $sponsorOptions);
     }
+
+    public function applicant_delete_center($id, $application_id)
+    {
+        // debug($id);
+        // debug($application_id);
+        // exit;
+        $this->loadModel('MultiCenter');
+        $this->MultiCenter->id = $id;
+        if (!$this->MultiCenter->exists()) {
+            throw new NotFoundException(__('Invalid application letter'));
+        }
+
+        $this->MultiCenter->id = $id;
+        $this->MultiCenter->saveField('deleted', true);
+        $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
+        $this->Session->setFlash(__('Application Multi Center deleted successfully'), 'alerts/flash_success');
+        $this->redirect($this->referer());
+    }
+    public function applicant_create_multi_center($id = null)
+    {
+        $this->loadModel('MultiCenter');
+        $this->loadModel('Application');
+        $this->loadModel('AuditTrail');
+        if ($this->request->is('post')) {
+
+            //before creating, ensure not user_id and application_id  matches to ensure you can't multiple records same user
+            $this->MultiCenter->recursive = -1;
+            $center = $this->MultiCenter->find('first', array('conditions' => array('MultiCenter.user_id' => $this->request->data['MultiCenter']['user_id'], 'MultiCenter.application_id' => $this->request->data['MultiCenter']['application_id'])));
+            if ($center) {
+                $this->Session->setFlash(__('The user has already been assigned to the application'), 'alerts/flash_error');
+                return $this->redirect($this->referer());
+            }
+
+            $this->MultiCenter->create();
+            if ($this->MultiCenter->save($this->request->data)) {
+                // pull the application details by application_id
+                $application = $this->Application->find('first', array(
+                    'conditions' => array('Application.id' => $this->request->data['MultiCenter']['application_id']),
+                    'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+                ));
+
+                //create and audit trail
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $id,
+                        'model' => 'Application',
+                        'message' => 'Multi Center request for the protocol with reference number ' . $application['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('name'),
+                        'ip' => $application['Application']['protocol_no']
+                    )
+                );
+                $this->AuditTrail->Create();
+                if ($this->AuditTrail->save($audit)) {
+                    $this->log($this->request->data, 'audit_success');
+                } else {
+                    $this->log('Error creating an audit trail', 'audit_error');
+                    $this->log($this->request->data, 'audit_error');
+                }
+                $this->Session->setFlash(__('The multi center has been saved'), 'alerts/flash_success');
+                // $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+                $this->redirect($this->referer());
+            } else {
+
+                $validationErrors = $this->MultiCenter->validationErrors;
+
+                // Concatenate validation errors into a single string
+                $errorMessage = 'Failed to submit the request. Please correct the following errors: <br>';
+                foreach ($validationErrors as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $errorMessage .= $error . ' <br>';
+                    }
+                }
+
+                // Set flash message with validation errors
+                $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        }
+        $this->redirect($this->referer());
+    }
+    public function safety_delete($id = null)
+    {
+        $this->loadModel('SafetyReport');
+        $this->SafetyReport->id = $id;
+        if (!$this->SafetyReport->exists()) {
+            throw new NotFoundException(__('Invalid Safety Report'));
+        }
+        $report = $this->SafetyReport->find('first', array('conditions' => array('SafetyReport.id' => $id)));
+        // debug($report);
+        // exit;
+        // Perform a soft delete by setting deleted to true and updating deleted_date
+        if ($this->SafetyReport->save([
+            'deleted' => true,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ])) {
+
+            $safety_type = $report['SafetyReport']['safety_type'] . "  Safety report ";
+            $this->Session->setFlash(__('The ' . $safety_type . ' has been deleted'), 'alerts/flash_success');
+        } else {
+            $this->Session->setFlash(__('The safety report could not be deleted. Please, try again.'), 'alerts/flash_error');
+        }
+        $this->redirect($this->referer());
+    }
+    public function manager_safety_delete($id = null)
+    {
+        $this->safety_delete($id);
+    }
+    public function applicant_safety_delete($id = null)
+    {
+        $this->safety_delete($id);
+    }
+
+    public function generate_safety_report($id = null)
+    {
+
+        $this->loadModel('SafetyReport');
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+        ));
+        if ($application) {
+
+            $safety_type = $this->request->data['SafetyReport']['safety_type'];
+            $count = $this->SafetyReport->find('count',  array('conditions' => array(
+                'SafetyReport.safety_type' => $safety_type,
+                'SafetyReport.created BETWEEN ? and ?' => array(date("Y-01-01 00:00:00"), date("Y-m-d H:i:s"))
+            )));
+            $count++;
+            $count = ($count < 10) ? "0$count" : $count;
+            $reference_no = $safety_type . '/' . date('Y') . '/' . $count;
+            $this->request->data['SafetyReport']['reference_no'] = $reference_no;
+            $this->SafetyReport->create();
+            if ($this->SafetyReport->saveAssociated($this->request->data, array('validate' => true, 'deep' => true))) {
+
+                // Notify the Admins
+
+                $app = $this->Application->read(null, $id);
+                $data = array(
+                    'function' => 'safetyReport',
+                    'Application' => array(
+                        'id' => $this->SafetyReport->id,
+                        'protocol_no' => $app['Application']['protocol_no'],
+
+                    )
+                );
+                CakeResque::enqueue('default', 'NotificationShell', array('safetyReport', $data));
+
+                // Create a Audit Trail
+                $audit = array(
+                    'AuditTrail' => array(
+                        'foreign_key' => $id,
+                        'model' => 'Application',
+                        'message' => 'New ' . $safety_type . ' report for the Protocol with protocol number ' . $app['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('username'),
+                        'ip' => $app['Application']['protocol_no']
+                    )
+                );
+                $this->loadModel('AuditTrail');
+                $this->AuditTrail->Create();
+                if ($this->AuditTrail->save($audit)) {
+                    $this->log($this->request->data, 'audit_success');
+                } else {
+                    $this->log('Error creating an audit trail', 'notifications_error');
+                    $this->log($this->request->data, 'notifications_error');
+                }
+
+                $this->Session->setFlash(__('The ' . $safety_type . ' has been created'), 'alerts/flash_success');
+                $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+            } else {
+                $validationErrors = $this->SafetyReport->validationErrors;
+
+                // Concatenate validation errors into a single string
+                $errorMessage = 'Failed to submit the request. Please correct the following errors: <br>';
+                foreach ($validationErrors as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $errorMessage .= $error . ' <br>';
+                    }
+                }
+
+                // Set flash message with validation errors
+                $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
+                $this->redirect($this->referer());
+            }
+        } else {
+            $this->Session->setFlash(__('Can\'t trace the protocol, please try again later'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
+        }
+    }
+    public function manager_generate_safety_report($id = null)
+    {
+        $this->generate_safety_report($id);
+    }
+    public function applicant_generate_safety_report($id = null)
+    {
+        $this->generate_safety_report($id);
+    }
+
     public function admin_extra($id = null)
     {
 

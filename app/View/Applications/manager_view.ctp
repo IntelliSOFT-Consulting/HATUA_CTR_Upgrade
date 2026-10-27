@@ -417,8 +417,17 @@ $renderTimelineStrip = function ($timelineEntry) use ($amendmentStageOrder, $res
                                                                     elseif ($application['Application']['approved'] == 1) echo 'Rejected';
                                                                     ?>)</small></a>
     </li>
+    <li><a href="#multicenter" data-toggle="tab">Multi Centers (<?php echo !empty($application['MultiCenter']) ? count($application['MultiCenter']) : 0; ?>)</a></li>
     <li><a href="#tab6" data-toggle="tab">Site Inspections (<?php echo count($application['SiteInspection']) ?>)</a></li>
-    <li><a href="#tab7" data-toggle="tab">SAE/SUSAR (<?php echo count($application['Sae']) ?>)</a></li>
+    <?php
+      $sae = !empty($application['Sae']) ? count($application['Sae']) : 0;
+      $gen = !empty($application['SafetyReportGen']) ? count($application['SafetyReportGen']) : 0;
+      $dsmb = !empty($application['SafetyReportDSMB']) ? count($application['SafetyReportDSMB']) : 0;
+      $dsur = !empty($application['SafetyReportDSUR']) ? count($application['SafetyReportDSUR']) : 0;
+      $line = !empty($application['SafetyReportLINE']) ? count($application['SafetyReportLINE']) : 0;
+      $safety = $sae + $gen + $dsmb + $dsur + $line;
+    ?>
+    <li><a href="#tab7" data-toggle="tab">Safety Reports (<?php echo $safety; ?>)</a></li>
     <li><a href="#tab15" data-toggle="tab">CIOMS E2B (<?php echo count($application['Ciom']) ?>)</a></li>
     <li><a href="#tab13" data-toggle="tab">Protocol Deviations (<?php echo count($application['Deviation']) ?>)</a></li>
     <li><a href="#tab8" data-toggle="tab" style="color: #52A652;">Annual Approval Checklist</a></li>
@@ -999,60 +1008,17 @@ $renderTimelineStrip = function ($timelineEntry) use ($amendmentStageOrder, $res
       </div>
     </div>
 
-    <div class="tab-pane" id="tab7">
+    <div class="tab-pane" id="multicenter">
       <div class="row-fluid">
         <div class="span12">
-
-          <table class="table  table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Reference No.</th>
-                <th>Report Type</th>
-                <th>Patient Initials</th>
-                <th>Created</th>
-                <th class="actions"><?php echo __('Actions'); ?></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              foreach ($application['Sae'] as $sae) : ?>
-                <tr class="">
-                  <td><?php echo h($sae['id']); ?>&nbsp;</td>
-                  <td><?php echo h($sae['reference_no']); ?>&nbsp;</td>
-                  <td><?php echo h($sae['report_type']);
-                      if ($sae['report_type'] == 'Followup') {
-                        echo "<br> Initial: ";
-                        echo $this->Html->link(
-                          '<label class="label label-info">' . substr($sae['reference_no'], 0, strpos($sae['reference_no'], '-')) . '</label>',
-                          array('controller' => 'saes', 'action' => 'view', $sae['sae_id']),
-                          array('escape' => false)
-                        );
-                      }
-                      ?>&nbsp;
-                  </td>
-                  <td><?php echo h($sae['patient_initials']); ?>&nbsp;</td>
-                  <td><?php echo h($sae['created']); ?>&nbsp;</td>
-                  <td class="actions">
-                    <?php if ($sae['approved'] > 0) echo $this->Html->link(
-                      __('<label class="label label-info">View</label>'),
-                      array('controller' => 'saes', 'action' => 'view', $sae['id']),
-                      array('target' => '_blank', 'escape' => false)
-                    ); ?>
-                    <?php if ($redir === 'applicant' && $sae['approved'] < 1) echo $this->Html->link(__('<label class="label label-success">Edit</label>'), array('controller' => 'saes', 'action' => 'edit', $sae['id']), array('escape' => false)); ?>
-                    <?php
-                    if ($sae['approved'] < 1) {
-                      echo $this->Form->postLink(__('<label class="label label-important">Delete</label>'), array('controller' => 'saes', 'action' => 'delete', $sae['id'], 1), array('escape' => false), __('Are you sure you want to delete # %s?', $sae['id']));
-                    }
-                    if ($redir === 'applicant' && $sae['approved'] > 0) echo $this->Form->postLink('<i class="icon-facebook"></i> Follow Up', array('controller' => 'saes', 'action' => 'followup', $sae['id']), array('class' => 'btn btn-mini btn-warning', 'escape' => false), __('Create followup for %s?', $sae['reference_no']));
-                    ?>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-
+          <?php echo $this->element('application/multicenter_manager'); ?>
         </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab7">
+      <div class="row-fluid">
+        <?php echo $this->element('application/safety'); ?>
       </div>
     </div>
 
