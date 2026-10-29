@@ -579,8 +579,8 @@ $renderTimelineStrip = function ($timelineEntry) use ($amendmentStageOrder, $res
 
           <div class="amend-form">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#list">FEEDBACK/QUERIES</a></li>
-              <li><a href="#comm">Add Comment</a></li>
+              <li class="active"><a href="#feedback_list" data-toggle="tab">FEEDBACK/QUERIES</a></li>
+              <li><a href="#comm" data-toggle="tab">Add Comment</a></li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="feedback_list">
@@ -591,7 +591,7 @@ $renderTimelineStrip = function ($timelineEntry) use ($amendmentStageOrder, $res
                 </div>
               </div>
 
-              <div class="tab-pane active" id="comm">
+              <div class="tab-pane" id="comm">
                 <div class="row-fluid">
                   <div class="span12">
                     <?php
@@ -1151,7 +1151,7 @@ $renderTimelineStrip = function ($timelineEntry) use ($amendmentStageOrder, $res
                       echo $this->element('amendments/section_one_snapshot', array(
                         'sectionOne' => !empty($timelineEntry['section_one']) ? $timelineEntry['section_one'] : array(),
                         'format' => 'column_values',
-                        'emptyText' => ''
+                        'emptyText' => 'Not provided'
                       ));
                       ?>
                     </tr>
