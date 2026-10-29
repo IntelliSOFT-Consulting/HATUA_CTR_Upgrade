@@ -15,7 +15,7 @@ class CommentsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('manager_comment_content_download', 'inspector_add_dev_external', 'verify', 'generateQRCode', 'applicant_comment_content_download', 'manager_add_annual_letter', 'applicant_add_annual_letter', 'delete');
+        $this->Auth->allow('manager_comment_content_download', 'inspector_add_dev_external', 'verify', 'generateQRCode', 'applicant_comment_content_download', 'manager_add_annual_letter', 'applicant_add_annual_letter', 'delete', 'applicant_delete', 'reviewer_delete', 'manager_delete', 'admin_delete');
     }
     public function verify($id = null)
     {
@@ -1114,19 +1114,22 @@ public function internalreviewer_add_review_internal()
      */
     public function manager_delete($id = null)
     {
-        if (!$this->request->is('post')) {
-            throw new MethodNotAllowedException();
-        }
-        $this->Comment->id = $id;
-        if (!$this->Comment->exists()) {
-            throw new NotFoundException(__('Invalid comment'));
-        }
-        if ($this->Comment->delete($id, true)) {
-            $this->Session->setFlash(__('Comment deleted successfully'), 'alerts/flash_success');
-            return $this->redirect($this->referer());
-        }
-        $this->Session->setFlash(__('Comment was not deleted'), 'alerts/flash_error');
-        return $this->redirect($this->referer());
+        $this->delete($id);
+    }
+
+    public function applicant_delete($id = null)
+    {
+        $this->delete($id);
+    }
+
+    public function reviewer_delete($id = null)
+    {
+        $this->delete($id);
+    }
+
+    public function admin_delete($id = null)
+    {
+        $this->delete($id);
     }
 
     /**
