@@ -1024,7 +1024,22 @@ class AnnualLettersController extends AppController
             throw new NotFoundException(__('Invalid annual approval letter'));
         }
         if ($this->request->is('post') || $this->request->is('put')) {
+            $anl = $this->AnnualLetter->find('first', array('contain' => array('Application'), 'conditions' => array('AnnualLetter.id' => $id)));
+            $wasApproved = (!empty($anl['AnnualLetter']['status']) && $anl['AnnualLetter']['status'] === 'approved');
+            $isDraftSave = isset($this->request->data['saveDraft']);
+            $targetStatus = ($isDraftSave && !$wasApproved) ? 'draft' : 'approved';
+
+            $this->request->data['AnnualLetter']['id'] = $id;
+            $this->request->data['AnnualLetter']['status'] = $targetStatus;
+
             if ($this->AnnualLetter->save($this->request->data)) {
+                if ($targetStatus !== 'approved') {
+                    $this->Session->setFlash(__('The annual approval letter draft has been saved'), 'alerts/flash_success');
+                    return $this->redirect(array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], 'ane' => $id, 'manager' => true));
+                }
+
+                // Skip notifications and workflow updates when editing an already submitted letter.
+                if (!$wasApproved) {
 
                 //******************       Send Email and Notifications to Applicant and Managers    *****************************
                 $this->loadModel('Message');
@@ -1106,13 +1121,16 @@ class AnnualLettersController extends AppController
                     $this->log($this->args[0], 'notifications_error');
                 }
 
-                $this->Session->setFlash(__('The annual approval letter has been saved'), 'alerts/flash_success');
-                $this->redirect(array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], 'anl' => $id, 'manager' => true));
+                    $this->Session->setFlash(__('The annual approval letter has been saved'), 'alerts/flash_success');
+                } else {
+                    $this->Session->setFlash(__('The submitted annual approval letter has been updated'), 'alerts/flash_success');
+                }
+                return $this->redirect(array('controller' => 'applications', 'action' => 'view', $anl['Application']['id'], 'anl' => $id, 'manager' => true));
             } else {
                 $this->Session->setFlash(__('The annual approval letter could not be saved. Please, try again.'), 'alerts/flash_error');
             }
         }
-        $this->redirect($this->referer());
+        return $this->redirect($this->referer());
     }
     /**
      * delete method

@@ -2,6 +2,253 @@
 $this->Html->script('ckeditor/ckeditor', array('inline' => false));
 $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 $this->Html->script('jquery.blockUI.js', array('inline' => false));
+
+$formatReviewSummary = function ($content) {
+  $content = trim((string)$content);
+  if ($content === '') {
+    return '<span class="muted">No summary provided.</span>';
+  }
+
+  if (preg_match('/<\s*(p|ul|ol|li|br|div|strong|em|span|h[1-6]|table|blockquote)\b/i', $content)) {
+    return $content;
+  }
+
+  $lines = preg_split('/\r\n|\r|\n/', $content);
+  $lines = array_values(array_filter(array_map('trim', $lines), 'strlen'));
+  if (count($lines) > 1) {
+    return '<ul><li>' . implode('</li><li>', array_map('h', $lines)) . '</li></ul>';
+  }
+
+  return '<p>' . h($content) . '</p>';
+};
+
+$formatReviewComments = function ($comments) {
+  if (empty($comments)) {
+    return '<span class="muted">No comments available.</span>';
+  }
+
+  $items = array();
+  foreach ((array)$comments as $comment) {
+    $subject = !empty($comment['subject']) ? trim((string)$comment['subject']) : '';
+    $content = !empty($comment['content']) ? trim((string)$comment['content']) : '';
+    $sender = !empty($comment['sender']) ? trim((string)$comment['sender']) : '';
+
+    $segments = array();
+    if ($subject !== '') {
+      $segments[] = '<strong>' . h($subject) . '</strong>';
+    }
+    if ($content !== '') {
+      $segments[] = nl2br(h($content));
+    }
+    if ($sender !== '') {
+      $segments[] = '<small class="muted">By: ' . h($sender) . '</small>';
+    }
+
+    if (!empty($segments)) {
+      $items[] = '<div style="margin-bottom: 8px;">' . implode('<br>', $segments) . '</div>';
+    }
+  }
+
+  if (empty($items)) {
+    return '<span class="muted">No comments available.</span>';
+  }
+
+  return implode('', $items);
+};
+
+$priorInternalFeedbackLookup = (!empty($priorInternalFeedbackLookup) && is_array($priorInternalFeedbackLookup))
+  ? $priorInternalFeedbackLookup
+  : array();
+
+if (empty($priorInternalFeedbackLookup)) {
+  $candidateGroups = array();
+  if (!empty($application['Review']) && is_array($application['Review'])) {
+    $candidateGroups[] = $application['Review'];
+  }
+  if (!empty($application['InternalReview']) && is_array($application['InternalReview'])) {
+    $candidateGroups[] = $application['InternalReview'];
+  }
+
+  foreach ($candidateGroups as $reviewGroup) {
+    foreach ($reviewGroup as $reviewEntry) {
+      $reviewId = !empty($reviewEntry['id']) ? (int) $reviewEntry['id'] : 0;
+      if ($reviewId <= 0 || !empty($priorInternalFeedbackLookup[$reviewId])) {
+        continue;
+      }
+
+      if (!empty($reviewEntry['type']) && $reviewEntry['type'] !== 'reviewer_comment') {
+        continue;
+      }
+
+      $priorInternalFeedbackLookup[$reviewId] = array(
+        'Review' => array(
+          'id' => $reviewId,
+          'user_id' => !empty($reviewEntry['user_id']) ? (int) $reviewEntry['user_id'] : 0
+        ),
+        'User' => !empty($reviewEntry['User']) ? $reviewEntry['User'] : array(),
+        'ReviewAnswer' => !empty($reviewEntry['ReviewAnswer']) ? $reviewEntry['ReviewAnswer'] : array()
+      );
+    }
+  }
+}
+
+$extractLinkedSourceReviewId = function ($title) {
+  $title = trim((string)$title);
+  if ($title !== '' && preg_match('/^internal_source_review:(\d+)$/', $title, $matches)) {
+    return (int)$matches[1];
+  }
+  return 0;
+};
+
+$buildComparisonKey = function ($questionType, $questionNumber, $questionText) {
+  $questionType = strtolower(trim((string) $questionType));
+  $questionNumber = trim((string) $questionNumber);
+  if ($questionNumber !== '' && is_numeric($questionNumber)) {
+    $questionNumber = number_format((float) $questionNumber, 2, '.', '');
+  }
+  $questionText = strtolower(preg_replace('/\s+/', ' ', trim((string) $questionText)));
+  return $questionType . '|' . $questionNumber . '|' . $questionText;
+};
+
+$extractAnswerValue = function ($answer) {
+  foreach (array('answer', 'workspace', 'comment') as $field) {
+    if (!empty($answer[$field]) && trim((string)$answer[$field]) !== '') {
+      return trim((string)$answer[$field]);
+    }
+  }
+  return '';
+};
+
+$reviewList = (!empty($reviewList) && is_array($reviewList))
+  ? array_values($reviewList)
+  : array_values((!empty($application['Review']) && is_array($application['Review'])) ? $application['Review'] : array());
+
+$linkedComparisonBySource = array();
+$filteredReviewList = array();
+foreach ($reviewList as $reviewEntry) {
+  $reviewId = !empty($reviewEntry['id']) ? (int)$reviewEntry['id'] : 0;
+  $reviewType = !empty($reviewEntry['type']) ? trim((string)$reviewEntry['type']) : '';
+  $sourceReviewId = $extractLinkedSourceReviewId(!empty($reviewEntry['title']) ? $reviewEntry['title'] : '');
+
+  if ($reviewType === 'reviewer_comment' && $sourceReviewId > 0) {
+    $answerMap = array();
+    foreach ((array)$reviewEntry['ReviewAnswer'] as $answer) {
+      $answerValue = $extractAnswerValue($answer);
+      if ($answerValue === '') {
+        continue;
+      }
+      $comparisonKey = $buildComparisonKey(
+        !empty($answer['question_type']) ? $answer['question_type'] : '',
+        !empty($answer['question_number']) ? $answer['question_number'] : '',
+        !empty($answer['question']) ? $answer['question'] : ''
+      );
+      $answerMap[$comparisonKey] = $answerValue;
+    }
+
+    $linkedReviewerName = '2nd Reviewer';
+    if (!empty($reviewEntry['User']['name'])) {
+      $linkedReviewerName = $reviewEntry['User']['name'];
+    } elseif (!empty($reviewEntry['User']['username'])) {
+      $linkedReviewerName = $reviewEntry['User']['username'];
+    }
+
+    $existingReviewId = !empty($linkedComparisonBySource[$sourceReviewId]['id'])
+      ? (int)$linkedComparisonBySource[$sourceReviewId]['id']
+      : 0;
+    if ($reviewId > $existingReviewId) {
+      $linkedComparisonBySource[$sourceReviewId] = array(
+        'id' => $reviewId,
+        'reviewer_name' => $linkedReviewerName,
+        'answer_map' => $answerMap
+      );
+    }
+
+    if (isset($redir) && $redir === 'manager') {
+      continue;
+    }
+  }
+
+  $filteredReviewList[] = $reviewEntry;
+}
+$reviewList = $filteredReviewList;
+
+$buildComparisonPayloadFromSource = function ($sourceReviewId) use ($priorInternalFeedbackLookup, $buildComparisonKey) {
+  $payload = array(
+    'map' => array(),
+    'reviewer_name' => 'Previous internal reviewer',
+    'source_review_id' => 0
+  );
+
+  if ($sourceReviewId <= 0 || empty($priorInternalFeedbackLookup[$sourceReviewId])) {
+    return $payload;
+  }
+
+  $feedback = $priorInternalFeedbackLookup[$sourceReviewId];
+  $payload['source_review_id'] = (int) $sourceReviewId;
+
+  if (!empty($feedback['User']['name'])) {
+    $payload['reviewer_name'] = $feedback['User']['name'];
+  } elseif (!empty($feedback['User']['username'])) {
+    $payload['reviewer_name'] = $feedback['User']['username'];
+  }
+
+  foreach ((array)$feedback['ReviewAnswer'] as $answer) {
+    $value = '';
+    if (trim((string)$answer['answer']) !== '') {
+      $value = trim((string)$answer['answer']);
+    } elseif (trim((string)$answer['workspace']) !== '') {
+      $value = trim((string)$answer['workspace']);
+    } elseif (trim((string)$answer['comment']) !== '') {
+      $value = trim((string)$answer['comment']);
+    }
+    if ($value === '') {
+      continue;
+    }
+
+    $comparisonKey = $buildComparisonKey($answer['question_type'], $answer['question_number'], $answer['question']);
+    $payload['map'][$comparisonKey] = $value;
+  }
+
+  return $payload;
+};
+
+$buildComparisonPayloadForReview = function ($reviewEntry) use (
+  $extractLinkedSourceReviewId,
+  $buildComparisonPayloadFromSource,
+  $linkedComparisonBySource
+) {
+  $sourceReviewId = $extractLinkedSourceReviewId(!empty($reviewEntry['title']) ? $reviewEntry['title'] : '');
+  if ($sourceReviewId > 0) {
+    return $buildComparisonPayloadFromSource($sourceReviewId);
+  }
+
+  $reviewId = !empty($reviewEntry['id']) ? (int)$reviewEntry['id'] : 0;
+  if ($reviewId > 0 && !empty($linkedComparisonBySource[$reviewId])) {
+    $linked = $linkedComparisonBySource[$reviewId];
+    return array(
+      'map' => !empty($linked['answer_map']) ? (array)$linked['answer_map'] : array(),
+      'reviewer_name' => !empty($linked['reviewer_name']) ? (string)$linked['reviewer_name'] : '2nd Reviewer',
+      'source_review_id' => $reviewId
+    );
+  }
+
+  return array(
+    'map' => array(),
+    'reviewer_name' => 'Previous internal reviewer',
+    'source_review_id' => 0
+  );
+};
+
+// Check if manager comments have been submitted
+$managerCommentsSubmitted = false;
+if (!empty($application['ManagerReview'])) {
+  foreach ($application['ManagerReview'] as $mRev) {
+    if (!empty($mRev['type']) && $mRev['type'] === 'ppb_comment') {
+      $managerCommentsSubmitted = true;
+      break;
+    }
+  }
+}
 ?>
 <div class="marketing">
   <div class="row-fluid">
@@ -13,103 +260,109 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
   <hr class="soften" style="margin: 10px 0px;">
 </div>
 
-<?php                                                                                                                                                                              
-    $myAssessments = array();                                                                                                         
-    if (!empty($application['Review'])) {                                                                                             
-      foreach ($application['Review'] as $rev) {                                                                                      
-        if (!empty($rev['assessment_type']) && $rev['type'] === 'reviewer_comment') {                                                 
-          $t = $rev['assessment_type'];                                                                          
-          if (!isset($myAssessments[$t]) || $rev['status'] === 'Unsubmitted') {                                                       
-            $myAssessments[$t] = $rev;                                                                                                
-          }                                                                                                                           
-        }                                                                                                                             
-      }                                                                                                                               
-    }                                                                                                                                                                                                                             
-    $assessmentButtons = array(                                                                                                       
-      'clinical' => array(                                                                                                            
-        'label' => 'Clinical Assessment',                                                                                             
-        'icon'  => 'icon-stethoscope',                                                                                                
-        'class' => 'btn-primary'                                                                                                      
-      ),                                                                                                                              
-      'non-clinical' => array(                                                                                                        
-        'label' => 'Non-Clinical Assessment',                                                                                         
-        'icon'  => 'icon-tint',                                                                                                       
-        'class' => 'btn-success'                                                                                                      
-      ),                                                                                                                              
-      'quality' => array(                                                                                                             
-        'label' => 'Quality Assessment',                                                                                              
-        'icon'  => 'icon-medkit',                                                                                                     
-        'class' => 'btn-info'                                                                                                         
-      ),                                                                                                                              
-      'statistical' => array(                                                                                                         
-        'label' => 'Statistical Assessment',                                                                                          
-        'icon'  => 'icon-list-ol',                                                                                                    
-        'class' => 'btn-warning'                                                                                                      
-      )                                                                                                                               
-    );                                                                                                                                
-    ?>                                                                                                                                
-                                                                                                                                      
-    <div class="row-fluid">                                                                                                           
-      <?php foreach ($assessmentButtons as $typeKey => $btnConfig): ?>                                                                
-        <div class="span3">                                                                                                           
-          <?php                                                                                                                       
-          if (isset($myAssessments[$typeKey])) {                                                                                      
-            $existing = $myAssessments[$typeKey];                                                                                     
-            if ($existing['status'] === 'Unsubmitted') {                                                               
-              echo $this->Html->link(                                                                                                 
-                __('<i class="icon-edit"></i> Edit %s ', $btnConfig['label']),          
-                array('action' => 'view', $application['Application']['id'], 'rreview_view' => $existing['id']),                      
-                array('escape' => false, 'class' => 'btn ' . $btnConfig['class'] . ' btn-block')                                      
-              );                                                                                                                      
-            } else {                                                                      
-              echo $this->Html->link(                                                                                                 
-                __('<i class="icon-check"></i> View %s', $btnConfig['label']),     
-                array('action' => 'view', $application['Application']['id'], 'rreview_view' => $existing['id']),                      
-                array('escape' => false, 'class' => 'btn btn-block')                                                                  
-              );                                                                                                                      
-            }                                                                                                                         
-          } else {                                                     
-            echo $this->Html->link(                                                                                                   
-              __('<i class="%s"></i> Add %s', $btnConfig['icon'], $btnConfig['label']),                                               
-              array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'], $typeKey),                       
-              array('escape' => false, 'class' => 'btn ' . $btnConfig['class'] . ' btn-block btn-add-assessment')                     
-            );                                                                                                                        
-          }                                                                                                                           
-          ?>                                                                                                                          
-        </div>                                                                                                                        
-      <?php endforeach; ?>                                                                                                            
-    </div>                   
+<?php
+if ($redir !== 'manager' && !$managerCommentsSubmitted) {
+?>
+  <div class="alert alert-info">
+    <i class="icon-info-sign"></i> <strong>Note:</strong> Evaluation forms are not available yet. They will become accessible once manager review comments have been submitted.
+  </div>
+<?php
+} else {
+  $myAssessments = array();
+  if (!empty($application['Review'])) {
+    foreach ($application['Review'] as $rev) {
+      if (!empty($rev['assessment_type']) && $rev['type'] === 'reviewer_comment') {
+        $t = $rev['assessment_type'];
+        if (!isset($myAssessments[$t]) || $rev['status'] === 'Unsubmitted') {
+          $myAssessments[$t] = $rev;
+        }
+      }
+    }
+  }
+  $assessmentButtons = array(
+    'clinical' => array(
+      'label' => 'Clinical Assessment',
+      'icon'  => 'icon-stethoscope',
+      'class' => 'btn-primary'
+    ),
+    'non-clinical' => array(
+      'label' => 'Non-Clinical Assessment',
+      'icon'  => 'icon-tint',
+      'class' => 'btn-success'
+    ),
+    'quality' => array(
+      'label' => 'Quality Assessment',
+      'icon'  => 'icon-medkit',
+      'class' => 'btn-info'
+    ),
+    'statistical' => array(
+      'label' => 'Statistical Assessment',
+      'icon'  => 'icon-list-ol',
+      'class' => 'btn-warning'
+    )
+  );
+?>
+  <div class="row-fluid">
+    <?php foreach ($assessmentButtons as $typeKey => $btnConfig): ?>
+      <div class="span3">
+        <?php
+        if (isset($myAssessments[$typeKey])) {
+          $existing = $myAssessments[$typeKey];
+          if ($existing['status'] === 'Unsubmitted') {
+            echo $this->Html->link(
+              __('<i class="icon-edit"></i> Edit %s ', $btnConfig['label']),
+              array('action' => 'view', $application['Application']['id'], 'rreview_view' => $existing['id']),
+              array('escape' => false, 'class' => 'btn ' . $btnConfig['class'] . ' btn-block')
+            );
+          } else {
+            echo $this->Html->link(
+              __('<i class="icon-check"></i> View %s', $btnConfig['label']),
+              array('action' => 'view', $application['Application']['id'], 'rreview_view' => $existing['id']),
+              array('escape' => false, 'class' => 'btn btn-block')
+            );
+          }
+        } else {
+          echo $this->Html->link(
+            __('<i class="%s"></i> Add %s', $btnConfig['icon'], $btnConfig['label']),
+            array('controller' => 'reviews', 'action' => 'add', $application['Application']['id'], $typeKey),
+            array('escape' => false, 'class' => 'btn ' . $btnConfig['class'] . ' btn-block btn-add-assessment')
+          );
+        }
+        ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
+<?php } ?>
 <br>
 
 <br>
 <div class="row-fluid">
   <div class="span12">
-    <table class="table  table-bordered" style="margin-bottom: 1px;">
+    <table class="table table-bordered table-striped table-condensed" style="margin-bottom: 1px;">
 
       <thead>
         <tr>
-          <th style="width:3%">ID</th>
-          <th style="width:3%">Recommendation</th>
-          <th style="width: 40%;">Comments</th>
-          <th style="width:3%">Status &amp; Type</th>
-          <th style="width:3%">User</th>
-          <th style="width:3%">Created</th>
-          <th style="width:3%"><?php echo __('Actions'); ?></th>
+          <th style="width: 6%;">#</th>
+          <th style="width: 20%;">Recommendation</th>
+          <th style="width: 30%;">Comments</th>
+          <th style="width: 14%;">Status &amp; Type</th>
+          <th style="width: 12%;">User</th>
+          <th style="width: 12%;">Created</th>
+          <th style="width: 6%;"><?php echo __('Actions'); ?></th>
         </tr>
       </thead>
       <tbody>
         <?php
-        foreach ($application['Review'] as $akey => $rreview) {
+        foreach ($reviewList as $akey => $rreview) {
         ?>
           <tr>
-            <td><?php echo $rreview['id'] ?></td>
+            <td><?php echo $akey + 1; ?></td>
             <td>
               <?php
               if ($rreview['type'] == 'request') {
                 echo 'Assigned: ' . $rreview['accepted'] . '<br/>';
               }
-              // echo $rreview['summary'] . '<br/>';
-              echo $rreview['recommendation'];
+              echo $formatReviewSummary($rreview['recommendation']);
               if (!empty($rreview['summary'])) {
               ?>
 
@@ -118,58 +371,60 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
                 </button>
 
                 <!-- Start -->
-                <div class="modal fade" id="myModal_<?php echo $rreview['id']; ?>">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-
-                      <!-- Modal Header -->
-                      <div class="modal-header">
-                        <h4 class="modal-title">Clinical Summary</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      </div>
-
-                      <!-- Modal Body -->
-                      <div class="modal-body">
-                        <?php 
-                        
-                        echo $rreview['summary'];
-                        ?>
-
-                      </div>
-
-                      <!-- Modal Footer -->
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      </div>
-
-                    </div>
+                <div class="modal hide fade" id="myModal_<?php echo $rreview['id']; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4>Clinical Summary</h4>
+                  </div>
+                  <div class="modal-body">
+                    <?php echo $formatReviewSummary($rreview['summary']); ?>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
                   </div>
                 </div>
 
                 <!-- End -->
               <?php } ?>
             </td>
-            <td><?php
-                foreach ($rreview['InternalComment'] as $iComment) {
-                  echo   $iComment['subject'] . "<br>";
-                  echo   $iComment['content'] . "<br>";
-                  echo   $iComment['sender'] . "<br>";
-                  echo "<br>";
+            <td><?php echo $formatReviewComments($rreview['InternalComment']); ?></td>
+            <td>
+              <?php
+                echo h($rreview['status']) . "<br>" . h($rreview['type']);
+                $currentReviewId = !empty($rreview['id']) ? (int) $rreview['id'] : 0;
+                if ($currentReviewId > 0 && !empty($linkedComparisonBySource[$currentReviewId]['id'])) {
+                  echo '<br><small class="text-info">Linked response: #' . (int) $linkedComparisonBySource[$currentReviewId]['id'] . '</small>';
                 }
-                ?></td>
-            <td><?php echo $rreview['status'] . "<br>" . $rreview['type'] ?></td>
-            <td><?php echo $rreview['User']['name']; ?></td>
+              ?>
+            </td>
+            <td>
+              <?php
+                if (!empty($rreview['User']['name'])) {
+                  echo h($rreview['User']['name']);
+                } elseif (!empty($rreview['User']['username'])) {
+                  echo h($rreview['User']['username']);
+                } elseif (!empty($rreview['user_id'])) {
+                  echo 'Reviewer #' . (int) $rreview['user_id'];
+                } else {
+                  echo 'Reviewer';
+                }
+              ?>
+            </td>
             <td><?php echo $rreview['created'] ?></td>
             <td>
               <?php
               if ($rreview['type'] != 'request' && $rreview['type'] != 'ppb_comment') {
                 if ($rreview['status'] == 'Unsubmitted') {
-                  echo $this->Html->link(
-                    '<span class="label label-success"> Edit </span>',
-                    array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']),
-                    array('escape' => false)
-                  );
-                  echo "&nbsp;";
+                  if ($redir !== 'manager' && !$managerCommentsSubmitted) {
+                    echo '<span class="label"> Pending Manager </span>';
+                  } else {
+                    echo $this->Html->link(
+                      '<span class="label label-success"> Edit </span>',
+                      array('action' => 'view', $application['Application']['id'], 'rreview_view' => $rreview['id']),
+                      array('escape' => false)
+                    );
+                    echo "&nbsp;";
+                  }
                 } else {
                   echo $this->Html->link(
                     '<span class="label label-info"> View </span>',
@@ -180,11 +435,9 @@ $this->Html->script('jquery.blockUI.js', array('inline' => false));
                 }
               }
 
-
               if (($redir == 'manager')) {
                 // echo $this->Form->postLink(__('<label class="label label-inverse">Unsubmit</label>'), array('controller' => 'rreviews', 'action' => 'unsubmit', $rreview['id']), array('escape' => false), __('Are you sure you want to unsubmit the rreview # %s? The applicant will be able to edit it.', $rreview['id']));
               }
-
               ?>
             </td>
           </tr>
@@ -206,9 +459,9 @@ if (isset($this->params['named']['rreview_view'])) {
 ?>
 
       <ul id="rreview_tab" class="nav nav-tabs">
-        <li class="active"><a href="#rreview_form">Assessment Form</a></li>
-        <li><a href="#rreview_summary">Summary report</a></li>
-        <li><a href="#rreview_comments">Comments (<?php echo count($rreview['InternalComment']); ?>)</a></li>
+        <li class="active"><a href="#rreview_form" data-toggle="tab">Assessment Form</a></li>
+        <li><a href="#rreview_summary" data-toggle="tab">Summary report</a></li>
+        <li><a href="#rreview_comments" data-toggle="tab">Comments (<?php echo count($rreview['InternalComment']); ?>)</a></li>
       </ul>
 
       <div class="tab-content">
@@ -216,7 +469,19 @@ if (isset($this->params['named']['rreview_view'])) {
           <div style="position: relative; border-top: 1px solid #ddd;">
             <?php
             if ($rreview['status'] == 'Unsubmitted') {
-              echo $this->element('/application/rreview_edit', array('rreview' => $rreview, 'akey' => $akey));
+              if ($redir !== 'manager' && !$managerCommentsSubmitted) {
+                echo '<div class="alert alert-info" style="margin-top:15px;"><i class="icon-info-sign"></i> <strong>Note:</strong> This evaluation form is currently hidden awaiting manager review comments submission.</div>';
+              } else {
+                $comparisonPayload = $buildComparisonPayloadForReview($rreview);
+
+                echo $this->element('/application/rreview_edit', array(
+                  'rreview' => $rreview,
+                  'akey' => $akey,
+                  'comparisonReviewAnswerMap' => $comparisonPayload['map'],
+                  'comparisonReviewerName' => $comparisonPayload['reviewer_name'],
+                  'comparisonSourceReviewId' => $comparisonPayload['source_review_id']
+                ));
+              }
             } else {
               echo $this->Html->link(
                 __('<i class="icon-download-alt"></i> Download PDF'),
@@ -247,9 +512,9 @@ if (isset($this->params['named']['rreview_view'])) {
             <div class="span12">
               <br>
               <div class="amend-form">
-                <ul id="rreview_tab" class="nav nav-tabs">
-                  <li class="active"><a href="#rreview_comment_list">COMMENTS/QUERIES</a></li>
-                  <li><a href="#rreview_comments_add">Add Comment</a></li>
+                <ul id="rreview_comments_tab" class="nav nav-tabs">
+                  <li class="active"><a href="#rreview_comment_list" data-toggle="tab">COMMENTS/QUERIES</a></li>
+                  <li><a href="#rreview_comments_add" data-toggle="tab">Add Comment</a></li>
                 </ul>
                 <div class="tab-content">
                   <div class="tab-pane active" id="rreview_comment_list">
@@ -257,14 +522,13 @@ if (isset($this->params['named']['rreview_view'])) {
                       <div class="span12">
                         <?php echo $this->element('comments/list_expandable', ['comments' => $rreview['InternalComment'], 'category' => false]) ?>
                       </div>
-
                     </div>
                   </div>
                   <div class="tab-pane " id="rreview_comments_add">
                     <div class="row-fluid">
                       <div class="span12">
                         <?php
-                        echo $this->element('comments/add', [
+                        echo $this->element('comments/add_editor', [
                           'model' => [
                             'model_id' => $application['Application']['id'], 'foreign_key' => $rreview['id'],
                             'model' => 'Review', 'type' => 51, 'category' => 'internal', 'url' => 'add_review_internal'
@@ -289,41 +553,52 @@ if (isset($this->params['named']['rreview_view'])) {
 ?>
 
 <script text="type/javascript">
-  $.expander.defaults.slicePoint = 170;
   $(function() {
-  $('a.btn-add-assessment').on('click', function(e) {                                                                           
-          var $btn = $(this);                                                                                                         
-          if ($btn.hasClass('disabled') || $btn.data('submitted')) {                                                                  
-            e.preventDefault();                                                                                                       
-            return false;                                                                                                             
-          }                                                                                                                           
-          $btn.data('submitted', true).addClass('disabled').css('pointer-events', 'none');                                            
-                                                                       
-          if ($.blockUI) {                                                                                                            
-            $.blockUI({ message: '<h5><i class="icon-spinner icon-spin"></i> Initializing assessment form...</h5>' });                
-          }                                                                                                                           
-        });       
-    //https://stackoverflow.com/questions/18999501/bootstrap-3-keep-selected-tab-on-page-refresh
-    //from mcaz
-    $('#rreview_tab a').click(function(e) {
-      e.preventDefault();
-      $(this).tab('show');
-    });
-
-    $('#rreview_tab a').on("shown", function(e) {
-      var id = $(e.target).attr("href");
-      localStorage.setItem('rreviewTab', id)
-    });
-
-    var rreviewTab = localStorage.getItem('rreviewTab');
-    if (rreviewTab != null) {
-      // console.log("select tab");
-      // console.log($('#rreview_tab a[href="' + rreviewTab + '"]'));
-      $('#rreview_tab a[href="' + rreviewTab + '"]').tab('show');
+    if ($.expander && $.expander.defaults) {
+      $.expander.defaults.slicePoint = 170;
     }
 
-    var hashTab = $('#rreview_tab a[href="' + location.hash + '"]');
-    hashTab && hashTab.tab('show');
-    //end mcaz
+    $('a.btn-add-assessment').on('click', function(e) {
+      var $btn = $(this);
+      if ($btn.hasClass('disabled') || $btn.data('submitted')) {
+        e.preventDefault();
+        return false;
+      }
+      $btn.data('submitted', true).addClass('disabled').css('pointer-events', 'none');
+
+      if ($.blockUI) {
+        $.blockUI({ message: '<h5><i class="icon-spinner icon-spin"></i> Initializing assessment form...</h5>' });
+      }
+    });
+
+    function bindTabGroup(navSelector, storageKey) {
+      var $links = $(navSelector).find('a[data-toggle="tab"]');
+      if (!$links.length) {
+        return;
+      }
+
+      $links.off('.persistTabs');
+      $links.on('click.persistTabs', function(e) {
+        e.preventDefault();
+        $(this).tab('show');
+      });
+
+      $links.on('shown.persistTabs shown.bs.tab.persistTabs', function(e) {
+        var id = $(e.target).attr('href');
+        localStorage.setItem(storageKey, id);
+      });
+
+      var saved = localStorage.getItem(storageKey);
+      if (saved && $links.filter('[href="' + saved + '"]').length) {
+        $links.filter('[href="' + saved + '"]').tab('show');
+      }
+
+      if (location.hash && $links.filter('[href="' + location.hash + '"]').length) {
+        $links.filter('[href="' + location.hash + '"]').tab('show');
+      }
+    }
+
+    bindTabGroup('#rreview_tab', 'rreviewTab');
+    bindTabGroup('#rreview_comments_tab', 'rreviewCommentTab');
   });
 </script>

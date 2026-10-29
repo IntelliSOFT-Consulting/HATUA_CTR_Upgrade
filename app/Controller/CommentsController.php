@@ -15,7 +15,7 @@ class CommentsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('manager_comment_content_download','inspector_add_dev_external', 'verify', 'generateQRCode', 'applicant_comment_content_download', 'manager_add_annual_letter', 'applicant_add_annual_letter');
+        $this->Auth->allow('manager_comment_content_download', 'inspector_add_dev_external', 'verify', 'generateQRCode', 'applicant_comment_content_download', 'manager_add_annual_letter', 'applicant_add_annual_letter', 'delete', 'applicant_delete', 'reviewer_delete', 'manager_delete', 'admin_delete');
     }
     public function verify($id = null)
     {
@@ -45,6 +45,162 @@ class CommentsController extends AppController
     public function applicant_add_annual_letter()
     {
         $this->add_annual_letter();
+    }
+
+    public function manager_add_amendment_discussion()
+    {
+        $this->add_amendment_discussion();
+    }
+
+    public function applicant_add_amendment_discussion()
+    {
+        $this->add_amendment_discussion();
+    }
+
+    public function add_amendment_discussion()
+    {
+        if (!$this->request->is('post')) {
+            return $this->redirect($this->referer());
+        }
+
+        if (empty($this->request->data['Comment'])) {
+            $this->Session->setFlash(__('Please enter a message before submitting.'), 'alerts/flash_error');
+            return $this->redirect($this->referer());
+        }
+
+        $comment = &$this->request->data['Comment'];
+        $applicationId = !empty($comment['model_id']) ? (int) $comment['model_id'] : 0;
+        if (empty($applicationId) && !empty($comment['foreign_key'])) {
+            $applicationId = (int) $comment['foreign_key'];
+        }
+
+        $category = !empty($comment['category']) ? trim((string) $comment['category']) : '';
+        $amendment = !empty($comment['amendment']) ? trim((string) $comment['amendment']) : '';
+        if (empty($amendment) && strpos($category, 'amendment-discussion-') === 0) {
+            $amendment = preg_replace('/^amendment-discussion-/', '', $category);
+        }
+
+        $content = !empty($comment['content']) ? trim((string) $comment['content']) : '';
+        $subject = !empty($comment['subject']) ? trim((string) $comment['subject']) : '';
+
+        if (empty($applicationId) || empty($amendment) || empty($content)) {
+            $this->Session->setFlash(__('Please enter a message before submitting.'), 'alerts/flash_error');
+            return $this->redirect($this->referer());
+        }
+
+        $senderName = $this->Auth->user('name');
+        if (empty($senderName)) {
+            $senderName = $this->Auth->user('username');
+        }
+
+        $safeAmendment = preg_replace('/[^a-zA-Z0-9_-]/', '', $amendment);
+        if (strpos($category, 'amendment-discussion-') !== 0) {
+            $category = 'amendment-discussion-' . $safeAmendment;
+        }
+        if (empty($subject)) {
+            $amendmentLabel = strtolower(trim((string) $amendment));
+            $amendmentLabel = preg_replace('/^\-+/', '', $amendmentLabel);
+            $amendmentLabel = preg_replace('/^amd[\s_-]*/', '', $amendmentLabel);
+            if (is_numeric($amendmentLabel)) {
+                $numericValue = (float) $amendmentLabel;
+                if (floor($numericValue) == $numericValue) {
+                    $amendmentLabel = (string) (int) $numericValue;
+                } else {
+                    $amendmentLabel = rtrim(rtrim(number_format($numericValue, 6, '.', ''), '0'), '.');
+                }
+            }
+            if ($amendmentLabel !== '') {
+                $amendmentLabel = 'AMD-' . $amendmentLabel;
+            }
+            $subject = 'Amendment ' . $amendmentLabel . ' Discussion';
+        }
+
+        $comment['foreign_key'] = $applicationId;
+        $comment['model_id'] = $applicationId;
+        $comment['model'] = 'Amendment';
+        $comment['category'] = $category;
+        $comment['user_id'] = $this->Auth->user('id');
+        $comment['sender'] = !empty($comment['sender']) ? $comment['sender'] : $senderName;
+        $comment['subject'] = $subject;
+        $comment['content'] = $content;
+
+        if (!empty($this->request->data['Attachment']) && is_array($this->request->data['Attachment'])) {
+            foreach ($this->request->data['Attachment'] as $idx => $attachment) {
+                if (empty($this->request->data['Attachment'][$idx]['model'])) {
+                    $this->request->data['Attachment'][$idx]['model'] = 'Comments';
+                }
+                if (empty($this->request->data['Attachment'][$idx]['category'])) {
+                    $this->request->data['Attachment'][$idx]['category'] = 'Amendment';
+                }
+            }
+        }
+
+        $this->Comment->create();
+        if (!$this->Comment->saveAssociated($this->request->data, array('deep' => true))) {
+            $this->Session->setFlash(__('The discussion message could not be saved. Please, try again.'), 'alerts/flash_error');
+            return $this->redirect($this->referer());
+        }
+
+        // Notify managers and the applicant about the new amendment discussion message.
+        $this->loadModel('Message');
+        $this->loadModel('Application');
+        $html = new HtmlHelper(new ThemeView());
+        $message = $this->Message->find('first', array('conditions' => array('name' => 'review_response')));
+        $app = $this->Application->find('first', array(
+            'contain' => array(),
+            'conditions' => array('Application.id' => $applicationId)
+        ));
+
+        if (!empty($message) && !empty($app['Application']['id'])) {
+            $users = $this->Comment->User->find('all', array(
+                'contain' => array(),
+                'conditions' => array('OR' => array('User.id' => $app['Application']['user_id'], 'User.group_id' => 2))
+            ));
+
+            foreach ($users as $user) {
+                if ($user['User']['group_id'] == 2) {
+                    $actioner = 'manager';
+                } elseif ($user['User']['group_id'] == 3) {
+                    $actioner = 'reviewer';
+                } else {
+                    $actioner = 'applicant';
+                }
+
+                $variables = array(
+                    'name' => $user['User']['name'],
+                    'protocol_no' => $app['Application']['protocol_no'],
+                    'comment_subject' => $subject,
+                    'comment_content' => $content,
+                    'reference_link' => $html->link(
+                        $app['Application']['protocol_no'],
+                        array(
+                            'controller' => 'applications',
+                            'action' => 'view',
+                            $app['Application']['id'],
+                            $actioner => true,
+                            'full_base' => true
+                        ),
+                        array('escape' => false)
+                    ),
+                );
+
+                $datum = array(
+                    'email' => $user['User']['email'],
+                    'id' => $applicationId,
+                    'user_id' => $user['User']['id'],
+                    'type' => 'review_response',
+                    'model' => 'Amendment',
+                    'subject' => String::insert($message['Message']['subject'], $variables),
+                    'message' => String::insert($message['Message']['content'], $variables)
+                );
+
+                CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+            }
+        }
+
+        $this->Session->setFlash(__('Discussion message sent successfully.'), 'alerts/flash_success');
+        return $this->redirect($this->referer());
     }
 
     public function add_annual_letter()
@@ -486,23 +642,31 @@ class CommentsController extends AppController
                 $sender = $this->Comment->User->find('first', array('contain' => array(), 'conditions' => array('User.id' => $this->request->data['Comment']['user_id'])));
                 foreach ($users as $user) {
                     $actioner = ($user['User']['group_id'] == 2) ? 'manager' : 'reviewer';
+                    $protocolNo = !empty($app['Application']['protocol_no']) ? trim((string) $app['Application']['protocol_no']) : '';
+                    $protocolLink = $html->link(
+                        $protocolNo,
+                        array(
+                            'controller' => 'applications', 'action' => 'view', $app['Application']['id'],
+                            $actioner => true, 'full_base' => true
+                        ),
+                        array('escape' => false)
+                    );
                     $variables = array(
-                        'name' => $user['User']['name'], 'sender' => $sender['User']['name'], 'reference_link' => $app['Application']['protocol_no'],
+                        'name' => $user['User']['name'],
+                        'sender' => $sender['User']['name'],
+                        'reference_link' => $protocolLink,
                         'comment_subject' => $this->request->data['Comment']['subject'],
                         'comment_content' => $this->request->data['Comment']['content'],
-                        'protocol_no' => $html->link(
-                            $app['Application']['protocol_no'],
-                            array(
-                                'controller' => 'applications', 'action' => 'view', $app['Application']['id'],
-                                $actioner => true, 'full_base' => true
-                            ),
-                            array('escape' => false)
-                        ),
+                        'protocol_no' => $protocolNo,
+                        'protocol_link' => $protocolLink,
                     );
+                    $internalReviewSubject = ($protocolNo !== '')
+                        ? 'Internal Review Comment (' . $protocolNo . ')'
+                        : 'Internal Review Comment';
                     $datum = array(
                         'email' => $user['User']['email'],
                         'id' => $this->request->data['Comment']['foreign_key'], 'user_id' => $user['User']['id'], 'type' => 'internal_review_comment', 'model' => 'Application',
-                        'subject' => String::insert($message['Message']['subject'], $variables),
+                        'subject' => $internalReviewSubject,
                         'message' => String::insert($message['Message']['content'], $variables)
                     );
                     CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
@@ -950,6 +1114,34 @@ public function internalreviewer_add_review_internal()
      */
     public function manager_delete($id = null)
     {
+        $this->delete($id);
+    }
+
+    public function applicant_delete($id = null)
+    {
+        $this->delete($id);
+    }
+
+    public function reviewer_delete($id = null)
+    {
+        $this->delete($id);
+    }
+
+    public function admin_delete($id = null)
+    {
+        $this->delete($id);
+    }
+
+    /**
+     * delete method (Undo functionality for posted comments)
+     *
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     * @param string $id
+     * @return void
+     */
+    public function delete($id = null)
+    {
         if (!$this->request->is('post')) {
             throw new MethodNotAllowedException();
         }
@@ -957,11 +1149,23 @@ public function internalreviewer_add_review_internal()
         if (!$this->Comment->exists()) {
             throw new NotFoundException(__('Invalid comment'));
         }
-        if ($this->Comment->delete()) {
-            $this->Session->setFlash(__('Comment deleted'));
-            $this->redirect(array('action' => 'index'));
+        $comment = $this->Comment->read(null, $id);
+        $userId = $this->Auth->user('id');
+        $groupId = $this->Auth->user('group_id');
+        if (empty($userId)) {
+            $this->Session->setFlash(__('Please log in to perform this action.'), 'alerts/flash_error');
+            return $this->redirect($this->referer());
         }
-        $this->Session->setFlash(__('Comment was not deleted'));
-        $this->redirect(array('action' => 'index'));
+        // Allow managers (group 2) or the comment author to delete/undo the comment
+        if ($groupId != 2 && (!isset($comment['Comment']['user_id']) || $comment['Comment']['user_id'] != $userId)) {
+            $this->Session->setFlash(__('You are not authorized to delete this comment.'), 'alerts/flash_error');
+            return $this->redirect($this->referer());
+        }
+        if ($this->Comment->delete($id, true)) {
+            $this->Session->setFlash(__('Comment deleted successfully'), 'alerts/flash_success');
+            return $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Comment was not deleted'), 'alerts/flash_error');
+        return $this->redirect($this->referer());
     }
 }
