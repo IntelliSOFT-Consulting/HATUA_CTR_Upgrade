@@ -151,12 +151,12 @@ class DeviationsController extends AppController
     {
         $_serialize = 'pdeviations';
         $_header = array(
-            '#', 'Protocol No', 'Reference No', 'Deviation Type', 'PI Name', 'Date of deviation',
+            '#', 'Protocol No', 'Study Title', 'Reference No', 'Deviation Type', 'PI Name', 'Date of deviation',
             'Study participant number', 'Treating physician', 'Description of deviation', 'Explanation', 'Measures taken',
             'Measure to preclude', 'Sponsor notified', 'Impact on study', 'Created date'
         );
         $_extract = array(
-            'Deviation.id', 'Application.protocol_no', 'Deviation.reference_no', 'Deviation.deviation_type', 'Deviation.pi_name', 'Deviation.deviation_date',
+            'Deviation.id', 'Application.protocol_no', 'Application.study_title', 'Deviation.reference_no', 'Deviation.deviation_type', 'Deviation.pi_name', 'Deviation.deviation_date',
             'Deviation.participant_number', 'Deviation.treating_physician', 'Deviation.deviation_description', 'Deviation.deviation_explanation', 'Deviation.deviation_measures',
             'Deviation.deviation_preclude', 'Deviation.sponsor_notified', 'Deviation.study_impact', 'Deviation.created'
         );

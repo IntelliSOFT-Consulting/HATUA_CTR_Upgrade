@@ -24,7 +24,7 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice', 'admin_stages_summary', 'inspector_stages_summary', 'admin_amendment_summary', 'inspector_amendment_summary');
 
         $action = isset($this->request->params['action']) ? $this->request->params['action'] : null;
         $prefix = isset($this->request->params['prefix']) ? $this->request->params['prefix'] : null;
@@ -865,10 +865,27 @@ class ApplicationsController extends AppController
 
         $criteria = $this->Application->parseCriteria($this->passedArgs);
         if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+        if (isset($this->passedArgs['approved']) && !isset($this->passedArgs['deactivated'])) {
+            $criteria['Application.deactivated'] = 0;
+        }
+        if (isset($this->passedArgs['trial_status_id']) && !isset($this->passedArgs['deactivated'])) {
+            $criteria['Application.deactivated'] = 0;
+            if (!isset($this->passedArgs['submitted'])) {
+                $criteria['Application.submitted'] = 1;
+            }
+        }
+        if (isset($this->passedArgs['status'])) {
+            if (!isset($this->passedArgs['deactivated'])) {
+                $criteria['Application.deactivated'] = 0;
+            }
+            if (!isset($this->passedArgs['submitted'])) {
+                $criteria['Application.submitted'] = 1;
+            }
+        }
 
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $limit = isset($this->paginate['limit']) ? $this->paginate['limit'] : 1000;
+        $exportLimit = 10000;
 
 
         //in case of csv export
@@ -878,7 +895,7 @@ class ApplicationsController extends AppController
                 array(
                     'conditions' => $this->paginate['conditions'],
                     'order' => $this->paginate['order'],
-                    'limit' => 10000,
+                    'limit' => $exportLimit,
                     'contain' => array()
                 )
             );
@@ -886,6 +903,7 @@ class ApplicationsController extends AppController
             $this->set(compact('applications'));
             $this->layout = false;
             $this->render('stage_csv_export');
+            return;
         }
         //end csv export
 
@@ -898,14 +916,15 @@ class ApplicationsController extends AppController
                 array(
                     'conditions' => $this->paginate['conditions'],
                     'order' => $this->paginate['order'],
-                    'limit' => $limit,
+                    'limit' => $exportLimit,
                     'contain' => $this->a_contain
                 )
             );
             $this->set(compact('applications'));
             // $this->layout = false;
             // $this->render('csv_export');
-            $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
+            $this->pdfConfig = array('filename' => 'Applications_Stages_Summary',  'orientation' => 'landscape');
+            return;
         }
         //end pdf export
 
@@ -1011,6 +1030,26 @@ class ApplicationsController extends AppController
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
+    }
+
+    public function admin_stages_summary()
+    {
+        $this->setAction('manager_stages_summary');
+    }
+
+    public function inspector_stages_summary()
+    {
+        $this->setAction('manager_stages_summary');
+    }
+
+    public function admin_amendment_summary()
+    {
+        $this->setAction('manager_amendment_summary');
+    }
+
+    public function inspector_amendment_summary()
+    {
+        $this->setAction('manager_amendment_summary');
     }
 
     private function _applicationHasAmendmentData($application)
@@ -2098,6 +2137,26 @@ class ApplicationsController extends AppController
 
         $criteria = $this->Application->parseCriteria($this->passedArgs);
         // if (!isset($this->passedArgs['submitted'])) $criteria['Application.submitted'] = 1;
+        if (isset($this->passedArgs['approved']) && !isset($this->passedArgs['deactivated'])) {
+            $criteria['Application.deactivated'] = 0;
+            if (!isset($this->passedArgs['submitted'])) {
+                $criteria['Application.submitted'] = 1;
+            }
+        }
+        if (isset($this->passedArgs['trial_status_id']) && !isset($this->passedArgs['deactivated'])) {
+            $criteria['Application.deactivated'] = 0;
+            if (!isset($this->passedArgs['submitted'])) {
+                $criteria['Application.submitted'] = 1;
+            }
+        }
+        if (isset($this->passedArgs['status'])) {
+            if (!isset($this->passedArgs['deactivated'])) {
+                $criteria['Application.deactivated'] = 0;
+            }
+            if (!isset($this->passedArgs['submitted'])) {
+                $criteria['Application.submitted'] = 1;
+            }
+        }
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
 

@@ -211,14 +211,13 @@
             <thead>
               <tr>
                 <th style="width:3%">#</th>
-                <th style="width: 13%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
-                <th style="width: 26%;"><?php echo $this->Paginator->sort('study_title'); ?></th>
-                <th style="width: 26%;">Investigator(s) &amp; Site(s)</th>
+                <th style="width: 14%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
+                <th style="width: 28%;"><?php echo $this->Paginator->sort('study_title'); ?></th>
+                <th style="width: 28%;">Investigator(s) &amp; Site(s)</th>
                 <?php if (!empty($status)) { ?>
-                <th style="width: 12%;"><?php echo $this->Paginator->sort($action_date_field, 'Date ' . ucfirst($status)); ?></th>
+                <th style="width: 17%;"><?php echo $this->Paginator->sort($action_date_field, 'Date ' . ucfirst($status)); ?></th>
                 <?php } ?>
-                <!-- <th style="width: 27%">Application Status </th> -->
-                <th style="width: 5%;"><i class="icon-link"></i></th>
+                <th style="width: 10%;"><i class="icon-link"></i></th>
               </tr>
             </thead>
             <tbody>
@@ -272,9 +271,6 @@
                   ?>
                 </td>
                 <?php } ?>
-                <!-- <td> 
-                  <?php //echo $this->element($this->fetch('attributes'), array('application' => $application)); ?>
-                 </td> -->
 
                 <td>
                   <?php

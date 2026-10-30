@@ -315,14 +315,14 @@
                   <td></td>
                   <td colspan="1">
                     <?php
-                    if ($this->fetch('is-manager') == 'true') {
+                    if ($this->fetch('is-manager') == 'true' || $this->fetch('is-admin') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'stages_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     }
                     ?>
                   </td>
                   <td colspan="2">
                     <?php
-                    if ($this->fetch('is-manager') == 'true') {
+                    if ($this->fetch('is-manager') == 'true' || $this->fetch('is-admin') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Html->link('<i class="icon-file"></i> Summary Report PDF', array_merge(array('action' => 'stages_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
                     }
                     ?>
@@ -437,10 +437,12 @@
                       } ?> &nbsp;
                     </td>
                     <td>
-                      <?php //echo $this->fetch('attributes'); 
-                      ?>
-                      <?php echo $this->element($this->fetch('attributes'), array('application' => $application)); ?>
-                      <?php  // echo $this->element('application/attributes/applicant_attributes', array('application' => $application)); 
+                      <?php 
+                        $attrElement = $this->fetch('attributes');
+                        if (empty($attrElement)) {
+                          $attrElement = 'application/attributes/public';
+                        }
+                        echo $this->element($attrElement, array('application' => $application)); 
                       ?>
                     </td>
 

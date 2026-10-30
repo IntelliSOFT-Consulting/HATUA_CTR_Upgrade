@@ -40,7 +40,7 @@
 				 }
 				 ?>
 			</ol>
-			<?php echo $this->Html->link('<i class="icon-link"></i> View All Protocols', array('controller' => 'applications', 'action' => 'index'),
+			<?php echo $this->Html->link('<i class="icon-link"></i> View All Protocols', array('controller' => 'applications', 'action' => 'index', 'manager' => true),
 					array('escape' => false, 'class' => 'btn'));?>
 		  </div>
 		</div>
