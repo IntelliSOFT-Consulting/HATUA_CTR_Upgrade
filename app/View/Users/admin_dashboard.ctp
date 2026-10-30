@@ -8,14 +8,14 @@ $this->assign('Dashboard', 'active');
 <div class="row-fluid">
   <div class="span4">
     <h4><img alt="" src="/img/report.ico" style="width: 25px;">&nbsp;
-      <?php echo $this->Html->link('Reports', array('controller' => 'applications', 'action' => 'index')); ?></h4>
+      <?php echo $this->Html->link('Reports', array('controller' => 'applications', 'action' => 'index', 'admin' => true)); ?></h4>
     <small class="muted">Filter, search and download reports</small>
     <ul class="nav nav-tabs nav-stacked">
       <li>
         <?php
         echo $this->Html->link(
           '<i class="icon-table"></i> All Applications',
-          array('controller' => 'applications', 'action' => 'index'),
+          array('controller' => 'applications', 'action' => 'index', 'admin' => true),
           array('escape' => false)
         );
         ?>
@@ -23,28 +23,28 @@ $this->assign('Dashboard', 'active');
       <li>
         <?php echo $this->Html->link(
           '<i class="icon-ok"></i> Approved',
-          array('controller' => 'applications', 'action' => 'index', 'submitted' => '1', 'approved' => 2),
+          array('controller' => 'applications', 'action' => 'index', 'submitted' => '1', 'approved' => 2, 'admin' => true),
           array('escape' => false, 'class' =>  'text-success')
         );   ?>
       </li>
       <li>
         <?php echo $this->Html->link(
           '<i class="icon-shopping-cart"></i> Waiting Approval',
-          array('controller' => 'applications', 'action' => 'index', 'submitted' => '1', 'approved' => 0),
+          array('controller' => 'applications', 'action' => 'index', 'submitted' => '1', 'approved' => 0, 'admin' => true),
           array('escape' => false, 'class' =>  'text-success')
         );   ?>
       </li>
       <li>
         <?php echo $this->Html->link(
           '<i class="icon-pause"></i> Rejected',
-          array('controller' => 'applications', 'action' => 'index', 'submitted' => '1', 'approved' => 1),
+          array('controller' => 'applications', 'action' => 'index', 'submitted' => '1', 'approved' => 1, 'admin' => true),
           array('escape' => false, 'class' =>  'text-success')
         );   ?>
       </li>
       <li>
         <?php echo $this->Html->link(
           '<i class="icon-minus"></i> Unsubmitted',
-          array('controller' => 'applications', 'action' => 'index', 'submitted' => '0'),
+          array('controller' => 'applications', 'action' => 'index', 'submitted' => '0', 'admin' => true),
           array('escape' => false, 'class' => 'text-info')
         );    ?>
       </li>
@@ -52,7 +52,7 @@ $this->assign('Dashboard', 'active');
         <?php
         echo $this->Html->link(
           '<i class="icon-remove-circle"></i> Deactivated Applications',
-          array('controller' => 'applications', 'action' => 'index', 'deactivated' => '1'),
+          array('controller' => 'applications', 'action' => 'index', 'deactivated' => '1', 'admin' => true),
           array('escape' => false, 'class' =>  'text-warning')
         );
         ?>
@@ -61,8 +61,17 @@ $this->assign('Dashboard', 'active');
         <?php
         echo $this->Html->link(
           '<i class="icon-remove"></i> Deleted Applications',
-          array('controller' => 'applications', 'action' => 'index', 'deleted' => '1'),
+          array('controller' => 'applications', 'action' => 'index', 'deleted' => '1', 'admin' => true),
           array('escape' => false, 'class' =>  'text-error')
+        );
+        ?>
+      </li>
+      <li>
+        <?php
+        echo $this->Html->link(
+          '<i class="icon-bar-chart"></i> Applications per Year',
+          array('controller' => 'reports', 'action' => 'protocols_per_year', 'admin' => true),
+          array('escape' => false)
         );
         ?>
       </li>
@@ -158,6 +167,15 @@ $this->assign('Dashboard', 'active');
           array('controller' => 'audit_trails', 'action' => 'index', 'admin' => true),
           array('escape' => false)
         ); ?>
+      </li>
+      <li>
+        <?php
+        echo $this->Html->link(
+          '<i class="icon-cog"></i> Automatic Deletion Period <small class="muted">(Current: ' . (int)$auto_deletion_period_months . ' months)</small>',
+          '#autoDeletionPeriodModal',
+          array('escape' => false, 'data-toggle' => 'modal')
+        );
+        ?>
       </li>
     </ul>
     <hr>
@@ -341,6 +359,35 @@ $this->assign('Dashboard', 'active');
         ?>
       </li>
     </ul>
+
+    <div id="autoDeletionPeriodModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="autoDeletionPeriodModalLabel" aria-hidden="true">
+      <?php echo $this->Form->create('DeletionSetting', array(
+        'url' => array('controller' => 'users', 'action' => 'deletion_settings', 'admin' => true),
+        'class' => 'form-horizontal',
+      )); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 id="autoDeletionPeriodModalLabel">Automatic Deletion Period</h4>
+      </div>
+      <div class="modal-body">
+        <p class="muted">Set retention duration in months for automatic deletion cleanup.</p>
+        <?php
+        echo $this->Form->input('duration_months', array(
+          'type' => 'number',
+          'min' => 1,
+          'step' => 1,
+          'class' => 'input-small',
+          'value' => (int)$auto_deletion_period_months,
+          'label' => array('text' => 'Duration (Months)'),
+        ));
+        ?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+        <?php echo $this->Form->button('<i class="icon-save"></i> Save', array('type' => 'submit', 'class' => 'btn btn-primary', 'escape' => false)); ?>
+      </div>
+      <?php echo $this->Form->end(); ?>
+    </div>
   </div>
 </div> <!-- /row -->
 <hr>
@@ -361,5 +408,8 @@ $this->assign('Dashboard', 'active');
   $.expander.defaults.slicePoint = 70;
   $(function() {
     $(".morecontent").expander();
+    if (window.location.hash === '#autoDeletionPeriodModal') {
+      $('#autoDeletionPeriodModal').modal('show');
+    }
   });
 </script>

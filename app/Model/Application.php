@@ -60,6 +60,7 @@ class Application extends AppModel
             case 'rejected':
                 $conditions['Application.approved'] = 1;
                 $conditions['Application.deactivated'] = 0;
+                $conditions['Application.submitted'] = 1;
                 break;
 
             case 'stopped':
@@ -68,11 +69,14 @@ class Application extends AppModel
                 $conditions['Application.trial_status_id'] = $trialStatusId
                     ? $trialStatusId
                     : 0; // 0 forces no results if not found, instead of matching everything
+                $conditions['Application.deactivated'] = 0;
+                $conditions['Application.submitted'] = 1;
                 break;
             case 'approved':
             default:
                 $conditions['Application.approved'] = 2;
                 $conditions['Application.deactivated'] = 0;
+                $conditions['Application.submitted'] = 1;
                 break;
         }
 

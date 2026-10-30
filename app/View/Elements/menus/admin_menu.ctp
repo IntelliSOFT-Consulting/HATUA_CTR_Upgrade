@@ -39,7 +39,11 @@
               <?php     echo $this->Html->link('<i class="icon-remove"></i> Deleted',
                           array('controller' => 'applications', 'action' => 'index', 'deleted'=>'1', 'admin' => true), array('escape' => false));   ?>
             </li>
-             <li class="divider"></li>
+            <li class="divider"></li>
+            <li>
+              <?php     echo $this->Html->link('<i class="icon-bar-chart"></i> Applications per Year',
+                          array('controller' => 'reports', 'action' => 'protocols_per_year', 'admin' => true), array('escape' => false, 'tabindex' => '-1'));   ?>
+            </li>
         </ul>
        </li>
        <li class="dropdown <?php echo $this->fetch('Users') ?>">

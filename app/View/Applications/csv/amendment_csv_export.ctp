@@ -69,7 +69,7 @@ $escape = function ($value) {
     return '"' . str_replace('"', '""', (string)$value) . '"';
 };
 
-$header = array('#', 'ECCT Reference No.', 'Amendment', 'Created', 'Submitted', 'Review', 'Approval');
+$header = array('#', 'ECCT Reference No.', 'Study Title', 'Amendment', 'Created', 'Submitted', 'Review', 'Approval');
 echo implode(',', array_map($escape, $header)) . "\n";
 
 $count = 0;
@@ -78,10 +78,14 @@ foreach ($rows as $rowData) {
     $timelines = !empty($rowData['timelines']) && is_array($rowData['timelines']) ? $rowData['timelines'] : array();
     $protocolNo = Hash::get($application, 'Application.protocol_no', '');
     $formattedProtocolNo = $formatProtocolReference($protocolNo);
+    $studyTitle = Hash::get($application, 'Application.study_title', '');
+    if (empty($studyTitle)) {
+        $studyTitle = Hash::get($application, 'Application.short_title', '');
+    }
 
     if (empty($timelines)) {
         $count++;
-        $row = array($count, $formattedProtocolNo, '', '', '', '', '');
+        $row = array($count, $formattedProtocolNo, $studyTitle, '', '', '', '', '');
         echo implode(',', array_map($escape, $row)) . "\n";
         continue;
     }
@@ -89,9 +93,11 @@ foreach ($rows as $rowData) {
     foreach ($timelines as $timelineIndex => $timeline) {
         $count++;
         $referenceValue = ($timelineIndex === 0) ? $formattedProtocolNo : '';
+        $studyTitleValue = ($timelineIndex === 0) ? $studyTitle : '';
         $row = array(
             $count,
             $referenceValue,
+            $studyTitleValue,
             $formatAmendmentLabel(!empty($timeline['label']) ? (string)$timeline['label'] : ''),
             Hash::get($timeline, 'stages.created.date', '-'),
             Hash::get($timeline, 'stages.submitted.date', '-'),

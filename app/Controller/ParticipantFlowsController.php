@@ -58,9 +58,9 @@ class ParticipantFlowsController extends AppController {
 
     private function csv_export($participants = ''){
         $_serialize = 'participants';
-        $_header = array('#','Protocol No', 'Year', 'Original Subjects', 'Consented', 'Screened', 'Enrolled', 'Lost', 'Withdrawn', 'Self withdrawal', 'Active subjects', 'Completed number',
+        $_header = array('#','Protocol No', 'Study Title', 'Year', 'Original Subjects', 'Consented', 'Screened', 'Enrolled', 'Lost', 'Withdrawn', 'Self withdrawal', 'Active subjects', 'Completed number',
             'Created', 'Reasons for lost', 'Withdrawn reasons', 'Self Withdrawal reasons');
-        $_extract = array('ParticipantFlow.id', 'Application.protocol_no', 'ParticipantFlow.year', 'ParticipantFlow.original_subjects', 'ParticipantFlow.consented', 'ParticipantFlow.screened', 'ParticipantFlow.enrolled', 'ParticipantFlow.lost', 'ParticipantFlow.withdrawn', 'ParticipantFlow.self_withdrawal', 'ParticipantFlow.active_subjects', 'ParticipantFlow.completed_number', 
+        $_extract = array('ParticipantFlow.id', 'Application.protocol_no', 'Application.study_title', 'ParticipantFlow.year', 'ParticipantFlow.original_subjects', 'ParticipantFlow.consented', 'ParticipantFlow.screened', 'ParticipantFlow.enrolled', 'ParticipantFlow.lost', 'ParticipantFlow.withdrawn', 'ParticipantFlow.self_withdrawal', 'ParticipantFlow.active_subjects', 'ParticipantFlow.completed_number', 
             'ParticipantFlow.created', 'ParticipantFlow.lost_reason', 'ParticipantFlow.withdrawal_reason', 'ParticipantFlow.self_withdrawal_reasons');
 
         $this->response->download('Participant_Flow_'.date('Ymd_Hi').'.csv'); // <= setting the file name
