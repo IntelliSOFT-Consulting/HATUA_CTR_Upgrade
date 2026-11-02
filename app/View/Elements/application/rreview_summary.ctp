@@ -1,5 +1,27 @@
+<?php
+$canEditSummary = (($this->Session->read('Auth.User.id') == $rreview['user_id']) and $rreview['status'] != 'Summary');
+$formatReviewContent = function ($content) {
+  $content = trim((string)$content);
+  if ($content === '') {
+    return '<span class="muted">No content provided.</span>';
+  }
 
-<?php if(($this->Session->read('Auth.User.id') == $rreview['user_id']) and $rreview['status'] != 'Summary') { ?>
+  // Keep WYSIWYG HTML as-is when present.
+  if (preg_match('/<\s*(p|ul|ol|li|br|div|strong|em|span|h[1-6]|table|blockquote)\b/i', $content)) {
+    return $content;
+  }
+
+  $lines = preg_split('/\r\n|\r|\n/', $content);
+  $lines = array_values(array_filter(array_map('trim', $lines), 'strlen'));
+  if (count($lines) > 1) {
+    return '<ul><li>' . implode('</li><li>', array_map('h', $lines)) . '</li></ul>';
+  }
+
+  return '<p>' . h($content) . '</p>';
+};
+?>
+
+<?php if ($canEditSummary) { ?>
   <div class="page-header">
     <div class="styled_title"><h3>Summary Report</h3></div>
   </div>
@@ -21,9 +43,19 @@
       echo $this->Form->input('Review.'.$akey.'.id', array('value' => $rreview['id'], 'type' => 'hidden'));
 
       echo $this->Form->input('Review.'.$akey.'.summary',
-        array('class' => 'input-xxlarge', 'label' => array('class' => 'control-label required', 'text' => 'Summary of comments <span class="sterix">*</span>')));
+        array(
+          'type' => 'textarea',
+          'rows' => 10,
+          'class' => 'input-xxlarge rreview-summary-editor',
+          'label' => array('class' => 'control-label required', 'text' => 'Summary of comments <span class="sterix">*</span>')
+        ));
       echo $this->Form->input('Review.'.$akey.'.recommendation',
-        array('class' => 'input-xxlarge', 'label' => array('class' => 'control-label required', 'text' => 'Recommendation <span class="sterix">*</span>')));
+        array(
+          'type' => 'textarea',
+          'rows' => 6,
+          'class' => 'input-xxlarge rreview-summary-editor',
+          'label' => array('class' => 'control-label required', 'text' => 'Recommendation <span class="sterix">*</span>')
+        ));
       ?>
 
     <div class="row-fluid">
@@ -56,20 +88,80 @@
       <tbody>
        <tr>
         <td class="table-label required"><p>Summary of comments: <span class="sterix">*</span></p></td>
-        <td>
-          <?php 
-               echo $rreview['summary'];
-          ?>
-        </td>
+        <td><div class="well well-small"><?php echo $formatReviewContent($rreview['summary']); ?></div></td>
        </tr>
        <tr>
         <td class="table-label required"><p>Reccomendation: <span class="sterix">*</span></p></td>
-        <td>
-          <?php 
-               echo $rreview['recommendation'];
-          ?>
-        </td>
+        <td><div class="well well-small"><?php echo $formatReviewContent($rreview['recommendation']); ?></div></td>
        </tr>
       </tbody>
     </table>
   <?php } ?>
+
+<?php if ($canEditSummary) { ?>
+<script text="type/javascript">
+$(function() {
+  if (!window.CKEDITOR) {
+    return;
+  }
+
+  function formatAssessmentSummaryForEditor(content) {
+    content = $.trim(content || '');
+    if (!content) {
+      return content;
+    }
+
+    if (/<\s*(p|ul|ol|li|br|div|strong|em|span|h[1-6]|table|blockquote)\b/i.test(content)) {
+      return content;
+    }
+
+    var lines = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+    var blocks = [];
+    var current = [];
+
+    $.each(lines, function(_, line) {
+      line = $.trim(line);
+      if (!line) {
+        if (current.length) {
+          blocks.push(current);
+          current = [];
+        }
+        return;
+      }
+      current.push(line);
+    });
+    if (current.length) {
+      blocks.push(current);
+    }
+    if (!blocks.length) {
+      return content;
+    }
+
+    var html = [];
+    $.each(blocks, function(_, block) {
+      var question = block.shift() || '';
+      var response = $.trim(block.join('\n'));
+
+      if (question) {
+        html.push('<p>' + CKEDITOR.tools.htmlEncode(question) + '</p>');
+      }
+      if (response) {
+        html.push('<p>' + CKEDITOR.tools.htmlEncode(response).replace(/\n/g, '<br>') + '</p>');
+      }
+      html.push('<p>&nbsp;</p>');
+    });
+
+    return html.join('');
+  }
+
+  $('.rreview-summary-editor').each(function() {
+    if (this.id && !CKEDITOR.instances[this.id]) {
+      if ((this.name || '').indexOf('[summary]') !== -1) {
+        this.value = formatAssessmentSummaryForEditor(this.value);
+      }
+      CKEDITOR.replace(this.id);
+    }
+  });
+});
+</script>
+<?php } ?>

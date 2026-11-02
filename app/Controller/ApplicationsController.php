@@ -24,7 +24,7 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'admin_stages_summary', 'inspector_stages_summary', 'summary_evaluation', 'manager_summary_evaluation', 'admin_summary_evaluation', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
 
         $action = isset($this->request->params['action']) ? $this->request->params['action'] : null;
         $prefix = isset($this->request->params['prefix']) ? $this->request->params['prefix'] : null;
@@ -886,6 +886,7 @@ class ApplicationsController extends AppController
             $this->set(compact('applications'));
             $this->layout = false;
             $this->render('stage_csv_export');
+            return;
         }
         //end csv export
 
@@ -905,7 +906,8 @@ class ApplicationsController extends AppController
             $this->set(compact('applications'));
             // $this->layout = false;
             // $this->render('csv_export');
-            $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
+            $this->pdfConfig = array('filename' => 'Applications_Stages_Summary',  'orientation' => 'landscape');
+            return;
         }
         //end pdf export
 
@@ -1653,7 +1655,7 @@ class ApplicationsController extends AppController
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
         else $this->paginate['limit'] = reset($page_options);
-        $publicStatuses = array('approved', 'rejected', 'stopped', 'suspended');
+        $publicStatuses = array('approved', 'rejected', 'active', 'completed', 'stopped', 'suspended');
         $status = !empty($this->params['named']['status']) ? strtolower($this->params['named']['status']) : 'approved';
         if (!in_array($status, $publicStatuses)) {
             $status = 'approved';
@@ -1665,7 +1667,7 @@ class ApplicationsController extends AppController
         $criteria['Application.deactivated'] = 0;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'TrialStatus');
 
         $this->set('page_options', $page_options);
         $applications = Sanitize::clean($this->paginate(), array('encode' => false));
@@ -1678,7 +1680,8 @@ class ApplicationsController extends AppController
         $this->set('applications', $applications);
         $this->set('status', $status);
         // Column the "Date <action>" header sorts on
-        $this->set('action_date_field', in_array($status, array('approved', 'rejected')) ? 'approval_date' : 'trial_status_date');
+        $hasTrialStatusDate = $this->Application->hasField('trial_status_date');
+        $this->set('action_date_field', in_array($status, array('approved', 'rejected', 'active')) ? 'approval_date' : ($hasTrialStatusDate ? 'trial_status_date' : ($status === 'completed' ? 'final_date' : 'approval_date')));
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
@@ -2157,9 +2160,69 @@ class ApplicationsController extends AppController
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
         }
-        $application = $this->Application->read(null, $id);
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'TrialStatus', 'Amendment')
+        ));
         $this->set('application', $application);
         $this->set('publicActions', $this->Application->publicActionDates($application));
+    }
+
+    public function summary_evaluation($id = null)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            throw new NotFoundException(__('Invalid application'));
+        }
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array(
+                'InvestigatorContact',
+                'Sponsor',
+                'SiteDetail' => array('County'),
+                'TrialStatus',
+                'Review' => array(
+                    'User',
+                    'ReviewAnswer',
+                    'InternalComment',
+                    'ExternalComment'
+                ),
+                'InternalReview' => array(
+                    'User',
+                    'ReviewAnswer',
+                    'InternalComment',
+                    'ExternalComment'
+                )
+            )
+        ));
+
+        if (strpos($this->request->url, 'pdf') !== false || (isset($this->request->params['ext']) && $this->request->params['ext'] === 'pdf')) {
+            $this->pdfConfig = array('filename' => 'Summary_Evaluation_' . $id, 'orientation' => 'portrait');
+        }
+
+        $this->set('application', $application);
+        $this->set('publicActions', $this->Application->publicActionDates($application));
+    }
+
+    public function manager_summary_evaluation($id = null)
+    {
+        $this->setAction('summary_evaluation', $id);
+    }
+
+    public function admin_summary_evaluation($id = null)
+    {
+        $this->setAction('summary_evaluation', $id);
+    }
+
+    public function admin_stages_summary()
+    {
+        $this->setAction('manager_stages_summary');
+    }
+
+    public function inspector_stages_summary()
+    {
+        $this->setAction('manager_stages_summary');
     }
 
     public function applicant_view($id = null)

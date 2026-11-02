@@ -30,6 +30,12 @@
             <i class="icon-bar-chart"></i> Reports <b class="caret"></b></a>
           <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
             <li><?php
+                      echo $this->Html->link('<i class="icon-dashboard"></i> Benchmark Turnaround Tracking',  array('controller' => 'applications', 'action'=>'stages_summary', 'inspector' => true ),
+                                array('escape' => false, 'tabindex' => '-1'));
+                  ?>
+            </li>
+            <li class="divider"></li>
+            <li><?php
                       echo $this->Html->link('<i class="icon-arrow-right"></i> Monthly Site Inspections',  array('controller' => 'reports', 'action'=>'si_per_month', 'inspector' => true ),
                                 array('escape' => false, 'tabindex' => '-1'));
                   ?>

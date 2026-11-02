@@ -46,6 +46,7 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
     ?>
     <li><a href="#tab2" data-toggle="tab">Assigned Reviewers <small>(<?php echo $count_reviews; ?>)</small></a></li>
     <li><a href="#tab3" data-toggle="tab">Reviewer Comments <small>(<?php echo $count_comments; ?>)</small></a></li>
+    <li><a href="#summary_evaluation" data-toggle="tab" style="color: #0088cc; font-weight: bold;"><i class="icon-file-text-alt"></i> Summary Evaluation Report</a></li>
     <li><a href="#tab4" data-toggle="tab">Manager Reviews <small>(<?php echo $my_reviews; ?>)</small></a></li>
     <li><a href="#tab5" data-toggle="tab">Approval Status <small>(<?php
                                                                   if ($application['Application']['approved'] == 2) echo 'Approved';
@@ -353,6 +354,10 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
           ?>
         </div>
       </div>
+    </div>
+
+    <div class="tab-pane" id="summary_evaluation">
+      <?php echo $this->element('application/summary_evaluation'); ?>
     </div>
 
     <div class="tab-pane" id="tab4">

@@ -211,13 +211,13 @@
             <thead>
               <tr>
                 <th style="width:3%">#</th>
-                <th style="width: 13%"><?php echo $this->Paginator->sort('protocol_no'); ?></th>
-                <th style="width: 26%;"><?php echo $this->Paginator->sort('study_title'); ?></th>
-                <th style="width: 26%;">Investigator(s) &amp; Site(s)</th>
+                <th style="width: 14%"><?php echo $this->Paginator->sort('protocol_no', 'ECCT Reference No'); ?></th>
+                <th style="width: 25%;"><?php echo $this->Paginator->sort('study_title'); ?></th>
+                <th style="width: 24%;">Investigator(s) &amp; Site(s)</th>
+                <th style="width: 15%;">Status</th>
                 <?php if (!empty($status)) { ?>
-                <th style="width: 12%;"><?php echo $this->Paginator->sort($action_date_field, 'Date ' . ucfirst($status)); ?></th>
+                <th style="width: 14%;"><?php echo $this->Paginator->sort($action_date_field, 'Date ' . ucfirst($status)); ?></th>
                 <?php } ?>
-                <!-- <th style="width: 27%">Application Status </th> -->
                 <th style="width: 5%;"><i class="icon-link"></i></th>
               </tr>
             </thead>
@@ -264,6 +264,27 @@
                           echo "<br>";
                           $cound++;
                         }?> &nbsp; </td>
+                <td>
+                  <?php
+                    if ($application['Application']['approved'] == 1) {
+                      echo '<span class="label label-important">Rejected</span>';
+                    } elseif (!empty($status) && $status === 'completed') {
+                      echo '<span class="label label-inverse">Completed</span>';
+                    } elseif (!empty($application['TrialStatus']['name'])) {
+                      $statusName = $application['TrialStatus']['name'];
+                      $badgeClass = 'label-info';
+                      if ($statusName === 'Completed') $badgeClass = 'label-inverse';
+                      elseif ($statusName === 'Suspended') $badgeClass = 'label-warning';
+                      elseif ($statusName === 'Stopped') $badgeClass = 'label-important';
+                      elseif (in_array($statusName, array('Recruiting', 'Ongoing Closeout Phase'))) $badgeClass = 'label-success';
+                      echo '<span class="label ' . $badgeClass . '">' . h($statusName) . '</span>';
+                    } elseif ($application['Application']['approved'] == 2) {
+                      echo '<span class="label label-success">Approved</span>';
+                    } else {
+                      echo '<span class="label">Under Review</span>';
+                    }
+                  ?>
+                </td>
                 <?php if (!empty($status)) { ?>
                 <td>
                   <?php

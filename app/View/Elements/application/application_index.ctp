@@ -312,17 +312,23 @@
                   </td>
                 </tr>
                 <tr class="searchmore" style="display: none;">
-                  <td></td>
+                  <td>
+                    <?php
+                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
+                      echo $this->Html->link('<i class="icon-dashboard"></i> Benchmark Tracking', array_merge(array('action' => 'stages_summary'), $this->request->named), array('class' => 'btn btn-info', 'escape' => false));
+                    }
+                    ?>
+                  </td>
                   <td colspan="1">
                     <?php
-                    if ($this->fetch('is-manager') == 'true') {
+                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Html->link('<i class="icon-file-alt"></i> Summary Report', array_merge(array('action' => 'stages_summary', 'ext' => 'csv'), $this->request->named), array('class' => 'btn btn-success', 'escape' => false));
                     }
                     ?>
                   </td>
                   <td colspan="2">
                     <?php
-                    if ($this->fetch('is-manager') == 'true') {
+                    if ($this->fetch('is-admin') == 'true' || $this->fetch('is-manager') == 'true' || $this->fetch('is-inspector') == 'true') {
                       echo $this->Html->link('<i class="icon-file"></i> Summary Report PDF', array_merge(array('action' => 'stages_summary', 'ext' => 'pdf'), $this->request->named), array('class' => 'btn btn-primary', 'escape' => false));
                     }
                     ?>

@@ -39,6 +39,11 @@
               <?php     echo $this->Html->link('<i class="icon-remove"></i> Deleted',
                           array('controller' => 'applications', 'action' => 'index', 'deleted'=>'1', 'admin' => true), array('escape' => false));   ?>
             </li>
+            <li class="divider"></li>
+            <li>
+              <?php echo $this->Html->link('<i class="icon-dashboard"></i> Benchmark Turnaround Tracking',  array('controller' => 'applications',
+                    'action' => 'stages_summary', 'admin' => true), array('escape' => false));?>
+            </li>
              <li class="divider"></li>
         </ul>
        </li>

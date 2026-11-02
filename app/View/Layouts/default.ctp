@@ -104,6 +104,12 @@ $cakeDescription = __d('cake_dev', 'Pharmacy and Poisons Board');
                       <?php echo $this->Html->link('<i class="icon-remove"></i> Rejected', array('controller' => 'applications', 'action' => 'index', 'admin' => false, 'status' => 'rejected'), array('escape' => false)); ?>
                     </li>
                     <li>
+                      <?php echo $this->Html->link('<i class="icon-play-circle"></i> Active', array('controller' => 'applications', 'action' => 'index', 'admin' => false, 'status' => 'active'), array('escape' => false)); ?>
+                    </li>
+                    <li>
+                      <?php echo $this->Html->link('<i class="icon-check"></i> Completed', array('controller' => 'applications', 'action' => 'index', 'admin' => false, 'status' => 'completed'), array('escape' => false)); ?>
+                    </li>
+                    <li>
                       <?php echo $this->Html->link('<i class="icon-stop"></i> Stopped', array('controller' => 'applications', 'action' => 'index', 'admin' => false, 'status' => 'stopped'), array('escape' => false)); ?>
                     </li>
                     <li>
