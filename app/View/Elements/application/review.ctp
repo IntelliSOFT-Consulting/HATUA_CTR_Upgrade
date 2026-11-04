@@ -206,9 +206,9 @@ if (isset($this->params['named']['rreview_view'])) {
 ?>
 
       <ul id="rreview_tab" class="nav nav-tabs">
-        <li class="active"><a href="#rreview_form">Assessment Form</a></li>
-        <li><a href="#rreview_summary">Summary report</a></li>
-        <li><a href="#rreview_comments">Comments (<?php echo count($rreview['InternalComment']); ?>)</a></li>
+        <li class="active"><a href="#rreview_form" data-toggle="tab">Assessment Form</a></li>
+        <li><a href="#rreview_summary" data-toggle="tab">Summary report</a></li>
+        <li><a href="#rreview_comments" data-toggle="tab">Comments (<?php echo count($rreview['InternalComment']); ?>)</a></li>
       </ul>
 
       <div class="tab-content">

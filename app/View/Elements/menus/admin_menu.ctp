@@ -39,6 +39,11 @@
               <?php     echo $this->Html->link('<i class="icon-remove"></i> Deleted',
                           array('controller' => 'applications', 'action' => 'index', 'deleted'=>'1', 'admin' => true), array('escape' => false));   ?>
             </li>
+            <li class="divider"></li>
+            <li>
+              <?php echo $this->Html->link('<i class="icon-dashboard"></i> Benchmark Turnaround Tracking',  array('controller' => 'applications',
+                    'action' => 'stages_summary', 'admin' => true), array('escape' => false));?>
+            </li>
              <li class="divider"></li>
         </ul>
        </li>
@@ -91,6 +96,11 @@
             echo $this->Html->link('<i class="icon-envelope"></i> Site Messages',
                 array('controller' => 'messages', 'action' => 'index', 'admin' => true), array('escape' => false)); ?>
             </li>
+	            <li><?php
+	            $deletionModalUrl = $this->Html->url(array('controller' => 'users', 'action' => 'dashboard', 'admin' => true)) . '#autoDeletionPeriodModal';
+	            echo $this->Html->link('<i class="icon-cog"></i> Automatic Deletion Period',
+	                $deletionModalUrl, array('escape' => false)); ?>
+	            </li>
             <li>
             <?php
             echo $this->Html->link('<i class="icon-hand-right"></i> Counties',

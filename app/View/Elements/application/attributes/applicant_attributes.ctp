@@ -79,6 +79,31 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
       <tr>
         <td colspan="2">Created on &nbsp; : &nbsp; <?php echo date('d-m-Y h:i a', strtotime($application['Application']['created'])); ?></td>
       </tr>
+      <?php
+      $initialSub = !empty($application['Application']['initial_date_submitted']) ? $application['Application']['initial_date_submitted'] : (!empty($application['Application']['date_submitted']) ? $application['Application']['date_submitted'] : null);
+      if (!empty($application['Application']['approval_date']) && !empty($initialSub)) {
+        $sD = new DateTime($initialSub);
+        $eD = new DateTime($application['Application']['approval_date']);
+        $dd = $sD->diff($eD);
+      ?>
+        <tr>
+          <td colspan="2">
+            <strong>Total Turnaround:</strong>
+            <?php echo date('d-m-Y', strtotime($initialSub)); ?> <small>-to-</small> <?php echo date('d-m-Y', strtotime($application['Application']['approval_date'])); ?><br>
+            <span class="badge badge-info"><?php echo $dd->days; ?> days</span>
+          </td>
+        </tr>
+      <?php } ?>
+      <?php if (!empty($application['Application']['admin_stopped']) || (isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], array(3, 4, '3', '4')))) { ?>
+        <tr class="error" style="background-color: #f2dede; color: #b94a48;">
+          <td colspan="2">
+            <strong><i class="icon-ban-circle"></i> Trial Status Alert: <?php echo !empty($trial_statuses[$application['Application']['trial_status_id']]) ? h($trial_statuses[$application['Application']['trial_status_id']]) : 'Stopped'; ?></strong>
+            <?php if (!empty($application['Application']['admin_stopped_reason'])) { ?>
+              <br><small><strong>Reason:</strong> <?php echo h($application['Application']['admin_stopped_reason']); ?></small>
+            <?php } ?>
+          </td>
+        </tr>
+      <?php } ?>
     </tbody>
   </table>
 </form>

@@ -62,6 +62,34 @@ class Application extends AppModel
                 $conditions['Application.deactivated'] = 0;
                 break;
 
+            case 'completed':
+                $trialStatusId = $this->publicTrialStatusId('completed');
+                $completedConditions = array();
+                if ($trialStatusId) {
+                    $completedConditions[] = array('Application.trial_status_id' => $trialStatusId);
+                }
+                $completedConditions[] = array('Application.final_date IS NOT NULL', 'Application.final_date >' => '1970-01-01');
+                $completedConditions[] = array('Application.final_report IS NOT NULL', 'Application.final_report !=' => '');
+                $conditions['Application.approved'] = 2;
+                $conditions['Application.deactivated'] = 0;
+                $conditions['OR'] = $completedConditions;
+                break;
+
+            case 'active':
+                $inactiveIds = array_filter(array(
+                    $this->publicTrialStatusId('completed'),
+                    $this->publicTrialStatusId('stopped'),
+                    $this->publicTrialStatusId('suspended'),
+                    $this->publicTrialStatusId('revoked'),
+                    $this->publicTrialStatusId('application withdrawn')
+                ));
+                $conditions['Application.approved'] = 2;
+                $conditions['Application.deactivated'] = 0;
+                if (!empty($inactiveIds)) {
+                    $conditions['NOT']['Application.trial_status_id'] = $inactiveIds;
+                }
+                break;
+
             case 'stopped':
             case 'suspended':
                 $trialStatusId = $this->publicTrialStatusId($data['status']);
@@ -124,15 +152,35 @@ class Application extends AppModel
             );
         }
 
+        if (isset($app['approved']) && (int)$app['approved'] === 2) {
+            $actions['active'] = array(
+                'label' => 'Active',
+                'date' => $this->_publicDisplayDate(isset($app['approval_date']) ? $app['approval_date'] : null),
+            );
+        }
+
         if (!empty($app['trial_status_id'])) {
-            foreach (array('suspended', 'stopped') as $key) {
+            foreach (array('suspended', 'stopped', 'completed') as $key) {
                 if ((int)$app['trial_status_id'] === $this->publicTrialStatusId($key)) {
+                    $dateVal = !empty($app['trial_status_date'])
+                        ? $app['trial_status_date']
+                        : (!empty($app['final_date']) ? $app['final_date'] : (isset($app['approval_date']) ? $app['approval_date'] : null));
                     $actions[$key] = array(
                         'label' => ucfirst($key),
-                        'date' => $this->_publicDisplayDate(isset($app['trial_status_date']) ? $app['trial_status_date'] : null),
+                        'date' => $this->_publicDisplayDate($dateVal),
                     );
                 }
             }
+        }
+
+        if (!isset($actions['completed']) && (!empty($app['final_date']) || !empty($app['final_report']))) {
+            $dateVal = !empty($app['final_date'])
+                ? $app['final_date']
+                : (!empty($app['trial_status_date']) ? $app['trial_status_date'] : (isset($app['approval_date']) ? $app['approval_date'] : null));
+            $actions['completed'] = array(
+                'label' => 'Completed',
+                'date' => $this->_publicDisplayDate($dateVal),
+            );
         }
 
         return $actions;
@@ -412,6 +460,11 @@ class Application extends AppModel
         ),
         'AmendmentLetter' => array(
             'className' => 'AmendmentLetter',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
+        'Termination' => array(
+            'className' => 'Termination',
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
@@ -1887,4 +1940,30 @@ class Application extends AppModel
                   // pr($response);
                    return $response;
             }*/
+
+    public function getTurnaroundDays($application)
+    {
+        $appData = isset($application['Application']) ? $application['Application'] : $application;
+        if (empty($appData['approval_date'])) {
+            return null;
+        }
+
+        $startDateStr = !empty($appData['initial_date_submitted']) ? $appData['initial_date_submitted'] : (!empty($appData['date_submitted']) ? $appData['date_submitted'] : null);
+        if (empty($startDateStr)) {
+            return null;
+        }
+
+        try {
+            $startDate = new DateTime($startDateStr);
+            $endDate = new DateTime($appData['approval_date']);
+            if ($endDate < $startDate) {
+                return 0;
+            }
+            $diff = $startDate->diff($endDate);
+            return (int)$diff->days;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
 }

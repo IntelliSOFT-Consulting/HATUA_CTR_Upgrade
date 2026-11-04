@@ -85,6 +85,12 @@
             <i class="icon-bar-chart"></i> Summaries <b class="caret"></b></a>
           <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
              <li><?php
+                        echo $this->Html->link('<i class="icon-dashboard"></i> Benchmark Turnaround Tracking',  array('controller' => 'applications', 'action'=>'stages_summary', 'manager' => true ),
+                                  array('escape' => false, 'tabindex' => '-1'));
+                    ?>
+            </li>
+            <li class="divider"></li>
+             <li><?php
                         echo $this->Html->link('<i class="icon-signal"></i> GCP Study Inspections conducted per month',  array('controller' => 'reports', 'action'=>'si_per_month', 'manager' => true ),
                                   array('escape' => false, 'tabindex' => '-1'));
                     ?>

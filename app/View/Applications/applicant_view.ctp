@@ -54,6 +54,9 @@ echo $this->Session->flash();
     <li><a href="#tab14" data-toggle="tab" style="color: #52A652;">Manufacturing Site(s)</a></li>
     <li><a href="#tab11" data-toggle="tab" style="color: #52A652;">Study Budget</a></li>
     <li><a href="#tab12" data-toggle="tab" style="color: #5e3ed3;">Approval Letters</a></li>
+    <?php if (!empty($application['Termination'])) { ?>
+      <li><a href="#termination_letters" data-toggle="tab" style="color: #b94a48;"><i class="icon-file"></i> Formal Letters (<?php echo count($application['Termination']); ?>)</a></li>
+    <?php } ?>
     <!-- <li><a href="#tab9" data-toggle="tab" style="color: #52A652;">Final Study Report</a></li> -->
     <?php if ($application['Application']['approved'] == 2) { ?>
       <li><a href="#tab9" data-toggle="tab" style="color: #15189d;">Final Study Report</a></li>
@@ -483,6 +486,18 @@ echo $this->Session->flash();
         </div>
       </div>
     </div>
+
+    <?php if (!empty($application['Termination'])) { ?>
+      <div class="tab-pane" id="termination_letters">
+        <div class="row-fluid">
+          <div class="span12">
+            <h4 class="text-error"><i class="icon-file"></i> Formal Letters from PPB</h4>
+            <hr class="soften" style="margin: 10px 0px;">
+            <?php echo $this->element('multi/termination', array('application' => $application)); ?>
+          </div>
+        </div>
+      </div>
+    <?php } ?>
 
   </div>
 </div>

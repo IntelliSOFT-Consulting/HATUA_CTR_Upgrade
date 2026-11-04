@@ -24,7 +24,7 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
+        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'admin_stages_summary', 'inspector_stages_summary', 'summary_evaluation', 'manager_summary_evaluation', 'admin_summary_evaluation', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice', 'download_termination', 'applicant_download_termination', 'admin_download_termination');
 
         $action = isset($this->request->params['action']) ? $this->request->params['action'] : null;
         $prefix = isset($this->request->params['prefix']) ? $this->request->params['prefix'] : null;
@@ -53,6 +53,155 @@ class ApplicationsController extends AppController
         ));
 
         $this->set('sponsor_options', $sponsorOptions);
+    }
+
+    public function applicant_download_termination($id)
+    {
+        $this->download_termination($id);
+    }
+
+    public function admin_download_termination($id)
+    {
+        $this->download_termination($id);
+    }
+
+    public function download_termination($id)
+    {
+        $this->loadModel('Termination');
+        $this->Termination->id = $id;
+        if (!$this->Termination->exists()) {
+            throw new NotFoundException(__('Invalid Termination letter'));
+        }
+        $dt = $this->Termination->find(
+            'first',
+            array(
+                'conditions' => array('Termination.id' => $id),
+                'contain' => array('User', 'Application')
+            )
+        );
+
+        $this->set('letter', $dt);
+        $this->pdfConfig = array('filename' => 'Termination Letter' . $id, 'orientation' => 'portrait');
+        $this->render('download_letter');
+    }
+
+    public function admin_letter($application_id)
+    {
+        $this->loadModel('Termination');
+        $content = $this->requestAction('/pockets/view/51');
+
+        $this->Termination->create();
+        $this->request->data['Termination']['application_id'] = $application_id;
+        $this->request->data['Termination']['user_id'] = $this->Auth->user('id');
+        $this->request->data['Termination']['content'] = !empty($content['Pocket']['content']) ? $content['Pocket']['content'] : '';
+        $this->request->data['Termination']['submitted'] = 0;
+        if ($this->Termination->save($this->request->data)) {
+            $id = $this->Termination->id;
+            $this->Session->setFlash(__('The letter has been saved'), 'alerts/flash_success');
+            $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id, 'eterm' => $id));
+        } else {
+            $this->Session->setFlash(__('The letter could not be saved. Please, try again.'), 'alerts/flash_error');
+            $this->redirect($this->referer());
+        }
+    }
+
+    public function admin_delete_letter($id)
+    {
+        $this->loadModel('Termination');
+
+        if (!$this->request->is('post')) {
+            throw new MethodNotAllowedException();
+        }
+        $this->Termination->id = $id;
+        if (!$this->Termination->exists()) {
+            throw new NotFoundException(__('Invalid application letter'));
+        }
+        if ($this->Termination->delete()) {
+            $this->Session->setFlash(__('Letter deleted successfully'), 'alerts/flash_success');
+            $this->redirect($this->referer());
+        }
+        $this->Session->setFlash(__('Application letter was not deleted, please try again later!!'), 'alerts/flash_error');
+        $this->redirect($this->referer());
+    }
+
+    public function admin_terminate($application_id)
+    {
+        $this->loadModel('Termination');
+        if ($this->request->is('post')) {
+            if (isset($this->request->data['submitReport'])) {
+                $this->request->data['Termination']['submitted'] = 1;
+            }
+            $this->Termination->create();
+            if ($this->Termination->saveAssociated($this->request->data, array('deep' => true))) {
+                $id = $this->Termination->id;
+                if (isset($this->request->data['submitReport'])) {
+                    $application = $this->Application->find('first', array(
+                        'conditions' => array('Application.id' => $application_id),
+                        'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
+                    ));
+
+                    $this->loadModel('Message');
+                    $html = new HtmlHelper(new ThemeView());
+                    $message = $this->Message->find('first', array('conditions' => array('name' => 'termination_letter')));
+                    $anl = $this->Termination->find('first', array(
+                        'contain' => array('Application'),
+                        'conditions' => array('Termination.id' => $this->Termination->id)
+                    ));
+
+                    $users = $this->Termination->Application->User->find('all', array(
+                        'contain' => array('Group'),
+                        'conditions' => array('OR' => array('User.id' => $this->Termination->Application->field('user_id'), 'User.group_id' => 2))
+                    ));
+                    foreach ($users as $user) {
+                        $variables = array(
+                            'name' => $user['User']['name'],
+                            'protocol_no' => $anl['Application']['protocol_no'],
+                            'protocol_link' => $html->link($anl['Application']['protocol_no'], array(
+                                'controller' => 'applications',
+                                'action' => 'view',
+                                $anl['Application']['id'],
+                                $user['Group']['redir'] => true,
+                                'full_base' => true
+                            ), array('escape' => false))
+                        );
+                        $datum = array(
+                            'email' => $user['User']['email'],
+                            'id' => $application_id,
+                            'user_id' => $user['User']['id'],
+                            'type' => 'termination_letter',
+                            'model' => 'Termination',
+                            'subject' => !empty($message['Message']['subject']) ? String::insert($message['Message']['subject'], $variables) : 'Termination Letter for Protocol ' . $anl['Application']['protocol_no'],
+                            'message' => !empty($message['Message']['content']) ? String::insert($message['Message']['content'], $variables) : 'A termination letter has been issued for protocol ' . $anl['Application']['protocol_no']
+                        );
+                        CakeResque::enqueue('default', 'GenericEmailShell', array('sendEmail', $datum));
+                        CakeResque::enqueue('default', 'GenericNotificationShell', array('sendNotification', $datum));
+                    }
+
+                    $audit = array(
+                        'AuditTrail' => array(
+                            'foreign_key' => $id,
+                            'model' => 'Termination Letter',
+                            'message' => 'Termination Letter for the protocol with reference number ' . $application['Application']['protocol_no'] . ' has been created by ' . $this->Auth->user('username'),
+                            'ip' => $application['Application']['protocol_no']
+                        )
+                    );
+                    $this->loadModel('AuditTrail');
+                    $this->AuditTrail->Create();
+                    if ($this->AuditTrail->save($audit)) {
+                        $this->log($this->request->data, 'audit_success');
+                    } else {
+                        $this->log('Error creating an audit trail', 'notifications_error');
+                    }
+                    $this->Session->setFlash(__('The letter has been sent to the user'), 'alerts/flash_success');
+                    return $this->redirect(array('controller' => 'applications', 'action' => 'view', $application_id, 'vterm' => $id));
+                }
+                $this->Session->setFlash(__('The letter has been saved'), 'alerts/flash_success');
+                return $this->redirect($this->referer());
+            } else {
+                $this->Session->setFlash(__('The letter could not be saved. Please, try again.'), 'alerts/flash_error');
+                return $this->redirect($this->referer());
+            }
+        }
     }
     public function admin_extra($id = null)
     {
@@ -886,6 +1035,7 @@ class ApplicationsController extends AppController
             $this->set(compact('applications'));
             $this->layout = false;
             $this->render('stage_csv_export');
+            return;
         }
         //end csv export
 
@@ -905,7 +1055,8 @@ class ApplicationsController extends AppController
             $this->set(compact('applications'));
             // $this->layout = false;
             // $this->render('csv_export');
-            $this->pdfConfig = array('filename' => 'Applications',  'orientation' => 'portrait');
+            $this->pdfConfig = array('filename' => 'Applications_Stages_Summary',  'orientation' => 'landscape');
+            return;
         }
         //end pdf export
 
@@ -1561,7 +1712,9 @@ class ApplicationsController extends AppController
                 // $stages['ReviewSubmission']['days'] = $rsb_s->diff($rsb_e)->format('%a'); 
                 $stages['ReviewSubmission']['days'] = $this->diff_wdays($rsb_s, $rsb_e);
 
-                if ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 0 && $stages['ReviewSubmission']['days'] <= 90) {
+                if (!empty($application['Application']['approved']) && $application['Application']['approved'] == 2) {
+                    $stages['ReviewSubmission']['color'] = 'success';
+                } elseif ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 0 && $stages['ReviewSubmission']['days'] <= 90) {
                     $stages['ReviewSubmission']['color'] = 'warning';
                 } elseif ($rsb['status'] == 'Current' && $stages['ReviewSubmission']['days'] > 90) {
                     $stages['ReviewSubmission']['color'] = 'danger';
@@ -1631,6 +1784,14 @@ class ApplicationsController extends AppController
             $stages['Approval'] = ['label' => 'Approval', 'start_date' => '', 'end_date' => '', 'days' => '', 'color' => 'default', 'state' => 'default'];
         }
 
+        if (!empty($application['Application']['approved']) && $application['Application']['approved'] == 2) {
+            if (isset($stages['ReviewSubmission'])) {
+                $stages['ReviewSubmission']['color'] = 'success';
+            }
+        }
+        $turnaroundDays = $this->Application->getTurnaroundDays($application);
+        $stages['turnaround_days'] = $turnaroundDays;
+
         $this->set('stages', $stages);
         $this->set('_serialize', 'stages');
         if ($this->request->is('requested')) {
@@ -1653,7 +1814,7 @@ class ApplicationsController extends AppController
         if (!empty($this->passedArgs['start_date']) || !empty($this->passedArgs['end_date'])) $this->passedArgs['range'] = true;
         if (isset($this->passedArgs['pages']) && !empty($this->passedArgs['pages'])) $this->paginate['limit'] = $this->passedArgs['pages'];
         else $this->paginate['limit'] = reset($page_options);
-        $publicStatuses = array('approved', 'rejected', 'stopped', 'suspended');
+        $publicStatuses = array('approved', 'rejected', 'active', 'completed', 'stopped', 'suspended');
         $status = !empty($this->params['named']['status']) ? strtolower($this->params['named']['status']) : 'approved';
         if (!in_array($status, $publicStatuses)) {
             $status = 'approved';
@@ -1665,7 +1826,7 @@ class ApplicationsController extends AppController
         $criteria['Application.deactivated'] = 0;
         $this->paginate['conditions'] = $criteria;
         $this->paginate['order'] = array('Application.created' => 'desc');
-        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'));
+        $this->paginate['contain'] = array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'TrialStatus');
 
         $this->set('page_options', $page_options);
         $applications = Sanitize::clean($this->paginate(), array('encode' => false));
@@ -1678,7 +1839,8 @@ class ApplicationsController extends AppController
         $this->set('applications', $applications);
         $this->set('status', $status);
         // Column the "Date <action>" header sorts on
-        $this->set('action_date_field', in_array($status, array('approved', 'rejected')) ? 'approval_date' : 'trial_status_date');
+        $hasTrialStatusDate = $this->Application->hasField('trial_status_date');
+        $this->set('action_date_field', in_array($status, array('approved', 'rejected', 'active')) ? 'approval_date' : ($hasTrialStatusDate ? 'trial_status_date' : ($status === 'completed' ? 'final_date' : 'approval_date')));
 
         $trial_statuses = $this->Application->TrialStatus->find('list');
         $this->set(compact('trial_statuses'));
@@ -2157,9 +2319,69 @@ class ApplicationsController extends AppController
         if (strpos($this->request->url, 'pdf') !== false) {
             $this->pdfConfig = array('filename' => 'Application_' . $id,  'orientation' => 'portrait');
         }
-        $application = $this->Application->read(null, $id);
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array('InvestigatorContact', 'Sponsor', 'SiteDetail' => array('County'), 'TrialStatus', 'Amendment')
+        ));
         $this->set('application', $application);
         $this->set('publicActions', $this->Application->publicActionDates($application));
+    }
+
+    public function summary_evaluation($id = null)
+    {
+        $this->Application->id = $id;
+        if (!$this->Application->exists()) {
+            throw new NotFoundException(__('Invalid application'));
+        }
+
+        $application = $this->Application->find('first', array(
+            'conditions' => array('Application.id' => $id),
+            'contain' => array(
+                'InvestigatorContact',
+                'Sponsor',
+                'SiteDetail' => array('County'),
+                'TrialStatus',
+                'Review' => array(
+                    'User',
+                    'ReviewAnswer',
+                    'InternalComment',
+                    'ExternalComment'
+                ),
+                'InternalReview' => array(
+                    'User',
+                    'ReviewAnswer',
+                    'InternalComment',
+                    'ExternalComment'
+                )
+            )
+        ));
+
+        if (strpos($this->request->url, 'pdf') !== false || (isset($this->request->params['ext']) && $this->request->params['ext'] === 'pdf')) {
+            $this->pdfConfig = array('filename' => 'Summary_Evaluation_' . $id, 'orientation' => 'portrait');
+        }
+
+        $this->set('application', $application);
+        $this->set('publicActions', $this->Application->publicActionDates($application));
+    }
+
+    public function manager_summary_evaluation($id = null)
+    {
+        $this->setAction('summary_evaluation', $id);
+    }
+
+    public function admin_summary_evaluation($id = null)
+    {
+        $this->setAction('summary_evaluation', $id);
+    }
+
+    public function admin_stages_summary()
+    {
+        $this->setAction('manager_stages_summary');
+    }
+
+    public function inspector_stages_summary()
+    {
+        $this->setAction('manager_stages_summary');
     }
 
     public function applicant_view($id = null)
@@ -3206,13 +3428,13 @@ class ApplicationsController extends AppController
                             $var = Hash::extract($stages, '{n}.ApplicationStage[stage=ReviewSubmission]');
                             if (!empty($var)) {
                                 $s5['ApplicationStage'] = min($var);
+                                $this->Application->ApplicationStage->create();
+                                $s5['ApplicationStage']['status'] = 'Complete';
+                                $s5['ApplicationStage']['comment'] = 'Manager final decision';
                                 if (empty($s5['ApplicationStage']['end_date'])) {
-                                    $this->Application->ApplicationStage->create();
-                                    $s5['ApplicationStage']['status'] = 'Complete';
-                                    $s5['ApplicationStage']['comment'] = 'Manager final decision';
                                     $s5['ApplicationStage']['end_date'] = date('Y-m-d');
-                                    $this->Application->ApplicationStage->save($s5);
                                 }
+                                $this->Application->ApplicationStage->save($s5);
                             }
                         }
 

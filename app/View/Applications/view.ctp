@@ -65,9 +65,9 @@
 						<?php if (!empty($publicActions)) { ?>
 						<?php foreach ($publicActions as $publicAction) { ?>
 						<tr>
-							<td style="width: 25%;">Status:</td>
+							<td style="width: 25%;">Regulatory Decision:</td>
 							<td style="width: 25%;"><strong><?php echo h($publicAction['label']); ?></strong></td>
-							<td style="width: 25%;">Date <?php echo h($publicAction['label']); ?>:</td>
+							<td style="width: 25%;">Official Action Date:</td>
 							<td style="width: 25%;"><strong><?php
 								if (!empty($publicAction['date'])) echo h($publicAction['date']);
 								else echo '<em class="muted">Not recorded</em>';
@@ -75,6 +75,22 @@
 						</tr>
 						<?php } ?>
 						<?php } ?>
+						<tr>
+							<td style="width: 25%;">Trial Status:</td>
+							<td style="width: 75%;" colspan="3">
+								<strong><?php
+									if (!empty($application['TrialStatus']['name'])) {
+										echo h($application['TrialStatus']['name']);
+									} elseif ($application['Application']['approved'] == 1) {
+										echo 'Rejected';
+									} elseif ($application['Application']['approved'] == 2) {
+										echo 'Approved (Active)';
+									} else {
+										echo 'Under Review';
+									}
+								?></strong>
+							</td>
+						</tr>
 					</table>
 					 <hr>
 					<table style="width: 100%;">
@@ -120,6 +136,41 @@
 			            <?php   } } ?>
 					</table>
 					<hr>
+					<?php
+					$hasResults = !empty($application['Application']['final_report'])
+						|| !empty($application['Application']['implication_results'])
+						|| !empty($application['Application']['final_date']);
+					if ($hasResults || (!empty($application['TrialStatus']['name']) && $application['TrialStatus']['name'] === 'Completed')) {
+					?>
+					<h4>Trial Results Summary</h4>
+					<table style="width: 100%;" class="table table-bordered table-striped">
+						<?php if (!empty($application['Application']['final_date'])) { ?>
+						<tr>
+							<th style="width: 25%;">Date of Results / Completion:</th>
+							<td style="width: 75%;"><strong><?php echo h(date('d-m-Y', strtotime($application['Application']['final_date']))); ?></strong></td>
+						</tr>
+						<?php } ?>
+						<?php if (!empty($application['Application']['final_report'])) { ?>
+						<tr>
+							<th style="width: 25%;">Results Executive Summary:</th>
+							<td style="width: 75%;"><?php echo $application['Application']['final_report']; ?></td>
+						</tr>
+						<?php } ?>
+						<?php if (!empty($application['Application']['implication_results'])) { ?>
+						<tr>
+							<th style="width: 25%;">Implication on Clinical Practice:</th>
+							<td style="width: 75%;"><?php echo $application['Application']['implication_results']; ?></td>
+						</tr>
+						<?php } ?>
+						<?php if (!empty($application['Application']['laymans_summary'])) { ?>
+						<tr>
+							<th style="width: 25%;">Layman's Summary:</th>
+							<td style="width: 75%;"><?php echo $application['Application']['laymans_summary']; ?></td>
+						</tr>
+						<?php } ?>
+					</table>
+					<hr>
+					<?php } ?>
 				</div>
 			</div>
 
