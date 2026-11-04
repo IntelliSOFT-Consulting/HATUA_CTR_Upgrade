@@ -463,6 +463,11 @@ class Application extends AppModel
             'foreignKey' => 'application_id',
             'dependent' => false,
         ),
+        'Termination' => array(
+            'className' => 'Termination',
+            'foreignKey' => 'application_id',
+            'dependent' => false,
+        ),
         'AmendmentApproval' => array(
             'className' => 'AmendmentApproval',
             'foreignKey' => 'application_id',
@@ -1935,4 +1940,30 @@ class Application extends AppModel
                   // pr($response);
                    return $response;
             }*/
+
+    public function getTurnaroundDays($application)
+    {
+        $appData = isset($application['Application']) ? $application['Application'] : $application;
+        if (empty($appData['approval_date'])) {
+            return null;
+        }
+
+        $startDateStr = !empty($appData['initial_date_submitted']) ? $appData['initial_date_submitted'] : (!empty($appData['date_submitted']) ? $appData['date_submitted'] : null);
+        if (empty($startDateStr)) {
+            return null;
+        }
+
+        try {
+            $startDate = new DateTime($startDateStr);
+            $endDate = new DateTime($appData['approval_date']);
+            if ($endDate < $startDate) {
+                return 0;
+            }
+            $diff = $startDate->diff($endDate);
+            return (int)$diff->days;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
 }

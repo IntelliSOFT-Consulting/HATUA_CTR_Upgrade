@@ -25,6 +25,7 @@
           <?php } ?>
           <th style="border: 1px solid #999; padding: 4px; text-align: left;">Date Submitted</th>
           <th style="border: 1px solid #999; padding: 4px; text-align: left;">Date Approved</th>
+          <th style="border: 1px solid #999; padding: 4px; text-align: left;">Total Turnaround</th>
         </tr>
       </thead>
       <tbody>
@@ -72,6 +73,19 @@
             <?php } ?>
             <td style="border: 1px solid #999; padding: 4px; text-align: left;"><?php echo h($application['Application']['date_submitted']); ?></td>
             <td style="border: 1px solid #999; padding: 4px; text-align: left;"><?php echo h($application['Application']['approval_date']); ?></td>
+            <td style="border: 1px solid #999; padding: 4px; text-align: left;">
+              <?php
+              $initialSub = !empty($application['Application']['initial_date_submitted']) ? $application['Application']['initial_date_submitted'] : (!empty($application['Application']['date_submitted']) ? $application['Application']['date_submitted'] : null);
+              if (!empty($application['Application']['approval_date']) && !empty($initialSub)) {
+                $sD = new DateTime($initialSub);
+                $eD = new DateTime($application['Application']['approval_date']);
+                $diff = $sD->diff($eD);
+                echo h($diff->days . ' days');
+              } else {
+                echo '-';
+              }
+              ?>
+            </td>
           </tr>
         <?php } ?>
       </tbody>

@@ -394,11 +394,18 @@
                 $counder = ($this->request->paging['Application']['page'] - 1) * $this->request->paging['Application']['limit'];
                 foreach ($applications as $application) :
                 ?>
-                  <tr class="<?php if ($this->fetch('color-codes') == 'true') {
-                                if ($application['Application']['deactivated']) echo 'text-warning';
-                                if ($application['Application']['approved'] == 1) echo 'text-error';
-                                if ($application['Application']['approved'] == 2) echo 'text-success';
-                              } ?>">
+                  <?php
+                  $isTrialStopped = (!empty($application['Application']['admin_stopped']) || (isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], array('3', '4', 3, 4))));
+                  $rowClass = '';
+                  if ($isTrialStopped) {
+                      $rowClass = 'error';
+                  } elseif ($this->fetch('color-codes') == 'true') {
+                      if ($application['Application']['deactivated']) $rowClass = 'text-warning';
+                      if ($application['Application']['approved'] == 1) $rowClass = 'text-error';
+                      if ($application['Application']['approved'] == 2) $rowClass = 'text-success';
+                  }
+                  ?>
+                  <tr class="<?php echo $rowClass; ?>">
                     <td rowspan="2">
                       <p class="tablenums"><?php $counder++;
                                             echo $counder; ?>.</p>
@@ -560,8 +567,15 @@
                       <?php
                       $stages = $this->requestAction('applications/stages/' . $application['Application']['id']);
                       foreach ($stages as $sk => $stage) {
+                        if ($sk === 'turnaround_days' || !is_array($stage)) continue;
                         $color = ($stage['color'] == 'danger') ? 'important' : $stage['color'];
                         echo '<span class="label label-' . $color . '">' . $stage['label'] . '<br><small style="color: #f9ef9c;">' . $stage['start_date'] . '</small>' . '</span><span class="badge">' . $stage['days'] . '<small>' . (($sk == 'AnnualApproval') ? ' (to expiry)' : '') . '</small>' . '</span>';
+                      }
+                      if ($isTrialStopped) {
+                        echo '<span class="label label-important pull-right" style="margin-left: 5px;"><i class="icon-ban-circle"></i> TRIAL STOPPED</span>';
+                      }
+                      if (isset($stages['turnaround_days']) && $stages['turnaround_days'] !== null) {
+                        echo '<span class="label label-info pull-right" style="margin-left: 5px;"><i class="icon-time"></i> Total Turnaround: ' . $stages['turnaround_days'] . ' days</span>';
                       }
                       ?>
                     </td>

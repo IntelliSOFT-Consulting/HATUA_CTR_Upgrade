@@ -256,6 +256,15 @@ $this->assign('Dashboard', 'active');
       <li>
         <?php
         echo $this->Html->link(
+          '<i class="icon-cog"></i> Automatic Deletion Period <small class="muted">(Current: ' . (int)$auto_deletion_period_months . ' months)</small>',
+          '#autoDeletionPeriodModal',
+          array('escape' => false, 'data-toggle' => 'modal')
+        );
+        ?>
+      </li>
+      <li>
+        <?php
+        echo $this->Html->link(
           '<i class="icon-question-sign"></i> Site Inspection Questions <small class="muted">(Site inspection questions)</small>',
           array('controller' => 'site_questions', 'action' => 'index', 'admin' => true),
           array('escape' => false)
@@ -341,6 +350,35 @@ $this->assign('Dashboard', 'active');
         ?>
       </li>
     </ul>
+
+    <div id="autoDeletionPeriodModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="autoDeletionPeriodModalLabel" aria-hidden="true">
+      <?php echo $this->Form->create('DeletionSetting', array(
+        'url' => array('controller' => 'users', 'action' => 'deletion_settings', 'admin' => true),
+        'class' => 'form-horizontal',
+      )); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 id="autoDeletionPeriodModalLabel">Automatic Deletion Period</h4>
+      </div>
+      <div class="modal-body">
+        <p class="muted">Set retention duration in months for automatic deletion cleanup.</p>
+        <?php
+        echo $this->Form->input('duration_months', array(
+          'type' => 'number',
+          'min' => 1,
+          'step' => 1,
+          'class' => 'input-small',
+          'value' => (int)$auto_deletion_period_months,
+          'label' => array('text' => 'Duration (Months)'),
+        ));
+        ?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+        <?php echo $this->Form->button('<i class="icon-save"></i> Save', array('type' => 'submit', 'class' => 'btn btn-primary', 'escape' => false)); ?>
+      </div>
+      <?php echo $this->Form->end(); ?>
+    </div>
   </div>
 </div> <!-- /row -->
 <hr>
@@ -361,5 +399,8 @@ $this->assign('Dashboard', 'active');
   $.expander.defaults.slicePoint = 70;
   $(function() {
     $(".morecontent").expander();
+    if (window.location.hash === '#autoDeletionPeriodModal') {
+      $('#autoDeletionPeriodModal').modal('show');
+    }
   });
 </script>

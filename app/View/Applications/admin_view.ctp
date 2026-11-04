@@ -462,6 +462,82 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
           <?php
           echo $this->Form->end();
           ?>
+          <hr>
+          <?php if (!empty($application['Application']['admin_stopped']) || (isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], array(3, 4, '3', '4')))) { ?>
+            <div class="alert alert-error">
+              <strong><i class="icon-warning-sign"></i> Formal Letter Action:</strong>
+              <p>This study has been stopped/suspended. You can generate and issue a formal PPB letter to the investigator.</p>
+              <?php
+              echo $this->Html->link(
+                '<i class="icon-file"></i> Generate Formal PPB Letter',
+                array('controller' => 'applications', 'action' => 'letter', $application['Application']['id'], 'admin' => true),
+                array('class' => 'btn btn-danger', 'escape' => false)
+              );
+              ?>
+            </div>
+          <?php } ?>
+        </div>
+
+        <div class="span8">
+          <?php if (!empty($application['Termination'])) { ?>
+            <h4><i class="icon-envelope"></i> Formal PPB Letters</h4>
+            <?php echo $this->element('multi/termination', array('application' => $application)); ?>
+          <?php } ?>
+
+          <?php
+          if (isset($this->params['named']['eterm'])) $cid = $this->params['named']['eterm'];
+          if (isset($this->params['named']['eterm']) && !empty($application['Termination'])) {
+            foreach ($application['Termination'] as $akey => $kk) {
+              if ($kk['id'] == $cid) {
+          ?>
+                <div class="row-fluid">
+                  <div class="bs-example">
+                    <h4>Edit Formal Termination / Suspension Letter</h4>
+                    <?php
+                    echo $this->Form->create('Termination', array(
+                      'url' => array('controller' => 'applications', 'action' => 'terminate', $application['Application']['id']),
+                      'type' => 'file',
+                      'class' => false,
+                    ));
+                    echo $this->Form->input('id', array('type' => 'hidden', 'value' => $kk['id']));
+                    echo $this->Form->input('reference_no', array('type' => 'hidden', 'value' => $application['Application']['protocol_no']));
+                    echo $this->Form->input('application_id', array('type' => 'hidden', 'value' => $application['Application']['id']));
+                    echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
+                    $uniqueId = 'content_' . uniqid();
+                    echo $this->Form->input('content', array(
+                      'label' => false,
+                      'value' => $kk['content'],
+                      'between' => '<div class="span12">',
+                      'class' => 'input-large editor',
+                      'id' => $uniqueId,
+                    ));
+                    ?>
+                    <div class="form-group">
+                      <div class="well controls">
+                        <?php
+                        echo $this->Form->button('<i class="icon-save"></i> Save Changes', array(
+                          'name' => 'saveChanges',
+                          'class' => 'btn btn-success',
+                          'div' => false,
+                        ));
+                        echo '&nbsp;';
+                        echo $this->Form->button('<i class="icon-rocket"></i> Submit & Issue Letter', array(
+                          'name' => 'submitReport',
+                          'onclick' => "return confirm('Are you sure you wish to submit and issue this formal letter?');",
+                          'class' => 'btn btn-primary',
+                          'div' => false,
+                        ));
+                        ?>
+                      </div>
+                    </div>
+                    <?php echo $this->Form->end(); ?>
+                  </div>
+                </div>
+          <?php
+              }
+            }
+          }
+          ?>
         </div>
       </div>
     </div>

@@ -23,7 +23,8 @@ $header = array(
     'final_decision' => 'Final Decision',
     'annual_approval' => 'Annual Approval',
     'date_submitted' => 'Date Submitted',
-    'approval_date' => 'Date Approved'
+    'approval_date' => 'Date Approved',
+    'total_turnaround_days' => 'Total Turnaround (Days)'
 );
 
 echo implode(',', $header) . "\n";
@@ -45,6 +46,19 @@ foreach ($applications as $application) :
                 ? $application['Application']['study_title']
                 : (isset($application['Application']['short_title']) ? $application['Application']['short_title'] : '');
             $row[$key] = '"' . preg_replace('/"/', '""', $studyTitle) . '"';
+            continue;
+        }
+
+        if ($key === 'total_turnaround_days') {
+            $initialSub = !empty($application['Application']['initial_date_submitted']) ? $application['Application']['initial_date_submitted'] : (!empty($application['Application']['date_submitted']) ? $application['Application']['date_submitted'] : null);
+            if (!empty($application['Application']['approval_date']) && !empty($initialSub)) {
+                $sD = new DateTime($initialSub);
+                $eD = new DateTime($application['Application']['approval_date']);
+                $diff = $sD->diff($eD);
+                $row[$key] = '"' . $diff->days . '"';
+            } else {
+                $row[$key] = '""';
+            }
             continue;
         }
 

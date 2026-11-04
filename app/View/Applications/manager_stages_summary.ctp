@@ -132,6 +132,7 @@ $stageColumns = array(
               <?php } ?>
               <th style="width: 7%; text-align: center;">Date Submitted</th>
               <th style="width: 7%; text-align: center;">Date Approved</th>
+              <th style="width: 7%; text-align: center;">Total Turnaround</th>
             </tr>
           </thead>
           <tbody>
@@ -192,6 +193,19 @@ $stageColumns = array(
                 </td>
                 <td style="text-align: center;">
                   <small><?php echo !empty($application['Application']['approval_date']) ? h(date('d-m-Y', strtotime($application['Application']['approval_date']))) : '-'; ?></small>
+                </td>
+                <td style="text-align: center;">
+                  <?php
+                  $initialSub = !empty($application['Application']['initial_date_submitted']) ? $application['Application']['initial_date_submitted'] : (!empty($application['Application']['date_submitted']) ? $application['Application']['date_submitted'] : null);
+                  if (!empty($application['Application']['approval_date']) && !empty($initialSub)) {
+                    $sD = new DateTime($initialSub);
+                    $eD = new DateTime($application['Application']['approval_date']);
+                    $diff = $sD->diff($eD);
+                    echo '<span class="badge badge-info" style="font-size: 10px;">' . $diff->days . 'd</span>';
+                  } else {
+                    echo '<span class="muted">-</span>';
+                  }
+                  ?>
                 </td>
               </tr>
             <?php } ?>

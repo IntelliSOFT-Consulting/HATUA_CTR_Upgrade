@@ -192,6 +192,26 @@ $stages = $this->requestAction('applications/stages/' . $application['Applicatio
                 <td><?php echo $statusBadge; ?></td>
               </tr>
             <?php } ?>
+            <?php
+            $initialSub = !empty($application['Application']['initial_date_submitted']) ? $application['Application']['initial_date_submitted'] : (!empty($application['Application']['date_submitted']) ? $application['Application']['date_submitted'] : null);
+            $totalDays = null;
+            if (!empty($application['Application']['approval_date']) && !empty($initialSub)) {
+              $sD = new DateTime($initialSub);
+              $eD = new DateTime($application['Application']['approval_date']);
+              $totalDays = $sD->diff($eD)->days;
+            }
+            ?>
+            <tr style="background-color: #f9f9f9; font-weight: bold;">
+              <td colspan="4" style="text-align: right;">Total Turnaround (Initial Submission to Approval):</td>
+              <td><?php echo ($totalDays !== null) ? ($totalDays . ' days') : '<span class="muted">-</span>'; ?></td>
+              <td>
+                <?php if ($totalDays !== null) { ?>
+                  <span class="label label-info">Completed (<?php echo $totalDays; ?> days)</span>
+                <?php } else { ?>
+                  <span class="label">In Progress</span>
+                <?php } ?>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

@@ -77,12 +77,14 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
         <td colspan="2">Created on &nbsp; : &nbsp; <?php echo date('d-m-Y h:i a', strtotime($application['Application']['created'])); ?></td>
       </tr>
 
-      <?php if (!empty($application['Application']['approval_date']) && !empty($application['Application']['date_submitted'])) { ?>
+      <?php
+      $initialSub = !empty($application['Application']['initial_date_submitted']) ? $application['Application']['initial_date_submitted'] : (!empty($application['Application']['date_submitted']) ? $application['Application']['date_submitted'] : null);
+      if (!empty($application['Application']['approval_date']) && !empty($initialSub)) { ?>
         <tr>
           <td colspan="2">
-            Duration from submit to approve: <br />
+            <strong>Total Turnaround (Initial Submit to Approve):</strong> <br />
             <p class="xeditable" data-type="date" data-name="data[Application][date_submitted]" data-url="/admin/applications/view/<?php echo $application["Application"]["id"]; ?>" data-pk="<?php echo $application['Application']['id']; ?>" data-original-title="Update submission date">
-              <?php echo date('d-m-Y', strtotime($application['Application']['date_submitted'])); ?>
+              <?php echo date('d-m-Y', strtotime($initialSub)); ?>
             </p>
             <small> -to- </small>
             <p class="xeditable" data-type="date" data-name="data[Application][approval_date]" data-url="/admin/applications/view/<?php echo $application["Application"]["id"]; ?>" data-pk="<?php echo $application['Application']['id']; ?>" data-original-title="Update approval date">
@@ -90,25 +92,25 @@ $this->Html->css('bootstrap-editable', null, array('inline' => false));
             </p>
             <br />
             <?php
-            //echo date('d-m-Y H:i', strtotime($application['Application']['date_submitted']))." &#8212; " ;
-            //echo date('d-m-Y H:i', strtotime($application['Application']['approval_date']));
-            $start_date_ = new DateTime($application['Application']['date_submitted']);
+            $start_date_ = new DateTime($initialSub);
             $end_date_ = new DateTime($application['Application']['approval_date']);
             $dd = date_diff($end_date_, $start_date_);
-            // //pr($dd);
-            // //To get hours use $dd->h, minutes - $dd->i, seconds - $dd->s.
-            echo "Y = $dd->y, M = $dd->m, D = $dd->d: &sum; days = $dd->days";
+            echo "Y = $dd->y, M = $dd->m, D = $dd->d &mdash; <span class='badge badge-info'>Total: $dd->days days</span>";
             ?>
           </td>
         </tr>
+      <?php } ?>
 
-        <?php if (!empty($application['Application']['admin_stopped_reason'])) { ?>
-        <tr>
-          <td colspan="2"> Reason for admin action: <br />
-          <?php   echo $application['Application']['admin_stopped_reason']; ?>
+      <?php if (!empty($application['Application']['admin_stopped']) || (isset($application['Application']['trial_status_id']) && in_array($application['Application']['trial_status_id'], array(3, 4, '3', '4')))) { ?>
+        <tr class="error" style="background-color: #f2dede; color: #b94a48;">
+          <td colspan="2">
+            <strong><i class="icon-ban-circle"></i> Trial Status Alert: <?php echo !empty($trial_statuses[$application['Application']['trial_status_id']]) ? h($trial_statuses[$application['Application']['trial_status_id']]) : 'Stopped'; ?></strong>
+            <?php if (!empty($application['Application']['admin_stopped_reason'])) { ?>
+              <br><small><strong>Reason:</strong> <?php echo h($application['Application']['admin_stopped_reason']); ?></small>
+            <?php } ?>
           </td>
         </tr>
-      <?php } } ?>
+      <?php } ?>
 
     </tbody>
   </table>
