@@ -24,9 +24,15 @@ class ApplicationsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('index', 'admin_extra', 'report_invoice', 'applicant_submitall', 'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 'manager_stages_summary', 'view', 'view.pdf', 'apl',  'study_title', 'myindex', 'download_invoice');
-
-        $action = isset($this->request->params['action']) ? $this->request->params['action'] : null;
+         $this->Auth->allow( 
+                'index', 'admin_extra', 'report_invoice', 'applicant_submitall',  
+                'admin_suspend', 'manager_amendment_summary', 'genereateQRCode', 
+                'manager_stages_summary', 'view', 'view.pdf', 'apl', 'study_title', 
+                'myindex', 'download_invoice',                                                                                                                                                                                   
+                'applicant_generate_safety_report', 'generate_safety_report',                                                                                                                                                    
+                'applicant_safety_delete', 'safety_delete'                                                                                                                                                                      
+            );      
+     $action = isset($this->request->params['action']) ? $this->request->params['action'] : null;
         $prefix = isset($this->request->params['prefix']) ? $this->request->params['prefix'] : null;
 
         $usesSponsorFilter =
@@ -55,84 +61,6 @@ class ApplicationsController extends AppController
         $this->set('sponsor_options', $sponsorOptions);
     }
 
-    public function applicant_delete_center($id, $application_id)
-    {
-        // debug($id);
-        // debug($application_id);
-        // exit;
-        $this->loadModel('MultiCenter');
-        $this->MultiCenter->id = $id;
-        if (!$this->MultiCenter->exists()) {
-            throw new NotFoundException(__('Invalid application letter'));
-        }
-
-        $this->MultiCenter->id = $id;
-        $this->MultiCenter->saveField('deleted', true);
-        $this->MultiCenter->saveField('deleted_date', date('Y-m-d H:i:s'));
-        $this->Session->setFlash(__('Application Multi Center deleted successfully'), 'alerts/flash_success');
-        $this->redirect($this->referer());
-    }
-    public function applicant_create_multi_center($id = null)
-    {
-        $this->loadModel('MultiCenter');
-        $this->loadModel('Application');
-        $this->loadModel('AuditTrail');
-        if ($this->request->is('post')) {
-
-            //before creating, ensure not user_id and application_id  matches to ensure you can't multiple records same user
-            $this->MultiCenter->recursive = -1;
-            $center = $this->MultiCenter->find('first', array('conditions' => array('MultiCenter.user_id' => $this->request->data['MultiCenter']['user_id'], 'MultiCenter.application_id' => $this->request->data['MultiCenter']['application_id'])));
-            if ($center) {
-                $this->Session->setFlash(__('The user has already been assigned to the application'), 'alerts/flash_error');
-                return $this->redirect($this->referer());
-            }
-
-            $this->MultiCenter->create();
-            if ($this->MultiCenter->save($this->request->data)) {
-                // pull the application details by application_id
-                $application = $this->Application->find('first', array(
-                    'conditions' => array('Application.id' => $this->request->data['MultiCenter']['application_id']),
-                    'contain' => array('SiteDetail', 'User', 'InvestigatorContact')
-                ));
-
-                //create and audit trail
-                $audit = array(
-                    'AuditTrail' => array(
-                        'foreign_key' => $id,
-                        'model' => 'Application',
-                        'message' => 'Multi Center request for the protocol with reference number ' . $application['Application']['protocol_no'] . ' has been submitted by ' . $this->Auth->user('name'),
-                        'ip' => $application['Application']['protocol_no']
-                    )
-                );
-                $this->AuditTrail->Create();
-                if ($this->AuditTrail->save($audit)) {
-                    $this->log($this->request->data, 'audit_success');
-                } else {
-                    $this->log('Error creating an audit trail', 'audit_error');
-                    $this->log($this->request->data, 'audit_error');
-                }
-                $this->Session->setFlash(__('The multi center has been saved'), 'alerts/flash_success');
-                // $this->redirect(array('controller' => 'applications', 'action' => 'view', $id));
-                $this->redirect($this->referer());
-            } else {
-
-                $validationErrors = $this->MultiCenter->validationErrors;
-
-                // Concatenate validation errors into a single string
-                $errorMessage = 'Failed to submit the request. Please correct the following errors: <br>';
-                foreach ($validationErrors as $field => $errors) {
-                    foreach ($errors as $error) {
-                        $errorMessage .= $error . ' <br>';
-                    }
-                }
-
-                // Set flash message with validation errors
-                $this->Session->setFlash(__($errorMessage), 'alerts/flash_error');
-                $this->redirect($this->referer());
-            }
-        }
-        $this->redirect($this->referer());
-    }
     public function safety_delete($id = null)
     {
         $this->loadModel('SafetyReport');

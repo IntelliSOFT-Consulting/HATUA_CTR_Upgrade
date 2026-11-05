@@ -7,9 +7,6 @@ $this->Html->script('ckeditor/adapters/jquery', array('inline' => false));
 
 <br>
 <?php
-$isMultiCenter = (!empty($application['Application']['multiple_sites_member_state']) && $application['Application']['multiple_sites_member_state'] === 'Yes')
-    || (!empty($application['Application']['multiple_countries']) && $application['Application']['multiple_countries'] === 'Yes')
-    || !empty($application['MultiCenter']);
 $foreignSaes = array();
 if (!empty($application['Sae'])) {
     foreach ($application['Sae'] as $s) {
@@ -33,9 +30,7 @@ if (!empty($application['Sae'])) {
 
         <ul class="nav nav-tabs" id="myTabs">
             <li class="active"><a href="#tabs-susar" data-toggle="tab">SAE/SUSAR</a></li>
-            <?php if ($isMultiCenter || !empty($foreignSaes)): ?>
             <li><a href="#tabs-foreign-sae" data-toggle="tab">Foreign SAEs (<?php echo count($foreignSaes); ?>)</a></li>
-            <?php endif; ?>
             <li><a href="#tabs-generalized" data-toggle="tab">Generalized safety report</a></li>
             <li><a href="#tabs-line" data-toggle="tab">Line Listings</a></li>
             <li><a href="#tabs-dsurs" data-toggle="tab">DSURs</a></li>
@@ -152,7 +147,6 @@ if (!empty($application['Sae'])) {
                 </div>
             </div>
 
-            <?php if ($isMultiCenter || !empty($foreignSaes)): ?>
             <div class="tab-pane" id="tabs-foreign-sae">
                 <div class="row-fluid">
                     <div class="span12">
@@ -223,7 +217,6 @@ if (!empty($application['Sae'])) {
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
 
             <div class="tab-pane" id="tabs-generalized">
                 <div class="row-fluid">

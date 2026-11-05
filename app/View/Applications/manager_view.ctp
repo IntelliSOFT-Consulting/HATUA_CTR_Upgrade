@@ -1008,13 +1008,6 @@ $renderTimelineStrip = function ($timelineEntry) use ($amendmentStageOrder, $res
       </div>
     </div>
 
-    <div class="tab-pane" id="multicenter">
-      <div class="row-fluid">
-        <div class="span12">
-          <?php echo $this->element('application/multicenter_manager'); ?>
-        </div>
-      </div>
-    </div>
 
     <div class="tab-pane" id="tab7">
       <div class="row-fluid">

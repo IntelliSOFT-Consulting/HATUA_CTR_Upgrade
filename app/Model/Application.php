@@ -677,11 +677,6 @@ class Application extends AppModel
                 'SafetyReportLINE.deleted' => '0'
             ),
         ),
-        'MultiCenter' => array(
-            'className' => 'MultiCenter',
-            'foreignKey' => 'application_id',
-            'dependent' => true,
-        ),
     );
 
     public $validate = array(

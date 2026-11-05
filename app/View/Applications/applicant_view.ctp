@@ -38,7 +38,6 @@ echo $this->Session->flash();
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tab1" data-toggle="tab">Application</a></li>
     <?php if ($application['Application']['user_id'] == $this->Session->read('Auth.User.id')) { ?>
-      <li><a href="#multicenter" data-toggle="tab">Multi Center(s)</a></li>
       <li><a href="#outsourcing" data-toggle="tab">Outsourcing</a></li>
     <li><a href="#tab17" data-toggle="tab">Screening</a></li>
     <li><a href="#amendments" data-toggle="tab">Amendments</a></li>
@@ -253,14 +252,7 @@ echo $this->Session->flash();
       </div>
     </div>
 
-        <div class="tab-pane" id="multicenter">
-      <div class="row-fluid">
-        <div class="span12">
-          <?php echo $this->element('application/multicenter'); ?>
-        </div>
-      </div>
-    </div>
-
+    
     <div class="tab-pane" id="outsourcing">
       <div class="row-fluid">
         <div class="span12">

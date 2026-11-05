@@ -73,7 +73,7 @@ class AppController extends Controller
     'Review'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'),
     'InternalReview'  => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment'), 'ReviewAnswer', 'User'),
     
-    'Sae' => array('Country'),
+    'Sae' => array('Country', 'SiteDetail' => array('County')),
     'AmendmentLetter',
     'AnnualLetter' => array('InternalComment' => array('Attachment'), 'ExternalComment' => array('Attachment')),
     'StudyRoute',
@@ -87,7 +87,6 @@ class AppController extends Controller
     'SafetyReportDSMB' => array('Attachment'),
     'SafetyReportDSUR' => array('Attachment'),
     'SafetyReportLINE' => array('Attachment'),
-    'MultiCenter' => array('User', 'Application'),
   );
   public $components = array(
     'Acl',
