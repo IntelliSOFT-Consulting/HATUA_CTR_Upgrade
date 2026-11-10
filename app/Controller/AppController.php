@@ -105,7 +105,7 @@ class AppController extends Controller
       'viewClassMap' => array('csv' => 'CsvView.Csv')
     ),
     'Session',
-    'DebugKit.Toolbar' => array('panels' => array('DebugKit.history'))
+    // 'DebugKit.Toolbar' => array('panels' => array('DebugKit.history'))
   );
   public $helpers = array('Html', 'Form', 'Session', 'Text');
 
@@ -124,6 +124,7 @@ class AppController extends Controller
     if ($this->Auth->User('group_id') == '7')  $redir = 'monitor';
     if ($this->Auth->User('group_id') == '8')  $redir = 'outsource';
     if ($this->Auth->User('group_id') == '9')  $redir = 'internalreviewer';
+    if (in_array($this->Auth->User('group_id'), array('11', '12', '13', '14'))) $redir = 'applicant';
 
     $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login', 'admin' => false);
     $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login', 'admin' => false);
