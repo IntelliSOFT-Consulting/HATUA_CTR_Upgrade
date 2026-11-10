@@ -46,7 +46,14 @@ foreach ($comments as $key => $comment) {
             <p><strong> Content </strong>
           </th>
           <td>
-            <p class="form-control-static"><?php echo $comment['content'] ?></p>
+            <div class="form-control-static"><?php
+                  $commentBody = (string)$comment['content'];
+                  if ($commentBody !== strip_tags($commentBody)) {
+                      echo $commentBody;
+                  } else {
+                      echo nl2br(h($commentBody));
+                  }
+                ?></div>
           </td>
   </div>
   <tr>
@@ -75,8 +82,18 @@ foreach ($comments as $key => $comment) {
     </td>
   </tr>
   <tr>
-    <th><?php
-        if ($redir === 'applicant' && $comment['user_id'] != $this->Session->read('Auth.User.id')) {
+    <th colspan="2"><?php
+        $currentUserId = $this->Session->read('Auth.User.id');
+        $currentUserGroup = $this->Session->read('Auth.User.group_id');
+        if ($currentUserGroup == 2 || (!empty($comment['user_id']) && $comment['user_id'] == $currentUserId)) {
+            echo $this->Form->postLink(
+                '<i class="icon-trash"></i> <small>Delete / Undo</small>',
+                array('controller' => 'comments', 'action' => 'delete', $comment['id']),
+                array('escape' => false, 'class' => 'btn btn-mini btn-danger pull-right', 'style' => 'margin-right: 5px;'),
+                __('Are you sure you want to undo/delete this comment?')
+            );
+        }
+        if ($redir === 'applicant' && $comment['user_id'] != $currentUserId) {
 
           if ($show) {
             echo $this->Html->link(
